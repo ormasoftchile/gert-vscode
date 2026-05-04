@@ -1,0 +1,78 @@
+{
+  "name": "gert-preview",
+  "displayName": "gert Runbook Preview",
+  "description": "Preview gert runbooks (.runbook.yaml) as a structural graph in VS Code.",
+  "version": "0.1.0",
+  "publisher": "ormasoftchile",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ormasoftchile/gert-vscode.git"
+  },
+  "engines": { "vscode": "^1.85.0" },
+  "categories": ["Visualization", "Other"],
+  "activationEvents": ["onLanguage:yaml"],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "gert.preview",
+        "title": "gert: Open Runbook Preview"
+      },
+      {
+        "command": "gert.previewGraph",
+        "title": "gert: Open Runbook Graph (React Flow)"
+      },
+      {
+        "command": "gert.showServerLog",
+        "title": "gert: Show Server Log"
+      },
+      {
+        "command": "gert.restartServer",
+        "title": "gert: Restart Server"
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "gert.preview",
+          "when": "resourceFilename =~ /\\.runbook\\.yaml$/",
+          "group": "navigation"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "gert Preview",
+      "properties": {
+        "gert.binaryPath": {
+          "type": "string",
+          "default": "gert",
+          "description": "Path to the gert CLI binary used for offline previews."
+        },
+        "gert.serverUrl": {
+          "type": "string",
+          "default": "http://localhost:7778",
+          "description": "Base URL of the gert server. If autoStartServer is true and this is left at the default, the extension picks a free port and ignores this value."
+        },
+        "gert.autoStartServer": {
+          "type": "boolean",
+          "default": true,
+          "description": "If true, the extension spawns `gert serve` automatically when you run a graph preview. Set to false to use an external server (configure gert.serverUrl)."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -w -p ./",
+    "vscode:prepublish": "npm run compile",
+    "package": "vsce package --no-dependencies -o gert-preview.vsix",
+    "package:clean": "rm -rf out && npm run compile && npm run package"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/vscode": "^1.85.0",
+    "@vscode/vsce": "^2.32.0",
+    "typescript": "^5.5.4"
+  }
+}
