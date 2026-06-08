@@ -1,0 +1,1339 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gert.dev/schemas/runbook/v1",
+  "title": "GERT Runbook v1",
+  "description": "Structural contract for *.runbook.yaml files with apiVersion: runbook/v1. Validates structure and types only ΓÇö GXL/GIS/GCP expression semantics are enforced at runtime, not by this schema. See design/gert/schemas/README.md for the full boundary statement and consumer rules. Hand-authored per Barbara's ruling (decisions/inbox/barbara-runbook-v1-schema-canonical-source.md).",
+  "type": "object",
+  "required": ["apiVersion", "id", "name", "flow"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Optional JSON Schema declaration for IDE tooling."
+    },
+    "apiVersion": {
+      "type": "string",
+      "const": "runbook/v1",
+      "description": "API version discriminator. MUST be 'runbook/v1' for all documents validated by this schema."
+    },
+    "id": {
+      "type": "string",
+      "description": "Unique runbook identifier. Used as an import key, in cross-references, and in audit logs.",
+      "minLength": 1
+    },
+    "name": {
+      "type": "string",
+      "description": "Human-readable display name of the runbook.",
+      "minLength": 1
+    },
+    "kind": {
+      "type": "string",
+      "description": "Operational classification of the runbook.",
+      "enum": ["mitigation", "reference", "composable", "rca"]
+    },
+    "description": {
+      "type": "string",
+      "description": "Non-normative description of the runbook's purpose."
+    },
+    "vars": {
+      "type": "object",
+      "description": "Default variable bindings populated into the execution context before the flow begins. Values are PJVM scalars or composites. Keys become variable names in GXL/GIS expressions.",
+      "additionalProperties": {}
+    },
+    "inputs": {
+      "type": "object",
+      "description": "Named input declarations. Each key becomes a variable in the execution context sourced from prompts, environment, or caller bindings.",
+      "additionalProperties": { "$ref": "#/$defs/Input" }
+    },
+    "outputs": {
+      "type": "object",
+      "description": "Named output declarations. Values are GCP paths resolved against the execution context at runbook completion.",
+      "additionalProperties": { "$ref": "#/$defs/Output" }
+    },
+    "toolRefs": {
+      "type": "array",
+      "description": "External tool references available to 'tool' steps in this runbook.",
+      "items": { "$ref": "#/$defs/ToolRef" }
+    },
+    "extensions": {
+      "type": "array",
+      "description": "Extension root directories whose step types are available in this runbook's flow.",
+      "items": { "$ref": "#/$defs/ExtensionRef" }
+    },
+    "imports": {
+      "type": "object",
+      "description": "Alias-to-path mapping for included child runbooks. Key is the alias; value is a filesystem path relative to this runbook.",
+      "additionalProperties": { "type": "string" }
+    },
+    "defaults": {
+      "$ref": "#/$defs/StepDefaults"
+    },
+    "governance": {
+      "$ref": "#/$defs/GovernanceConfig"
+    },
+    "prose": {
+      "type": "object",
+      "description": "Named prose blocks (markdown strings) for documentation or renderer use. Not evaluated at runtime.",
+      "additionalProperties": { "type": "string" }
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Arbitrary string key-value pairs for external tooling (CI, portals, audit). Not evaluated at runtime.",
+      "additionalProperties": { "type": "string" }
+    },
+    "expand": {
+      "type": "string",
+      "description": "Default include expansion mode for all include sites in this runbook. Empty string inherits from planner policy. Per-include 'expand:' overrides this.",
+      "enum": ["", "eager", "lazy", "auto"]
+    },
+    "regions": {
+      "$ref": "#/$defs/RegionsManifest"
+    },
+    "flow": {
+      "type": "array",
+      "description": "Ordered list of flow nodes (steps, iterate loops, parallel blocks). MUST contain at least one node.",
+      "items": { "$ref": "#/$defs/FlowNode" },
+      "minItems": 1
+    }
+  },
+
+  "$defs": {
+
+    "FlowNode": {
+      "type": "object",
+      "description": "One element in a runbook flow array or a branch/compensate/iterate steps array. Exactly one of 'step', 'iterate', or 'parallel' MUST be present.",
+      "properties": {
+        "step":     { "$ref": "#/$defs/Step" },
+        "iterate":  { "$ref": "#/$defs/IterateNode" },
+        "parallel": { "$ref": "#/$defs/ParallelNode" }
+      },
+      "additionalProperties": false,
+      "oneOf": [
+        { "required": ["step"] },
+        { "required": ["iterate"] },
+        { "required": ["parallel"] }
+      ]
+    },
+
+    "Step": {
+      "type": "object",
+      "description": "A single step in the runbook flow. The 'type' field discriminates which type-specific properties are required. All common fields (id, type, title, when, timeout, delay, retry, capture, etc.) apply to every step type. String fields that accept GIS templates are opaque to this schema ΓÇö expression semantics are enforced at runtime.",
+      "required": ["id", "type"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Step identifier. MUST be unique within the enclosing flow scope. Used for cross-references and audit logs.",
+          "pattern": "^[a-z][a-z0-9_-]*$"
+        },
+        "type": {
+          "type": "string",
+          "description": "Step type discriminator.",
+          "enum": [
+            "cli", "tool", "include",
+            "choice", "decision", "collector",
+            "branch",
+            "approve", "assert", "compensate", "extension",
+            "wait_for_event",
+            "end", "noop", "display"
+          ]
+        },
+        "title": {
+          "type": "string",
+          "description": "Short human-readable label rendered in UI and reports. Evaluated as GIS at runtime; structural validation only at parse time."
+        },
+        "name": {
+          "type": "string",
+          "description": "Alternative step label. Present in some runbooks as a legacy field ΓÇö prefer 'title'. See edith-runbook-schema-questions.md SQ-001 for clarification request."
+        },
+        "subtitle": {
+          "type": "string",
+          "description": "Secondary descriptor rendered below the title. Evaluated as GIS at runtime; structural validation only at parse time."
+        },
+        "when": {
+          "type": "string",
+          "description": "GXL boolean condition. Step executes only when this expression evaluates to true. Evaluated as GXL at runtime; structural validation only at parse time."
+        },
+        "timeout": {
+          "type": "string",
+          "description": "Maximum wall-clock time before the step is aborted (e.g., '300s', '5m', 'PT5M')."
+        },
+        "delay": {
+          "type": "string",
+          "description": "Duration to pause before executing this step (e.g., '5s', '1m')."
+        },
+        "retry": {
+          "$ref": "#/$defs/RetryConfig"
+        },
+        "continue_on_fail": {
+          "type": "boolean",
+          "description": "When true, a non-zero exit or runtime error does not abort the runbook. Default: false."
+        },
+        "scope": {
+          "type": "string",
+          "description": "Variable scope isolation key. Variables captured in this scope are not visible outside it."
+        },
+        "export": {
+          "type": "array",
+          "description": "Variable names to export from this step's scope into the parent scope.",
+          "items": { "type": "string" }
+        },
+        "capture": {
+          "type": "object",
+          "description": "Maps local variable names to GCP capture paths (e.g., 'stdout', 'exit_code', 'local.varname'). Values are GCP paths; structural validation only at parse time.",
+          "additionalProperties": { "type": "string" }
+        },
+        "capture_defaults": {
+          "type": "object",
+          "description": "Default values for captured variables when the GCP path resolves to null or is absent. Keys MUST match capture keys. Values are PJVM scalars.",
+          "additionalProperties": {}
+        },
+        "contract": {
+          "$ref": "#/$defs/Contract"
+        },
+        "required_evidence": {
+          "type": "array",
+          "description": "Evidence artifacts that MUST be submitted before this step is marked complete.",
+          "items": { "$ref": "#/$defs/EvidenceRequirement" }
+        },
+        "on_error": {
+          "type": "string",
+          "description": "Action or step ID to execute when this step errors. Common values: 'abort', 'continue', or a step ID."
+        }
+      },
+      "allOf": [
+        {
+          "if": { "required": ["type"], "properties": { "type": { "const": "cli" } } },
+          "then": {
+            "properties": {
+              "command": {
+                "type": "string",
+                "description": "Executable invoked directly without a shell."
+              },
+              "args": {
+                "type": "array",
+                "items": { "type": "string" },
+                "description": "Argument list passed to 'command'. Each element is a GIS template; structural validation only at parse time."
+              },
+              "run": {
+                "description": "Shell command: either a single string or a platform-keyed map ({sh: '...', pwsh: '...'}). Evaluated as GIS at runtime; structural validation only at parse time.",
+                "oneOf": [
+                  { "type": "string" },
+                  { "type": "object", "additionalProperties": { "type": "string" } }
+                ]
+              },
+              "shell": {
+                "type": "string",
+                "description": "Shell interpreter override (e.g., 'bash', 'sh', 'pwsh'). Overrides the runtime default."
+              },
+              "env": {
+                "type": "object",
+                "description": "Environment variables injected into the child process. Values are GIS templates; structural validation only at parse time.",
+                "additionalProperties": { "type": "string" }
+              },
+              "workdir": {
+                "type": "string",
+                "description": "Working directory for the child process."
+              },
+              "stdin": {
+                "type": "string",
+                "description": "String piped to process stdin. Evaluated as GIS at runtime; structural validation only at parse time."
+              }
+            }
+          }
+        },
+        {
+          "if": { "required": ["type"], "properties": { "type": { "const": "tool" } } },
+          "then": {
+            "required": ["tool"],
+            "properties": {
+              "tool": { "$ref": "#/$defs/ToolInvocation" }
+            }
+          }
+        },
+        {
+          "if": { "required": ["type"], "properties": { "type": { "const": "include" } } },
+          "then": {
+            "required": ["include"],
+            "properties": {
+              "include": { "$ref": "#/$defs/IncludeConfig" }
+            }
+          }
+        },
+        {
+          "if": { "required": ["type"], "properties": { "type": { "const": "choice" } } },
+          "then": {
+            "required": ["prompt", "options", "variable"],
+            "properties": {
+              "prompt": {
+                "type": "string",
+                "description": "Question or instruction presented to the operator. Evaluated as GIS at runtime; structural validation only at parse time."
+              },
+              "options": {
+                "type": "array",
+                "items": { "$ref": "#/$defs/ChoiceOption" },
+                "minItems": 1,
+                "description": "Selectable options presented to the operator."
+              },
+              "variable": {
+                "type": "string",
+                "description": "Variable name that receives the selected option's value."
+              },
+              "default": {
+                "type": "string",
+                "description": "Pre-selected option value."
+              },
+              "multiple": {
+                "type": "boolean",
+                "description": "When true, multiple options may be selected simultaneously."
+              },
+              "min_selections": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "Minimum number of options that must be selected when 'multiple' is true."
+              },
+              "max_selections": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "Maximum number of options that can be selected when 'multiple' is true."
+              },
+              "approvals": {
+                "$ref": "#/$defs/ApprovalGate"
+              }
+            }
+          }
+        },
+        {
+          "if": { "required": ["type"], "properties": { "type": { "const": "decision" } } },
+          "then": {
+            "required": ["prompt", "routes"],
+            "properties": {
+              "prompt": {
+                "type": "string",
+                "description": "Question or instruction for the operator. Evaluated as GIS at runtime; structural validation only at parse time."
+              },
+              "routes": {
+                "type": "array",
+                "items": { "$ref": "#/$defs/DecisionRoute" },
+                "minItems": 1,
+                "description": "Ordered list of routing options."
+              },
+              "variable": {
+                "type": "string",
+                "description": "Variable name that receives the selected route label."
+              }
+            }
+          }
+        },
+        {
+          "if": { "required": ["type"], "properties": { "type": { "const": "collector" } } },
+          "then": {
+            "required": ["prompt", "fields"],
+            "properties": {
+              "prompt": {
+                "type": "string",
+                "description": "Instructions for the operator completing the form. Evaluated as GIS at runtime; structural validation only at parse time."
+              },
+              "fields": {
+                "type": "array",
+                "items": { "$ref": "#/$defs/CollectorField" },
+                "minItems": 1,
+                "description": "Ordered list of input fields presented as a form."
+              },
+              "approvals": {
+                "$ref": "#/$defs/ApprovalGate"
+              }
+            }
+          }
+        },
+        {
+          "if": { "required": ["type"], "properties": { "type": { "const": "branch" } } },
+          "then": {
+            "required": ["branches"],
+            "properties": {
+              "branches": {
+                "type": "array",
+                "items": { "$ref": "#/$defs/BranchArm" },
+                "minItems": 1,
+                "description": "Conditional arms evaluated in order. The first arm whose condition evaluates to true is executed."
+              }
+            }
+          }
+        },
+        {
+          "if": { "required": ["type"], "properties": { "type": { "const": "approve" } } },
+          "then": {
+            "required": ["approvals"],
+            "properties": {
+              "approvals": {
+                "$ref": "#/$defs/ApprovalGate"
+              },
+              "timeout_business_days": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "Number of business days before the approval request times out."
+              },
+              "timezone": {
+                "type": "string",
+                "description": "IANA timezone name used for business-day calculation (e.g., 'America/New_York')."
+              },
+              "business_calendar": {
+                "type": "string",
+                "description": "Named calendar for business-day calculation."
+              },
+              "on_timeout": {
+                "type": "string",
+                "description": "Action on approval timeout. Common values: 'abort', 'continue', or a step ID."
+              }
+            }
+          }
+        },
+        {
+          "if": { "required": ["type"], "properties": { "type": { "const": "assert" } } },
+          "then": {
+            "required": ["assert"],
+            "properties": {
+              "assert": {
+                "type": "array",
+                "items": { "$ref": "#/$defs/Assertion" },
+                "minItems": 1,
+                "description": "List of assertions. All MUST pass for the step to succeed."
+              }
+            }
+          }
+        },
+        {
+          "if": { "required": ["type"], "properties": { "type": { "const": "compensate" } } },
+          "then": {
+            "required": ["compensate"],
+            "properties": {
+              "compensate": { "$ref": "#/$defs/CompensateConfig" }
+            }
+          }
+        },
+        {
+          "if": { "required": ["type"], "properties": { "type": { "const": "wait_for_event" } } },
+          "then": {
+            "required": ["event"],
+            "properties": {
+              "event": { "$ref": "#/$defs/WaitEventConfig" },
+              "on_timeout": {
+                "type": "string",
+                "description": "Action when the event is not received before the step timeout. Common values: 'abort', 'continue', or a step ID."
+              }
+            }
+          }
+        },
+        {
+          "if": { "required": ["type"], "properties": { "type": { "const": "end" } } },
+          "then": {
+            "properties": {
+              "outcome": { "$ref": "#/$defs/OutcomeDeclaration" }
+            }
+          }
+        },
+        {
+          "if": { "required": ["type"], "properties": { "type": { "const": "display" } } },
+          "then": {
+            "required": ["display"],
+            "properties": {
+              "display": { "$ref": "#/$defs/DisplayConfig" }
+            }
+          }
+        },
+        {
+          "if": { "required": ["type"], "properties": { "type": { "const": "noop" } } },
+          "then": {}
+        },
+        {
+          "if": { "required": ["type"], "properties": { "type": { "const": "extension" } } },
+          "then": {},
+          "description": "Extension step payload is not yet normatively defined. See edith-runbook-schema-questions.md SQ-002."
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+
+    "IterateNode": {
+      "type": "object",
+      "description": "A top-level iterate loop in the flow. Iterates over a comma-separated string or array variable, executing the steps block for each item.",
+      "required": ["id", "steps"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for this iterate node.",
+          "pattern": "^[a-z][a-z0-9_-]*$"
+        },
+        "over": {
+          "type": "string",
+          "description": "Variable name whose value is the iteration source (comma-separated string or array). Evaluated as GIS at runtime; structural validation only at parse time."
+        },
+        "as": {
+          "type": "string",
+          "description": "Variable name bound to the current iteration item within the steps block."
+        },
+        "max": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Maximum number of iterations allowed."
+        },
+        "until": {
+          "type": "string",
+          "description": "GXL boolean condition. Iteration stops when this expression evaluates to true. Evaluated as GXL at runtime; structural validation only at parse time."
+        },
+        "collect": {
+          "type": "object",
+          "description": "Accumulator map. Keys are variable names; values are GIS template strings evaluated after each iteration and appended to the accumulator list.",
+          "additionalProperties": { "type": "string" }
+        },
+        "concurrency": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Maximum number of concurrent iteration executions. Default: 1 (sequential)."
+        },
+        "steps": {
+          "type": "array",
+          "description": "Flow nodes executed for each iteration item.",
+          "items": { "$ref": "#/$defs/FlowNode" },
+          "minItems": 1
+        }
+      }
+    },
+
+    "ParallelNode": {
+      "type": "object",
+      "description": "A top-level parallel execution block. Runs all branches concurrently and joins on a configurable completion condition.",
+      "required": ["id", "branches"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for this parallel node.",
+          "pattern": "^[a-z][a-z0-9_-]*$"
+        },
+        "branches": {
+          "type": "array",
+          "description": "Concurrent execution branches.",
+          "items": { "$ref": "#/$defs/ParallelBranch" },
+          "minItems": 2
+        },
+        "join": { "$ref": "#/$defs/ParallelJoin" }
+      }
+    },
+
+    "ParallelBranch": {
+      "type": "object",
+      "description": "A single concurrent branch in a parallel node.",
+      "required": ["steps"],
+      "additionalProperties": false,
+      "properties": {
+        "label": {
+          "type": "string",
+          "description": "Human-readable label for this branch, shown in progress views."
+        },
+        "steps": {
+          "type": "array",
+          "description": "Flow nodes executed in this branch.",
+          "items": { "$ref": "#/$defs/FlowNode" },
+          "minItems": 1
+        }
+      }
+    },
+
+    "ParallelJoin": {
+      "type": "object",
+      "description": "Join semantics for a parallel node.",
+      "additionalProperties": false,
+      "properties": {
+        "wait_for": {
+          "type": "string",
+          "description": "Join policy: 'all' (default ΓÇö wait for every branch), 'any' (first success suffices), or 'first' (first completion, success or failure)."
+        },
+        "on_failure": {
+          "type": "string",
+          "description": "Failure policy when a branch errors: 'abort' (default) or 'continue'."
+        }
+      }
+    },
+
+    "RetryConfig": {
+      "type": "object",
+      "description": "Automatic retry configuration for a step.",
+      "required": ["max"],
+      "additionalProperties": false,
+      "properties": {
+        "max": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Maximum number of retry attempts after the first failure."
+        },
+        "interval": {
+          "type": "string",
+          "description": "Initial wait between retries (e.g., '5s', '1m')."
+        },
+        "backoff": {
+          "type": "string",
+          "description": "Backoff strategy. Values: 'linear', 'exponential'."
+        },
+        "max_interval": {
+          "type": "string",
+          "description": "Maximum interval between retries when using exponential backoff."
+        },
+        "jitter": {
+          "type": "boolean",
+          "description": "When true, random jitter is added to retry intervals to avoid thundering-herd effects."
+        }
+      }
+    },
+
+    "Contract": {
+      "type": "object",
+      "description": "Behavioural contract declared by a step for governance and audit purposes.",
+      "additionalProperties": false,
+      "properties": {
+        "effects": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Side effects produced by this step (e.g., 'deploy', 'restart', 'notify')."
+        },
+        "reads": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Resources this step reads."
+        },
+        "writes": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Resources this step writes or mutates."
+        },
+        "idempotent": {
+          "type": "boolean",
+          "description": "When true, executing this step multiple times produces the same outcome as once."
+        },
+        "deterministic": {
+          "type": "boolean",
+          "description": "When true, identical inputs always produce identical outputs."
+        }
+      }
+    },
+
+    "EvidenceRequirement": {
+      "type": "object",
+      "description": "A required evidence artifact that MUST be submitted before the enclosing step is marked complete.",
+      "required": ["kind", "name"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["text", "checklist", "attachment"],
+          "description": "Evidence artifact type."
+        },
+        "name": {
+          "type": "string",
+          "description": "Machine-readable identifier for this evidence requirement."
+        },
+        "label": {
+          "type": "string",
+          "description": "Human-readable label shown in the UI."
+        },
+        "items": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Checklist items. Required when kind is 'checklist'; ignored for other kinds."
+        }
+      }
+    },
+
+    "Input": {
+      "type": "object",
+      "description": "Runbook input variable declaration.",
+      "required": ["type"],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "Expected PJVM type of the input value. 'list' is accepted as a runtime alias for 'array'. See edith-runbook-schema-questions.md SQ-003 for normative enum pending spec confirmation.",
+          "enum": ["string", "number", "integer", "boolean", "array", "object", "list"]
+        },
+        "required": {
+          "type": "boolean",
+          "description": "When true, the runbook MUST NOT start without this input provided."
+        },
+        "description": {
+          "type": "string",
+          "description": "Human-readable description of the input's purpose."
+        },
+        "default": {
+          "description": "Default value when the input is not provided. Type SHOULD match the declared 'type'."
+        },
+        "from": {
+          "type": "string",
+          "description": "Input source: 'prompt' (operator-supplied at runtime), 'env' (environment variable), 'context' (caller-provided binding).",
+          "enum": ["prompt", "env", "context"]
+        }
+      }
+    },
+
+    "Output": {
+      "type": "object",
+      "description": "Runbook output variable declaration.",
+      "required": ["type"],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "Expected PJVM type of the output value.",
+          "enum": ["string", "number", "integer", "boolean", "object", "array"]
+        },
+        "description": {
+          "type": "string",
+          "description": "Human-readable description of the output's purpose."
+        },
+        "value": {
+          "type": "string",
+          "description": "GCP path resolved against the final execution context. Evaluated as GCP at runtime; structural validation only at parse time."
+        }
+      }
+    },
+
+    "ToolRef": {
+      "type": "object",
+      "description": "Reference to an external tool made available to 'tool' steps in this runbook.",
+      "required": ["name"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Tool name used in tool step 'tool.name' fields."
+        },
+        "path": {
+          "type": "string",
+          "description": "Filesystem path to the .tool.yaml definition file."
+        },
+        "alias": {
+          "type": "string",
+          "description": "Alternative name by which this tool is referenced in steps."
+        },
+        "source": {
+          "type": "string",
+          "description": "URI or registry reference for tools loaded from a remote registry."
+        },
+        "actions": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Explicit allowlist of action names available from this tool ref. Empty means all actions are available."
+        }
+      }
+    },
+
+    "ExtensionRef": {
+      "type": "object",
+      "description": "Reference to an extension root directory whose step types are available in this runbook.",
+      "required": ["path"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Extension name for reference in steps."
+        },
+        "path": {
+          "type": "string",
+          "description": "Filesystem path to the extension root directory."
+        },
+        "grants": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Capability grants this extension is permitted to use."
+        }
+      }
+    },
+
+    "StepDefaults": {
+      "type": "object",
+      "description": "Default settings applied to all steps in this runbook unless overridden at the step level.",
+      "additionalProperties": false,
+      "properties": {
+        "timeout": {
+          "type": "string",
+          "description": "Default step timeout duration string (e.g., '300s')."
+        },
+        "retry_max": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Default maximum retry count applied to all steps."
+        },
+        "continue_on_fail": {
+          "type": "boolean",
+          "description": "Default continue-on-fail behaviour for all steps."
+        }
+      }
+    },
+
+    "GovernanceConfig": {
+      "type": "object",
+      "description": "Runbook-level governance policy block.",
+      "additionalProperties": false,
+      "properties": {
+        "require_approval": {
+          "type": "boolean",
+          "description": "When true, the runbook requires approval before execution begins."
+        },
+        "rules": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/GovernanceRule" },
+          "description": "Ordered list of governance rules evaluated by the governance engine."
+        },
+        "allow_commands": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Allowlist of CLI command names this runbook may invoke."
+        },
+        "deny_commands": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Denylist of CLI command names this runbook MUST NOT invoke."
+        },
+        "deny_env_vars": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Environment variable name patterns (glob syntax) that MUST NOT be read or written by steps."
+        },
+        "redact": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/RedactRule" },
+          "description": "Output redaction rules applied to all step outputs before they are stored or displayed."
+        }
+      }
+    },
+
+    "GovernanceRule": {
+      "type": "object",
+      "description": "A single governance rule entry.",
+      "additionalProperties": false,
+      "properties": {
+        "effects": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Side effects this rule governs."
+        },
+        "action": {
+          "type": "string",
+          "enum": ["allow", "deny", "require-approval"],
+          "description": "Governance action applied to matching effects."
+        },
+        "min_approvers": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Minimum approvers required when action is 'require-approval'."
+        }
+      }
+    },
+
+    "RedactRule": {
+      "type": "object",
+      "description": "A single redaction rule applied to step outputs. Pattern is a RE2 regex.",
+      "required": ["pattern", "replace"],
+      "additionalProperties": false,
+      "properties": {
+        "pattern": {
+          "type": "string",
+          "description": "RE2 regular expression matching sensitive data in step output."
+        },
+        "replace": {
+          "type": "string",
+          "description": "Substitution string replacing all matches of 'pattern' in the output."
+        }
+      }
+    },
+
+    "RegionsManifest": {
+      "type": "object",
+      "description": "Region manifest for domain-shaped rendering. The engine ignores this block at runtime. See specs/regions-v1.md.",
+      "required": ["schema_version", "regions"],
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "type": "string",
+          "description": "Region manifest schema version. Current value: '1'.",
+          "const": "1"
+        },
+        "regions": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Region" },
+          "description": "List of region definitions."
+        }
+      }
+    },
+
+    "Region": {
+      "type": "object",
+      "description": "One kit-declared grouping of gert nodes.",
+      "required": ["id", "kit", "op_type", "op_id", "label", "members", "entries", "exits"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Region identifier, unique within this manifest."
+        },
+        "kit": {
+          "type": "string",
+          "description": "Slug of the source kit (e.g., 'dri', 'home')."
+        },
+        "op_type": {
+          "type": "string",
+          "description": "Kit-defined op type (e.g., 'ops.approval')."
+        },
+        "op_id": {
+          "type": "string",
+          "description": "Kit-side identifier of the source op."
+        },
+        "label": {
+          "type": "string",
+          "description": "Human-readable, kit-localized title for this region."
+        },
+        "members": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Step IDs belonging to this region. May be empty only when 'skip_reason' is set."
+        },
+        "entries": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Member step IDs reachable from outside the region or from the runbook entry point."
+        },
+        "exits": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Member step IDs with at least one outbound edge leaving the region or terminating the runbook."
+        },
+        "display": {
+          "type": "string",
+          "enum": ["collapsed", "expanded", "always-expanded"],
+          "description": "Default rendering mode. Absent means 'collapsed'."
+        },
+        "status_rule": {
+          "type": "string",
+          "description": "Status aggregation function name. 'default' uses the table defined in specs/regions-v1.md."
+        },
+        "skip_reason": {
+          "type": "string",
+          "description": "Explains why 'members' is empty (e.g., 'severity=emergency'). MUST be present when members is empty; MUST be absent otherwise."
+        }
+      }
+    },
+
+    "ToolInvocation": {
+      "type": "object",
+      "description": "Tool invocation block inside a 'tool' step. Specifies which tool, which action, and what arguments to pass.",
+      "required": ["name", "action"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Tool name matching a 'toolRefs' entry in this runbook."
+        },
+        "action": {
+          "type": "string",
+          "description": "Action name declared in the tool's .tool.yaml definition."
+        },
+        "args": {
+          "type": "object",
+          "description": "Argument map passed to the action. Keys are arg names; values are GIS templates or static values. Structural validation only at parse time.",
+          "additionalProperties": {}
+        },
+        "version": {
+          "type": "string",
+          "description": "Tool version constraint. Runtime enforces semver compatibility with the declared version."
+        }
+      }
+    },
+
+    "IncludeConfig": {
+      "type": "object",
+      "description": "Include step configuration block specifying the child runbook and how to invoke it.",
+      "required": ["runbook"],
+      "additionalProperties": false,
+      "properties": {
+        "runbook": {
+          "type": "string",
+          "description": "Filesystem path or import alias of the child runbook to include."
+        },
+        "with": {
+          "type": "object",
+          "description": "Variable bindings passed to the child runbook as inputs. Values are GIS templates; structural validation only at parse time.",
+          "additionalProperties": { "type": "string" }
+        },
+        "when": {
+          "type": "string",
+          "description": "GXL boolean condition. The include executes only when this evaluates to true. Structural validation only at parse time."
+        },
+        "gate": {
+          "$ref": "#/$defs/GateSpec"
+        },
+        "expand": {
+          "type": "string",
+          "enum": ["", "eager", "lazy", "auto"],
+          "description": "Expansion mode override for this include site. Overrides the runbook-level 'expand:' setting."
+        }
+      }
+    },
+
+    "GateSpec": {
+      "type": "object",
+      "description": "Outcome-based short-circuit gate on an include step. When the child runbook terminates with a matching outcome category, the parent runbook stops cleanly.",
+      "additionalProperties": false,
+      "properties": {
+        "stop_if": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Outcome category strings that cause the parent run to stop without error (e.g., ['resolved', 'escalated'])."
+        }
+      }
+    },
+
+    "ApprovalGate": {
+      "type": "object",
+      "description": "Approval gate configuration. Used in 'approve' steps (required) and 'choice'/'collector' steps (optional).",
+      "additionalProperties": false,
+      "properties": {
+        "mode": {
+          "type": "string",
+          "description": "Approval mode: 'any' (any one approver suffices), 'all' (all listed roles must approve), 'threshold' (use 'min')."
+        },
+        "roles": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Role names whose holders may approve."
+        },
+        "pool": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Explicit user or group identifiers who may approve."
+        },
+        "required": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Exact number of approvals required. Alternative to mode+min."
+        },
+        "min": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Minimum approvals required."
+        },
+        "timeout": {
+          "type": "string",
+          "description": "Duration before the approval request expires (e.g., '24h', '2d')."
+        },
+        "on_timeout": {
+          "type": "string",
+          "description": "Action when timeout is reached. Common values: 'abort', 'continue', or a step ID."
+        },
+        "escalate_to": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Roles or user identifiers notified if approval is not completed before timeout."
+        }
+      }
+    },
+
+    "Assertion": {
+      "type": "object",
+      "description": "A single assertion in an 'assert' step. All assertions in the step MUST pass.",
+      "required": ["type", "subject"],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "Assertion predicate kind (e.g., 'contains', 'equals', 'matches', 'exists', 'not-contains')."
+        },
+        "subject": {
+          "type": "string",
+          "description": "Value or GIS template under assertion. Evaluated as GIS at runtime; structural validation only at parse time."
+        },
+        "expected": {
+          "type": "string",
+          "description": "Expected value compared against 'subject'. Evaluated as GIS at runtime; structural validation only at parse time."
+        },
+        "path": {
+          "type": "string",
+          "description": "Optional GCP path to extract the assertion subject from a structured step output."
+        }
+      }
+    },
+
+    "ChoiceOption": {
+      "type": "object",
+      "description": "A single selectable option in a 'choice' step or a collector 'select'/'autocomplete' field.",
+      "required": ["label", "value"],
+      "additionalProperties": false,
+      "properties": {
+        "label": {
+          "type": "string",
+          "description": "Human-readable option label shown to the operator."
+        },
+        "value": {
+          "type": "string",
+          "description": "Machine-readable value stored in the target variable when this option is selected."
+        },
+        "hint": {
+          "type": "string",
+          "description": "Additional context displayed beneath the label."
+        }
+      }
+    },
+
+    "CollectorField": {
+      "type": "object",
+      "description": "A single input field in a 'collector' step form.",
+      "required": ["name", "type", "label"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Machine-readable field identifier. Becomes a variable name in the execution context after submission."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "text", "number", "integer", "date", "datetime",
+            "boolean", "select", "autocomplete", "file", "image"
+          ],
+          "description": "Field input type controlling the UI widget and validation semantics."
+        },
+        "label": {
+          "type": "string",
+          "description": "Human-readable field label displayed in the form."
+        },
+        "required": {
+          "type": "boolean",
+          "description": "When true, the form MUST NOT be submitted without a value for this field."
+        },
+        "when": {
+          "type": "string",
+          "description": "GXL condition. Field is rendered only when this expression evaluates to true. Evaluated as GXL at runtime; structural validation only at parse time."
+        },
+        "hint": {
+          "type": "string",
+          "description": "Supplemental text displayed beneath the field label."
+        },
+        "default": {
+          "description": "Default pre-populated value. Type SHOULD be compatible with the declared field type."
+        },
+        "validation": {
+          "$ref": "#/$defs/FieldValidation"
+        },
+        "options": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ChoiceOption" },
+          "description": "Static options list for 'select' and 'autocomplete' field types."
+        },
+        "options_from": {
+          "$ref": "#/$defs/DynamicOptions"
+        },
+        "multiple": {
+          "type": "boolean",
+          "description": "When true, multiple values may be selected. Applicable to 'select' and 'autocomplete' only."
+        },
+        "multiline": {
+          "type": "boolean",
+          "description": "When true, the text field renders as a multi-line textarea. Applicable to 'text' only."
+        },
+        "ephemeral": {
+          "type": "boolean",
+          "description": "When true, the collected value is NOT persisted in the audit log."
+        },
+        "from_step": {
+          "type": "string",
+          "description": "Step ID whose stdout pre-populates this field. TUI-layer hint only; engine ignores this field."
+        },
+        "evidence": {
+          "$ref": "#/$defs/EvidenceRequirement"
+        }
+      }
+    },
+
+    "FieldValidation": {
+      "type": "object",
+      "description": "Type-specific validation constraints for a collector field.",
+      "additionalProperties": false,
+      "properties": {
+        "min_length": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Minimum string length. Applicable to 'text' fields only."
+        },
+        "max_length": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Maximum string length. Applicable to 'text' fields only."
+        },
+        "pattern": {
+          "type": "string",
+          "description": "RE2 regular expression the field value MUST match."
+        },
+        "format": {
+          "type": "string",
+          "description": "Semantic format hint for the runtime (e.g., 'email', 'uri', 'iso8601')."
+        },
+        "min": {
+          "description": "Minimum value. Type depends on field type: number for numeric fields, date string for date fields."
+        },
+        "max": {
+          "description": "Maximum value. Type depends on field type: number for numeric fields, date string for date fields."
+        },
+        "step": {
+          "type": "number",
+          "description": "Step increment for numeric fields (e.g., 0.5, 1, 10)."
+        }
+      }
+    },
+
+    "DynamicOptions": {
+      "type": "object",
+      "description": "Provider-backed options list for 'autocomplete' and 'select' fields.",
+      "required": ["provider", "field"],
+      "additionalProperties": false,
+      "properties": {
+        "provider": {
+          "type": "string",
+          "description": "Provider name declared in the runbook's 'extensions' list."
+        },
+        "field": {
+          "type": "string",
+          "description": "Field name exposed by the named provider."
+        }
+      }
+    },
+
+    "BranchArm": {
+      "type": "object",
+      "description": "A single conditional arm in a 'branch' step. Arms are evaluated in declaration order. The first matching arm's steps are executed.",
+      "additionalProperties": false,
+      "properties": {
+        "condition": {
+          "type": "string",
+          "description": "GXL boolean condition. This arm's steps execute when the condition is true. Evaluated as GXL at runtime; structural validation only at parse time."
+        },
+        "else": {
+          "type": "boolean",
+          "description": "When true, this arm executes if no preceding arm's condition matched. MUST NOT be combined with 'condition'."
+        },
+        "label": {
+          "type": "string",
+          "description": "Human-readable label for this arm, shown in progress and audit views."
+        },
+        "steps": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/FlowNode" },
+          "description": "Flow nodes executed when this arm is taken. May be absent for a no-op arm."
+        }
+      }
+    },
+
+    "DecisionRoute": {
+      "type": "object",
+      "description": "A single routing option in a 'decision' step.",
+      "required": ["label"],
+      "additionalProperties": false,
+      "properties": {
+        "label": {
+          "type": "string",
+          "description": "Human-readable route label shown to the operator."
+        },
+        "runbook": {
+          "type": "string",
+          "description": "Path or import alias of the runbook to include when this route is selected."
+        },
+        "goto": {
+          "type": "string",
+          "description": "Step ID to jump to when this route is selected."
+        },
+        "hint": {
+          "type": "string",
+          "description": "Supplemental context displayed beneath the route label."
+        }
+      }
+    },
+
+    "OutcomeDeclaration": {
+      "type": "object",
+      "description": "Terminal outcome declaration for an 'end' step.",
+      "additionalProperties": false,
+      "properties": {
+        "category": {
+          "type": "string",
+          "description": "Outcome category string used by gate 'stop_if' lists and result reporting (e.g., 'resolved', 'escalated', 'needs_rca', 'aborted')."
+        },
+        "code": {
+          "type": "string",
+          "description": "Fine-grained outcome code for detailed audit and routing purposes."
+        }
+      }
+    },
+
+    "WaitEventConfig": {
+      "type": "object",
+      "description": "Event configuration block for a 'wait_for_event' step.",
+      "required": ["source"],
+      "additionalProperties": false,
+      "properties": {
+        "source": {
+          "type": "string",
+          "enum": ["webhook", "message", "signal", "channel"],
+          "description": "Event source type."
+        },
+        "id": {
+          "type": "string",
+          "description": "Event correlation identifier used to match inbound events to this wait."
+        },
+        "filter": {
+          "type": "object",
+          "additionalProperties": { "type": "string" },
+          "description": "Key-value filter applied to incoming events. ALL entries must match for the event to be accepted."
+        },
+        "payload_schema": {
+          "type": "string",
+          "description": "URI of a JSON Schema used to validate the event payload structure."
+        }
+      }
+    },
+
+    "CompensateConfig": {
+      "type": "object",
+      "description": "Compensate step configuration block. Steps are executed when the trigger fires.",
+      "required": ["steps"],
+      "additionalProperties": false,
+      "properties": {
+        "on": {
+          "type": "string",
+          "description": "Trigger condition: 'error' (default), 'abort', or 'always'."
+        },
+        "steps": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/FlowNode" },
+          "minItems": 1,
+          "description": "Compensation flow nodes executed when the trigger fires."
+        }
+      }
+    },
+
+    "DisplayConfig": {
+      "type": "object",
+      "description": "Display step configuration block. Renders content to the operator's terminal without requiring input.",
+      "required": ["content"],
+      "additionalProperties": false,
+      "properties": {
+        "content": {
+          "type": "string",
+          "description": "Template string rendered to the operator's terminal. Evaluated as GIS at runtime; structural validation only at parse time."
+        },
+        "format": {
+          "type": "string",
+          "enum": ["text", "markdown"],
+          "description": "Rendering format for the content string. Default: 'text'."
+        }
+      }
+    }
+
+  }
+}

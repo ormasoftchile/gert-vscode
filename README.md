@@ -33,6 +33,21 @@ and uploads the resulting `.vsix` as a build artifact.
 
 To install a local build: `code --install-extension gert-preview.vsix`.
 
+## Schema validation
+
+The extension contributes a JSON Schema for `.runbook.yaml` / `.runbook.yml` files. When the [Red Hat YAML extension](https://marketplace.visualstudio.com/items?itemName=redhat.vscode-yaml) is installed, VS Code uses this schema to provide structural validation, completions, and hover docs for all runbook files automatically — no per-file `$schema:` declaration required.
+
+**Peer dependency:** `redhat.vscode-yaml` must be installed for schema validation to activate.
+
+The schema is vendored from `gert-private` under `schemas/runbook.v1.schema.json`. To check for drift or refresh the vendor copy, run:
+
+```sh
+npm run schema:check    # exits 0 if in sync, 1 if drifted
+npm run schema:update   # overwrites vendored copy with canonical
+```
+
+**Assumption:** `gert-private` is cloned as a sibling directory of `gert-vscode` (i.e., `../gert-private/`). Set `GERT_PRIVATE_ROOT` to override.
+
 ## See also
 
 - [gert](https://github.com/ormasoftchile/gert) — the runbook engine, server,
