@@ -10,10 +10,24 @@
     "url": "https://github.com/ormasoftchile/gert-vscode.git"
   },
   "engines": { "vscode": "^1.85.0" },
-  "categories": ["Visualization", "Other"],
-  "activationEvents": ["onLanguage:yaml"],
+  "categories": ["Visualization", "Other", "Linters"],
+  "activationEvents": ["onLanguage:yaml", "onLanguage:runbook-yaml"],
   "main": "./out/extension.js",
   "contributes": {
+    "languages": [
+      {
+        "id": "runbook-yaml",
+        "aliases": ["GERT Runbook", "runbook-yaml"],
+        "extensions": [".runbook.yaml", ".runbook.yml"],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "yamlValidation": [
+      {
+        "fileMatch": ["*.runbook.yaml", "*.runbook.yml"],
+        "url": "./schemas/runbook.v1.schema.json"
+      }
+    ],
     "commands": [
       {
         "command": "gert.preview",
@@ -67,7 +81,9 @@
     "watch": "tsc -w -p ./",
     "vscode:prepublish": "npm run compile",
     "package": "vsce package --no-dependencies -o gert-preview.vsix",
-    "package:clean": "rm -rf out && npm run compile && npm run package"
+    "package:clean": "rm -rf out && npm run compile && npm run package",
+    "schema:check": "node scripts/sync-schema.js",
+    "schema:update": "node scripts/sync-schema.js --update"
   },
   "devDependencies": {
     "@types/node": "^20.11.0",
