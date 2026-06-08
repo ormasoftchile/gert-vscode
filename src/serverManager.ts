@@ -92,7 +92,7 @@ export class ServerManager {
   dispose(): void {
     if (this.proc && this.proc.exitCode === null) {
       this.output.appendLine(`[gert] killing server pid=${this.proc.pid}`);
-      this.proc.kill('SIGTERM');
+      this.proc.kill();
     }
     this.proc = null;
     this.url = null;
