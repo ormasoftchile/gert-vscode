@@ -10,7 +10,7 @@ Two commands:
 ## Settings
 
 - `gert.binaryPath` — path to the `gert` CLI (default `gert`).
-- `gert.serverUrl` — base URL of the gert server (default `http://localhost:8080`).
+- `gert.serverUrl` — base URL of the gert server (default `http://localhost:7778`).
 
 ## Build
 

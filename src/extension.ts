@@ -16,6 +16,7 @@
 import * as vscode from 'vscode';
 import { execFile } from 'child_process';
 import { promisify } from 'util';
+import * as path from 'path';
 import { ServerManager } from './serverManager';
 
 const pexec = promisify(execFile);
@@ -90,7 +91,7 @@ async function previewGraph() {
   const rbPath = encodeURIComponent(runbookPath);
   const panel = vscode.window.createWebviewPanel(
     'gertPreviewGraph',
-    `gert: ${runbookPath.split('/').pop()}`,
+    `gert: ${path.basename(runbookPath)}`,
     vscode.ViewColumn.Beside,
     { enableScripts: true, retainContextWhenHidden: true },
   );
