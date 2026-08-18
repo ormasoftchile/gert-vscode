@@ -128,8 +128,10 @@ async function previewProse() {
   }
   const runbookPath = editor.document.fileName;
   refreshBridgeRegistry(runbookPath);
-  const cfg = vscode.workspace.getConfiguration('gert');
-  const bin = cfg.get<string>('binaryPath', 'gert');
+  // binaryPath is folder-scoped: different projects may use different local
+  // gert builds. runbookPath is in scope here so there is no obstacle to
+  // reading from the correct folder.
+  const bin = vscode.workspace.getConfiguration('gert', vscode.Uri.file(runbookPath)).get<string>('binaryPath', 'gert');
   try {
     const { stdout } = await pexec(bin, ['preview', '--format', 'prose', runbookPath]);
     const doc = await vscode.workspace.openTextDocument({ content: stdout, language: 'markdown' });
@@ -156,9 +158,9 @@ async function validateInputs() {
     void vscode.window.showWarningMessage('Open a *.runbook.yaml file first.');
     return;
   }
-  const cfg = vscode.workspace.getConfiguration('gert');
-  const bin = cfg.get<string>('binaryPath', 'gert');
   const file = editor.document.fileName;
+  // binaryPath is folder-scoped: same reasoning as previewProse.
+  const bin = vscode.workspace.getConfiguration('gert', vscode.Uri.file(file)).get<string>('binaryPath', 'gert');
   refreshBridgeRegistry(file);
 
   let doc: unknown;

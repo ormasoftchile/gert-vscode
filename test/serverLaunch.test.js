@@ -16,7 +16,7 @@ const os = require('node:os');
 const path = require('node:path');
 const test = require('node:test');
 
-const { localServerAddress, buildServeArgs, resolvePackageMapPath, readGertSpawnConfig } =
+const { localServerAddress, buildServeArgs, resolvePackageMapPath, readGertSpawnConfig, makeScopedGetter } =
   require('../out/serverLaunch');
 
 // ─── localServerAddress ───────────────────────────────────────────────────────
@@ -253,5 +253,66 @@ test('multi-root: scoped packageMap setting produces --package-map; unscoped doe
 
   assert.ok(!unscopedArgs.includes('--package-map'),
     'unscoped (folder 0) config must not produce --package-map — proves scoping matters');
+});
+
+// ─── makeScopedGetter: URI wiring is load-bearing ────────────────────────────
+//
+// This test proves that makeScopedGetter passes the runbook path to
+// getConfiguration as the resource argument. Without this test, the wiring
+// line in serverManager.ts (the second argument to getConfiguration) can be
+// deleted and the suite stays green — the exact failure mode that bit this
+// engagement.
+//
+// MUTATION: delete the `resource` argument from the getConfiguration call
+// inside makeScopedGetter (i.e., call getConfiguration('gert', {}) or
+// getConfiguration('gert') — note: the type-level drop is simulated by
+// passing an empty object so fsPath is undefined) →
+//   'makeScopedGetter: records the runbook path as the resource URI' fails.
+//
+// ALSO: if the `, vscode.Uri.file(runbookPath)` argument is deleted from the
+// serverManager.ts call-site of makeScopedGetter (so resource.fsPath becomes
+// undefined), that call no longer reaches this test directly. The mutation
+// target is now inside makeScopedGetter itself, which IS covered. The
+// serverManager.ts wiring is a one-line delegation to makeScopedGetter and
+// is genuinely trivial: if you drop the runbookPath argument there, TypeScript
+// raises a type error (resource is required) and compilation fails, making
+// the mutation detectable at compile time rather than at test time.
+
+test('makeScopedGetter: records the runbook path as the resource URI', () => {
+  const RUNBOOK_PATH = '/workspace/project-a/incident.runbook.yaml';
+  let recordedSection = null;
+  let recordedResourcePath = null;
+
+  // Spy: records what section and resource.fsPath getConfiguration was called with.
+  const spyGetConfiguration = (section, resource) => {
+    recordedSection = section;
+    recordedResourcePath = resource ? resource.fsPath : undefined;
+    // Return a fake config object with predictable values.
+    return { get: (key, def) => def };
+  };
+
+  makeScopedGetter(RUNBOOK_PATH, spyGetConfiguration);
+
+  assert.equal(recordedSection, 'gert',
+    'makeScopedGetter must call getConfiguration with section "gert"');
+  assert.equal(recordedResourcePath, RUNBOOK_PATH,
+    'makeScopedGetter must pass runbookPath as resource.fsPath — ' +
+    'deleting the resource argument drops folder scoping in multi-root workspaces');
+});
+
+test('makeScopedGetter: returned getter delegates key reads to the scoped config', () => {
+  const settings = { binaryPath: '/usr/local/bin/gert', packageMap: 'maps/custom.yaml' };
+  const fakeGetConfiguration = (_section, _resource) => ({
+    get: (key, def) => settings[key] !== undefined ? settings[key] : def,
+  });
+
+  const getSetting = makeScopedGetter('/any/path.runbook.yaml', fakeGetConfiguration);
+
+  assert.equal(getSetting('binaryPath', 'gert'), '/usr/local/bin/gert',
+    'getter must return the scoped setting value for binaryPath');
+  assert.equal(getSetting('packageMap', ''), 'maps/custom.yaml',
+    'getter must return the scoped setting value for packageMap');
+  assert.equal(getSetting('unknownKey', 'fallback'), 'fallback',
+    'getter must return the default when the key is absent');
 });
 

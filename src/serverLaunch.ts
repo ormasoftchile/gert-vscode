@@ -17,6 +17,42 @@ import * as path from 'path';
 export type GetScopedSetting = (key: string, defaultValue: string) => string;
 
 /**
+ * GetConfigurationFn is the minimal slice of `vscode.workspace.getConfiguration`
+ * that makeScopedGetter requires. The second parameter is the resource URI for
+ * scope resolution. Keeping this as `{ fsPath?: string }` rather than
+ * `vscode.Uri` lets the function be called from unit tests without importing
+ * the vscode module.
+ */
+export type GetConfigurationFn = (
+  section: string,
+  resource: { fsPath?: string },
+) => { get: <T>(key: string, defaultValue: T) => T };
+
+/**
+ * makeScopedGetter constructs a GetScopedSetting callback scoped to the
+ * active runbook's resource URI. It is a pure function: given a runbookPath
+ * and a getConfiguration implementation it returns a GetScopedSetting without
+ * any side effects or vscode dependency.
+ *
+ * **Why this is extracted:** serverManager.ts needs one line to wire the real
+ * vscode.workspace.getConfiguration to this helper; unit tests can pass a spy
+ * that records the resource argument, asserting that the URI is never dropped.
+ * Without this extraction the wiring line is untestable without an extension
+ * host.
+ *
+ * **Load-bearing mutation guard:** deleting the `resource` argument from the
+ * getConfiguration call inside this function causes the test
+ * 'makeScopedGetter: records the runbook path as the resource URI' to fail.
+ */
+export function makeScopedGetter(
+  runbookPath: string,
+  getConfiguration: GetConfigurationFn,
+): GetScopedSetting {
+  const cfg = getConfiguration('gert', { fsPath: runbookPath });
+  return (key, defaultValue) => cfg.get<string>(key, defaultValue);
+}
+
+/**
  * readGertSpawnConfig reads the gert configuration keys required by
  * spawnServer. The caller is responsible for constructing getSetting so that
  * it is scoped to the active runbook's resource URI, ensuring that per-folder

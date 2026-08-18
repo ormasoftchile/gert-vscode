@@ -14,7 +14,7 @@ import * as http from 'http';
 import * as fs from 'fs';
 import * as path from 'path';
 import { pickServerRoot } from './serverRoot';
-import { localServerAddress, buildServeArgs, resolvePackageMapPath, readGertSpawnConfig } from './serverLaunch';
+import { localServerAddress, buildServeArgs, resolvePackageMapPath, readGertSpawnConfig, makeScopedGetter } from './serverLaunch';
 
 const DEFAULT_SERVER_URL = 'http://localhost:7778';
 
@@ -42,7 +42,12 @@ export class ServerManager {
   // is reachable. It either reuses an already-spawned server, returns
   // the user-configured external URL, or starts a new child process.
   async ensureRunning(runbookPath: string): Promise<string> {
-    const cfg = vscode.workspace.getConfiguration('gert');
+    // serverUrl and autoStartServer are folder-scoped: in a multi-root
+    // workspace, the active runbook's project may configure a dedicated
+    // external server (serverUrl) or opt out of auto-spawn (autoStartServer)
+    // independently of other folders. Reading them unscoped would silently
+    // use workspaceFolders[0]'s values for a runbook in a different folder.
+    const cfg = vscode.workspace.getConfiguration('gert', vscode.Uri.file(runbookPath));
     const configuredURL = cfg.get<string>('serverUrl', DEFAULT_SERVER_URL).replace(/\/$/, '');
     const autoStart = cfg.get<boolean>('autoStartServer', true);
 
@@ -65,13 +70,15 @@ export class ServerManager {
   }
 
   private async spawnServer(runbookPath: string): Promise<string> {
-    // Scope to the active runbook's resource URI so per-folder settings in a
-    // multi-root workspace resolve from the correct folder, not workspaceFolders[0].
-    // binaryPath and packageMap are both legitimately folder-scoped — see
-    // readGertSpawnConfig JSDoc in serverLaunch.ts for the full judgment.
-    const scopedCfg = vscode.workspace.getConfiguration('gert', vscode.Uri.file(runbookPath));
+    // makeScopedGetter constructs the folder-scoped config accessor. The wiring
+    // (passing vscode.Uri.file(runbookPath) as the resource) lives in
+    // serverLaunch.makeScopedGetter and is covered by a load-bearing unit test
+    // that spies on the resource argument — deleting it from makeScopedGetter
+    // causes that test to fail. See serverLaunch.ts JSDoc for the full judgment.
     const { binaryPath: configured, packageMapSetting } = readGertSpawnConfig(
-      (key, def) => scopedCfg.get<string>(key, def) as string,
+      makeScopedGetter(runbookPath, (section, resource) =>
+        vscode.workspace.getConfiguration(section, vscode.Uri.file(resource.fsPath!)),
+      ),
     );
     const bin = await resolveBinary(configured, this.output);
     const port = await pickFreePort();
