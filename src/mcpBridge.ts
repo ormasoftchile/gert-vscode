@@ -195,6 +195,46 @@ function redact(secret: string, text: string): string {
   return text.split(secret).join('[REDACTED]');
 }
 
+// ─── Invocation error classifier ─────────────────────────────────────────────
+// Allowlisted categories for vscode.lm.invokeTool failures.  Provider
+// exception text is NEVER forwarded; we classify from it and then drop it.
+//
+// invocation_token_unavailable — VS Code rejected the call because no
+//   toolInvocationToken was present (bridge runs outside a chat-participant
+//   handler; no token is available to supply).
+// authorization_unavailable    — auth/credential/forbidden failure from the
+//   provider or VS Code auth layer.
+// provider_input_rejected      — the provider rejected the supplied arguments
+//   (input-validation failure raised by the MCP server itself, not our schema
+//   guard which fires earlier as input_validation_error).
+// invocation_error             — any other or unrecognised exception; the safe
+//   conservative fallback.
+
+export type InvocationErrorCategory =
+  | 'invocation_token_unavailable'
+  | 'authorization_unavailable'
+  | 'provider_input_rejected'
+  | 'invocation_error';
+
+export function classifyInvocationError(err: unknown): InvocationErrorCategory {
+  const msg = err instanceof Error ? err.message : String(err);
+  // Token-unavailable: VS Code requires a toolInvocationToken that only exists
+  // inside a ChatRequestHandler; calling with undefined triggers this.
+  if (/invocation.?token|toolInvocationToken|no.*token.*invocation|token.*required/i.test(msg)) {
+    return 'invocation_token_unavailable';
+  }
+  // Authorization / credential failure — preserve the existing category meaning.
+  if (/auth|credential|unauthorized|forbidden/i.test(msg)) {
+    return 'authorization_unavailable';
+  }
+  // Provider rejected the supplied arguments at its own validation layer.
+  if (/invalid.?input|input.?invalid|invalid.?param|bad.?request|schema.?error|validation.?error/i.test(msg)) {
+    return 'provider_input_rejected';
+  }
+  // Conservative fallback — unknown or ambiguous exception.
+  return 'invocation_error';
+}
+
 // ─── Input schema validation ──────────────────────────────────────────────────
 // Validates adapted args against a tool's live inputSchema BEFORE invoking the
 // tool. Fail-closed: any missing required parameter, unknown parameter, or type
@@ -522,12 +562,18 @@ export class McpBridge {
         if (timedOut || cts.token.isCancellationRequested) {
           return this.errorResponse(req.request_id, 'deadline_exceeded', 'invocation timed out');
         }
-        const msg = err instanceof Error ? err.message : String(err);
-        if (/auth|credential|token|unauthorized|forbidden/i.test(msg)) {
-          return this.errorResponse(req.request_id, 'authorization_unavailable',
-            'MCP tool authorization is not available');
-        }
-        return this.errorResponse(req.request_id, 'invocation_error', 'MCP invocation failed');
+        const category = classifyInvocationError(err);
+        // Log safe metadata only: class name + chosen category + request id.
+        // Never log the exception message, args, or any result content.
+        const className = err instanceof Error ? err.constructor.name : typeof err;
+        this.log(`[mcpBridge] invocation error: category=${category} class=${className} request_id=${req.request_id}`);
+        const safeMessage: Record<InvocationErrorCategory, string> = {
+          invocation_token_unavailable: 'MCP tool invocation token is unavailable (bridge runs outside a chat-participant request)',
+          authorization_unavailable:    'MCP tool authorization is not available',
+          provider_input_rejected:      'MCP tool provider rejected the supplied input',
+          invocation_error:             'MCP invocation failed',
+        };
+        return this.errorResponse(req.request_id, category, safeMessage[category]);
       }
 
       const text = extractTextFromResult(raw);

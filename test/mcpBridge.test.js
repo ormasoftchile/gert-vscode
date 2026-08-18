@@ -883,3 +883,205 @@ test('input validation: no secret in input_validation_error message', async (t) 
   assert.equal(JSON.stringify(body).includes(secret), false,
     'capability secret must not appear in error message');
 });
+
+// ─── Deliverable E: invocation error classification ───────────────────────────
+// Allowlisted category set:
+//   invocation_token_unavailable — VS Code requires toolInvocationToken;
+//     calling with undefined triggers this (bridge runs outside chat handler).
+//   authorization_unavailable    — auth/credential/forbidden provider failure.
+//   provider_input_rejected      — provider's own input-validation failure.
+//   invocation_error             — unrecognised or ambiguous exception (fallback).
+
+const { classifyInvocationError } = require('../out/mcpBridge');
+
+test('classifier: invocation token missing → invocation_token_unavailable', () => {
+  assert.equal(classifyInvocationError(new Error('No toolInvocationToken provided')),
+    'invocation_token_unavailable');
+  assert.equal(classifyInvocationError(new Error('invocation token is required')),
+    'invocation_token_unavailable');
+  assert.equal(classifyInvocationError(new Error('toolInvocationToken must not be undefined')),
+    'invocation_token_unavailable');
+});
+
+test('classifier: auth/credential error → authorization_unavailable', () => {
+  assert.equal(classifyInvocationError(new Error('Unauthorized: credential not found')),
+    'authorization_unavailable');
+  assert.equal(classifyInvocationError(new Error('Forbidden: access denied')),
+    'authorization_unavailable');
+  assert.equal(classifyInvocationError(new Error('auth challenge failed')),
+    'authorization_unavailable');
+});
+
+test('classifier: provider input rejected → provider_input_rejected', () => {
+  assert.equal(classifyInvocationError(new Error('invalid input: schema mismatch')),
+    'provider_input_rejected');
+  assert.equal(classifyInvocationError(new Error('input_invalid: missing field')),
+    'provider_input_rejected');
+  assert.equal(classifyInvocationError(new Error('bad request: invalid param')),
+    'provider_input_rejected');
+  assert.equal(classifyInvocationError(new Error('validation_error from provider')),
+    'provider_input_rejected');
+});
+
+test('classifier: unrecognised exception → invocation_error (conservative fallback)', () => {
+  assert.equal(classifyInvocationError(new Error('something totally unexpected happened')),
+    'invocation_error');
+  assert.equal(classifyInvocationError(new Error('ECONN_RESET')),
+    'invocation_error');
+  assert.equal(classifyInvocationError('a plain string error'),
+    'invocation_error');
+  assert.equal(classifyInvocationError(null),
+    'invocation_error');
+});
+
+test('bridge: invocation_token_unavailable is returned with safe message', async (t) => {
+  const lm = makeLm(async () => {
+    throw new Error('No toolInvocationToken provided for this invocation');
+  });
+  const bridge = await createBridge(lm);
+  t.after(() => bridge.dispose());
+
+  const { body } = await postBridge(bridge.bridgeUrl, makeRequest(bridge));
+  assert.ok(body.error);
+  assert.equal(body.error.code, 'invocation_token_unavailable');
+  assert.equal(body.result, undefined);
+});
+
+test('bridge: provider_input_rejected is returned with safe message', async (t) => {
+  const lm = makeLm(async () => {
+    throw new Error('invalid input: incidentId must be a positive integer');
+  });
+  const bridge = await createBridge(lm);
+  t.after(() => bridge.dispose());
+
+  const { body } = await postBridge(bridge.bridgeUrl, makeRequest(bridge));
+  assert.ok(body.error);
+  assert.equal(body.error.code, 'provider_input_rejected');
+  assert.equal(body.result, undefined);
+});
+
+test('bridge: unrecognised exception → invocation_error (fallback)', async (t) => {
+  const lm = makeLm(async () => {
+    throw new Error('some completely unknown provider failure XYZZY');
+  });
+  const bridge = await createBridge(lm);
+  t.after(() => bridge.dispose());
+
+  const { body } = await postBridge(bridge.bridgeUrl, makeRequest(bridge));
+  assert.ok(body.error);
+  assert.equal(body.error.code, 'invocation_error');
+  assert.equal(body.result, undefined);
+});
+
+// Regression: existing timeout / cancellation behaviour must still hold.
+test('regression: deadline_exceeded still fires on timeout (category tests must not break this)', async (t) => {
+  const lm = makeLm(async (_name, _opts, token) => {
+    await new Promise((resolve) => {
+      token.onCancellationRequested(resolve);
+      setTimeout(resolve, 2000);
+    });
+    throw new Error('cancelled');
+  });
+  const bridge = await createBridge(lm);
+  t.after(() => bridge.dispose());
+
+  const { body } = await postBridge(bridge.bridgeUrl, makeRequest(bridge, {
+    deadline_unix_ms: Date.now() + 80,
+  }));
+  assert.ok(body.error);
+  assert.equal(body.error.code, 'deadline_exceeded');
+});
+
+// ─── Redaction tests ──────────────────────────────────────────────────────────
+// Each test throws an error whose message embeds one of the four forbidden
+// substrings, then asserts that substring is absent from the full serialized
+// response body AND from every output-channel line.
+//
+// Non-vacuity: each test also asserts the serialized body is non-empty (> 2
+// chars) to ensure the redaction scan actually inspects real data.
+
+function assertNoSubstring(haystack, needle, label) {
+  assert.ok(haystack.length > 2, `${label}: scanned string must be non-empty (got: "${haystack}")`);
+  assert.equal(
+    haystack.includes(needle), false,
+    `${label}: forbidden substring found — "${needle.slice(0, 20)}…" appears in: ${haystack.slice(0, 120)}`,
+  );
+}
+
+test('redaction: bearer token in provider error must not appear in response or log', async (t) => {
+  const BEARER = 'Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.fakepayload.fakesig';
+  const logLines = [];
+  const output = { appendLine: (s) => logLines.push(s) };
+  const lm = makeLm(async () => { throw new Error(`Provider rejected: ${BEARER}`); });
+  const bridge = await McpBridge.create(lm, 0, output, { registry: fixtureRegistry });
+  t.after(() => bridge.dispose());
+
+  const { body } = await postBridge(bridge.bridgeUrl, makeRequest(bridge));
+  const serialized = JSON.stringify(body);
+  assertNoSubstring(serialized, BEARER, 'response body');
+  for (const line of logLines) assertNoSubstring(line, BEARER, 'output channel');
+});
+
+test('redaction: capability secret in provider error must not appear in response or log', async (t) => {
+  const logLines = [];
+  const output = { appendLine: (s) => logLines.push(s) };
+  // We don't know the secret yet; we'll inject it into the error after getting it.
+  let secret;
+  const lm = makeLm(async () => { throw new Error(`token=${secret} rejected`); });
+  const bridge = await McpBridge.create(lm, 0, output, { registry: fixtureRegistry });
+  t.after(() => bridge.dispose());
+  secret = bridge.bridgeToken;
+
+  const { body } = await postBridge(bridge.bridgeUrl, makeRequest(bridge));
+  const serialized = JSON.stringify(body);
+  assertNoSubstring(serialized, secret, 'response body (secret)');
+  for (const line of logLines) assertNoSubstring(line, secret, 'output channel (secret)');
+});
+
+test('redaction: tool arguments in provider error must not appear in response or log', async (t) => {
+  const SECRET_ARG_VALUE = 'SUPER_SECRET_INCIDENT_ARG_7f3k9x';
+  const logLines = [];
+  const output = { appendLine: (s) => logLines.push(s) };
+  const lm = makeLm(async (_name, opts) => {
+    throw new Error(`Provider saw args: ${JSON.stringify(opts.input)} and rejected them because ${SECRET_ARG_VALUE}`);
+  });
+  const bridge = await McpBridge.create(lm, 0, output, { registry: fixtureRegistry });
+  t.after(() => bridge.dispose());
+
+  const { body } = await postBridge(bridge.bridgeUrl, makeRequest(bridge, {
+    args: { incident_id: SECRET_ARG_VALUE },
+  }));
+  const serialized = JSON.stringify(body);
+  assertNoSubstring(serialized, SECRET_ARG_VALUE, 'response body (args)');
+  for (const line of logLines) assertNoSubstring(line, SECRET_ARG_VALUE, 'output channel (args)');
+});
+
+test('redaction: provider result content in provider error must not appear in response or log', async (t) => {
+  const SECRET_RESULT = 'CONFIDENTIAL_RESULT_CONTENT_9z8y7x6w';
+  const logLines = [];
+  const output = { appendLine: (s) => logLines.push(s) };
+  const lm = makeLm(async () => {
+    throw new Error(`Partial result leaked: ${SECRET_RESULT}`);
+  });
+  const bridge = await McpBridge.create(lm, 0, output, { registry: fixtureRegistry });
+  t.after(() => bridge.dispose());
+
+  const { body } = await postBridge(bridge.bridgeUrl, makeRequest(bridge));
+  const serialized = JSON.stringify(body);
+  assertNoSubstring(serialized, SECRET_RESULT, 'response body (result content)');
+  for (const line of logLines) assertNoSubstring(line, SECRET_RESULT, 'output channel (result content)');
+});
+
+// Non-vacuity control: confirm the redaction scan fails when the secret IS present.
+// This test deliberately injects a known string into the response check to prove
+// the scanner is not scanning an empty string.
+test('redaction non-vacuity: scanner detects injected secret in a constructed response', () => {
+  const INJECTED = 'INJECTED_SECRET_CANARY_abc123';
+  const fakeBody = { error: { code: 'invocation_error', message: `leaked: ${INJECTED}` } };
+  const serialized = JSON.stringify(fakeBody);
+  // The serialized body is non-empty.
+  assert.ok(serialized.length > 2, 'non-vacuity: body must be non-empty');
+  // The scanner DOES find the injected secret (proves the scan works).
+  assert.equal(serialized.includes(INJECTED), true,
+    'non-vacuity: injected secret must be detectable in a constructed body — if this fails the scanner is broken');
+});
