@@ -29,15 +29,22 @@ test('gert.validateInputs is contributed as a Command Palette entry', () => {
 
 // CE-C-02 (barbara-client-enum-compatibility-ruling.md, AR-CE-8): this
 // extension has no `runbook/v1` JSON Schema, no `jsonValidation`/
-// `yamlValidation` contribution, and no YAML parser dependency. It forwards
-// files to the real `gert` CLI/server and never re-implements structural or
-// enum-membership validation of its own.
+// `yamlValidation` contribution, and no YAML parser dependency for runbook
+// files. It forwards files to the real `gert` CLI/server and never
+// re-implements structural or enum-membership validation of its own.
+// Exception: js-yaml is allowed because it is used to parse *.tool.yaml
+// *tool definition* files for the MCP bridge registry — never to validate
+// runbook YAML or to substitute for the gert engine.
 test('CE-C-02: no bundled schema, no editor schema-validation contribution, no YAML parser dependency', () => {
   assert.equal(manifest.contributes.jsonValidation, undefined, 'no jsonValidation contribution point expected');
   assert.equal(manifest.contributes.yamlValidation, undefined, 'no yamlValidation contribution point expected');
 
   const deps = { ...(manifest.dependencies ?? {}), ...(manifest.devDependencies ?? {}) };
+  // js-yaml is intentionally allowed: used for parsing .tool.yaml definitions
+  // in the MCP bridge registry, not for runbook validation.
+  const yamlParserAllowlist = new Set(['js-yaml', '@types/js-yaml']);
   for (const name of Object.keys(deps)) {
+    if (yamlParserAllowlist.has(name)) continue;
     assert.doesNotMatch(
       name.toLowerCase(),
       /(^|[^a-z])yaml([^a-z]|$)/,

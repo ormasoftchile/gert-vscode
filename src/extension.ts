@@ -65,7 +65,10 @@ export function activate(context: vscode.ExtensionContext) {
     invokeTool(name, options, token) {
       return vscode.lm.invokeTool(name, { input: options.input, toolInvocationToken: undefined }, token as vscode.CancellationToken) as Promise<import('./mcpBridge').LmToolResult>;
     },
-  }, 0, output).then((bridge) => {
+  }, 0, output, {
+    registryDir: vscode.workspace.workspaceFolders?.[0]?.uri.fsPath,
+    overrides: vscode.workspace.getConfiguration('gert').get<Record<string, string>>('mcpBridge.toolNameOverrides') ?? {},
+  }).then((bridge) => {
     mcpBridge = bridge;
     serverManager?.setBridgeEnv(bridge.bridgeUrl, bridge.bridgeToken);
     output?.appendLine(`[gert] MCP bridge listening at ${bridge.bridgeUrl}`);

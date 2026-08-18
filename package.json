@@ -55,6 +55,12 @@
     "configuration": {
       "title": "gert Preview",
       "properties": {
+        "gert.mcpBridge.toolNameOverrides": {
+          "type": "object",
+          "additionalProperties": { "type": "string" },
+          "default": {},
+          "markdownDescription": "Override the registered MCP tool name for a logical `tool/action` key. Use this to correct a name mismatch in a live session without a code change or release. Example: `{ \"tsg-recommendation/recommend\": \"my-org-tsg-recommend\" }`"
+        },
         "gert.binaryPath": {
           "type": "string",
           "default": "gert",
@@ -73,6 +79,9 @@
       }
     }
   },
+  "dependencies": {
+    "js-yaml": "^4.1.0"
+  },
   "scripts": {
     "compile": "tsc -p ./",
     "compile:test": "tsc -p tsconfig.test.json",
@@ -84,6 +93,7 @@
     "package:clean": "rm -rf out && npm run compile && npm run package"
   },
   "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
     "@types/node": "^20.11.0",
     "@types/vscode": "^1.95.0",
     "@vscode/test-cli": "^0.0.15",

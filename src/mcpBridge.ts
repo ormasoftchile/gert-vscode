@@ -13,6 +13,7 @@
 import * as http from 'http';
 import * as crypto from 'crypto';
 import type * as vscode from 'vscode';
+import { buildRegistryFromDir } from './toolDefinitionRegistry';
 
 // ─── Wire types ──────────────────────────────────────────────────────────────
 
@@ -43,6 +44,13 @@ export interface BridgeResponse {
 
 export type FieldType = 'string' | 'number' | 'boolean' | 'object' | 'array';
 
+/** Per-field output specification: declared type and whether the field is required. */
+export interface OutputFieldSpec {
+  type: FieldType;
+  /** When false, an absent field is allowed. Present-but-null/wrong-type still fails. */
+  required: boolean;
+}
+
 export interface LmToolInfo {
   name: string;
 }
@@ -65,46 +73,51 @@ export interface LmInterface {
   ): Promise<LmToolResult>;
 }
 
-// ─── Tool / action registry ───────────────────────────────────────────────────
-// THE ONE PLACE where (tool, action) → registered MCP tool name and declared
-// output schema live. Add entries here when new tool actions are on-boarded.
-// Unknown extra fields in MCP results are REJECTED (fail-closed policy).
+// ─── Tool / action spec ────────────────────────────────────────────────────────
+// The registry is built at runtime from workspace *.tool.yaml definitions.
+// resolveSpec() is the single lookup surface: callers pass the registry and
+// optional name-override map rather than relying on a hard-coded constant.
 
 export interface ToolActionSpec {
   registeredName: string;
-  // Every key that must appear in the result, with its required JS type.
-  // Extra keys not listed here cause normalizeResult to fail.
-  outputFields: Record<string, FieldType>;
+  /** Declared output fields with type and required flag. */
+  outputFields: Record<string, OutputFieldSpec>;
 }
 
-export const TOOL_ACTION_REGISTRY: Record<string, ToolActionSpec> = {
-  'icm/get-incident': {
-    registeredName: 'icm-get-incident',
-    outputFields: {
-      title: 'string',
-      service: 'string',
-      environment: 'string',
-      logical_server: 'string',
-      database: 'string',
-    },
-  },
-  'tsg-recommendation/recommend': {
-    registeredName: 'tsg-recommendation-recommend',
-    outputFields: {
-      outcome: 'string',
-      suggested: 'string',
-    },
-  },
-};
-
-// resolveSpec returns the spec for a (tool, action) pair, or undefined.
-export function resolveSpec(tool: string, action: string): ToolActionSpec | undefined {
-  return TOOL_ACTION_REGISTRY[`${tool}/${action}`];
+/**
+ * resolveSpec returns the spec for a (tool, action) pair, consulting the
+ * provided registry and applying any name overrides.
+ *
+ * @param tool        Logical tool name (e.g. "icm")
+ * @param action      Action name (e.g. "get-incident")
+ * @param registry    Registry built from *.tool.yaml definitions
+ * @param overrides   Optional map of "tool/action" → registered name, sourced
+ *                    from the gert.mcpBridge.toolNameOverrides VS Code setting
+ */
+export function resolveSpec(
+  tool: string,
+  action: string,
+  registry: Record<string, ToolActionSpec>,
+  overrides?: Record<string, string>,
+): ToolActionSpec | undefined {
+  const key = `${tool}/${action}`;
+  const spec = registry[key];
+  if (!spec) return undefined;
+  const overrideName = overrides?.[key];
+  if (typeof overrideName === 'string' && overrideName) {
+    return { ...spec, registeredName: overrideName };
+  }
+  return spec;
 }
 
 // ─── Result normalizer ────────────────────────────────────────────────────────
-// Fail-closed: missing declared field → error; unknown extra field → error;
-// type-incompatible value → error.
+// Fail-closed with one explicit exception: a declared field marked
+// required: false may be absent (optional absent → OK). Any other deviation
+// is still an error:
+//   • present-but-null/undefined → error
+//   • present-but-wrong-type    → error
+//   • required field absent     → error
+//   • unknown extra field       → error (fail-closed policy)
 
 export function normalizeResult(
   raw: unknown,
@@ -123,19 +136,24 @@ export function normalizeResult(
   }
 
   const out: Record<string, unknown> = {};
-  for (const [field, expected] of Object.entries(spec.outputFields)) {
+  for (const [field, fieldSpec] of Object.entries(spec.outputFields)) {
     if (!(field in obj)) {
+      if (!fieldSpec.required) {
+        // Optional field absent — this is a valid outcome; omit from output.
+        continue;
+      }
       return { ok: false, reason: `declared output field "${field}" is missing from MCP result` };
     }
     const v = obj[field];
+    // present-but-null/undefined is always an error, even for optional fields.
     if (v === null || v === undefined) {
       return { ok: false, reason: `declared output field "${field}" is null/undefined` };
     }
     const actual = Array.isArray(v) ? 'array' : typeof v;
-    if (actual !== expected) {
+    if (actual !== fieldSpec.type) {
       return {
         ok: false,
-        reason: `field "${field}": expected ${expected}, got ${actual}`,
+        reason: `field "${field}": expected ${fieldSpec.type}, got ${actual}`,
       };
     }
     out[field] = v;
@@ -171,6 +189,20 @@ function redact(secret: string, text: string): string {
 
 const BRIDGE_VERSION = 'vscode-mcp-bridge/v1';
 
+export interface McpBridgeOptions {
+  /** Pre-built registry. Takes precedence over registryDir when both are given. */
+  registry?: Record<string, ToolActionSpec>;
+  /** Directory to scan for *.tool.yaml definitions. Used when registry is not provided. */
+  registryDir?: string;
+  /**
+   * Tool name overrides keyed by "tool/action". Sourced from the
+   * gert.mcpBridge.toolNameOverrides VS Code setting. Overrides the
+   * YAML-derived registered name for live-session corrections without a
+   * code change or release.
+   */
+  overrides?: Record<string, string>;
+}
+
 export class McpBridge {
   private readonly secret: string;
   private readonly server: http.Server;
@@ -179,19 +211,23 @@ export class McpBridge {
   private _port: number;
   private disposed = false;
   private readonly output?: { appendLine(s: string): void };
+  private readonly registry: Record<string, ToolActionSpec>;
+  private readonly overrides: Record<string, string>;
 
   private constructor(
     private readonly lm: LmInterface,
     port: number,
-    output?: { appendLine(s: string): void },
+    output: { appendLine(s: string): void } | undefined,
+    registry: Record<string, ToolActionSpec>,
+    overrides: Record<string, string>,
   ) {
     this.secret = crypto.randomBytes(32).toString('hex');
     this._port = port;
     this.output = output;
+    this.registry = registry;
+    this.overrides = overrides;
     this.server = http.createServer((req, res) => {
       this.dispatch(req, res).catch((err) => {
-        // last-ditch: the handler already wraps everything, so this is a
-        // programming error. Respond 500 and swallow.
         if (!res.headersSent) {
           res.writeHead(500);
           res.end();
@@ -206,9 +242,21 @@ export class McpBridge {
     lm: LmInterface,
     port = 7779,
     output?: { appendLine(s: string): void },
+    options?: McpBridgeOptions,
   ): Promise<McpBridge> {
+    // Resolve registry: explicit > dir scan > empty
+    let registry: Record<string, ToolActionSpec>;
+    if (options?.registry) {
+      registry = options.registry;
+    } else if (options?.registryDir) {
+      registry = buildRegistryFromDir(options.registryDir);
+    } else {
+      registry = {};
+    }
+    const overrides = options?.overrides ?? {};
+
     return new Promise((resolve, reject) => {
-      const bridge = new McpBridge(lm, port, output);
+      const bridge = new McpBridge(lm, port, output, registry, overrides);
       bridge.server.on('error', reject);
       bridge.server.listen(port, '127.0.0.1', () => {
         const addr = bridge.server.address();
@@ -246,7 +294,6 @@ export class McpBridge {
       return this.sendError(res, 503, 'bridge_disconnected', 'Bridge is shutting down', '');
     }
 
-    // Read body.
     let bodyText: string;
     try {
       bodyText = await readBody(req);
@@ -254,7 +301,6 @@ export class McpBridge {
       return this.sendError(res, 400, 'malformed_request', 'Failed to read request body', '');
     }
 
-    // Parse JSON.
     let parsed: unknown;
     try {
       parsed = JSON.parse(bodyText);
@@ -268,7 +314,6 @@ export class McpBridge {
 
     const body = parsed as Partial<BridgeRequest>;
 
-    // Version check — echo our version in error even when request has none.
     if (body.version !== BRIDGE_VERSION) {
       return this.sendError(
         res,
@@ -285,7 +330,6 @@ export class McpBridge {
 
     const request_id = body.request_id;
 
-    // Capability proof — timing-safe comparison.
     if (!this.checkCapability(body.capability_proof)) {
       return this.sendError(res, 403, 'capability_rejected', 'capability_proof is invalid', request_id);
     }
@@ -301,13 +345,11 @@ export class McpBridge {
 
     const args = (body.args ?? {}) as Record<string, unknown>;
 
-    // Idempotency: return cached completed response.
     const cached = this.completed.get(request_id);
     if (cached) {
       return this.sendJson(res, 200, cached);
     }
 
-    // Idempotency: join an in-flight invocation.
     const inflight = this.inflight.get(request_id);
     if (inflight) {
       return this.sendJson(res, 200, await inflight);
@@ -336,17 +378,20 @@ export class McpBridge {
 
   // handle performs the authorized MCP invocation for a validated request.
   private async handle(req: BridgeRequest): Promise<BridgeResponse> {
-    const spec = resolveSpec(req.tool, req.action);
+    const spec = resolveSpec(req.tool, req.action, this.registry, this.overrides);
     if (!spec) {
       return this.errorResponse(req.request_id, 'tool_not_found',
         `no tool action registered for "${req.tool}/${req.action}"`);
     }
 
-    // Verify the tool is actually registered in vscode.lm.tools.
+    // Verify the tool is registered in vscode.lm.tools; name available names
+    // so a mismatch is diagnosable without reading source code.
     const toolInfo = this.lm.tools.find((t) => t.name === spec.registeredName);
     if (!toolInfo) {
+      const available = this.lm.tools.map((t) => t.name).join(', ') || '(none)';
       return this.errorResponse(req.request_id, 'tool_unavailable',
-        `MCP tool "${spec.registeredName}" is not registered in vscode.lm.tools`);
+        `logical action "${req.tool}/${req.action}" resolved to registered name "${spec.registeredName}", ` +
+        `which is not present in vscode.lm.tools; available: [${available}]`);
     }
 
     // Set up deadline / cancellation.
@@ -391,17 +436,16 @@ export class McpBridge {
         return this.errorResponse(req.request_id, 'invocation_error', 'MCP invocation failed');
       }
 
-      // Parse JSON from text content.
       const text = extractTextFromResult(raw);
-      let parsed: unknown;
+      let parsedResult: unknown;
       try {
-        parsed = JSON.parse(text);
+        parsedResult = JSON.parse(text);
       } catch {
         return this.errorResponse(req.request_id, 'result_parse_error',
           'MCP result content is not valid JSON');
       }
 
-      const normalized = normalizeResult(parsed, spec);
+      const normalized = normalizeResult(parsedResult, spec);
       if (!normalized.ok) {
         return this.errorResponse(req.request_id, 'result_normalization_error', normalized.reason);
       }
@@ -416,9 +460,6 @@ export class McpBridge {
     }
   }
 
-  // checkCapability does a timing-safe comparison of the provided proof
-  // against the minted secret. Guards the length check so timingSafeEqual
-  // does not throw on mismatched buffer lengths.
   private checkCapability(proof: unknown): boolean {
     if (typeof proof !== 'string') return false;
     const expected = Buffer.from(this.secret, 'utf8');
@@ -427,8 +468,6 @@ export class McpBridge {
     return crypto.timingSafeEqual(actual, expected);
   }
 
-  // errorResponse builds a BridgeResponse with an error body, redacting the
-  // secret from the message before it leaves the bridge.
   private errorResponse(request_id: string, code: string, message: string): BridgeResponse {
     return {
       version: BRIDGE_VERSION,
@@ -470,7 +509,6 @@ function readBody(req: http.IncomingMessage): Promise<string> {
   });
 }
 
-// Minimal cancellation-token-source that satisfies LmCancellationToken.
 function makeCancellationSource(): {
   token: LmCancellationToken;
   cancel: () => void;
@@ -494,6 +532,5 @@ function makeCancellationSource(): {
     },
   };
 }
-
 
 

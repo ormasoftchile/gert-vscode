@@ -7,16 +7,23 @@
 
 const assert = require('node:assert/strict');
 const http = require('node:http');
+const path = require('node:path');
 const test = require('node:test');
 
 // ─── Load compiled bridge ────────────────────────────────────────────────────
 const {
   McpBridge,
-  TOOL_ACTION_REGISTRY,
   resolveSpec,
   normalizeResult,
   extractTextFromResult,
 } = require('../out/mcpBridge');
+
+const { buildRegistryFromDir } = require('../out/toolDefinitionRegistry');
+
+const FIXTURE_TOOLS_DIR = path.join(__dirname, 'fixtures', 'tools');
+
+// Load the fixture registry once (sync) — all tests share it.
+const fixtureRegistry = buildRegistryFromDir(FIXTURE_TOOLS_DIR);
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -88,86 +95,194 @@ function makeLm(invokeToolFn, tools) {
   };
 }
 
+// createBridge creates a McpBridge using the fixture registry.
+function createBridge(lm, overrides) {
+  return McpBridge.create(lm ?? makeLm(), 0, undefined, {
+    registry: fixtureRegistry,
+    overrides,
+  });
+}
+
 // ─── Pure unit tests (no network) ────────────────────────────────────────────
 
-test('TOOL_ACTION_REGISTRY: icm/get-incident has five declared output fields', () => {
-  const spec = TOOL_ACTION_REGISTRY['icm/get-incident'];
-  assert.ok(spec, 'icm/get-incident must be in the registry');
+test('fixture registry: icm/get-incident has five declared output fields', () => {
+  const spec = fixtureRegistry['icm/get-incident'];
+  assert.ok(spec, 'icm/get-incident must be in the fixture registry');
   assert.equal(spec.registeredName, 'icm-get-incident');
   const fields = Object.keys(spec.outputFields);
   assert.deepEqual(fields.sort(), ['database', 'environment', 'logical_server', 'service', 'title'].sort());
+  // All fields are required
+  for (const f of fields) {
+    assert.equal(spec.outputFields[f].required, true, `${f} must be required`);
+    assert.equal(spec.outputFields[f].type, 'string');
+  }
 });
 
-test('TOOL_ACTION_REGISTRY: tsg-recommendation/recommend is registered', () => {
-  const spec = TOOL_ACTION_REGISTRY['tsg-recommendation/recommend'];
-  assert.ok(spec, 'tsg-recommendation/recommend must be in the registry');
+test('fixture registry: tsg-recommendation/recommend has correct contract', () => {
+  const spec = fixtureRegistry['tsg-recommendation/recommend'];
+  assert.ok(spec, 'tsg-recommendation/recommend must be in the fixture registry');
   assert.equal(spec.registeredName, 'tsg-recommendation-recommend');
+  assert.equal(spec.outputFields['recommendation_status'].required, true);
+  assert.equal(spec.outputFields['suggested_tsg_id'].required, false);
+  assert.equal(spec.outputFields['suggested_tsg_title'].required, false);
+});
+
+test('precedence: action-level vscode_tool beats transport-level and fallback', () => {
+  const spec = fixtureRegistry['precedence-tool/action-with-action-level'];
+  assert.ok(spec);
+  assert.equal(spec.registeredName, 'action-level-name',
+    'action-level vscode_tool must beat transport-level');
+});
+
+test('precedence: transport-level vscode_tool beats logical-name fallback', () => {
+  const spec = fixtureRegistry['precedence-tool/action-with-transport-level'];
+  assert.ok(spec);
+  assert.equal(spec.registeredName, 'transport-level-name',
+    'transport-level vscode_tool must beat logical-name fallback');
+});
+
+test('precedence: logical tool name is the fallback when no vscode_tool is declared', () => {
+  const spec = fixtureRegistry['fallback-tool/fallback-action'];
+  assert.ok(spec, 'fallback-tool/fallback-action must be in registry');
+  assert.equal(spec.registeredName, 'fallback-tool',
+    'logical tool name must be used when no vscode_tool is declared at any level');
 });
 
 test('resolveSpec: returns correct spec for known pair', () => {
-  const spec = resolveSpec('icm', 'get-incident');
+  const spec = resolveSpec('icm', 'get-incident', fixtureRegistry);
   assert.ok(spec);
   assert.equal(spec.registeredName, 'icm-get-incident');
 });
 
 test('resolveSpec: returns undefined for unknown pair', () => {
-  assert.equal(resolveSpec('no-such', 'tool'), undefined);
+  assert.equal(resolveSpec('no-such', 'tool', fixtureRegistry), undefined);
 });
 
+test('resolveSpec: settings override replaces registeredName', () => {
+  const overrides = { 'icm/get-incident': 'my-org-icm-get-incident' };
+  const spec = resolveSpec('icm', 'get-incident', fixtureRegistry, overrides);
+  assert.ok(spec);
+  assert.equal(spec.registeredName, 'my-org-icm-get-incident',
+    'settings override must replace YAML-derived registeredName');
+  // outputFields should still come from the YAML
+  assert.ok(spec.outputFields['title']);
+});
+
+test('resolveSpec: empty override map has no effect', () => {
+  const spec = resolveSpec('icm', 'get-incident', fixtureRegistry, {});
+  assert.equal(spec?.registeredName, 'icm-get-incident');
+});
+
+// Build an icm spec inline so normalizeResult tests are self-contained.
+const ICM_SPEC = {
+  registeredName: 'icm-get-incident',
+  outputFields: {
+    title:          { type: 'string', required: true },
+    service:        { type: 'string', required: true },
+    environment:    { type: 'string', required: true },
+    logical_server: { type: 'string', required: true },
+    database:       { type: 'string', required: true },
+  },
+};
+
+const TSG_SPEC = {
+  registeredName: 'tsg-recommendation-recommend',
+  outputFields: {
+    recommendation_status: { type: 'string', required: true },
+    suggested_tsg_id:      { type: 'string', required: false },
+    suggested_tsg_title:   { type: 'string', required: false },
+  },
+};
+
 test('normalizeResult: accepts a fully-valid icm result', () => {
-  const spec = resolveSpec('icm', 'get-incident');
   const result = normalizeResult(
     { title: 'T', service: 'S', environment: 'E', logical_server: 'L', database: 'D' },
-    spec,
+    ICM_SPEC,
   );
   assert.equal(result.ok, true);
   assert.deepEqual(result.value, { title: 'T', service: 'S', environment: 'E', logical_server: 'L', database: 'D' });
 });
 
-test('normalizeResult: fails on missing declared field', () => {
-  const spec = resolveSpec('icm', 'get-incident');
+test('normalizeResult: required field absent → fails', () => {
   const result = normalizeResult(
     { title: 'T', service: 'S', environment: 'E', logical_server: 'L' /* database missing */ },
-    spec,
+    ICM_SPEC,
   );
   assert.equal(result.ok, false);
   assert.match(result.reason, /database/);
 });
 
+test('normalizeResult: optional field ABSENT → succeeds (no-suggestion case)', () => {
+  // regression test: was broken by the original hard-coded outputFields
+  const result = normalizeResult(
+    { recommendation_status: 'no-suggestion' },
+    TSG_SPEC,
+  );
+  assert.equal(result.ok, true, `expected ok but got reason: ${result.ok ? '' : result.reason}`);
+  assert.equal(result.value['recommendation_status'], 'no-suggestion');
+  assert.equal('suggested_tsg_id' in result.value, false,
+    'absent optional field must not appear in normalized output');
+});
+
+test('normalizeResult: optional field PRESENT with correct type → succeeds (suggested case)', () => {
+  const result = normalizeResult(
+    { recommendation_status: 'suggested', suggested_tsg_id: 'TSG-123', suggested_tsg_title: 'Check CPU' },
+    TSG_SPEC,
+  );
+  assert.equal(result.ok, true, `expected ok but got reason: ${result.ok ? '' : result.reason}`);
+  assert.equal(result.value['suggestion_tsg_id'], undefined); // named correctly:
+  assert.equal(result.value['suggested_tsg_id'], 'TSG-123');
+  assert.equal(result.value['suggested_tsg_title'], 'Check CPU');
+});
+
+test('normalizeResult: optional field PRESENT but wrong type → fails', () => {
+  const result = normalizeResult(
+    { recommendation_status: 'suggested', suggested_tsg_id: 42 /* should be string */ },
+    TSG_SPEC,
+  );
+  assert.equal(result.ok, false);
+  assert.match(result.reason, /suggested_tsg_id/);
+});
+
+test('normalizeResult: optional field PRESENT but null → fails', () => {
+  const result = normalizeResult(
+    { recommendation_status: 'suggested', suggested_tsg_id: null },
+    TSG_SPEC,
+  );
+  assert.equal(result.ok, false);
+  assert.match(result.reason, /null/);
+});
+
 test('normalizeResult: fails on unknown extra field (fail-closed)', () => {
-  const spec = resolveSpec('icm', 'get-incident');
   const result = normalizeResult(
     { title: 'T', service: 'S', environment: 'E', logical_server: 'L', database: 'D', extra: 'x' },
-    spec,
+    ICM_SPEC,
   );
   assert.equal(result.ok, false);
   assert.match(result.reason, /extra/);
 });
 
 test('normalizeResult: fails on type-incompatible value', () => {
-  const spec = resolveSpec('icm', 'get-incident');
   const result = normalizeResult(
     { title: 42 /* should be string */, service: 'S', environment: 'E', logical_server: 'L', database: 'D' },
-    spec,
+    ICM_SPEC,
   );
   assert.equal(result.ok, false);
   assert.match(result.reason, /title/);
 });
 
 test('normalizeResult: fails on null declared field', () => {
-  const spec = resolveSpec('icm', 'get-incident');
   const result = normalizeResult(
     { title: null, service: 'S', environment: 'E', logical_server: 'L', database: 'D' },
-    spec,
+    ICM_SPEC,
   );
   assert.equal(result.ok, false);
 });
 
 test('normalizeResult: fails when input is not an object', () => {
-  const spec = resolveSpec('icm', 'get-incident');
-  assert.equal(normalizeResult('string', spec).ok, false);
-  assert.equal(normalizeResult(null, spec).ok, false);
-  assert.equal(normalizeResult([1, 2], spec).ok, false);
+  assert.equal(normalizeResult('string', ICM_SPEC).ok, false);
+  assert.equal(normalizeResult(null, ICM_SPEC).ok, false);
+  assert.equal(normalizeResult([1, 2], ICM_SPEC).ok, false);
 });
 
 test('extractTextFromResult: reads value fields from content', () => {
@@ -183,7 +298,7 @@ test('extractTextFromResult: reads text fields from content', () => {
 // ─── Network tests (bridge HTTP server) ──────────────────────────────────────
 
 test('bridge starts on loopback and responds to a valid request', async (t) => {
-  const bridge = await McpBridge.create(makeLm(), 0);
+  const bridge = await createBridge();
   t.after(() => bridge.dispose());
 
   assert.match(bridge.bridgeUrl, /^http:\/\/127\.0\.0\.1:/);
@@ -199,7 +314,7 @@ test('tool discovery: invokeTool is called with the registered tool name', async
     calledWith = name;
     return makeIcmResult();
   });
-  const bridge = await McpBridge.create(lm, 0);
+  const bridge = await createBridge(lm);
   t.after(() => bridge.dispose());
 
   await postBridge(bridge.bridgeUrl, makeRequest(bridge));
@@ -212,7 +327,7 @@ test('invocation argument shaping: args from request reach invokeTool input', as
     receivedInput = opts.input;
     return makeIcmResult();
   });
-  const bridge = await McpBridge.create(lm, 0);
+  const bridge = await createBridge(lm);
   t.after(() => bridge.dispose());
 
   const args = { incident_id: 'INC-999', region: 'us-west-2' };
@@ -221,7 +336,7 @@ test('invocation argument shaping: args from request reach invokeTool input', as
 });
 
 test('result normalization success: response contains expected fields', async (t) => {
-  const bridge = await McpBridge.create(makeLm(), 0);
+  const bridge = await createBridge();
   t.after(() => bridge.dispose());
 
   const { body } = await postBridge(bridge.bridgeUrl, makeRequest(bridge));
@@ -234,6 +349,24 @@ test('result normalization success: response contains expected fields', async (t
   assert.equal(body.error, undefined);
 });
 
+test('settings override: invokeTool is called with the overridden tool name', async (t) => {
+  let calledWith = null;
+  const lm = makeLm(async (name) => {
+    calledWith = name;
+    return makeIcmResult();
+  }, [{ name: 'my-org-icm-get-incident' }]);
+  const bridge = await McpBridge.create(lm, 0, undefined, {
+    registry: fixtureRegistry,
+    overrides: { 'icm/get-incident': 'my-org-icm-get-incident' },
+  });
+  t.after(() => bridge.dispose());
+
+  const { body } = await postBridge(bridge.bridgeUrl, makeRequest(bridge));
+  assert.equal(calledWith, 'my-org-icm-get-incident',
+    'invokeTool must use the settings-override name');
+  assert.ok(body.result, 'result must be present when override resolves correctly');
+});
+
 test('missing declared output field: bridge returns normalization error', async (t) => {
   const lm = makeLm(async () => ({
     content: [{
@@ -242,7 +375,7 @@ test('missing declared output field: bridge returns normalization error', async 
       ),
     }],
   }));
-  const bridge = await McpBridge.create(lm, 0);
+  const bridge = await createBridge(lm);
   t.after(() => bridge.dispose());
 
   const { body } = await postBridge(bridge.bridgeUrl, makeRequest(bridge));
@@ -260,7 +393,7 @@ test('type-incompatible field: bridge returns normalization error', async (t) =>
       ),
     }],
   }));
-  const bridge = await McpBridge.create(lm, 0);
+  const bridge = await createBridge(lm);
   t.after(() => bridge.dispose());
 
   const { body } = await postBridge(bridge.bridgeUrl, makeRequest(bridge));
@@ -269,11 +402,93 @@ test('type-incompatible field: bridge returns normalization error', async (t) =>
   assert.match(body.error.message, /title/);
 });
 
+// Regression test for Cristiano's blocker: tsg-recommendation/recommend must
+// support BOTH outcomes — "suggested" (all three fields present) and
+// "no-suggestion" (only recommendation_status present).
+test('tsg regression: "suggested" outcome (all fields) normalizes successfully', async (t) => {
+  const lm = makeLm(async () => ({
+    content: [{
+      value: JSON.stringify({
+        recommendation_status: 'suggested',
+        suggested_tsg_id: 'TSG-42',
+        suggested_tsg_title: 'Restart the service',
+      }),
+    }],
+  }));
+  const bridge = await createBridge(lm);
+  t.after(() => bridge.dispose());
+
+  const { body } = await postBridge(bridge.bridgeUrl, makeRequest(bridge, {
+    tool: 'tsg-recommendation',
+    action: 'recommend',
+  }));
+  assert.equal(body.error, undefined, `unexpected error: ${JSON.stringify(body.error)}`);
+  assert.ok(body.result);
+  assert.equal(body.result['recommendation_status'], 'suggested');
+  assert.equal(body.result['suggested_tsg_id'], 'TSG-42');
+  assert.equal(body.result['suggested_tsg_title'], 'Restart the service');
+});
+
+test('tsg regression: "no-suggestion" outcome (only recommendation_status) normalizes successfully', async (t) => {
+  const lm = makeLm(async () => ({
+    content: [{
+      value: JSON.stringify({
+        recommendation_status: 'no-suggestion',
+        // suggested_tsg_id and suggested_tsg_title absent — valid because required: false
+      }),
+    }],
+  }));
+  const bridge = await createBridge(lm);
+  t.after(() => bridge.dispose());
+
+  const { body } = await postBridge(bridge.bridgeUrl, makeRequest(bridge, {
+    tool: 'tsg-recommendation',
+    action: 'recommend',
+  }));
+  assert.equal(body.error, undefined, `unexpected error: ${JSON.stringify(body.error)}`);
+  assert.ok(body.result);
+  assert.equal(body.result['recommendation_status'], 'no-suggestion');
+  assert.equal('suggested_tsg_id' in body.result, false,
+    'absent optional field must not appear in the response result');
+});
+
+test('tool-not-found error: names the logical action and attempted registered name', async (t) => {
+  const bridge = await createBridge();
+  t.after(() => bridge.dispose());
+
+  const { body } = await postBridge(bridge.bridgeUrl, makeRequest(bridge, {
+    tool: 'nonexistent',
+    action: 'do-thing',
+  }));
+  assert.ok(body.error);
+  assert.equal(body.error.code, 'tool_not_found');
+  assert.match(body.error.message, /nonexistent\/do-thing/);
+});
+
+test('tool-unavailable error: names logical action, attempted name, and available names', async (t) => {
+  const lm = makeLm(undefined, [{ name: 'some-other-tool' }]); // icm-get-incident not present
+  const bridge = await createBridge(lm);
+  t.after(() => bridge.dispose());
+
+  const { body } = await postBridge(bridge.bridgeUrl, makeRequest(bridge));
+  assert.ok(body.error);
+  assert.equal(body.error.code, 'tool_unavailable');
+  // Must name the logical action
+  assert.match(body.error.message, /icm\/get-incident/,
+    'error must name the logical action');
+  // Must name the attempted registered name
+  assert.match(body.error.message, /icm-get-incident/,
+    'error must name the attempted registered name');
+  // Must list available names
+  assert.match(body.error.message, /some-other-tool/,
+    'error must list available tool names');
+});
+
 test('authorization unavailable: invokeTool throws auth error → coded response', async (t) => {
   const lm = makeLm(async () => {
     throw new Error('Unauthorized: credential not found');
   });
-  const bridge = await McpBridge.create(lm, 0);
+  const bridge = await createBridge(lm);
   t.after(() => bridge.dispose());
 
   const { body } = await postBridge(bridge.bridgeUrl, makeRequest(bridge));
@@ -288,7 +503,7 @@ test('timeout: deadline in the past returns deadline_exceeded', async (t) => {
     invokeCount++;
     return makeIcmResult();
   });
-  const bridge = await McpBridge.create(lm, 0);
+  const bridge = await createBridge(lm);
   t.after(() => bridge.dispose());
 
   const { body } = await postBridge(bridge.bridgeUrl, makeRequest(bridge, {
@@ -302,7 +517,6 @@ test('timeout: deadline in the past returns deadline_exceeded', async (t) => {
 test('cancellation: invokeTool cancellation token fires when deadline expires', async (t) => {
   let tokenCancelledDuringInvoke = false;
   const lm = makeLm(async (_name, _opts, token) => {
-    // Simulate slow async work; wait for cancellation.
     await new Promise((resolve) => {
       token.onCancellationRequested(resolve);
       setTimeout(resolve, 2000); // safety fallback
@@ -310,7 +524,7 @@ test('cancellation: invokeTool cancellation token fires when deadline expires', 
     tokenCancelledDuringInvoke = token.isCancellationRequested;
     throw new Error('cancelled');
   });
-  const bridge = await McpBridge.create(lm, 0);
+  const bridge = await createBridge(lm);
   t.after(() => bridge.dispose());
 
   const { body } = await postBridge(bridge.bridgeUrl, makeRequest(bridge, {
@@ -325,15 +539,13 @@ test('duplicate request_id: invokeTool called exactly once', async (t) => {
   let invokeCount = 0;
   const lm = makeLm(async () => {
     invokeCount++;
-    // Slow enough that the second request arrives while first is in-flight.
     await new Promise((r) => setTimeout(r, 30));
     return makeIcmResult();
   });
-  const bridge = await McpBridge.create(lm, 0);
+  const bridge = await createBridge(lm);
   t.after(() => bridge.dispose());
 
   const req = makeRequest(bridge);
-  // Fire two concurrent requests with the same request_id.
   const [r1, r2] = await Promise.all([
     postBridge(bridge.bridgeUrl, req),
     postBridge(bridge.bridgeUrl, req),
@@ -341,12 +553,11 @@ test('duplicate request_id: invokeTool called exactly once', async (t) => {
   assert.equal(invokeCount, 1, 'invokeTool must be called exactly once for duplicate request_id');
   assert.equal(r1.body.request_id, req.request_id);
   assert.equal(r2.body.request_id, req.request_id);
-  // Both responses must be identical success responses.
   assert.deepEqual(r1.body.result, r2.body.result);
 });
 
 test('capability rejection: wrong token → HTTP 403 capability_rejected', async (t) => {
-  const bridge = await McpBridge.create(makeLm(), 0);
+  const bridge = await createBridge();
   t.after(() => bridge.dispose());
 
   const { status, body } = await postBridge(bridge.bridgeUrl, makeRequest(bridge, {
@@ -358,7 +569,7 @@ test('capability rejection: wrong token → HTTP 403 capability_rejected', async
 });
 
 test('version mismatch: wrong version → coded error with our version echoed', async (t) => {
-  const bridge = await McpBridge.create(makeLm(), 0);
+  const bridge = await createBridge();
   t.after(() => bridge.dispose());
 
   const { status, body } = await postBridge(bridge.bridgeUrl, makeRequest(bridge, {
@@ -371,7 +582,7 @@ test('version mismatch: wrong version → coded error with our version echoed', 
 });
 
 test('malformed request: non-JSON body → coded error', async (t) => {
-  const bridge = await McpBridge.create(makeLm(), 0);
+  const bridge = await createBridge();
   t.after(() => bridge.dispose());
 
   const { status, body } = await postBridge(bridge.bridgeUrl, 'not json at all');
@@ -381,7 +592,7 @@ test('malformed request: non-JSON body → coded error', async (t) => {
 });
 
 test('malformed request: missing request_id → coded error', async (t) => {
-  const bridge = await McpBridge.create(makeLm(), 0);
+  const bridge = await createBridge();
   t.after(() => bridge.dispose());
 
   const req = makeRequest(bridge);
@@ -392,7 +603,7 @@ test('malformed request: missing request_id → coded error', async (t) => {
 });
 
 test('unregistered tool: tool not in registry → tool_not_found', async (t) => {
-  const bridge = await McpBridge.create(makeLm(), 0);
+  const bridge = await createBridge();
   t.after(() => bridge.dispose());
 
   const { body } = await postBridge(bridge.bridgeUrl, makeRequest(bridge, {
@@ -405,7 +616,7 @@ test('unregistered tool: tool not in registry → tool_not_found', async (t) => 
 
 test('tool unavailable in vscode.lm.tools: returns tool_unavailable', async (t) => {
   const lm = makeLm(undefined, []); // no tools registered
-  const bridge = await McpBridge.create(lm, 0);
+  const bridge = await createBridge(lm);
   t.after(() => bridge.dispose());
 
   const { body } = await postBridge(bridge.bridgeUrl, makeRequest(bridge));
@@ -422,19 +633,16 @@ test('redaction sweep: capability secret never appears in any output surface', a
     invokeCount++;
     throw new Error('intentional failure');
   });
-  const bridge = await McpBridge.create(lm, 0, output);
+  const bridge = await McpBridge.create(lm, 0, output, { registry: fixtureRegistry });
   t.after(() => bridge.dispose());
 
   const secret = bridge.bridgeToken;
 
-  // Drive a failing request (wrong capability proof containing the secret).
   const { body: b1 } = await postBridge(bridge.bridgeUrl, makeRequest(bridge, {
     capability_proof: 'wrong-' + secret,
   }));
-  // Drive a successful request that triggers an invocation error.
   const { body: b2 } = await postBridge(bridge.bridgeUrl, makeRequest(bridge));
 
-  // Assert: secret does not appear in any response body string.
   for (const body of [b1, b2]) {
     const serialized = JSON.stringify(body);
     assert.equal(
@@ -444,7 +652,6 @@ test('redaction sweep: capability secret never appears in any output surface', a
     );
   }
 
-  // Assert: secret does not appear in any log line.
   for (const line of logLines) {
     assert.equal(
       line.includes(secret),
@@ -456,11 +663,16 @@ test('redaction sweep: capability secret never appears in any output surface', a
 
 // ─── Mutation-control verification comments ───────────────────────────────────
 // The three mutations below are run manually as part of the delivery report.
-// They are not automated here because they require source edits; the results
-// are documented in the commit message / summary.
 //
-// Mutation 1: remove checkCapability → capability-rejection test must FAIL.
-// Mutation 2: return raw parsed JSON from handle() without normalizeResult →
-//             missing-declared-output test must FAIL.
-// Mutation 3: remove inflight/completed maps → duplicate-request_id test
-//             must FAIL (invokeCount will be > 1).
+// Mutation 1 — make optional fields strict (treat every declared field as
+//   required): in normalizeResult, change `if (!fieldSpec.required)` to always
+//   return the "missing" error.  → the "no-suggestion" tsg regression test and
+//   "optional field ABSENT → succeeds" test must FAIL.
+//
+// Mutation 2 — ignore the settings override: in resolveSpec, remove the
+//   `overrides?.[key]` branch and always return the raw spec.
+//   → the "settings override" tests must FAIL.
+//
+// Mutation 3 — always use logical-name fallback: in buildRegistryFromDir,
+//   always set `registeredName = toolName` (skip action-level and
+//   transport-level vscode_tool).  → the precedence tests must FAIL.
