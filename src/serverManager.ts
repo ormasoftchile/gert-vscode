@@ -68,7 +68,11 @@ export class ServerManager {
     const configured = cfg.get<string>('binaryPath', 'gert');
     const bin = await resolveBinary(configured, this.output);
     const port = await pickFreePort();
-    const addr = `:${port}`;
+    // Always bind to the explicit loopback address. A bare `:port` address
+    // leaves the bind host up to the OS and gert core rejects non-loopback
+    // connections without auth. `localhost` is intentionally avoided because
+    // on dual-stack hosts it may resolve to ::1 (IPv6) while we bind IPv4.
+    const addr = `127.0.0.1:${port}`;
     // Scope the server to the active runbook's project. Scanning a broad
     // multi-root workspace allows duplicate tool names from another project to
     // shadow the binding declared by this runbook.
@@ -77,8 +81,14 @@ export class ServerManager {
       (vscode.workspace.workspaceFolders ?? []).map((folder) => folder.uri.fsPath),
       path.dirname(bin),
     );
-    this.output.appendLine(`[gert] spawning ${bin} serve --addr ${addr} (cwd=${cwd})`);
-    const proc = spawn(bin, ['serve', '--addr', addr], {
+    // Pass --package-map only when a package-map.yaml exists in the project
+    // root. Never pass an empty string — no flag is cleaner than a blank path.
+    const packageMapPath = resolvePackageMap(cwd);
+    const serveArgs = packageMapPath
+      ? ['serve', '--addr', addr, '--package-map', packageMapPath]
+      : ['serve', '--addr', addr];
+    this.output.appendLine(`[gert] spawning ${bin} serve --addr ${addr}${packageMapPath ? ` --package-map ${packageMapPath}` : ''} (cwd=${cwd})`);
+    const proc = spawn(bin, serveArgs, {
       cwd,
       stdio: ['ignore', 'pipe', 'pipe'],
       env: { ...process.env, ...this.bridgeEnv ?? {} },
@@ -96,7 +106,10 @@ export class ServerManager {
       this.output.appendLine(`[gert] server spawn error: ${err.message}`);
     });
 
-    const url = `http://localhost:${port}`;
+    // Use the explicit loopback address for the health/probe URL. `localhost`
+    // can resolve to ::1 on dual-stack hosts, which is a different socket than
+    // our 127.0.0.1 bind and would cause every probe request to ECONNREFUSED.
+    const url = `http://127.0.0.1:${port}`;
     await waitForReady(url, 10_000);
     this.output.appendLine(`[gert] server ready at ${url}`);
     this.url = url;
@@ -160,6 +173,19 @@ function waitForReady(url: string, timeoutMs: number): Promise<void> {
     };
     tryOnce();
   });
+}
+
+// resolvePackageMap returns the absolute path to a package-map.yaml in the
+// project root, or undefined when none exists. Returning undefined signals
+// the caller to omit --package-map entirely rather than passing a blank string.
+function resolvePackageMap(projectRoot: string): string | undefined {
+  const candidate = path.join(projectRoot, 'package-map.yaml');
+  try {
+    if (fs.statSync(candidate).isFile()) return candidate;
+  } catch {
+    // file absent — expected in projects that don't use package maps
+  }
+  return undefined;
 }
 
 // resolveBinary tries a sequence of locations to find an executable
