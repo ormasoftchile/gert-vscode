@@ -53,6 +53,16 @@ export interface OutputFieldSpec {
 
 export interface LmToolInfo {
   name: string;
+  /**
+   * JSON Schema object describing the tool's accepted inputs.  When present,
+   * the bridge validates adapted args against it before calling invokeTool.
+   * Shape mirrors VS Code's LanguageModelToolInformation.inputSchema.
+   */
+  inputSchema?: {
+    type?: string;
+    properties?: Record<string, { type?: string }>;
+    required?: string[];
+  };
 }
 
 export interface LmToolResult {
@@ -185,6 +195,71 @@ function redact(secret: string, text: string): string {
   return text.split(secret).join('[REDACTED]');
 }
 
+// ─── Input schema validation ──────────────────────────────────────────────────
+// Validates adapted args against a tool's live inputSchema BEFORE invoking the
+// tool. Fail-closed: any missing required parameter, unknown parameter, or type
+// mismatch returns an error string; undefined means the args are valid.
+
+function checkJsonSchemaType(param: string, value: unknown, expectedType: string): string | undefined {
+  switch (expectedType) {
+    case 'integer':
+      if (typeof value !== 'number' || !Number.isInteger(value))
+        return `parameter "${param}": expected integer, got ${typeof value}`;
+      break;
+    case 'number':
+      if (typeof value !== 'number')
+        return `parameter "${param}": expected number, got ${typeof value}`;
+      break;
+    case 'string':
+      if (typeof value !== 'string')
+        return `parameter "${param}": expected string, got ${typeof value}`;
+      break;
+    case 'boolean':
+      if (typeof value !== 'boolean')
+        return `parameter "${param}": expected boolean, got ${typeof value}`;
+      break;
+    case 'array':
+      if (!Array.isArray(value))
+        return `parameter "${param}": expected array, got ${typeof value}`;
+      break;
+    case 'object':
+      if (typeof value !== 'object' || Array.isArray(value) || value === null)
+        return `parameter "${param}": expected object, got ${Array.isArray(value) ? 'array' : typeof value}`;
+      break;
+  }
+  return undefined;
+}
+
+export function validateArgsAgainstSchema(
+  args: Record<string, unknown>,
+  schema: NonNullable<LmToolInfo['inputSchema']>,
+): string | undefined {
+  const props = schema.properties ?? {};
+  const required = schema.required ?? [];
+
+  // Required params must be present.
+  for (const param of required) {
+    if (!(param in args))
+      return `required parameter "${param}" is missing`;
+  }
+
+  // No extra params allowed (fail-closed).
+  for (const key of Object.keys(args)) {
+    if (!(key in props))
+      return `parameter "${key}" is not declared in the tool's input schema`;
+  }
+
+  // Type check each supplied param.
+  for (const [key, value] of Object.entries(args)) {
+    const propSchema = props[key];
+    if (!propSchema?.type) continue;
+    const err = checkJsonSchemaType(key, value, propSchema.type);
+    if (err) return err;
+  }
+
+  return undefined;
+}
+
 // ─── McpBridge class ─────────────────────────────────────────────────────────
 
 const BRIDGE_VERSION = 'vscode-mcp-bridge/v1';
@@ -211,7 +286,7 @@ export class McpBridge {
   private _port: number;
   private disposed = false;
   private readonly output?: { appendLine(s: string): void };
-  private readonly registry: Record<string, ToolActionSpec>;
+  private registry: Record<string, ToolActionSpec>;
   private readonly overrides: Record<string, string>;
 
   private constructor(
@@ -282,6 +357,15 @@ export class McpBridge {
     this.server.close();
     this.inflight.clear();
     this.completed.clear();
+  }
+
+  /**
+   * Replace the registry used for all subsequent requests. Call this whenever
+   * the active runbook changes so bridge dispatches from the correct project's
+   * tool definitions, not the stale snapshot taken at bridge creation.
+   */
+  updateRegistry(registry: Record<string, ToolActionSpec>): void {
+    this.registry = registry;
   }
 
   private log(msg: string): void {
@@ -392,6 +476,16 @@ export class McpBridge {
       return this.errorResponse(req.request_id, 'tool_unavailable',
         `logical action "${req.tool}/${req.action}" resolved to registered name "${spec.registeredName}", ` +
         `which is not present in vscode.lm.tools; available: [${available}]`);
+    }
+
+    // Validate adapted args against the tool's live inputSchema before any
+    // invocation. Fail-closed: missing required, unknown, or wrong-type params
+    // all produce a coded error; no partial arg set is ever sent downstream.
+    if (toolInfo.inputSchema) {
+      const schemaError = validateArgsAgainstSchema(req.args, toolInfo.inputSchema);
+      if (schemaError) {
+        return this.errorResponse(req.request_id, 'input_validation_error', schemaError);
+      }
     }
 
     // Set up deadline / cancellation.
