@@ -3,3 +3,5 @@ out/
 *.vsix
 .runbook/
 *.jsonl
+.vscode-test/
+_typescheck/
