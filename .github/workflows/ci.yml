@@ -8,7 +8,7 @@ on:
 
 jobs:
   build-and-package:
-    name: Compile & Package Extension
+    name: Compile, Test & Package Extension
     runs-on: ubuntu-latest
 
     steps:
@@ -26,6 +26,15 @@ jobs:
       - name: Compile (tsc)
         run: npm run compile
 
+      - name: Unit tests
+        # Runs the hermetic unit suite — no external binary required.
+        # The suite includes test/repoBoundary.test.js which enforces:
+        #   - no sibling-repo references or cross-repo path traversals
+        #   - no process.env.GERT_BIN in unit test files
+        #   - no skip: in test declarations
+        #   - every test/**/*.test.js is reachable by a configured runner
+        run: npm test
+
       - name: Package (vsce)
         run: npm run package
 
@@ -35,3 +44,21 @@ jobs:
           name: gert-preview-vsix
           path: gert-preview.vsix
           if-no-files-found: error
+  # Integration tests (requires a real gert binary) are not currently wired
+  # into CI because there are no integration test files.
+  #
+  # CE-S-01/CE-V-01 (CLI accepts a valid declared enum member) was the
+  # candidate probe, but it exercises only CLI behaviour with no extension
+  # code in the loop — it cannot be made hermetic from this repo.  The
+  # contract is guarded by gert's own test suite.  See
+  # .squad/decisions/inbox/ken-skip-defect.md for the full reasoning.
+  #
+  # To add a genuine integration test:
+  #   1. Place the file under test/integration/.
+  #   2. Add "test:integration": "node --test test/integration/**/*.test.js"
+  #      to package.json scripts.
+  #   3. Add an integration-tests job here that sets GERT_BIN (e.g., via a
+  #      "Download gert release" step or by fetching a CI artifact from the
+  #      gert repo).  The test MUST fail (never skip) when GERT_BIN is absent.
+  #   4. The orphan check in test/repoBoundary.test.js will fail until
+  #      step 2 is done — this enforces that steps 1–3 are done together.

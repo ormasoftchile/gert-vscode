@@ -1,206 +1,302 @@
-// repoBoundary.test.js — repo-wide guard against cross-repo path leaks and
-// unconditional/precondition-based skips in test sources.
+// repoBoundary.test.js — repo-wide guard against cross-repo path leaks,
+// unconditional skips, and orphaned test files.
 //
-// Mirrors gert/internal/tool/repo_boundary_test.go (TestRepoBoundary_NoExternalPaths)
-// which Don added in response to the same systemic defect class.
+// Mirrors gert/internal/tool/repo_boundary_test.go
+// (TestRepoBoundary_NoExternalPaths), which Don added in response to the
+// same systemic defect class.
 //
-// **What this guard catches:**
+// **Rules enforced (one top-level test per rule — failures name the rule):**
 //
-//  1. Sibling-repo references — any test file that mentions a sibling repo
-//     name (assembled at runtime so this file doesn't trigger itself).
+//  1. Sibling-repo name references — any test/src file that contains a
+//     sibling repo name (assembled at runtime so this guard doesn't
+//     trigger itself).
 //
-//  2. Cross-repo ".." traversals — any `path.join(..., '..', ...)` or
-//     string literal `'../'` that walks outside this repo into a sibling.
-//     Specifically: occurrences of `../gert` (the engine repo) or
-//     `../gert-private` (the private companion repo).
+//  2. Cross-repo path traversals — `path.join(__dirname, '..', '..', 'gert'`
+//     and `'../gert'`-style literals in test/src files.
 //
-//  3. GERT_BIN-style sibling-repo escapes — any reference to the
-//     `GERT_BIN` env variable in a unit-test file (*.test.js at
-//     test/*.test.js depth, i.e. NOT in test/integration/), which is the
-//     canonical escape hatch to the sibling binary.
+//  3. `process.env.GERT_BIN` in unit test files — the canonical escape
+//     hatch to a sibling-repo binary; prohibited in test/*.test.js.
 //
-//  4. `skip:` in test declarations — the `{ skip: ... }` option passed to
-//     `test(name, opts, fn)` is the Node.js test runner's skip mechanism.
-//     A skipping test in a unit suite is the defect pattern described in
-//     .squad/decisions/inbox/ken-skip-defect.md.  Every allowlisted entry
-//     carries a mandatory justification; an empty or blanket allowlist is
-//     not acceptable.
+//  4. `skip:` in test declarations — the { skip: ... } option passed to
+//     `test(name, opts, fn)`; a skipping test is the defect pattern
+//     described in .squad/decisions/inbox/ken-skip-defect.md.
 //
-// **Allowlist:** every entry MUST have a comment that states why the
-// occurrence is safe.  Unjustified entries will be rejected in review.
-// The allowlist uses paths relative to the test/ directory.
+//  5. Orphaned test files — every test/**/*.test.js file must be reachable
+//     by at least one glob in a `node --test <glob>` npm script.  A file
+//     that no script can reach is invisible to every runner — strictly
+//     worse than a skipped test (a skip is at least reported).
+//
+// **Allowlists:** every entry MUST carry a justifying comment.
+// An empty allowlist is the correct starting state.
+
+'use strict';
 
 const assert = require('node:assert/strict');
-const test = require('node:test');
-const path = require('node:path');
-const fs = require('node:fs');
+const test   = require('node:test');
+const path   = require('node:path');
+const fs     = require('node:fs');
 
-const TEST_DIR = path.join(__dirname);
-const SRC_DIR  = path.join(__dirname, '..', 'src');
+const REPO_ROOT = path.join(__dirname, '..');
+const TEST_DIR  = __dirname;
+const SRC_DIR   = path.join(REPO_ROOT, 'src');
 
-// siblingRepoPatterns: assembled at runtime so this guard file does not
-// trigger its own check.
+// ── Sibling-repo patterns (assembled at runtime; guard file safe) ─────────
 const SIBLING_REPO_PATTERNS = [
-  'gert' + '-private',  // the private companion repo
+  'gert' + '-private',  // private companion repo — never read from tests
 ];
 
-// process.env.GERT_BIN is the env-var escape hatch to a sibling-repo binary.
-// Its code usage pattern is prohibited in unit test files (test/*.test.js).
-// The integration suite (test/integration/) is explicitly exempt.
-// We match the code pattern `process.env.GERT_BIN` (not bare `GERT_BIN`)
-// to avoid false positives on documentation comments.
-const GERT_BIN_PATTERN = 'process.env.GERT_BIN';
-
-// Cross-repo path patterns: sibling-repo directory names that should never
-// appear as a path component in a unit test file.
-const CROSS_REPO_PATH_PATTERNS = [
-  '..', // checked contextually below via the ../gert and ../gert-private checks
+// ── Cross-repo path literals to ban ──────────────────────────────────────
+const CROSS_REPO_PATH_LITERALS = [
+  "path.join(__dirname, '..', '..', 'gert'",
+  'path.join(__dirname, "..", "..", "gert"',
+  "'../gert",
+  '"../gert',
+  '`../gert',
 ];
 
-// skipAllowlist: test files that are permitted to contain the `skip:` test
-// option, with a mandatory justification per entry.
-// Adding a new `skip:` to any file NOT in this list fails this guard.
-const skipAllowlist = {
-  // No entries — there are currently no justified uses of `skip:` in unit
-  // test files.  Every test in test/*.test.js must run unconditionally from
-  // a clean checkout; conditional skips are prohibited.
-  //
-  // If a test genuinely requires an external resource (e.g. a binary),
-  // it belongs in test/integration/ — see test/integration/cli.test.js.
+// ── Skip allowlist ────────────────────────────────────────────────────────
+// Files permitted to contain `skip:` — must have a justifying comment.
+// An unjustified entry or a blanket allowlist is not acceptable.
+const SKIP_ALLOWLIST = {
+  // No entries — there are no justified uses of skip: in unit test files.
+  // Tests that require an unavailable precondition must FAIL with an
+  // actionable message, never skip silently.
 };
 
-// integrationTestPattern: files under test/integration/ are exempt from
-// the GERT_BIN and sibling-repo binary checks because they are integration
-// tests that deliberately require a binary.  They are NOT exempt from the
-// sibling-repo name check (they must not read files from a sibling repo).
-function isIntegrationFile(relPath) {
-  return relPath.startsWith('integration' + path.sep) || relPath.startsWith('integration/');
-}
+// ── Orphan allowlist ──────────────────────────────────────────────────────
+// Test files NOT reachable by any configured runner, with a mandatory
+// justification per entry.  This allowlist should be empty; entries here
+// represent accepted blind spots that must be re-evaluated on each review.
+const ORPHAN_ALLOWLIST = {
+  // No entries — every test/**/*.test.js must be reachable by a script.
+};
 
-// collectTestFiles walks a directory and collects all *.test.js files.
-function collectTestFiles(dir, prefix) {
-  const results = [];
-  if (!fs.existsSync(dir)) return results;
-  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-    const rel = prefix ? path.join(prefix, entry.name) : entry.name;
-    if (entry.isDirectory()) {
-      // Descend into subdirectories (covers test/integration/, test/suite/).
-      results.push(...collectTestFiles(path.join(dir, entry.name), rel));
-    } else if (entry.name.endsWith('.test.js')) {
-      results.push({ absPath: path.join(dir, entry.name), relPath: rel });
+// ── Helpers ───────────────────────────────────────────────────────────────
+
+/** Collect all *.test.js files under a directory, recursively. */
+function collectTestJs(dir, relPrefix) {
+  const out = [];
+  if (!fs.existsSync(dir)) return out;
+  for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+    const rel = relPrefix ? relPrefix + '/' + e.name : e.name;
+    if (e.isDirectory()) {
+      out.push(...collectTestJs(path.join(dir, e.name), rel));
+    } else if (e.name.endsWith('.test.js')) {
+      out.push({ abs: path.join(dir, e.name), rel });
     }
   }
-  return results;
+  return out;
 }
 
-// collectSrcFiles walks src/ for all .ts files (compiled source, same rules).
-function collectSrcFiles(dir, prefix) {
-  const results = [];
-  if (!fs.existsSync(dir)) return results;
-  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-    const rel = prefix ? path.join(prefix, entry.name) : entry.name;
-    if (entry.isDirectory()) {
-      results.push(...collectSrcFiles(path.join(dir, entry.name), rel));
-    } else if (entry.name.endsWith('.ts') || entry.name.endsWith('.js')) {
-      results.push({ absPath: path.join(dir, entry.name), relPath: rel });
+/** Collect all .ts and .js source files under a directory, recursively. */
+function collectSrc(dir, relPrefix) {
+  const out = [];
+  if (!fs.existsSync(dir)) return out;
+  for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+    const rel = relPrefix ? relPrefix + '/' + e.name : e.name;
+    if (e.isDirectory()) {
+      out.push(...collectSrc(path.join(dir, e.name), rel));
+    } else if (e.name.endsWith('.ts') || e.name.endsWith('.js')) {
+      out.push({ abs: path.join(dir, e.name), rel });
     }
   }
-  return results;
+  return out;
 }
 
-test('repoBoundary: no cross-repo references or unconditional skips in test/ or src/', () => {
-  const testFiles = collectTestFiles(TEST_DIR, '');
-  const srcFiles  = collectSrcFiles(SRC_DIR, 'src/');
-
-  const failures = [];
-
-  function check(files, isSrc) {
-    for (const { absPath, relPath } of files) {
-      // The guard file excludes itself.
-      if (path.basename(absPath) === 'repoBoundary.test.js') continue;
-
-      const content = fs.readFileSync(absPath, 'utf8');
-      const lower   = content.toLowerCase();
-      const isIntegration = isIntegrationFile(relPath);
-
-      // Check 1 — sibling-repo name patterns (no exception for integration files;
-      // integration tests must not READ files from a sibling repo either).
-      for (const pat of SIBLING_REPO_PATTERNS) {
-        if (lower.includes(pat.toLowerCase())) {
-          failures.push(
-            `${relPath}: contains cross-repo reference ${JSON.stringify(pat)} — ` +
-            `tests must read only files inside the repo root; ` +
-            `move the fixture into test/fixtures/ and delete the external path`
-          );
-        }
+/**
+ * Very small glob matcher supporting `*` (one segment) and `**` (any depth).
+ * Both pattern and filepath use forward slashes.
+ * Used to check whether a file is reachable by a `node --test <glob>` script.
+ */
+function globMatch(pattern, filepath) {
+  const pParts = pattern.split('/');
+  const fParts = filepath.split('/');
+  function match(pi, fi) {
+    if (pi === pParts.length && fi === fParts.length) return true;
+    if (pi === pParts.length) return false;
+    if (pParts[pi] === '**') {
+      // ** matches zero or more segments
+      for (let k = fi; k <= fParts.length; k++) {
+        if (match(pi + 1, k)) return true;
       }
+      return false;
+    }
+    if (fi === fParts.length) return false;
+    const seg = pParts[pi];
+    const fSeg = fParts[fi];
+    // Convert glob segment to regex: * → [^/]*, . → \.
+    const re = new RegExp('^' + seg.replace(/\./g, '\\.').replace(/\*/g, '[^/]*') + '$');
+    return re.test(fSeg) && match(pi + 1, fi + 1);
+  }
+  return match(0, 0);
+}
 
-      // Check 2 — cross-repo ".." path traversals: ../gert or ../gert-private.
-      // We look for the string sequences that would escape to a sibling repo.
-      // Plain ".." used to ascend to a parent within the repo is fine and is
-      // not flagged here — only the specific cross-repo sequences are banned.
-      const crossRepoSequences = [
-        '..', path.sep + 'gert' + path.sep,  // ../gert/ on this OS
-        '../gert/',                            // forward-slash variant
-        '..', path.sep + 'gert"',             // ../gert" (end of path string)
-        '../gert"',
-        '..', path.sep + 'gert`',
-        '../gert`',
-      ];
-      // Simpler: just check the string literal forms.
-      const crossRepoBanned = ["'../gert", '"../gert', '`../gert', "path.join(__dirname, '..', '..', 'gert'", 'path.join(__dirname, "..", "..", "gert"'];
-      for (const banned of crossRepoBanned) {
-        if (content.includes(banned)) {
-          failures.push(
-            `${relPath}: contains cross-repo path traversal ${JSON.stringify(banned)} — ` +
-            `this escapes to the sibling engine repo; use test/fixtures/ instead`
-          );
-        }
-      }
+/**
+ * Extract `node --test <glob>` glob patterns from all npm scripts in
+ * package.json.  Returns an array of glob strings (forward-slash paths).
+ * This is the set of globs that `npm test` (and any test:* script) uses
+ * to discover test files.
+ */
+function extractTestGlobs() {
+  const pkg = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'package.json'), 'utf8'));
+  const scripts = pkg.scripts || {};
+  const globs = [];
+  for (const cmd of Object.values(scripts)) {
+    if (typeof cmd !== 'string') continue;
+    // Match `node --test <glob>` — glob may be bare, single-quoted, or
+    // double-quoted, and is terminated by whitespace or end of string.
+    const re = /node\s+--test\s+(['"]?)([^\s'"]+)\1/g;
+    let m;
+    while ((m = re.exec(cmd)) !== null) {
+      globs.push(m[2].replace(/\\/g, '/'));
+    }
+  }
+  return globs;
+}
 
-      // Check 3 — GERT_BIN references in unit test files (not integration).
-      if (!isIntegration && !isSrc) {
-        if (content.includes(GERT_BIN_PATTERN)) {
-          failures.push(
-            `${relPath}: references GERT_BIN — this is a sibling-repo binary escape; ` +
-            `unit test files must not require an external binary. ` +
-            `If this test requires a real binary, move it to test/integration/ and ` +
-            `call requireGertBin() which fails (never skips) when the binary is absent`
-          );
-        }
-      }
+// ── Tests (one per rule) ──────────────────────────────────────────────────
 
-      // Check 4 — `skip:` in test declarations (unit test files only, not
-      // integration, not src).
-      if (!isIntegration && !isSrc) {
-        // Match `{ skip:` or `{ skip :` — the Node.js test option syntax.
-        if (/\bskip\s*:/.test(content)) {
-          const reason = skipAllowlist[relPath];
-          if (!reason) {
-            failures.push(
-              `${relPath}: contains a skip: test option — ` +
-              `a skip must never be the default outcome (ken-skip-defect.md). ` +
-              `If the test genuinely requires an unavailable precondition, it must ` +
-              `FAIL with an actionable message, not silently skip. ` +
-              `If a justified exception is required, add the file to skipAllowlist ` +
-              `in test/repoBoundary.test.js with a comment explaining why`
-            );
-          } else {
-            // Emit an informational note (no assert — just verifies the entry is used).
-            console.log(`repoBoundary: skip: in ${relPath} is allowed (${reason})`);
-          }
-        }
+const testFiles = collectTestJs(TEST_DIR, '');
+const srcFiles  = collectSrc(SRC_DIR, 'src');
+const allFiles  = [...testFiles, ...srcFiles];
+
+// Rule 1 — sibling-repo name references
+test('repoBoundary/rule1: no sibling-repo name references in test/ or src/', () => {
+  const violations = [];
+  for (const { abs, rel } of allFiles) {
+    if (path.basename(abs) === 'repoBoundary.test.js') continue;
+    const lower = fs.readFileSync(abs, 'utf8').toLowerCase();
+    for (const pat of SIBLING_REPO_PATTERNS) {
+      if (lower.includes(pat.toLowerCase())) {
+        violations.push(
+          `${rel}: contains cross-repo reference ${JSON.stringify(pat)} — ` +
+          `tests must read only files inside the repo root; ` +
+          `move the fixture into test/fixtures/ and delete the external path`
+        );
       }
     }
   }
+  if (violations.length > 0) {
+    assert.fail('rule1 violations:\n' + violations.map((v, i) => `  [${i+1}] ${v}`).join('\n'));
+  }
+});
 
-  check(testFiles, false);
-  check(srcFiles,  true);
+// Rule 2 — cross-repo path traversals
+test('repoBoundary/rule2: no cross-repo path traversals in test/ or src/', () => {
+  const violations = [];
+  for (const { abs, rel } of allFiles) {
+    if (path.basename(abs) === 'repoBoundary.test.js') continue;
+    const content = fs.readFileSync(abs, 'utf8');
+    for (const banned of CROSS_REPO_PATH_LITERALS) {
+      if (content.includes(banned)) {
+        violations.push(
+          `${rel}: contains cross-repo path ${JSON.stringify(banned)} — ` +
+          `this escapes to the sibling engine repo; use test/fixtures/ instead`
+        );
+      }
+    }
+  }
+  if (violations.length > 0) {
+    assert.fail('rule2 violations:\n' + violations.map((v, i) => `  [${i+1}] ${v}`).join('\n'));
+  }
+});
 
-  if (failures.length > 0) {
-    assert.fail(
-      `repoBoundary: ${failures.length} violation(s) found:\n` +
-      failures.map((f, i) => `  [${i + 1}] ${f}`).join('\n')
-    );
+// Rule 3 — process.env.GERT_BIN in unit test files
+test('repoBoundary/rule3: no process.env.GERT_BIN in unit test files (test/*.test.js)', () => {
+  const violations = [];
+  for (const { abs, rel } of testFiles) {
+    if (path.basename(abs) === 'repoBoundary.test.js') continue;
+    // Only check files directly under test/ (depth 1 — the unit test layer).
+    // Subdirectories (test/integration/, test/suite/) are out of scope for
+    // this rule because they may legitimately require a binary.
+    if (rel.includes('/')) continue;
+    const content = fs.readFileSync(abs, 'utf8');
+    if (content.includes('process.env.GERT_BIN')) {
+      violations.push(
+        `${rel}: references process.env.GERT_BIN — this is a sibling-repo binary ` +
+        `escape that makes the test non-hermetic. Unit test files must not require ` +
+        `an external binary. If this test exercises only CLI behaviour with no ` +
+        `extension code in the loop, it cannot be made hermetic from this repo; ` +
+        `delete it and guard the contract in the gert test suite instead.`
+      );
+    }
+  }
+  if (violations.length > 0) {
+    assert.fail('rule3 violations:\n' + violations.map((v, i) => `  [${i+1}] ${v}`).join('\n'));
+  }
+});
+
+// Rule 4 — skip: in test declarations
+test('repoBoundary/rule4: no skip: in test declarations in test/*.test.js', () => {
+  const violations = [];
+  for (const { abs, rel } of testFiles) {
+    if (path.basename(abs) === 'repoBoundary.test.js') continue;
+    // Only check files directly under test/ — same scope as rule 3.
+    if (rel.includes('/')) continue;
+    const content = fs.readFileSync(abs, 'utf8');
+    if (/\bskip\s*:/.test(content)) {
+      const reason = SKIP_ALLOWLIST[rel];
+      if (!reason) {
+        violations.push(
+          `${rel}: contains a skip: test option — ` +
+          `a skip must never be the default outcome (ken-skip-defect.md). ` +
+          `Tests that require an unavailable precondition must FAIL with an ` +
+          `actionable message. ` +
+          `If a justified exception is truly needed, add the file to SKIP_ALLOWLIST ` +
+          `in test/repoBoundary.test.js with a comment explaining why.`
+        );
+      }
+    }
+  }
+  if (violations.length > 0) {
+    assert.fail('rule4 violations:\n' + violations.map((v, i) => `  [${i+1}] ${v}`).join('\n'));
+  }
+});
+
+// Rule 5 — orphaned test files
+//
+// Every test/**/*.test.js must be reachable by at least one glob in a
+// `node --test <glob>` npm script.  An unreachable file is an orphan: it
+// appears in the directory listing and looks like coverage but provides
+// none — strictly worse than a skipped test (a skip is at least reported).
+//
+// Implementation: reads package.json at runtime so this check stays correct
+// when scripts are updated without touching this file.
+test('repoBoundary/rule5: every test/**/*.test.js is reachable by a configured test runner', () => {
+  const testGlobs = extractTestGlobs();
+  assert.ok(
+    testGlobs.length > 0,
+    'repoBoundary: no `node --test <glob>` patterns found in package.json scripts — ' +
+    'the orphan check cannot run without at least one configured pattern'
+  );
+
+  const violations = [];
+  for (const { rel } of testFiles) {
+    if (path.basename(rel.split('/').pop()) === 'repoBoundary.test.js') continue;
+
+    // Normalise the relative path (from repo root) to forward slashes.
+    // The file is under test/, so its repo-root-relative path is 'test/' + rel.
+    const relFromRoot = 'test/' + rel.replace(/\\/g, '/');
+
+    const reachable = testGlobs.some(g => globMatch(g, relFromRoot));
+    if (!reachable) {
+      const reason = ORPHAN_ALLOWLIST[rel];
+      if (!reason) {
+        violations.push(
+          `${rel}: this test file is not reachable by any configured test runner. ` +
+          `Configured globs: ${testGlobs.map(g => JSON.stringify(g)).join(', ')}. ` +
+          `Either wire this file into a script (e.g. extend the test glob in package.json ` +
+          `and add a CI step that runs that script with the required preconditions), ` +
+          `or delete it — an orphan provides no coverage and misleads readers. ` +
+          `If a justified exception is needed, add the file to ORPHAN_ALLOWLIST in ` +
+          `test/repoBoundary.test.js with a comment explaining why.`
+        );
+      } else {
+        console.log(`repoBoundary/rule5: orphan allowed for ${rel} (${reason})`);
+      }
+    }
+  }
+  if (violations.length > 0) {
+    assert.fail('rule5 (orphan) violations:\n' + violations.map((v, i) => `  [${i+1}] ${v}`).join('\n'));
   }
 });

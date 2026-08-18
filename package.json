@@ -91,6 +91,7 @@
     "compile": "tsc -p ./",
     "compile:test": "tsc -p tsconfig.test.json",
     "test": "node --test test/*.test.js",
+    "test:integration": "node --test test/integration/**/*.test.js",
     "test:e2e": "npm run compile && npm run compile:test && vscode-test",
     "watch": "tsc -w -p ./",
     "vscode:prepublish": "npm run compile",
