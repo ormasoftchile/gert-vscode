@@ -22,9 +22,19 @@ export class ServerManager {
   private url: string | null = null;
   private starting: Promise<string> | null = null;
   private readonly output: vscode.OutputChannel;
+  // Bridge environment provisioned by the extension on activation.
+  // Passed through to every `gert serve` child process so Gert can reach
+  // the loopback MCP bridge without ever learning the auth credentials.
+  private bridgeEnv: { GERT_VSCODE_BRIDGE_URL: string; GERT_VSCODE_BRIDGE_TOKEN: string } | null = null;
 
   constructor(output: vscode.OutputChannel) {
     this.output = output;
+  }
+
+  // setBridgeEnv provisions the loopback bridge coordinates. Must be called
+  // before the first ensureRunning if you want Gert to see the bridge.
+  setBridgeEnv(url: string, token: string): void {
+    this.bridgeEnv = { GERT_VSCODE_BRIDGE_URL: url, GERT_VSCODE_BRIDGE_TOKEN: token };
   }
 
   // ensureRunning returns a base URL (e.g. http://localhost:54321) that
@@ -71,6 +81,7 @@ export class ServerManager {
     const proc = spawn(bin, ['serve', '--addr', addr], {
       cwd,
       stdio: ['ignore', 'pipe', 'pipe'],
+      env: { ...process.env, ...this.bridgeEnv ?? {} },
     });
     this.proc = proc;
 

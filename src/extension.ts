@@ -28,6 +28,7 @@ import { execFile } from 'child_process';
 import { promisify } from 'util';
 import * as path from 'path';
 import { ServerManager } from './serverManager';
+import { McpBridge } from './mcpBridge';
 import {
   CANCELLED,
   UNSET,
@@ -47,14 +48,35 @@ const pexec = promisify(execFile);
 let serverManager: ServerManager | null = null;
 let output: vscode.OutputChannel | null = null;
 let graphPanel: vscode.WebviewPanel | undefined;
+let mcpBridge: McpBridge | null = null;
 
 export function activate(context: vscode.ExtensionContext) {
   output = vscode.window.createOutputChannel('gert');
   serverManager = new ServerManager(output);
 
+  // Start the loopback MCP bridge. The bridge mints its own capability
+  // secret and provisions it into the ServerManager so every spawned gert
+  // process sees GERT_VSCODE_BRIDGE_URL and GERT_VSCODE_BRIDGE_TOKEN.
+  // We use port 0 so the OS picks a free port; the bridge reports the real
+  // bound URL back to us. We don't block activation on this — the bridge
+  // will be ready before any runbook preview fires a tool call.
+  McpBridge.create({
+    get tools() { return vscode.lm.tools; },
+    invokeTool(name, options, token) {
+      return vscode.lm.invokeTool(name, { input: options.input, toolInvocationToken: undefined }, token as vscode.CancellationToken) as Promise<import('./mcpBridge').LmToolResult>;
+    },
+  }, 0, output).then((bridge) => {
+    mcpBridge = bridge;
+    serverManager?.setBridgeEnv(bridge.bridgeUrl, bridge.bridgeToken);
+    output?.appendLine(`[gert] MCP bridge listening at ${bridge.bridgeUrl}`);
+  }).catch((err: unknown) => {
+    const msg = err instanceof Error ? err.message : String(err);
+    output?.appendLine(`[gert] WARNING: MCP bridge failed to start — ${msg}`);
+  });
+
   context.subscriptions.push(
     output,
-    { dispose: () => serverManager?.dispose() },
+    { dispose: () => { serverManager?.dispose(); mcpBridge?.dispose(); mcpBridge = null; } },
     vscode.commands.registerCommand('gert.preview', () => previewProse()),
     vscode.commands.registerCommand('gert.previewGraph', () => previewGraph()),
     vscode.commands.registerCommand('gert.validateInputs', () => validateInputs()),
@@ -69,6 +91,8 @@ export function activate(context: vscode.ExtensionContext) {
 export function deactivate() {
   serverManager?.dispose();
   serverManager = null;
+  mcpBridge?.dispose();
+  mcpBridge = null;
 }
 
 // previewProse runs the gert CLI with --format prose against the active
