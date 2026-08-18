@@ -31,7 +31,7 @@ Three commands:
 ## Build
 
 ```sh
-npm install
+npm ci
 npm run compile
 ```
 
@@ -39,15 +39,35 @@ Then press F5 in VS Code to launch an Extension Development Host.
 
 ## Package (.vsix)
 
+Reproducible local build from a clean checkout:
+
 ```sh
-npm run package          # produces gert-preview.vsix
-npm run package:clean    # rebuild from scratch
+npm ci
+npm run compile
+npx vsce package --no-dependencies -o gert-preview-<version>.vsix
+# e.g.
+npx vsce package --no-dependencies -o gert-preview-0.1.0.vsix
 ```
+
+Or use the pre-wired npm scripts:
+
+```sh
+npm run package          # produces gert-preview.vsix (uses version from package.json)
+npm run package:clean    # wipes out/ first, recompiles, then packages
+```
+
+**Versioned install** (replace `<version>` with the version in `package.json`):
+
+```sh
+code --install-extension gert-preview-<version>.vsix
+# e.g.
+code --install-extension gert-preview-0.1.0.vsix
+```
+
+Uninstall: `code --uninstall-extension ormasoftchile.gert-preview`
 
 The CI workflow `.github/workflows/ci.yml` runs `npm run package` on every PR
 and uploads the resulting `.vsix` as a build artifact.
-
-To install a local build: `code --install-extension gert-preview.vsix`.
 
 ## See also
 
