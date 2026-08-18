@@ -23,15 +23,6 @@ const { deriveFailureMessage, firstLine, warningLines, extractInputDecls } = req
 
 const FIXTURE_ENUM = path.join(__dirname, 'fixtures', 'enum.runbook.yaml');
 const FIXTURE_WARN = path.join(__dirname, 'fixtures', 'enum-warn.runbook.yaml');
-// Minimal unattended profile used by all dry-run calls. gert's Phase 1B
-// fail-fast gate (runWithMode: runtimeProfile == nil && !isInteractiveTTY())
-// fires whenever dry-run is invoked from a non-TTY subprocess — exactly
-// what execFile does here and exactly what the extension's validateInputs
-// command does. Passing this profile satisfies the gate without altering
-// dry-run semantics: in dry-run mode no tools execute, so the attendance/
-// approval fields are inert, and all ENUM-0xx/ENUM-W0xx signals come from
-// the planner (plan-time), not from execution.
-const PROFILE_UNATTENDED = path.join(__dirname, 'fixtures', 'vscode-validate-inputs.profile.yaml');
 
 function findGertBinary() {
   const candidates = [];
@@ -52,15 +43,15 @@ const gertBin = findGertBinary();
 test('CE-V-04/D-3 regression: ENUM-008 from the real CLI survives verbatim through deriveFailureMessage', { skip: !gertBin && 'no gert binary found; set GERT_BIN or build ../gert/gert(.exe)' }, async () => {
   assert.ok(fs.existsSync(FIXTURE_ENUM), 'fixture runbook must exist');
   await assert.rejects(
-    pexec(gertBin, ['dry-run', '--profile', PROFILE_UNATTENDED, '--var', 'env_name=not-a-member', FIXTURE_ENUM]),
+    pexec(gertBin, ['dry-run', '--var', 'env_name=not-a-member', FIXTURE_ENUM]),
     (err) => {
       const message = deriveFailureMessage(err);
-      // The CLI formats enum membership errors as either `ENUM-008: ...` or
-      // `input "<name>": ENUM-008: ...` depending on engine version. Both
-      // forms are acceptable: the D-3 contract is that the coded error reaches
-      // the operator without being buried under a "Command failed: <argv>"
-      // wrapper — not that it must be the very first token.
-      assert.match(message, /ENUM-008:/, 'the coded error must be present in the message, not buried in a generic wrapper');
+      // The engine now prefixes enum membership errors with the input name:
+      // `input "<name>": ENUM-008: <description>`. Pin the full expected shape
+      // so the assertion tests structure, not just substring presence (a loose
+      // /ENUM-008:/ would pass even if the code were buried inside a
+      // "Command failed: ..." wrapper and would stop testing D-3).
+      assert.match(message, /^input "[^"]+": ENUM-008:/, 'the coded error must follow the input-name prefix, not be buried in a generic wrapper');
       assert.match(firstLine(message), /ENUM-008/, 'the code must survive into the first line shown to the operator');
       assert.doesNotMatch(message, /^Command failed/, 'must never present as a bare wrapped command failure');
       return true;
@@ -69,13 +60,13 @@ test('CE-V-04/D-3 regression: ENUM-008 from the real CLI survives verbatim throu
 });
 
 test('CE-S-01/CE-V-01 regression: a declared enum member is accepted through the real CLI (no client rejection)', { skip: !gertBin && 'no gert binary found; set GERT_BIN or build ../gert/gert(.exe)' }, async () => {
-  const { stdout } = await pexec(gertBin, ['dry-run', '--profile', PROFILE_UNATTENDED, '--var', 'env_name=prod', FIXTURE_ENUM]);
+  const { stdout } = await pexec(gertBin, ['dry-run', '--var', 'env_name=prod', FIXTURE_ENUM]);
   assert.match(stdout, /dry-run complete/);
 });
 
 test('CE-W-01 regression: ENUM-W001 (case-only-distinct members) is a non-fatal warning surfaced on stderr, run still succeeds', { skip: !gertBin && 'no gert binary found; set GERT_BIN or build ../gert/gert(.exe)' }, async () => {
   assert.ok(fs.existsSync(FIXTURE_WARN), 'warning fixture runbook must exist');
-  const { stdout, stderr } = await pexec(gertBin, ['dry-run', '--profile', PROFILE_UNATTENDED, '--var', 'env_name=prod', FIXTURE_WARN]);
+  const { stdout, stderr } = await pexec(gertBin, ['dry-run', '--var', 'env_name=prod', FIXTURE_WARN]);
   assert.match(stdout, /dry-run complete/, 'a case-only-distinct enum must not fail the run');
   const warnings = warningLines(stderr);
   assert.ok(warnings.length >= 1, 'ENUM-W001 must reach stderr');
