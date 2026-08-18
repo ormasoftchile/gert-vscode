@@ -14,6 +14,7 @@ import * as http from 'http';
 import * as fs from 'fs';
 import * as path from 'path';
 import { pickServerRoot } from './serverRoot';
+import { localServerAddress, buildServeArgs, resolvePackageMapPath } from './serverLaunch';
 
 const DEFAULT_SERVER_URL = 'http://localhost:7778';
 
@@ -68,11 +69,7 @@ export class ServerManager {
     const configured = cfg.get<string>('binaryPath', 'gert');
     const bin = await resolveBinary(configured, this.output);
     const port = await pickFreePort();
-    // Always bind to the explicit loopback address. A bare `:port` address
-    // leaves the bind host up to the OS and gert core rejects non-loopback
-    // connections without auth. `localhost` is intentionally avoided because
-    // on dual-stack hosts it may resolve to ::1 (IPv6) while we bind IPv4.
-    const addr = `127.0.0.1:${port}`;
+    const addr = localServerAddress(port);
     // Scope the server to the active runbook's project. Scanning a broad
     // multi-root workspace allows duplicate tool names from another project to
     // shadow the binding declared by this runbook.
@@ -81,13 +78,16 @@ export class ServerManager {
       (vscode.workspace.workspaceFolders ?? []).map((folder) => folder.uri.fsPath),
       path.dirname(bin),
     );
-    // Pass --package-map only when a package-map.yaml exists in the project
-    // root. Never pass an empty string — no flag is cleaner than a blank path.
-    const packageMapPath = resolvePackageMap(cwd);
-    const serveArgs = packageMapPath
-      ? ['serve', '--addr', addr, '--package-map', packageMapPath]
-      : ['serve', '--addr', addr];
-    this.output.appendLine(`[gert] spawning ${bin} serve --addr ${addr}${packageMapPath ? ` --package-map ${packageMapPath}` : ''} (cwd=${cwd})`);
+    // Package-map resolution chain: setting → convention → absent.
+    // settingValue is resolved against cwd (the active project root), never
+    // against workspaceFolders[0], which would reintroduce the multi-root bug.
+    const packageMapSetting = cfg.get<string>('packageMap', '');
+    const packageMapPath = resolvePackageMapPath(cwd, packageMapSetting);
+    if (packageMapSetting && !packageMapPath) {
+      this.output.appendLine(`[gert] WARNING: gert.packageMap "${packageMapSetting}" not found in ${cwd}; falling through to convention`);
+    }
+    const serveArgs = buildServeArgs(addr, packageMapPath);
+    this.output.appendLine(`[gert] spawning ${bin} ${serveArgs.join(' ')} (cwd=${cwd})`);
     const proc = spawn(bin, serveArgs, {
       cwd,
       stdio: ['ignore', 'pipe', 'pipe'],
@@ -173,19 +173,6 @@ function waitForReady(url: string, timeoutMs: number): Promise<void> {
     };
     tryOnce();
   });
-}
-
-// resolvePackageMap returns the absolute path to a package-map.yaml in the
-// project root, or undefined when none exists. Returning undefined signals
-// the caller to omit --package-map entirely rather than passing a blank string.
-function resolvePackageMap(projectRoot: string): string | undefined {
-  const candidate = path.join(projectRoot, 'package-map.yaml');
-  try {
-    if (fs.statSync(candidate).isFile()) return candidate;
-  } catch {
-    // file absent — expected in projects that don't use package maps
-  }
-  return undefined;
 }
 
 // resolveBinary tries a sequence of locations to find an executable
