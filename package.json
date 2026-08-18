@@ -9,7 +9,7 @@
     "type": "git",
     "url": "https://github.com/ormasoftchile/gert-vscode.git"
   },
-  "engines": { "vscode": "^1.85.0" },
+  "engines": { "vscode": "^1.95.0" },
   "categories": ["Visualization", "Other"],
   "activationEvents": ["onLanguage:yaml"],
   "main": "./out/extension.js",
@@ -75,7 +75,9 @@
   },
   "scripts": {
     "compile": "tsc -p ./",
+    "compile:test": "tsc -p tsconfig.test.json",
     "test": "node --test test/*.test.js",
+    "test:e2e": "npm run compile && npm run compile:test && vscode-test",
     "watch": "tsc -w -p ./",
     "vscode:prepublish": "npm run compile",
     "package": "vsce package --no-dependencies -o gert-preview.vsix",
@@ -83,7 +85,9 @@
   },
   "devDependencies": {
     "@types/node": "^20.11.0",
-    "@types/vscode": "^1.85.0",
+    "@types/vscode": "^1.95.0",
+    "@vscode/test-cli": "^0.0.15",
+    "@vscode/test-electron": "^3.1.0",
     "@vscode/vsce": "^2.32.0",
     "typescript": "^5.5.4"
   }
