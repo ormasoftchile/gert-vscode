@@ -50,7 +50,7 @@ test('CE-C-02: no vendored *.schema.json in the extension source tree', () => {
   const fs = require('node:fs');
   const path = require('node:path');
   const root = path.join(__dirname, '..');
-  const skipDirs = new Set(['node_modules', 'out', '.git', '.vscode']);
+  const skipDirs = new Set(['node_modules', 'out', '.git', '.vscode', '.vscode-test']);
 
   const offenders = [];
   (function walk(dir) {

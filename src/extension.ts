@@ -26,6 +26,7 @@
 import * as vscode from 'vscode';
 import { execFile } from 'child_process';
 import { promisify } from 'util';
+import * as fs from 'fs';
 import * as path from 'path';
 import { ServerManager } from './serverManager';
 import {
@@ -47,10 +48,40 @@ const pexec = promisify(execFile);
 let serverManager: ServerManager | null = null;
 let output: vscode.OutputChannel | null = null;
 let graphPanel: vscode.WebviewPanel | undefined;
+// Path to the minimal unattended profile written at activation for use by
+// validateInputs. The Phase 1B fail-fast gate in the gert CLI rejects any
+// dry-run invoked from a non-TTY subprocess (execFile) that carries no
+// profile. This profile satisfies the gate for users who have not authored
+// their own — in dry-run mode no tools execute, so the attendance/approval
+// fields are inert and all ENUM-0xx signals still originate from the engine.
+let dryRunProfilePath: string | null = null;
+
+// MINIMAL_VALIDATE_PROFILE is the YAML content of the auto-generated profile.
+// Kept inline so the extension carries no extra fixture files in the VSIX.
+const MINIMAL_VALIDATE_PROFILE = [
+  'apiVersion: runtime-profile/v1',
+  'id: vscode-validate-inputs',
+  'context: vscode-operator',
+  'attendance: unattended',
+  '',
+].join('\n');
 
 export function activate(context: vscode.ExtensionContext) {
   output = vscode.window.createOutputChannel('gert');
   serverManager = new ServerManager(output);
+
+  // Write the minimal validation profile into the extension's private global
+  // storage directory. This directory is extension-scoped (not shared between
+  // users) and persists across VS Code sessions. We create it fresh each
+  // activation so the file is always present.
+  try {
+    fs.mkdirSync(context.globalStorageUri.fsPath, { recursive: true });
+    const profilePath = path.join(context.globalStorageUri.fsPath, 'vscode-validate-inputs.yaml');
+    fs.writeFileSync(profilePath, MINIMAL_VALIDATE_PROFILE, 'utf8');
+    dryRunProfilePath = profilePath;
+  } catch (err) {
+    output.appendLine(`[gert] warning: could not write validation profile: ${err}`);
+  }
 
   context.subscriptions.push(
     output,
@@ -130,8 +161,18 @@ async function validateInputs() {
   // argument: -var" before ever reaching validation. Verified against the
   // real `gert` binary while building this command.
   const varArgs = Object.entries(vars).flatMap(([k, v]) => ['--var', `${k}=${v}`]);
+  // Pass the auto-generated validation profile so the Phase 1B fail-fast gate
+  // (runWithMode: runtimeProfile == nil && !isInteractiveTTY()) does not
+  // reject the subprocess invocation. In dry-run mode no tools execute, so
+  // the attendance/approval fields in the profile are inert — all ENUM-0xx
+  // signals still come from the engine. dryRunProfilePath is null only if the
+  // global storage directory could not be written at activation (reported
+  // as a warning); in that case the invocation proceeds without --profile and
+  // will fail with the gate error on Phase 1B+ binaries, which is the honest
+  // failure surface.
+  const profileArgs = dryRunProfilePath ? ['--profile', dryRunProfilePath] : [];
   try {
-    const { stdout, stderr } = await pexec(bin, ['dry-run', ...varArgs, file]);
+    const { stdout, stderr } = await pexec(bin, ['dry-run', ...profileArgs, ...varArgs, file]);
     surfaceWarnings(stderr);
     if (stdout.trim()) output?.appendLine(stdout.trim());
     void vscode.window.showInformationMessage('gert: runbook inputs are valid.');
