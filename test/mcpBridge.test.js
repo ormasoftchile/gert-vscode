@@ -676,3 +676,196 @@ test('redaction sweep: capability secret never appears in any output surface', a
 // Mutation 3 — always use logical-name fallback: in buildRegistryFromDir,
 //   always set `registeredName = toolName` (skip action-level and
 //   transport-level vscode_tool).  → the precedence tests must FAIL.
+
+// ─── Deliverable D: input schema validation ───────────────────────────────────
+// Tests use a fixture modelled on the real ICM MCP tool:
+//   mcp_icm_mcp_serve_get_incident_details_by_id
+//   inputSchema: { properties: { incidentId: { type: 'integer' } }, required: ['incidentId'] }
+//
+// Core applies vscode_input mapping before args reach the wire; we validate
+// the POST-mapping, POST-coercion args against the live inputSchema here.
+
+const { validateArgsAgainstSchema } = require('../out/mcpBridge');
+
+// ICM MCP tool schema fixture — general mechanism, no ICM-specific code in src/.
+const ICM_INPUT_SCHEMA = {
+  type: 'object',
+  properties: {
+    incidentId: { type: 'integer' },
+  },
+  required: ['incidentId'],
+};
+
+test('validateArgsAgainstSchema: valid integer incidentId → undefined (no error)', () => {
+  const err = validateArgsAgainstSchema({ incidentId: 12345 }, ICM_INPUT_SCHEMA);
+  assert.equal(err, undefined, `expected no error but got: ${err}`);
+});
+
+test('validateArgsAgainstSchema: missing required incidentId → error', () => {
+  const err = validateArgsAgainstSchema({}, ICM_INPUT_SCHEMA);
+  assert.ok(typeof err === 'string', 'expected an error string');
+  assert.match(err, /incidentId/, 'error must name the missing parameter');
+});
+
+test('validateArgsAgainstSchema: extra parameter not in schema → error', () => {
+  const err = validateArgsAgainstSchema({ incidentId: 1, extraParam: 'x' }, ICM_INPUT_SCHEMA);
+  assert.ok(typeof err === 'string');
+  assert.match(err, /extraParam/);
+});
+
+test('validateArgsAgainstSchema: incidentId as string (not integer) → type error', () => {
+  const err = validateArgsAgainstSchema({ incidentId: '12345' }, ICM_INPUT_SCHEMA);
+  assert.ok(typeof err === 'string');
+  assert.match(err, /incidentId/);
+  assert.match(err, /integer/);
+});
+
+test('validateArgsAgainstSchema: incidentId as float (not integer) → type error', () => {
+  const err = validateArgsAgainstSchema({ incidentId: 123.5 }, ICM_INPUT_SCHEMA);
+  assert.ok(typeof err === 'string');
+  assert.match(err, /incidentId/);
+});
+
+test('validateArgsAgainstSchema: no schema → bridge proceeds without validation', async (t) => {
+  // When a tool has no inputSchema the bridge must NOT block the request.
+  const lm = makeLm(async (_name, opts) => {
+    return makeIcmResult();
+  }, [{ name: 'icm-get-incident' /* no inputSchema */ }]);
+  const bridge = await createBridge(lm);
+  t.after(() => bridge.dispose());
+
+  const { body } = await postBridge(bridge.bridgeUrl, makeRequest(bridge));
+  assert.equal(body.error, undefined, `unexpected error: ${JSON.stringify(body.error)}`);
+  assert.ok(body.result);
+});
+
+test('input_validation_error: missing required param → HTTP 200 with coded error', async (t) => {
+  // Bridge returns HTTP 200 with a structured error body (not 4xx) because
+  // the protocol error is at the MCP layer, not the HTTP layer.
+  const ICM_SCHEMA_REGISTRY = {
+    'icm/get-incident': {
+      registeredName: 'icm-get-incident',
+      outputFields: {
+        title:          { type: 'string', required: true },
+        service:        { type: 'string', required: true },
+        environment:    { type: 'string', required: true },
+        logical_server: { type: 'string', required: true },
+        database:       { type: 'string', required: true },
+      },
+    },
+  };
+  const lm = makeLm(undefined, [{
+    name: 'icm-get-incident',
+    inputSchema: {
+      type: 'object',
+      properties: { incidentId: { type: 'integer' } },
+      required: ['incidentId'],
+    },
+  }]);
+  const bridge = await McpBridge.create(lm, 0, undefined, { registry: ICM_SCHEMA_REGISTRY });
+  t.after(() => bridge.dispose());
+
+  // Send args that are missing incidentId (provider name after coercion).
+  const { status, body } = await postBridge(bridge.bridgeUrl, makeRequest(bridge, {
+    args: { incident_id: 12345 }, // wrong name — provider expects incidentId
+  }));
+  assert.equal(status, 200);
+  assert.ok(body.error, 'expected an error body');
+  assert.equal(body.error.code, 'input_validation_error');
+  assert.match(body.error.message, /incidentId/, 'error must name the missing parameter');
+  assert.equal(body.result, undefined, 'result must be absent on validation error');
+});
+
+test('input_validation_error: extra parameter → coded error, invokeTool not called', async (t) => {
+  let invokeCalled = false;
+  const lm = makeLm(async () => {
+    invokeCalled = true;
+    return makeIcmResult();
+  }, [{
+    name: 'icm-get-incident',
+    inputSchema: {
+      type: 'object',
+      properties: { incidentId: { type: 'integer' } },
+      required: ['incidentId'],
+    },
+  }]);
+  const ICM_SCHEMA_REGISTRY = {
+    'icm/get-incident': {
+      registeredName: 'icm-get-incident',
+      outputFields: {
+        title:          { type: 'string', required: true },
+        service:        { type: 'string', required: true },
+        environment:    { type: 'string', required: true },
+        logical_server: { type: 'string', required: true },
+        database:       { type: 'string', required: true },
+      },
+    },
+  };
+  const bridge = await McpBridge.create(lm, 0, undefined, { registry: ICM_SCHEMA_REGISTRY });
+  t.after(() => bridge.dispose());
+
+  const { body } = await postBridge(bridge.bridgeUrl, makeRequest(bridge, {
+    args: { incidentId: 1, rogue: 'hax' },
+  }));
+  assert.ok(body.error);
+  assert.equal(body.error.code, 'input_validation_error');
+  assert.match(body.error.message, /rogue/);
+  assert.equal(invokeCalled, false, 'invokeTool must not be called when args fail schema validation');
+});
+
+test('input_validation_error: type mismatch → coded error', async (t) => {
+  const lm = makeLm(undefined, [{
+    name: 'icm-get-incident',
+    inputSchema: {
+      type: 'object',
+      properties: { incidentId: { type: 'integer' } },
+      required: ['incidentId'],
+    },
+  }]);
+  const ICM_SCHEMA_REGISTRY = {
+    'icm/get-incident': {
+      registeredName: 'icm-get-incident',
+      outputFields: {
+        title:          { type: 'string', required: true },
+        service:        { type: 'string', required: true },
+        environment:    { type: 'string', required: true },
+        logical_server: { type: 'string', required: true },
+        database:       { type: 'string', required: true },
+      },
+    },
+  };
+  const bridge = await McpBridge.create(lm, 0, undefined, { registry: ICM_SCHEMA_REGISTRY });
+  t.after(() => bridge.dispose());
+
+  const { body } = await postBridge(bridge.bridgeUrl, makeRequest(bridge, {
+    args: { incidentId: 'INC-123' }, // string, not integer
+  }));
+  assert.ok(body.error);
+  assert.equal(body.error.code, 'input_validation_error');
+  assert.match(body.error.message, /incidentId/);
+});
+
+test('input validation: no secret in input_validation_error message', async (t) => {
+  const lm = makeLm(undefined, [{
+    name: 'icm-get-incident',
+    inputSchema: {
+      type: 'object',
+      properties: { incidentId: { type: 'integer' } },
+      required: ['incidentId'],
+    },
+  }]);
+  const ICM_SCHEMA_REGISTRY = {
+    'icm/get-incident': {
+      registeredName: 'icm-get-incident',
+      outputFields: { title: { type: 'string', required: true }, service: { type: 'string', required: true }, environment: { type: 'string', required: true }, logical_server: { type: 'string', required: true }, database: { type: 'string', required: true } },
+    },
+  };
+  const bridge = await McpBridge.create(lm, 0, undefined, { registry: ICM_SCHEMA_REGISTRY });
+  t.after(() => bridge.dispose());
+
+  const secret = bridge.bridgeToken;
+  const { body } = await postBridge(bridge.bridgeUrl, makeRequest(bridge, { args: {} }));
+  assert.equal(body.error?.code, 'input_validation_error');
+  assert.equal(JSON.stringify(body).includes(secret), false,
+    'capability secret must not appear in error message');
+});
