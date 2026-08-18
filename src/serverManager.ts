@@ -13,6 +13,7 @@ import * as net from 'net';
 import * as http from 'http';
 import * as fs from 'fs';
 import * as path from 'path';
+import { pickServerRoot } from './serverRoot';
 
 const DEFAULT_SERVER_URL = 'http://localhost:7778';
 
@@ -29,7 +30,7 @@ export class ServerManager {
   // ensureRunning returns a base URL (e.g. http://localhost:54321) that
   // is reachable. It either reuses an already-spawned server, returns
   // the user-configured external URL, or starts a new child process.
-  async ensureRunning(): Promise<string> {
+  async ensureRunning(runbookPath: string): Promise<string> {
     const cfg = vscode.workspace.getConfiguration('gert');
     const configuredURL = cfg.get<string>('serverUrl', DEFAULT_SERVER_URL).replace(/\/$/, '');
     const autoStart = cfg.get<boolean>('autoStartServer', true);
@@ -46,24 +47,26 @@ export class ServerManager {
     if (this.starting) {
       return this.starting;
     }
-    this.starting = this.spawnServer().finally(() => {
+    this.starting = this.spawnServer(runbookPath).finally(() => {
       this.starting = null;
     });
     return this.starting;
   }
 
-  private async spawnServer(): Promise<string> {
+  private async spawnServer(runbookPath: string): Promise<string> {
     const cfg = vscode.workspace.getConfiguration('gert');
     const configured = cfg.get<string>('binaryPath', 'gert');
     const bin = await resolveBinary(configured, this.output);
     const port = await pickFreePort();
     const addr = `:${port}`;
-    // Pick a sane cwd: walk up from each workspace folder looking for a
-    // directory that contains a `tools/` subdir (the gert project root).
-    // 'gert serve' scans cwd recursively for tool defs at startup, so the
-    // cwd needs to be the project root, not a sub-folder. Falls back to the
-    // first workspace folder, then the dir containing the binary.
-    const cwd = pickServerCwd(bin);
+    // Scope the server to the active runbook's project. Scanning a broad
+    // multi-root workspace allows duplicate tool names from another project to
+    // shadow the binding declared by this runbook.
+    const cwd = pickServerRoot(
+      runbookPath,
+      (vscode.workspace.workspaceFolders ?? []).map((folder) => folder.uri.fsPath),
+      path.dirname(bin),
+    );
     this.output.appendLine(`[gert] spawning ${bin} serve --addr ${addr} (cwd=${cwd})`);
     const proc = spawn(bin, ['serve', '--addr', addr], {
       cwd,
@@ -192,7 +195,11 @@ async function resolveBinary(configured: string, output: vscode.OutputChannel): 
     }
   }
 
-  for (const c of candidates) {
+  const executableCandidates = process.platform === 'win32'
+    ? candidates.flatMap((candidate) => path.extname(candidate) ? [candidate] : [candidate, `${candidate}.exe`])
+    : candidates;
+
+  for (const c of executableCandidates) {
     try {
       const st = await fs.promises.stat(c);
       if (!st.isFile()) continue;
@@ -205,32 +212,7 @@ async function resolveBinary(configured: string, output: vscode.OutputChannel): 
   }
 
   throw new Error(
-    `cannot find gert binary on disk. Tried:\n  ${candidates.join('\n  ')}\nSet "gert.binaryPath" in settings to an absolute path.`,
+    `cannot find gert binary on disk. Tried:\n  ${executableCandidates.join('\n  ')}\nSet "gert.binaryPath" in settings to an absolute path.`,
   );
-}
-
-// pickServerCwd finds a directory to run `gert serve` from. The server
-// scans cwd recursively for *.tool.yaml at startup, so we want the
-// project root. We walk up from each workspace folder looking for a
-// directory that contains a `tools/` subdirectory; failing that we use
-// the first workspace folder, then the directory containing the binary.
-function pickServerCwd(bin: string): string {
-  const folders = vscode.workspace.workspaceFolders ?? [];
-  for (const f of folders) {
-    let dir = f.uri.fsPath;
-    for (let i = 0; i < 6; i++) {
-      try {
-        const st = fs.statSync(path.join(dir, 'tools'));
-        if (st.isDirectory()) return dir;
-      } catch {
-        // not here, walk up
-      }
-      const parent = path.dirname(dir);
-      if (parent === dir) break;
-      dir = parent;
-    }
-  }
-  if (folders[0]) return folders[0].uri.fsPath;
-  return path.dirname(bin);
 }
 
