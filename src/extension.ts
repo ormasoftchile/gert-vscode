@@ -29,6 +29,8 @@ import { promisify } from 'util';
 import * as path from 'path';
 import { ServerManager } from './serverManager';
 import { McpBridge } from './mcpBridge';
+import { buildRegistryFromDir } from './toolDefinitionRegistry';
+import { pickServerRoot } from './serverRoot';
 import {
   CANCELLED,
   UNSET,
@@ -61,12 +63,16 @@ export function activate(context: vscode.ExtensionContext) {
   // bound URL back to us. We don't block activation on this — the bridge
   // will be ready before any runbook preview fires a tool call.
   McpBridge.create({
-    get tools() { return vscode.lm.tools; },
+    get tools() { return vscode.lm.tools as unknown as readonly import('./mcpBridge').LmToolInfo[]; },
     invokeTool(name, options, token) {
       return vscode.lm.invokeTool(name, { input: options.input, toolInvocationToken: undefined }, token as vscode.CancellationToken) as Promise<import('./mcpBridge').LmToolResult>;
     },
   }, 0, output, {
-    registryDir: vscode.workspace.workspaceFolders?.[0]?.uri.fsPath,
+    // Registry starts empty; it is refreshed from the active runbook's
+    // resolved project the first time a command (previewGraph / previewProse /
+    // validateInputs) is invoked. This avoids the workspaceFolders[0] bias
+    // that breaks multi-root workspaces.
+    registry: {},
     overrides: vscode.workspace.getConfiguration('gert').get<Record<string, string>>('mcpBridge.toolNameOverrides') ?? {},
   }).then((bridge) => {
     mcpBridge = bridge;
@@ -98,6 +104,20 @@ export function deactivate() {
   mcpBridge = null;
 }
 
+// refreshBridgeRegistry rebuilds the MCP bridge registry from the active
+// runbook's resolved project so the bridge always dispatches against the
+// correct set of tool definitions, regardless of workspace folder order.
+// Multi-root: a runbook in the second folder correctly selects that folder's
+// project rather than workspaceFolders[0].
+function refreshBridgeRegistry(runbookPath: string): void {
+  if (!mcpBridge) return;
+  const folders = (vscode.workspace.workspaceFolders ?? []).map((f) => f.uri.fsPath);
+  const projectRoot = pickServerRoot(runbookPath, folders, path.dirname(runbookPath));
+  const registry = buildRegistryFromDir(projectRoot);
+  mcpBridge.updateRegistry(registry);
+  output?.appendLine(`[gert] MCP bridge registry refreshed from ${projectRoot}`);
+}
+
 // previewProse runs the gert CLI with --format prose against the active
 // runbook file and opens the rendered Markdown in a side-by-side preview.
 async function previewProse() {
@@ -106,10 +126,12 @@ async function previewProse() {
     void vscode.window.showWarningMessage('Open a *.runbook.yaml file first.');
     return;
   }
+  const runbookPath = editor.document.fileName;
+  refreshBridgeRegistry(runbookPath);
   const cfg = vscode.workspace.getConfiguration('gert');
   const bin = cfg.get<string>('binaryPath', 'gert');
   try {
-    const { stdout } = await pexec(bin, ['preview', '--format', 'prose', editor.document.fileName]);
+    const { stdout } = await pexec(bin, ['preview', '--format', 'prose', runbookPath]);
     const doc = await vscode.workspace.openTextDocument({ content: stdout, language: 'markdown' });
     await vscode.window.showTextDocument(doc, { viewColumn: vscode.ViewColumn.Beside, preview: true });
     await vscode.commands.executeCommand('markdown.showPreview', doc.uri);
@@ -137,6 +159,7 @@ async function validateInputs() {
   const cfg = vscode.workspace.getConfiguration('gert');
   const bin = cfg.get<string>('binaryPath', 'gert');
   const file = editor.document.fileName;
+  refreshBridgeRegistry(file);
 
   let doc: unknown;
   try {
@@ -296,6 +319,7 @@ async function previewGraph() {
   }
 
   const runbookPath = editor.document.fileName;
+  refreshBridgeRegistry(runbookPath);
   let base: string;
   try {
     base = await serverManager!.ensureRunning(runbookPath);
