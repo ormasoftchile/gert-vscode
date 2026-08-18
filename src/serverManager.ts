@@ -14,7 +14,7 @@ import * as http from 'http';
 import * as fs from 'fs';
 import * as path from 'path';
 import { pickServerRoot } from './serverRoot';
-import { localServerAddress, buildServeArgs, resolvePackageMapPath } from './serverLaunch';
+import { localServerAddress, buildServeArgs, resolvePackageMapPath, readGertSpawnConfig } from './serverLaunch';
 
 const DEFAULT_SERVER_URL = 'http://localhost:7778';
 
@@ -65,8 +65,14 @@ export class ServerManager {
   }
 
   private async spawnServer(runbookPath: string): Promise<string> {
-    const cfg = vscode.workspace.getConfiguration('gert');
-    const configured = cfg.get<string>('binaryPath', 'gert');
+    // Scope to the active runbook's resource URI so per-folder settings in a
+    // multi-root workspace resolve from the correct folder, not workspaceFolders[0].
+    // binaryPath and packageMap are both legitimately folder-scoped — see
+    // readGertSpawnConfig JSDoc in serverLaunch.ts for the full judgment.
+    const scopedCfg = vscode.workspace.getConfiguration('gert', vscode.Uri.file(runbookPath));
+    const { binaryPath: configured, packageMapSetting } = readGertSpawnConfig(
+      (key, def) => scopedCfg.get<string>(key, def) as string,
+    );
     const bin = await resolveBinary(configured, this.output);
     const port = await pickFreePort();
     const addr = localServerAddress(port);
@@ -81,7 +87,6 @@ export class ServerManager {
     // Package-map resolution chain: setting → convention → absent.
     // settingValue is resolved against cwd (the active project root), never
     // against workspaceFolders[0], which would reintroduce the multi-root bug.
-    const packageMapSetting = cfg.get<string>('packageMap', '');
     const packageMapPath = resolvePackageMapPath(cwd, packageMapSetting);
     if (packageMapSetting && !packageMapPath) {
       this.output.appendLine(`[gert] WARNING: gert.packageMap "${packageMapSetting}" not found in ${cwd}; falling through to convention`);

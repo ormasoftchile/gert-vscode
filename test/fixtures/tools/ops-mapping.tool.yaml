@@ -1,0 +1,11 @@
+# Fixture: ops-mapping — legacy mapping-form actions.
+# Mirrors the MappingNode branch of decodeToolActions in core (tool.go).
+# Key IS the action name; no per-entry name: field.
+name: ops-mapping
+transport:
+  mode: vscode-mcp
+actions:
+  get-work:
+    description: gets work
+  post-result:
+    description: posts result

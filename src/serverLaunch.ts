@@ -8,6 +8,40 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 /**
+ * GetScopedSetting reads a single gert configuration key in the scope of a
+ * specific resource (the active runbook). In production, serverManager.ts
+ * provides a closure over `vscode.workspace.getConfiguration('gert',
+ * vscode.Uri.file(runbookPath))`; in unit tests a plain map lookup suffices —
+ * no extension host required.
+ */
+export type GetScopedSetting = (key: string, defaultValue: string) => string;
+
+/**
+ * readGertSpawnConfig reads the gert configuration keys required by
+ * spawnServer. The caller is responsible for constructing getSetting so that
+ * it is scoped to the active runbook's resource URI, ensuring that per-folder
+ * VS Code settings in a multi-root workspace resolve from the correct folder
+ * rather than from workspaceFolders[0].
+ *
+ * **Folder-scoped judgment:**
+ * - `binaryPath` — YES, folder-scoped. Different projects in a multi-root
+ *   workspace may use different local gert builds. Reading from the wrong
+ *   scope silently uses the wrong binary.
+ * - `packageMap`  — YES, folder-scoped. This is the live-site defect: the
+ *   active project's package-map file path must come from the active folder's
+ *   settings, not from workspaceFolders[0] which may have no setting at all.
+ */
+export function readGertSpawnConfig(getSetting: GetScopedSetting): {
+  binaryPath: string;
+  packageMapSetting: string;
+} {
+  return {
+    binaryPath: getSetting('binaryPath', 'gert'),
+    packageMapSetting: getSetting('packageMap', ''),
+  };
+}
+
+/**
  * localServerAddress returns the bind address string passed to `gert serve
  * --addr`. Always 127.0.0.1, never a bare :port or localhost:
  *

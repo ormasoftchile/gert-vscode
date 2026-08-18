@@ -1,0 +1,8 @@
+# Fixture: ops-legacy — legacy transport.type instead of transport.mode.
+# Mirrors TransportConfig.UnmarshalYAML in core: when mode is absent the
+# legacy type field is used as the effective mode.
+name: ops-legacy
+transport:
+  type: vscode-mcp
+actions:
+  - name: act

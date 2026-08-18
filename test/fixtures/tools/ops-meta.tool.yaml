@@ -1,0 +1,11 @@
+# Fixture: ops-meta — meta.name wins over flat name.
+# Mirrors ToolDef.UnmarshalYAML in core: when meta.Name is non-empty it
+# overwrites the flat Name field. Registry key must be ops-meta/act,
+# not ops-flat/act.
+name: ops-flat
+meta:
+  name: ops-meta
+transport:
+  mode: vscode-mcp
+actions:
+  - name: act

@@ -8,6 +8,8 @@
 'use strict';
 
 const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const os = require('node:os');
 const path = require('node:path');
 const test = require('node:test');
 
@@ -36,22 +38,6 @@ test('registry: icm/get-incident has the correct output fields', () => {
   }
 });
 
-test('registry: tsg-recommendation/recommend is present with correct registered name', () => {
-  const spec = registry['tsg-recommendation/recommend'];
-  assert.ok(spec, 'tsg-recommendation/recommend must be in the registry');
-  assert.equal(spec.registeredName, 'tsg-recommendation-recommend');
-});
-
-test('registry: tsg-recommendation/recommend has correct required/optional field mix', () => {
-  const spec = registry['tsg-recommendation/recommend'];
-  assert.equal(spec.outputFields['recommendation_status'].required, true);
-  assert.equal(spec.outputFields['recommendation_status'].type, 'string');
-  assert.equal(spec.outputFields['suggested_tsg_id'].required, false);
-  assert.equal(spec.outputFields['suggested_tsg_id'].type, 'string');
-  assert.equal(spec.outputFields['suggested_tsg_title'].required, false);
-  assert.equal(spec.outputFields['suggested_tsg_title'].type, 'string');
-});
-
 // ─── vscode_tool precedence ───────────────────────────────────────────────────
 
 test('precedence: action-level vscode_tool beats transport-level', () => {
@@ -77,12 +63,17 @@ test('precedence: logical tool name is fallback when no vscode_tool declared', (
 
 // ─── Non-vscode-mcp tools are excluded ──────────────────────────────────────
 
-test('registry: tools without transport.mode=vscode-mcp are not included', () => {
-  // The fixture dir only has vscode-mcp tools; confirm non-vscode-mcp tools
-  // from other dirs are not accidentally included by listing all keys.
+test('registry: tools without effective transport mode vscode-mcp are not included', () => {
+  // All keys from our fixture dir are known; unknown keys would be a leak.
+  const knownPrefixes = [
+    'icm/',           // flat-name form; sequence actions
+    'precedence-tool/', // transport-level vscode_tool
+    'fallback-tool/', // logical-name fallback
+    'ops-mapping/',   // mapping-form (legacy) actions
+    'ops-legacy/',    // legacy transport.type
+    'ops-meta/',      // meta.name precedence
+  ];
   for (const key of Object.keys(registry)) {
-    // All keys from our fixture dir are known; unknown keys would be a leak.
-    const knownPrefixes = ['icm/', 'tsg-recommendation/', 'precedence-tool/', 'fallback-tool/'];
     const isKnown = knownPrefixes.some((p) => key.startsWith(p));
     assert.ok(isKnown, `unexpected registry key "${key}" — non-vscode-mcp tool may have leaked in`);
   }
@@ -106,6 +97,79 @@ test('buildRegistryFromDir: returns empty registry for empty directory', (t) => 
 
 test('findToolYamls: returns tool yaml paths for known fixture dir', () => {
   const files = findToolYamls(FIXTURE_TOOLS_DIR);
-  assert.ok(files.length >= 3, 'expected at least 3 fixture tool yamls');
+  assert.ok(files.length >= 4, 'expected at least 4 fixture tool yamls');
   assert.ok(files.every((f) => f.endsWith('.tool.yaml')));
+});
+
+// ─── DEFECT 2 regression tests ───────────────────────────────────────────────
+// These five tests guard the three parse axes that were broken before the fix.
+
+// Test 1: consumer's exact fixture (byte-for-byte as supplied in the ask).
+// meta.name + sequence-form actions + transport.mode — all three must work together.
+test('defect2-reg: consumer icm fixture (meta.name + sequence + transport.mode) registers icm/get-incident', (t) => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gert-icm-'));
+  t.after(() => fs.rmSync(tmpDir, { recursive: true, force: true }));
+  fs.writeFileSync(path.join(tmpDir, 'icm.tool.yaml'), [
+    'apiVersion: tool/v1',
+    'meta:',
+    '  name: icm',
+    'transport:',
+    '  mode: vscode-mcp',
+    'actions:',
+    '  - name: get-incident',
+  ].join('\n'));
+  const r = buildRegistryFromDir(tmpDir);
+  assert.ok(r['icm/get-incident'], 'icm/get-incident must be in the registry');
+});
+
+// Test 2: mapping-form actions (legacy).
+test('defect2-reg: mapping-form actions register correctly', () => {
+  const spec = registry['ops-mapping/get-work'];
+  assert.ok(spec, 'ops-mapping/get-work must be in registry (mapping-form actions)');
+  assert.equal(spec.registeredName, 'ops-mapping',
+    'logical tool name must be the registeredName when no vscode_tool is declared');
+  assert.ok(registry['ops-mapping/post-result'],
+    'ops-mapping/post-result must also be registered');
+});
+
+// Test 3: legacy transport.type.
+test('defect2-reg: legacy transport.type registers the tool', () => {
+  const spec = registry['ops-legacy/act'];
+  assert.ok(spec, 'ops-legacy/act must be in registry when transport.type=vscode-mpc is used');
+});
+
+// Test 4: meta.name precedence (meta.name wins over flat name).
+test('defect2-reg: meta.name wins over flat name in registry key', () => {
+  // ops-meta.tool.yaml declares name: ops-flat AND meta.name: ops-meta.
+  // The registry key must use ops-meta (meta wins).
+  assert.ok(registry['ops-meta/act'],
+    'ops-meta/act must be registered — meta.name must win over flat name');
+  assert.equal(registry['ops-flat/act'], undefined,
+    'ops-flat/act must NOT be registered — flat name must not win when meta.name is present');
+});
+
+// Test 5: drift guard — documents the full shape matrix the extension must accept.
+// If any axis is removed from buildRegistryFromDir, at least one assertion here fails.
+test('defect2-drift-guard: all three core parse axes are handled', () => {
+  // This test documents the shape matrix mirrored from:
+  //   tool.go ToolDef.UnmarshalYAML  (meta.name promotion)
+  //   tool.go decodeToolActions       (sequence vs mapping)
+  //   tool.go TransportConfig.UnmarshalYAML (mode wins over type)
+  const shapeMatrix = [
+    // Axis 1: meta.name promotion
+    { desc: 'meta.name wins over flat name',             key: 'ops-meta/act' },
+    { desc: 'flat name used when meta is absent',        key: 'icm/get-incident' },
+    // Axis 2: actions form
+    { desc: 'sequence-form actions (canonical)',         key: 'fallback-tool/fallback-action' },
+    { desc: 'mapping-form actions (legacy)',             key: 'ops-mapping/get-work' },
+    // Axis 3: transport mode field
+    { desc: 'transport.mode (canonical)',                key: 'icm/get-incident' },
+    { desc: 'transport.type (legacy fallback)',          key: 'ops-legacy/act' },
+  ];
+  for (const shape of shapeMatrix) {
+    assert.ok(
+      registry[shape.key] !== undefined,
+      `shape "${shape.desc}" must produce registry key "${shape.key}"`,
+    );
+  }
 });

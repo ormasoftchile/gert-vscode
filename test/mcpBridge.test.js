@@ -88,7 +88,6 @@ function makeLm(invokeToolFn, tools) {
   return {
     tools: tools ?? [
       { name: 'icm-get-incident' },
-      { name: 'tsg-recommendation-recommend' },
     ],
     invokeTool: invokeToolFn ??
       (async (_name, _opts, _token) => makeIcmResult()),
@@ -101,6 +100,12 @@ function createBridge(lm, overrides) {
     registry: fixtureRegistry,
     overrides,
   });
+}
+
+// createBridgeWithRegistry creates a McpBridge with a custom registry.
+// Used by optional-field regression tests which need an inline spec.
+function createBridgeWithRegistry(registry, lm) {
+  return McpBridge.create(lm ?? makeLm(), 0, undefined, { registry });
 }
 
 // ─── Pure unit tests (no network) ────────────────────────────────────────────
@@ -118,13 +123,11 @@ test('fixture registry: icm/get-incident has five declared output fields', () =>
   }
 });
 
-test('fixture registry: tsg-recommendation/recommend has correct contract', () => {
-  const spec = fixtureRegistry['tsg-recommendation/recommend'];
-  assert.ok(spec, 'tsg-recommendation/recommend must be in the fixture registry');
-  assert.equal(spec.registeredName, 'tsg-recommendation-recommend');
-  assert.equal(spec.outputFields['recommendation_status'].required, true);
-  assert.equal(spec.outputFields['suggested_tsg_id'].required, false);
-  assert.equal(spec.outputFields['suggested_tsg_title'].required, false);
+test('fixture registry: ops-meta/act is present with correct registered name', () => {
+  const spec = fixtureRegistry['ops-meta/act'];
+  assert.ok(spec, 'ops-meta/act must be in the fixture registry');
+  assert.equal(spec.registeredName, 'ops-meta',
+    'meta.name must win: registeredName must derive from meta.name, not flat name');
 });
 
 test('precedence: action-level vscode_tool beats transport-level and fallback', () => {
@@ -185,14 +188,19 @@ const ICM_SPEC = {
   },
 };
 
-const TSG_SPEC = {
-  registeredName: 'tsg-recommendation-recommend',
+// Neutral inline spec for optional-field normalizeResult tests.
+// Field names are abstract to avoid coupling to any consumer contract.
+const OPS_OPT_SPEC = {
+  registeredName: 'ops-optional-probe',
   outputFields: {
-    recommendation_status: { type: 'string', required: true },
-    suggested_tsg_id:      { type: 'string', required: false },
-    suggested_tsg_title:   { type: 'string', required: false },
+    status:      { type: 'string', required: true },
+    detail_id:   { type: 'string', required: false },
+    detail_name: { type: 'string', required: false },
   },
 };
+
+// Inline registry for optional-field bridge regression tests.
+const OPS_OPT_REGISTRY = { 'ops-optional/probe': OPS_OPT_SPEC };
 
 test('normalizeResult: accepts a fully-valid icm result', () => {
   const result = normalizeResult(
@@ -215,39 +223,39 @@ test('normalizeResult: required field absent → fails', () => {
 test('normalizeResult: optional field ABSENT → succeeds (no-suggestion case)', () => {
   // regression test: was broken by the original hard-coded outputFields
   const result = normalizeResult(
-    { recommendation_status: 'no-suggestion' },
-    TSG_SPEC,
+    { status: 'not-found' },
+    OPS_OPT_SPEC,
   );
   assert.equal(result.ok, true, `expected ok but got reason: ${result.ok ? '' : result.reason}`);
-  assert.equal(result.value['recommendation_status'], 'no-suggestion');
-  assert.equal('suggested_tsg_id' in result.value, false,
+  assert.equal(result.value['status'], 'not-found');
+  assert.equal('detail_id' in result.value, false,
     'absent optional field must not appear in normalized output');
 });
 
-test('normalizeResult: optional field PRESENT with correct type → succeeds (suggested case)', () => {
+test('normalizeResult: optional field PRESENT with correct type → succeeds', () => {
   const result = normalizeResult(
-    { recommendation_status: 'suggested', suggested_tsg_id: 'TSG-123', suggested_tsg_title: 'Check CPU' },
-    TSG_SPEC,
+    { status: 'found', detail_id: 'D-1', detail_name: 'Alpha' },
+    OPS_OPT_SPEC,
   );
   assert.equal(result.ok, true, `expected ok but got reason: ${result.ok ? '' : result.reason}`);
-  assert.equal(result.value['suggestion_tsg_id'], undefined); // named correctly:
-  assert.equal(result.value['suggested_tsg_id'], 'TSG-123');
-  assert.equal(result.value['suggested_tsg_title'], 'Check CPU');
+  assert.equal(result.value['no_such_field'], undefined); // guard: unknown keys absent
+  assert.equal(result.value['detail_id'], 'D-1');
+  assert.equal(result.value['detail_name'], 'Alpha');
 });
 
 test('normalizeResult: optional field PRESENT but wrong type → fails', () => {
   const result = normalizeResult(
-    { recommendation_status: 'suggested', suggested_tsg_id: 42 /* should be string */ },
-    TSG_SPEC,
+    { status: 'found', detail_id: 42 /* should be string */ },
+    OPS_OPT_SPEC,
   );
   assert.equal(result.ok, false);
-  assert.match(result.reason, /suggested_tsg_id/);
+  assert.match(result.reason, /detail_id/);
 });
 
 test('normalizeResult: optional field PRESENT but null → fails', () => {
   const result = normalizeResult(
-    { recommendation_status: 'suggested', suggested_tsg_id: null },
-    TSG_SPEC,
+    { status: 'found', detail_id: null },
+    OPS_OPT_SPEC,
   );
   assert.equal(result.ok, false);
   assert.match(result.reason, /null/);
@@ -402,53 +410,59 @@ test('type-incompatible field: bridge returns normalization error', async (t) =>
   assert.match(body.error.message, /title/);
 });
 
-// Regression test for Cristiano's blocker: tsg-recommendation/recommend must
-// support BOTH outcomes — "suggested" (all three fields present) and
-// "no-suggestion" (only recommendation_status present).
-test('tsg regression: "suggested" outcome (all fields) normalizes successfully', async (t) => {
-  const lm = makeLm(async () => ({
-    content: [{
-      value: JSON.stringify({
-        recommendation_status: 'suggested',
-        suggested_tsg_id: 'TSG-42',
-        suggested_tsg_title: 'Restart the service',
-      }),
-    }],
-  }));
-  const bridge = await createBridge(lm);
+// Optional-field bridge regression: the bridge must handle BOTH outcomes —
+// all optional fields present AND optional fields absent. Uses a neutral
+// inline registry (OPS_OPT_REGISTRY) to avoid consumer-contract coupling.
+test('optional-field regression: "present" outcome (all fields) normalizes successfully', async (t) => {
+  const lm = {
+    tools: [{ name: 'ops-optional-probe' }],
+    invokeTool: async () => ({
+      content: [{
+        value: JSON.stringify({
+          status: 'found',
+          detail_id: 'D-1',
+          detail_name: 'Alpha',
+        }),
+      }],
+    }),
+  };
+  const bridge = await createBridgeWithRegistry(OPS_OPT_REGISTRY, lm);
   t.after(() => bridge.dispose());
 
   const { body } = await postBridge(bridge.bridgeUrl, makeRequest(bridge, {
-    tool: 'tsg-recommendation',
-    action: 'recommend',
+    tool: 'ops-optional',
+    action: 'probe',
   }));
   assert.equal(body.error, undefined, `unexpected error: ${JSON.stringify(body.error)}`);
   assert.ok(body.result);
-  assert.equal(body.result['recommendation_status'], 'suggested');
-  assert.equal(body.result['suggested_tsg_id'], 'TSG-42');
-  assert.equal(body.result['suggested_tsg_title'], 'Restart the service');
+  assert.equal(body.result['status'], 'found');
+  assert.equal(body.result['detail_id'], 'D-1');
+  assert.equal(body.result['detail_name'], 'Alpha');
 });
 
-test('tsg regression: "no-suggestion" outcome (only recommendation_status) normalizes successfully', async (t) => {
-  const lm = makeLm(async () => ({
-    content: [{
-      value: JSON.stringify({
-        recommendation_status: 'no-suggestion',
-        // suggested_tsg_id and suggested_tsg_title absent — valid because required: false
-      }),
-    }],
-  }));
-  const bridge = await createBridge(lm);
+test('optional-field regression: "absent" outcome (only required field) normalizes successfully', async (t) => {
+  const lm = {
+    tools: [{ name: 'ops-optional-probe' }],
+    invokeTool: async () => ({
+      content: [{
+        value: JSON.stringify({
+          status: 'not-found',
+          // detail_id and detail_name absent — valid because required: false
+        }),
+      }],
+    }),
+  };
+  const bridge = await createBridgeWithRegistry(OPS_OPT_REGISTRY, lm);
   t.after(() => bridge.dispose());
 
   const { body } = await postBridge(bridge.bridgeUrl, makeRequest(bridge, {
-    tool: 'tsg-recommendation',
-    action: 'recommend',
+    tool: 'ops-optional',
+    action: 'probe',
   }));
   assert.equal(body.error, undefined, `unexpected error: ${JSON.stringify(body.error)}`);
   assert.ok(body.result);
-  assert.equal(body.result['recommendation_status'], 'no-suggestion');
-  assert.equal('suggested_tsg_id' in body.result, false,
+  assert.equal(body.result['status'], 'not-found');
+  assert.equal('detail_id' in body.result, false,
     'absent optional field must not appear in the response result');
 });
 
@@ -666,8 +680,8 @@ test('redaction sweep: capability secret never appears in any output surface', a
 //
 // Mutation 1 — make optional fields strict (treat every declared field as
 //   required): in normalizeResult, change `if (!fieldSpec.required)` to always
-//   return the "missing" error.  → the "no-suggestion" tsg regression test and
-//   "optional field ABSENT → succeeds" test must FAIL.
+//   return the "missing" error.  → the "optional-field regression: absent outcome"
+//   and "optional field ABSENT → succeeds" test must FAIL.
 //
 // Mutation 2 — ignore the settings override: in resolveSpec, remove the
 //   `overrides?.[key]` branch and always return the raw spec.

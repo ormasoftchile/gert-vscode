@@ -31,12 +31,14 @@ interface RawAction {
 
 interface RawTransport {
   mode?: unknown;
+  type?: unknown;  // legacy; falls back when mode is absent (mirrors TransportConfig.UnmarshalYAML)
   vscode_tool?: unknown;
   [key: string]: unknown;
 }
 
 interface RawToolDef {
   name?: unknown;
+  meta?: unknown;  // canonical identity block { name, version, description }
   transport?: unknown;
   actions?: unknown;
   [key: string]: unknown;
@@ -94,7 +96,14 @@ export function findToolYamls(dir: string): string[] {
  * Build a registry of (tool/action) → ToolActionSpec by reading all
  * *.tool.yaml files found recursively under dir.
  *
- * Only tool definitions with transport.mode === 'vscode-mcp' are included.
+ * Only tool definitions with an effective transport mode of 'vscode-mcp' are
+ * included. This mirrors three reconciliation axes in core:
+ *
+ *   1. meta.name wins over flat name (ToolDef.UnmarshalYAML in tool.go).
+ *   2. actions: may be a sequence (canonical) or a mapping (legacy;
+ *      key IS the action name) — decodeToolActions in tool.go.
+ *   3. transport.mode (canonical) wins over transport.type (legacy) —
+ *      TransportConfig.UnmarshalYAML in tool.go copies Mode into Type.
  *
  * registeredName resolution order (matching core):
  *   1. action-level  vscode_tool
@@ -113,22 +122,45 @@ export function buildRegistryFromDir(dir: string): Record<string, ToolActionSpec
     if (!raw || typeof raw !== 'object' || Array.isArray(raw)) continue;
     const def = raw as RawToolDef;
 
-    const toolName = typeof def.name === 'string' ? def.name : undefined;
+    // Axis 1: meta.name wins over flat name when non-empty.
+    // Mirrors: if raw.Meta.Name != "" { t.Name = raw.Meta.Name } in UnmarshalYAML.
+    let toolName = typeof def.name === 'string' ? def.name : undefined;
+    const meta = def.meta as { name?: unknown } | undefined;
+    if (meta && typeof meta.name === 'string' && meta.name) {
+      toolName = meta.name;
+    }
     if (!toolName) continue;
 
     const transport = def.transport as RawTransport | undefined;
-    if (!transport || transport.mode !== 'vscode-mcp') continue;
+    if (!transport) continue;
+
+    // Axis 3: transport.mode (canonical) wins; falls back to transport.type (legacy).
+    // Mirrors: TransportConfig.UnmarshalYAML — if t.Mode != "" { t.Type = Transport(t.Mode) }
+    const effectiveMode =
+      (typeof transport.mode === 'string' ? transport.mode : undefined) ??
+      (typeof transport.type === 'string' ? transport.type : undefined);
+    if (effectiveMode !== 'vscode-mcp') continue;
 
     const transportVscodeTool = typeof transport.vscode_tool === 'string'
       ? transport.vscode_tool
       : undefined;
 
-    if (!Array.isArray(def.actions)) continue;
+    // Axis 2: actions can be a sequence (canonical) or a mapping (legacy).
+    // Mirrors: decodeToolActions SequenceNode vs MappingNode branches.
+    let actionEntries: Array<[string, RawAction]>;
+    if (Array.isArray(def.actions)) {
+      // Canonical sequence form: each item must declare name:.
+      actionEntries = (def.actions as RawAction[])
+        .filter((a) => typeof a.name === 'string' && a.name)
+        .map((a) => [a.name as string, a]);
+    } else if (def.actions && typeof def.actions === 'object') {
+      // Legacy mapping form: key IS the action name.
+      actionEntries = Object.entries(def.actions as Record<string, RawAction>);
+    } else {
+      continue;
+    }
 
-    for (const rawAction of def.actions as RawAction[]) {
-      const actionName = typeof rawAction.name === 'string' ? rawAction.name : undefined;
-      if (!actionName) continue;
-
+    for (const [actionName, rawAction] of actionEntries) {
       const logicalKey = `${toolName}/${actionName}`;
       const actionVscodeTool = typeof rawAction.vscode_tool === 'string'
         ? rawAction.vscode_tool

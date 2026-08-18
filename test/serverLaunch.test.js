@@ -16,7 +16,7 @@ const os = require('node:os');
 const path = require('node:path');
 const test = require('node:test');
 
-const { localServerAddress, buildServeArgs, resolvePackageMapPath } =
+const { localServerAddress, buildServeArgs, resolvePackageMapPath, readGertSpawnConfig } =
   require('../out/serverLaunch');
 
 // ─── localServerAddress ───────────────────────────────────────────────────────
@@ -198,3 +198,60 @@ test('multi-root relative-path guard: resolution is always against projectRoot',
   assert.notEqual(result, undefined,
     'file was not found — relative path was probably resolved against the wrong base');
 });
+
+// ─── DEFECT 1 regression: multi-root config scoping ──────────────────────────
+//
+// Live-site reproduction: the SQL Live-Site folder had gert.packageMap set, but
+// workspaceFolders[0] did NOT. The bug: getConfiguration('gert') without a resource
+// URI read from the wrong scope → packageMapSetting was '' → --package-map was omitted.
+//
+// The fix: spawnServer calls readGertSpawnConfig with a getSetting callback scoped to
+// vscode.Uri.file(runbookPath). This test proves that scoping matters by comparing
+// the scoped path (non-empty) vs the unscoped path (empty/folder-0).
+//
+// MUTATION: change readGertSpawnConfig to always return packageMapSetting: '' (ignoring
+// getSetting) → the scoped assertion below fails: flagIdx is -1.
+
+test('multi-root: scoped packageMap setting produces --package-map; unscoped does not', (t) => {
+  // Simulate the active project root for the runbook's folder.
+  const activeRoot = makeTempRoot(t, ['packages/incident-routing.vscode-mcp.package-map.yaml']);
+
+  // folder 0 (wrong scope): has no gert.packageMap setting.
+  const folder0Config = { binaryPath: 'gert', packageMap: '' };
+  // Active runbook folder (correct scope): has the setting from SQL Live-Site.
+  const activeFolderConfig = {
+    binaryPath: 'gert',
+    packageMap: 'packages/incident-routing.vscode-mcp.package-map.yaml',
+  };
+
+  // ── Scoped path (the fix) ───────────────────────────────────────────────
+  const { packageMapSetting: scopedPM } = readGertSpawnConfig(
+    (key, def) => activeFolderConfig[key] !== undefined ? activeFolderConfig[key] : def,
+  );
+  const scopedPath = resolvePackageMapPath(activeRoot, scopedPM);
+  const scopedArgs = buildServeArgs('127.0.0.1:9000', scopedPath);
+
+  const flagIdx = scopedArgs.indexOf('--package-map');
+  assert.ok(flagIdx !== -1,
+    'scoped config: --package-map must be present when active folder has gert.packageMap');
+  assert.equal(
+    scopedArgs[flagIdx + 1],
+    path.join(activeRoot, 'packages', 'incident-routing.vscode-mcp.package-map.yaml'),
+    '--package-map value must be the absolute path resolved against the active project root',
+  );
+  // Path must be a separate argv element, not fused to the flag.
+  assert.ok(!scopedArgs[flagIdx].includes('='),
+    '--package-map must not use = syntax; path is a separate element');
+
+  // ── Unscoped path (the bug) ─────────────────────────────────────────────
+  // Simulates reading from workspaceFolders[0] which has no packageMap setting.
+  const { packageMapSetting: unscopedPM } = readGertSpawnConfig(
+    (key, def) => folder0Config[key] !== undefined ? folder0Config[key] : def,
+  );
+  const unscopedPath = resolvePackageMapPath(activeRoot, unscopedPM);
+  const unscopedArgs = buildServeArgs('127.0.0.1:9000', unscopedPath);
+
+  assert.ok(!unscopedArgs.includes('--package-map'),
+    'unscoped (folder 0) config must not produce --package-map — proves scoping matters');
+});
+
