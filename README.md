@@ -16,6 +16,17 @@ Three commands:
 - `gert.binaryPath` — path to the `gert` CLI (default `gert`).
 - `gert.serverUrl` — base URL of the gert server (default `http://localhost:7778`).
 - `gert.autoStartServer` — start and manage `gert serve` automatically (default `true`).
+- `gert.mcpBridge.toolNameOverrides` — a JSON object mapping logical `"tool/action"` keys to
+  registered MCP tool names. Use this to correct a name mismatch in a live session without a code
+  change or extension release. Example:
+  ```json
+  {
+    "tsg-recommendation/recommend": "my-org-tsg-recommend",
+    "icm/get-incident": "corp-icm-get-incident"
+  }
+  ```
+  This setting takes precedence over the name declared in the workspace's `.tool.yaml` definitions.
+  The YAML-derived names are still used for all entries not listed here.
 
 ## Build
 
