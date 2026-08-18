@@ -301,6 +301,120 @@ test('repoBoundary/rule5: every test/**/*.test.js is reachable by a configured t
   }
 });
 
+// Rule 7 — every getConfiguration( call in src/ must be resource-scoped or
+// carry an explicit window-scoped justification marker.
+//
+// A call to vscode.workspace.getConfiguration without a second (resource) URI
+// silently falls back to workspaceFolders[0], which is the wrong folder in
+// any multi-root workspace where the active runbook belongs to a different
+// folder.  Every call site must either:
+//
+//   (a) pass a second argument  — detected by a comma after getConfiguration(
+//       on the same line or the immediately following line, or
+//   (b) carry the marker `// window-scoped:` on the same line or the
+//       immediately preceding line, with a reason following the colon.
+//
+// JUSTIFICATION MARKER FORMAT: `// window-scoped: <reason>`
+// Applying the marker is an explicit, reviewable decision recorded in source.
+// Do NOT add a blanket allowlist here — the marker belongs at the call site.
+test('repoBoundary/rule7: every getConfiguration( in src/ is resource-scoped or window-scoped:', () => {
+  // Collect all .ts files under src/ from disk so a new file auto-trips the rule.
+  function collectTs(dir) {
+    const out = [];
+    if (!fs.existsSync(dir)) return out;
+    for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+      if (e.isDirectory()) {
+        out.push(...collectTs(path.join(dir, e.name)));
+      } else if (e.name.endsWith('.ts')) {
+        out.push(path.join(dir, e.name));
+      }
+    }
+    return out;
+  }
+
+  const MARKER = '// window-scoped:';
+  const violations = [];
+  let totalCallSites = 0;
+
+  for (const abs of collectTs(SRC_DIR)) {
+    const rel = path.relative(REPO_ROOT, abs).replace(/\\/g, '/');
+    const lines = fs.readFileSync(abs, 'utf8').split('\n');
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+
+      // Skip this guard file itself.
+      if (path.basename(abs) === 'repoBoundary.test.js') continue;
+
+      // Only care about lines that contain a getConfiguration( call (not in a
+      // comment or string — we check by requiring it appears outside a leading //)
+      const trimmed = line.trimStart();
+      if (!line.includes('getConfiguration(')) continue;
+      // Skip comment-only lines (the call appears only in a comment).
+      if (trimmed.startsWith('//') || trimmed.startsWith('*')) continue;
+
+      totalCallSites++;
+
+      // (a) Does this line or the next line contain a comma after getConfiguration(?
+      // We look from the first getConfiguration( occurrence onward on this line,
+      // and if the line has no closing ) before the comma we also check next line.
+      const callIdx = line.indexOf('getConfiguration(');
+      const afterCall = line.slice(callIdx + 'getConfiguration('.length);
+      // Find the first comma not nested inside inner parens.
+      function hasTopLevelComma(text) {
+        let depth = 0;
+        for (const ch of text) {
+          if (ch === '(') { depth++; continue; }
+          if (ch === ')') { if (depth === 0) return false; depth--; continue; }
+          if (ch === ',' && depth === 0) return true;
+        }
+        return false;
+      }
+      const hasCommaOnSameLine = hasTopLevelComma(afterCall);
+      const hasCommaOnNextLine = !hasCommaOnSameLine &&
+        i + 1 < lines.length && hasTopLevelComma(lines[i + 1]);
+
+      if (hasCommaOnSameLine || hasCommaOnNextLine) continue; // resource-scoped ✓
+
+      // (b) Does this line or any immediately preceding contiguous comment line
+      //     carry // window-scoped:?  We walk backwards through comment-only lines.
+      let markerFound = line.includes(MARKER);
+      if (!markerFound) {
+        for (let j = i - 1; j >= 0 && !markerFound; j--) {
+          const pLine = lines[j].trimStart();
+          if (pLine.startsWith('//') || pLine.startsWith('*')) {
+            if (lines[j].includes(MARKER)) { markerFound = true; }
+          } else {
+            break; // non-comment line — stop looking
+          }
+        }
+      }
+      if (markerFound) continue; // justified ✓
+
+      violations.push(
+        `${rel}:${i + 1}: unscoped getConfiguration( without a resource argument or ` +
+        `'${MARKER}' justification — either pass a second resource URI argument to ` +
+        `scope the lookup to the correct workspace folder, or add ` +
+        `'${MARKER} <reason>' on the preceding line if window-scope is genuinely correct. ` +
+        `Offending line: ${line.trim()}`
+      );
+    }
+  }
+
+  assert.ok(
+    totalCallSites > 0,
+    'repoBoundary/rule7: inspected 0 getConfiguration( call sites in src/ — ' +
+    'the rule is not running correctly; check that SRC_DIR resolves to the src/ directory'
+  );
+
+  if (violations.length > 0) {
+    assert.fail(
+      `rule7 violations (${violations.length} unscoped getConfiguration call site(s)):\n` +
+      violations.map((v, i) => `  [${i + 1}] ${v}`).join('\n')
+    );
+  }
+});
+
 // Rule 6 — unwired test scripts
 //
 // Rule5 proves a test file is reachable by *a configured npm script*.

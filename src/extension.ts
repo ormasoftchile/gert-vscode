@@ -73,6 +73,9 @@ export function activate(context: vscode.ExtensionContext) {
     // validateInputs) is invoked. This avoids the workspaceFolders[0] bias
     // that breaks multi-root workspaces.
     registry: {},
+    // window-scoped: mcpBridge.toolNameOverrides is read at extension activation
+    // before any runbook is open; there is no resource to scope to at this point,
+    // so window-level (unscoped) resolution is the only correct choice.
     overrides: vscode.workspace.getConfiguration('gert').get<Record<string, string>>('mcpBridge.toolNameOverrides') ?? {},
   }).then((bridge) => {
     mcpBridge = bridge;
