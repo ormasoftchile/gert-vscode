@@ -9,9 +9,16 @@
     "type": "git",
     "url": "https://github.com/ormasoftchile/gert-vscode.git"
   },
-  "engines": { "vscode": "^1.95.0" },
-  "categories": ["Visualization", "Other"],
-  "activationEvents": ["onLanguage:yaml"],
+  "engines": {
+    "vscode": "^1.95.0"
+  },
+  "categories": [
+    "Visualization",
+    "Other"
+  ],
+  "activationEvents": [
+    "onLanguage:yaml"
+  ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
@@ -62,7 +69,9 @@
         },
         "gert.mcpBridge.toolNameOverrides": {
           "type": "object",
-          "additionalProperties": { "type": "string" },
+          "additionalProperties": {
+            "type": "string"
+          },
           "default": {},
           "markdownDescription": "Override the registered MCP tool name for a logical `tool/action` key. Use this to correct a name mismatch in a live session without a code change or release. Example: `{ \"tsg-recommendation/recommend\": \"my-org-tsg-recommend\" }`"
         },
@@ -91,7 +100,6 @@
     "compile": "tsc -p ./",
     "compile:test": "tsc -p tsconfig.test.json",
     "test": "node --test test/*.test.js",
-    "test:integration": "node --test test/integration/**/*.test.js",
     "test:e2e": "npm run compile && npm run compile:test && vscode-test",
     "watch": "tsc -w -p ./",
     "vscode:prepublish": "npm run compile",
@@ -108,3 +116,4 @@
     "typescript": "^5.5.4"
   }
 }
+

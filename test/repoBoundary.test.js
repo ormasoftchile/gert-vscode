@@ -285,8 +285,8 @@ test('repoBoundary/rule5: every test/**/*.test.js is reachable by a configured t
         violations.push(
           `${rel}: this test file is not reachable by any configured test runner. ` +
           `Configured globs: ${testGlobs.map(g => JSON.stringify(g)).join(', ')}. ` +
-          `Either wire this file into a script (e.g. extend the test glob in package.json ` +
-          `and add a CI step that runs that script with the required preconditions), ` +
+          `Either wire this file into a script in package.json AND add a CI job ` +
+          `that invokes that script (rule6 enforces the CI wiring), ` +
           `or delete it — an orphan provides no coverage and misleads readers. ` +
           `If a justified exception is needed, add the file to ORPHAN_ALLOWLIST in ` +
           `test/repoBoundary.test.js with a comment explaining why.`
@@ -298,5 +298,94 @@ test('repoBoundary/rule5: every test/**/*.test.js is reachable by a configured t
   }
   if (violations.length > 0) {
     assert.fail('rule5 (orphan) violations:\n' + violations.map((v, i) => `  [${i+1}] ${v}`).join('\n'));
+  }
+});
+
+// Rule 6 — unwired test scripts
+//
+// Rule5 proves a test file is reachable by *a configured npm script*.
+// Rule6 closes the remaining link: every npm script that runs tests
+// (i.e., contains `node --test`) must be invoked by at least one step
+// in `.github/workflows/*.yml`.  Together, rules 5+6 make the chain
+// transitive and complete:
+//
+//   test file → matched by a script glob (rule5)
+//             → that script is invoked by CI (rule6)
+//
+// Breaking either link fails a rule.  A script that exists but is never
+// called by CI is an unwired runner: it certifies orphan files (rule5
+// passes) while executing nothing in CI — the same class as the original
+// "tests 0" defect.
+//
+// Matching logic:
+//   - Script named "test": matches `npm test` or `npm run test` in a
+//     workflow `run:` block.  `npm test` is an official npm shorthand for
+//     `npm run test` and both must be accepted.
+//   - Any other script named "test:foo": matches `npm run test:foo`.
+//   - Matching is done on the raw YAML text (no YAML parser dependency).
+//     A `run:` block that invokes a script via shell variable expansion or
+//     a Makefile target would not be detected — that is intentional; such
+//     indirection is opaque and should be avoided in CI steps.
+test('repoBoundary/rule6: every node --test npm script is invoked by a CI workflow', () => {
+  // Collect all workflow YAML files.
+  const workflowDir = path.join(REPO_ROOT, '.github', 'workflows');
+  const workflowTexts = [];
+  if (fs.existsSync(workflowDir)) {
+    for (const f of fs.readdirSync(workflowDir)) {
+      if (f.endsWith('.yml') || f.endsWith('.yaml')) {
+        workflowTexts.push(fs.readFileSync(path.join(workflowDir, f), 'utf8'));
+      }
+    }
+  }
+  const combinedWorkflows = workflowTexts.join('\n');
+
+  // Collect all npm scripts containing `node --test`.
+  const pkg = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'package.json'), 'utf8'));
+  const testScripts = Object.entries(pkg.scripts || {})
+    .filter(([, cmd]) => typeof cmd === 'string' && /node\s+--test/.test(cmd))
+    .map(([name]) => name);
+
+  assert.ok(
+    testScripts.length > 0,
+    'repoBoundary/rule6: no npm scripts containing `node --test` found — ' +
+    'this guard requires at least one test script to be meaningful'
+  );
+
+  /**
+   * Returns true if the given npm script name is invoked somewhere in the
+   * combined workflow YAML text.
+   *
+   * "test" can be invoked as `npm test` or `npm run test`.
+   * Any other script "foo:bar" must be invoked as `npm run foo:bar`.
+   */
+  function isScriptInvokedByCI(name) {
+    if (name === 'test') {
+      // `npm test` is official shorthand for `npm run test`.
+      // Use (?!\S) instead of \b to prevent `npm run test:integration`
+      // from matching — \b fires between 't' and ':' since ':' is a
+      // non-word character, producing a false positive.
+      return /\bnpm\s+test(?!\S)/.test(combinedWorkflows) ||
+             /\bnpm\s+run\s+test(?!\S)/.test(combinedWorkflows);
+    }
+    // Escape special regex chars in the script name (e.g. the colon in test:integration).
+    const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return new RegExp(`\\bnpm\\s+run\\s+${escaped}(?!\\S)`).test(combinedWorkflows);
+  }
+
+  const violations = [];
+  for (const name of testScripts) {
+    if (!isScriptInvokedByCI(name)) {
+      violations.push(
+        `package.json script "${name}" runs \`node --test\` but is not invoked ` +
+        `by any step in .github/workflows/*.yml. ` +
+        `Either add a CI job that runs \`npm run ${name}\` (the job must fail, ` +
+        `not silently pass, when no test files are matched), ` +
+        `or delete the script until there is a test file to justify it — ` +
+        `rule5 will then force the script to be re-added when the file is added.`
+      );
+    }
+  }
+  if (violations.length > 0) {
+    assert.fail('rule6 violations:\n' + violations.map((v, i) => `  [${i+1}] ${v}`).join('\n'));
   }
 });
