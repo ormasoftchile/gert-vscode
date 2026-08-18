@@ -2,6 +2,9 @@
 .vscode-test/**
 .github/**
 src/**
+test/**
+.runbook/**
+*.jsonl
 **/*.ts
 **/tsconfig.json
 **/tsconfig.*.json

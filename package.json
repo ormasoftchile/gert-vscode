@@ -17,11 +17,13 @@
     "commands": [
       {
         "command": "gert.preview",
-        "title": "gert: Open Runbook Preview"
+        "title": "gert: Open Runbook Preview",
+        "icon": "$(preview)"
       },
       {
         "command": "gert.previewGraph",
-        "title": "gert: Open Runbook Graph (React Flow)"
+        "title": "gert: Open Runbook Graph (React Flow)",
+        "icon": "$(type-hierarchy-sub)"
       },
       {
         "command": "gert.showServerLog",
@@ -30,6 +32,10 @@
       {
         "command": "gert.restartServer",
         "title": "gert: Restart Server"
+      },
+      {
+        "command": "gert.validateInputs",
+        "title": "gert: Validate Runbook Inputs (Dry Run)"
       }
     ],
     "menus": {
@@ -37,7 +43,12 @@
         {
           "command": "gert.preview",
           "when": "resourceFilename =~ /\\.runbook\\.yaml$/",
-          "group": "navigation"
+          "group": "navigation@2"
+        },
+        {
+          "command": "gert.previewGraph",
+          "when": "resourceFilename =~ /\\.runbook\\.yaml$/",
+          "group": "navigation@1"
         }
       ]
     },
@@ -64,6 +75,7 @@
   },
   "scripts": {
     "compile": "tsc -p ./",
+    "test": "node --test test/*.test.js",
     "watch": "tsc -w -p ./",
     "vscode:prepublish": "npm run compile",
     "package": "vsce package --no-dependencies -o gert-preview.vsix",
