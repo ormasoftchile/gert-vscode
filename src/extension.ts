@@ -53,6 +53,7 @@ import {
 } from './enumInputs';
 import { stashPendingRun, claimPendingRun } from './pendingRunStore';
 import { parseRunArgs, resolveRunbookPath, buildRunChatQuery, formatRunStartLog } from './runbookArgParse';
+import { performRunHandoff } from './runHandoff';
 
 const pexec = promisify(execFile);
 
@@ -498,29 +499,17 @@ async function runAuthenticated() {
     // The run handler will attempt the run with whatever inputs are supplied.
   }
 
-  // Step 3 — collect required inputs only.
+  // Steps 3-5 — collect required inputs, stash, build query, open chat.
+  // Delegated to performRunHandoff() in src/runHandoff.ts so the
+  // security-critical redaction sequence is testable without VS Code.
   const allDecls = previewDoc ? (extractInputDecls(previewDoc) ?? []) : [];
   const requiredDecls = filterRequiredInputs(allDecls);
 
-  const collectedInputs: Record<string, string> = {};
-  for (const decl of requiredDecls) {
-    const result = await promptForInput(decl);
-    if (result === CANCELLED) return; // operator cancelled; abort silently
-    if (result !== UNSET) collectedInputs[decl.name] = result;
-  }
-
-  // Step 4 — stash inputs in extension-host memory; obtain nonce.
-  // Security: collectedInputs may contain secret values; they must never
-  // appear in the chat query string or any log line.
-  const nonce = stashPendingRun(runbookPath, collectedInputs);
-
-  // Step 5 — open chat with the nonce handoff query.
-  // The query contains only the runbook path (not sensitive) and the nonce.
-  // Input values remain in the pending-run store until claimed.
-  const query = buildRunChatQuery(nonce, runbookPath);
-  await vscode.commands.executeCommand('workbench.action.chat.open', {
-    query,
-    isPartialQuery: false,
+  await performRunHandoff(runbookPath, requiredDecls, {
+    promptForInput,
+    stashPendingRun,
+    buildRunChatQuery,
+    executeCommand: async (cmd, opts) => { await vscode.commands.executeCommand(cmd, opts); },
   });
 }
 
@@ -706,3 +695,4 @@ async function previewGraph() {
     if (graphPanel === panel) graphPanel = undefined;
   });
 }
+
