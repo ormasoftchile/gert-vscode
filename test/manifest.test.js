@@ -80,6 +80,18 @@ test('gert.chat participant declares the arm-mcp command', () => {
   assert.ok(armCmd, 'gert.chat must declare the "arm-mcp" command');
 });
 
+// INVTOKEN-M-03: The /run slash command must be declared in the manifest so
+// VS Code surfaces it in the autocomplete picker. A command handled in code
+// but absent from the manifest is silently missing from the UI — the same
+// class of defect that has bitten this engagement repeatedly.
+test('gert.chat participant declares the run command', () => {
+  const participants = manifest.contributes.chatParticipants ?? [];
+  const gert = participants.find((p) => p.id === 'gert.chat');
+  assert.ok(gert, 'gert.chat participant must be declared');
+  const runCmd = (gert.commands ?? []).find((c) => c.name === 'run');
+  assert.ok(runCmd, 'gert.chat must declare the "run" command');
+});
+
 test('CE-C-02: no vendored *.schema.json in the extension source tree', () => {
   const fs = require('node:fs');
   const path = require('node:path');

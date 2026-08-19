@@ -72,10 +72,6 @@
         {
           "name": "arm-mcp",
           "description": "Diagnostic only: capture a tool invocation token (causes VS Code to start MCP servers ~60s). Does NOT authorize deferred runs; use /run instead."
-        },
-        {
-          "name": "probe-token",
-          "description": "Diagnostic: test whether toolInvocationToken survives await boundaries. Usage: @gert /probe-token <toolName> {\"key\":\"val\"}. Reports ok/failed per scheduling tier. THROWAWAY — will be removed after measurement."
         }
         ]
       }
@@ -110,11 +106,6 @@
           "type": "boolean",
           "default": true,
           "description": "If true, the extension spawns `gert serve` automatically when you run a graph preview. Set to false to use an external server (configure gert.serverUrl)."
-        },
-        "gert.diagnostics.unsafeErrorText": {
-          "type": "boolean",
-          "default": false,
-          "description": "Diagnostic flag: when true, raw provider error text (err.message, err.stack) from failed /probe-token attempts is written to the gert output channel. This text NEVER appears in the chat response, HTTP responses, run state, or child-process environment. Enable only when actively diagnosing invocation failures; disable afterwards."
         }
       }
     }

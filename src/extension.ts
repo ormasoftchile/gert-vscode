@@ -33,7 +33,6 @@ import { buildRegistryFromDir } from './toolDefinitionRegistry';
 import { pickServerRoot } from './serverRoot';
 import { setToolToken, getToolToken, clearToolToken } from './toolTokenStore';
 import { isArmCommand } from './chatParticipantGate';
-import { handleProbeToken } from './probeToken';
 import {
   CANCELLED,
   UNSET,
@@ -108,6 +107,17 @@ export function activate(context: vscode.ExtensionContext) {
     async (request, _ctx, response, _token) => {
       if (isArmCommand(request.command)) {
         setToolToken(request.toolInvocationToken);
+        // Diagnostic: list tools visible in vscode.lm.tools right now.
+        // Accessing toolInvocationToken triggers MCP server discovery, so this
+        // snapshot reflects the state immediately after the discovery signal.
+        // Zero invoke budget — no invokeTool calls.
+        const visibleTools = (vscode.lm.tools as unknown as readonly { name: string }[])
+          .map((t) => t.name)
+          .sort();
+        const toolsSummary = visibleTools.length === 0
+          ? '_No tools visible yet — VS Code may still be starting MCP servers (~60s on ' +
+            'first use). Run `/arm-mcp` again after ~60s to see them._'
+          : visibleTools.map((n) => `- \`${n}\``).join('\n');
         response.markdown(
           'ℹ️ **Token armed — MCP dialog suppression enabled.**\n\n' +
           'Accessing `request.toolInvocationToken` causes VS Code to auto-discover ' +
@@ -117,29 +127,72 @@ export function activate(context: vscode.ExtensionContext) {
           'with the token, the bridge retries once without it — the consent dialog ' +
           'will appear instead. This token is NEVER an authorization credential.\n\n' +
           '**Re-arm when needed:** The token is cleared on rejection. ' +
-          'Run `/arm-mcp` again if calls fail with `invocation_token_unavailable`.',
+          'Run `/arm-mcp` again if calls fail with `invocation_token_unavailable`.\n\n' +
+          '**VS Code MCP tools visible right now:**\n\n' +
+          toolsSummary,
         );
         return {};
       }
 
-      if (request.command === 'probe-token') {
-        // window-scoped: unsafeErrorText is a diagnostics flag; no resource context at call time.
-        const unsafeErrorText = vscode.workspace.getConfiguration('gert').get<boolean>('diagnostics.unsafeErrorText', false);
-        await handleProbeToken(
-          request.prompt,
-          request.toolInvocationToken,
-          vscode.lm.tools as unknown as readonly { name: string; description?: string; inputSchema?: unknown }[],
-          (name, options, cancellation) =>
-            vscode.lm.invokeTool(
-              name,
-              { input: options.input, toolInvocationToken: options.toolInvocationToken as never },
-              cancellation as vscode.CancellationToken,
-            ) as Promise<unknown>,
-          _token,
-          response,
-          output,
-          unsafeErrorText,
-        );
+      if (request.command === 'run') {
+        // Access toolInvocationToken first — triggers VS Code to start MCP servers
+        // (~60s on first use) and caches the token for bridge dialog suppression.
+        // Petals model: store unconditionally; bridge decides whether to use it.
+        setToolToken(request.toolInvocationToken);
+
+        const prompt = request.prompt.trim();
+        if (!prompt) {
+          response.markdown(
+            '**gert /run**: runbook path required.\n\n' +
+            'Usage: `@gert /run <path/to/runbook.yaml> [key=val ...]`',
+          );
+          return {};
+        }
+
+        // First token is the runbook path; remainder are key=val pairs for --var.
+        const [runbookArg, ...varPairArgs] = prompt.split(/\s+/);
+        const runbookPath = path.isAbsolute(runbookArg)
+          ? runbookArg
+          : path.resolve(
+              vscode.window.activeTextEditor?.document.uri.fsPath
+                ? path.dirname(vscode.window.activeTextEditor.document.uri.fsPath)
+                : process.cwd(),
+              runbookArg,
+            );
+
+        // Refresh registry so the bridge dispatches against this runbook's tools.
+        refreshBridgeRegistry(runbookPath);
+
+        const bin = vscode.workspace
+          .getConfiguration('gert', vscode.Uri.file(runbookPath))
+          .get<string>('binaryPath', 'gert');
+        const varArgs = varPairArgs.flatMap((p) => ['--var', p]);
+        const bridgeVars = mcpBridge
+          ? {
+              GERT_VSCODE_BRIDGE_URL: mcpBridge.bridgeUrl,
+              GERT_VSCODE_BRIDGE_TOKEN: mcpBridge.bridgeToken,
+            }
+          : {};
+
+        await new Promise<void>((resolve) => {
+          execFile(
+            bin,
+            ['run', ...varArgs, runbookPath],
+            { env: { ...process.env, ...bridgeVars }, maxBuffer: 10 * 1024 * 1024 },
+            (err, stdout, stderr) => {
+              if (stderr.trim()) output?.appendLine(`[gert run] ${stderr.trim()}`);
+              if (err) {
+                reportEngineFailure('gert run', err);
+                response.markdown(
+                  '❌ **gert run failed** — see the `gert` output channel for details.',
+                );
+              } else {
+                response.markdown(stdout.trim() || '✅ Runbook completed.');
+              }
+              resolve();
+            },
+          );
+        });
         return {};
       }
 
@@ -147,7 +200,7 @@ export function activate(context: vscode.ExtensionContext) {
         '**gert**: Unknown command.\n\n' +
         'Commands:\n' +
         '- `/arm-mcp` — optional: capture a token for MCP dialog suppression\n' +
-        '- `/probe-token <toolName> <jsonInput>` — diagnostic: test token lifetime across scheduling boundaries\n',
+        '- `/run <runbook.yaml> [key=val ...]` — run a runbook live\n',
       );
       return {};
     },
