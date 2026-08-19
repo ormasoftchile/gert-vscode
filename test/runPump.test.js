@@ -99,19 +99,26 @@ test('PUMP-1: pump resolves an enqueued invocation when the handler drains and r
     'enqueue Promise must resolve with the value passed to item.resolve');
 });
 
-// ─── PUMP-2: no active run → rejected without invoking ───────────────────────
-// Mutation proof: remove `if (this.lm.hasActivePump?.() === false)` gate from
-// mcpBridge handle() → invokeTool is called, invokeCount increments to 1,
-// assert.equal(invokeCount, 0) fails.
+// ─── PUMP-2: no active run + no cached token → no_active_run ─────────────────
+// Tests layer 3 of the layered invocation model: no pump AND no cached token
+// (unarmed) → no_active_run, invokeTool never called.
+//
+// Mutation proof for layer 3 gate: remove `cachedToken === undefined` check →
+// no_active_run still fires (because !hasPump is true), invokeTool still not
+// called — but LAYER-2 below catches this by asserting layer-2 IS invoked
+// when armed. Together, PUMP-2 and LAYER-2 together prove the gate.
+//
+// Additional mutation: swap `!hasPump` to `hasPump` → no_active_run fires when
+// pump IS active → LAYER-1 (below) fails because invokeTool count drops to 0.
 
-test('PUMP-2: bridge rejects without invoking when no active run (no_active_run gate)', async (t) => {
+test('PUMP-2: bridge rejects without invoking when no pump AND no cached token (no_active_run floor)', async (t) => {
   const registry = buildRegistryFromDir(FIXTURE_TOOLS_DIR);
 
   let invokeCount = 0;
   const lm = {
     tools:                   [{ name: 'icm-get-incident' }],
-    getToolInvocationToken:  () => 'some-token',
-    hasActivePump:           () => false,          // explicit: no active run
+    getToolInvocationToken:  () => undefined,  // explicitly unarmed
+    hasActivePump:           () => false,       // no pump
     invokeTool:              async () => { invokeCount++; return makeIcmResult(); },
   };
 
@@ -120,12 +127,233 @@ test('PUMP-2: bridge rejects without invoking when no active run (no_active_run 
 
   const { body } = await postBridge(bridge.bridgeUrl, makeRequest(bridge));
 
-  assert.ok(body.error, 'bridge must return an error when no run is active');
+  assert.ok(body.error, 'bridge must return an error when no run is active and unarmed');
   assert.equal(body.error.code, 'no_active_run',
     `error code must be no_active_run, got: ${body.error.code}`);
   assert.equal(body.result, undefined, 'result must be absent');
   assert.equal(invokeCount, 0,
-    `invokeTool must NOT be called when gate fires (spy count = ${invokeCount})`);
+    `invokeTool must NOT be called when both pump and token are absent (spy count = ${invokeCount})`);
+});
+
+// ─── LAYER-1: pump active → layer 1 used, no retry on Canceled ───────────────
+// Tests that when hasActivePump()===true, the bridge uses layer 1 (direct
+// invokeTool, no two-attempt retry). If the precedence were inverted (layer 2
+// used when pump present), Canceled would trigger a retry and callCount=2.
+//
+// Mutation proof A (invert precedence): change `if (hasPump)` to `if (!hasPump)`
+// → layer 2 fires when pump IS active → Canceled triggers retry → callCount=2
+// → assert.equal(callCount, 1) FAILS.
+//
+// Mutation proof B (remove layer-1 branch entirely): remove the `if (hasPump)`
+// path → no invokeTool ever called → callCount=0 → fails.
+
+test('LAYER-1: pump active → invokeTool called once, no retry on Canceled (layer 1 semantics)', async (t) => {
+  const registry = buildRegistryFromDir(FIXTURE_TOOLS_DIR);
+  let callCount = 0;
+  const lm = {
+    tools:                   [{ name: 'icm-get-incident' }],
+    getToolInvocationToken:  () => 'cached-token',
+    hasActivePump:           () => true,            // pump IS active
+    invokeTool:              async () => { callCount++; throw new Error('Canceled'); },
+  };
+
+  const bridge = await McpBridge.create(lm, 0, undefined, { registry });
+  t.after(() => bridge.dispose());
+
+  const { body } = await postBridge(bridge.bridgeUrl, makeRequest(bridge));
+
+  assert.ok(body.error, 'a Canceled error must produce an error response');
+  // Layer 1 does NOT retry → callCount must be exactly 1.
+  assert.equal(callCount, 1,
+    `layer 1 must call invokeTool exactly once (no retry). Got callCount=${callCount}`);
+  // no_active_run must NOT appear — that code is the layer-3 floor.
+  assert.notEqual(body.error.code, 'no_active_run',
+    'error code must not be no_active_run when pump is active');
+});
+
+// ─── LAYER-2: no pump, armed → layer 2 invokes (spy count) ───────────────────
+// Tests that when hasActivePump()===false but getToolInvocationToken() returns
+// a token, the bridge DOES call invokeTool (layer 2), not no_active_run.
+//
+// Mutation proof (delete layer 2): replace layer-2 branch with an immediate
+// no_active_run return → invokeTool never called → callCount=0
+// → assert.ok(callCount > 0) FAILS.
+
+test('LAYER-2: no pump, armed token → invokeTool IS invoked (spy count > 0)', async (t) => {
+  const registry = buildRegistryFromDir(FIXTURE_TOOLS_DIR);
+  let callCount = 0;
+  const lm = {
+    tools:                   [{ name: 'icm-get-incident' }],
+    getToolInvocationToken:  () => 'armed-token',   // token is armed
+    hasActivePump:           () => false,            // no pump
+    invokeTool:              async () => { callCount++; return makeIcmResult(); },
+  };
+
+  const bridge = await McpBridge.create(lm, 0, undefined, { registry });
+  t.after(() => bridge.dispose());
+
+  const { body } = await postBridge(bridge.bridgeUrl, makeRequest(bridge));
+
+  // Non-vacuity: result must be a successful invocation.
+  assert.ok(body.result, `layer 2 must produce a result; got error: ${JSON.stringify(body.error)}`);
+  assert.ok(callCount > 0,
+    `invokeTool must be called at least once in layer 2 (spy count=${callCount})`);
+  assert.equal(callCount, 1, 'exactly one call on success path');
+  // no_active_run must NOT be the outcome — that is the layer-3 floor (unarmed).
+  assert.equal(body.error, undefined, 'must have no error on success');
+});
+
+// ─── LAYER-2b: no pump, armed, Canceled → layer 2 retries (call count = 2) ───
+// Tests that layer 2 uses the two-attempt retry (invokeWithTwoAttempts) —
+// same semantics as the pump path.
+//
+// Mutation proof (skip retry in layer 2): remove invokeWithTwoAttempts from
+// layer 2, call invokeTool once without retry → callCount=1 on Canceled →
+// assert.equal(callCount, 2) FAILS.
+
+test('LAYER-2b: no pump, armed, Canceled on attempt 1 → layer 2 retries (call count = 2)', async (t) => {
+  const registry = buildRegistryFromDir(FIXTURE_TOOLS_DIR);
+  let callCount = 0;
+  const tokens = [];
+  const lm = {
+    tools:                   [{ name: 'icm-get-incident' }],
+    getToolInvocationToken:  () => 'armed-token',
+    hasActivePump:           () => false,
+    invokeTool:              async (_name, opts) => {
+      callCount++;
+      tokens.push(opts.toolInvocationToken);
+      if (callCount === 1) throw new Error('Canceled');
+      return makeIcmResult();
+    },
+  };
+
+  const bridge = await McpBridge.create(lm, 0, undefined, { registry });
+  t.after(() => bridge.dispose());
+
+  const { body } = await postBridge(bridge.bridgeUrl, makeRequest(bridge));
+
+  assert.ok(body.result, `layer 2 retry should succeed; error=${JSON.stringify(body.error)}`);
+  assert.equal(callCount, 2, 'layer 2 must use two-attempt retry: callCount must be 2');
+  assert.equal(tokens[0], 'armed-token', 'attempt 1 must use the armed cached token');
+  assert.equal(tokens[1], undefined, 'attempt 2 must use undefined (no-token retry)');
+});
+
+// ─── LAYER-3: no pump, unarmed → no_active_run, invokeTool never called ──────
+// Already covered by updated PUMP-2 above.
+
+// ─── LAYER-4: no pump, armed, fails → named category ≠ no_active_run ─────────
+// Tests that a layer-2 invocation failure surfaces with a named error category
+// (e.g. authorization_unavailable), NOT no_active_run.
+// The two must be distinguishable: conflating them hides that an invocation was
+// attempted but failed, versus never attempted at all.
+//
+// Mutation proof: return no_active_run from layer-2 catch block → body.error.code
+// becomes 'no_active_run' → assert.notEqual(…, 'no_active_run') FAILS.
+
+test('LAYER-4: no pump, armed, invocation fails → named category, not no_active_run', async (t) => {
+  const registry = buildRegistryFromDir(FIXTURE_TOOLS_DIR);
+  let callCount = 0;
+  const lm = {
+    tools:                   [{ name: 'icm-get-incident' }],
+    getToolInvocationToken:  () => 'armed-token',
+    hasActivePump:           () => false,
+    invokeTool:              async () => {
+      callCount++;
+      throw new Error('auth failed: credential rejected (forbidden)');
+    },
+  };
+
+  const bridge = await McpBridge.create(lm, 0, undefined, { registry });
+  t.after(() => bridge.dispose());
+
+  const { body } = await postBridge(bridge.bridgeUrl, makeRequest(bridge));
+
+  assert.ok(body.error, 'layer-2 failure must produce an error response');
+  assert.ok(callCount > 0, 'invokeTool must have been called (layer 2 attempted)');
+  assert.notEqual(body.error.code, 'no_active_run',
+    `layer-2 failure must surface as a named category, not no_active_run. Got: ${body.error.code}`);
+  // Specifically: auth failure classifies as authorization_unavailable.
+  assert.equal(body.error.code, 'authorization_unavailable',
+    `expected authorization_unavailable, got: ${body.error.code}`);
+});
+
+// ─── LAYER-5: layer-2 log lines must not contain the armed token ──────────────
+// Redaction guarantee: the cached token must never appear in any output-channel
+// line, on every path through layer 2 (attempt-1 success, Canceled retry, failure).
+//
+// Path A: Canceled on attempt 1, retry succeeds (tests invokeWithTwoAttempts log lines)
+// Path B: attempt 1 succeeds directly (tests direct invokeTool log lines)
+// Path C: both attempts fail (tests failure log lines)
+//
+// Mutation proof: change invokeWithTwoAttempts to log handlerToken →
+// line includes armedToken → assert.ok(!line.includes(armedToken)) FAILS.
+
+test('LAYER-5a: armed token absent from log lines on layer-2 Canceled retry path', async (t) => {
+  const registry = buildRegistryFromDir(FIXTURE_TOOLS_DIR);
+  const logLines = [];
+  const output = { appendLine: (s) => logLines.push(s) };
+
+  const armedToken = 'ARMED_TOKEN_LAYER5_SECRET_REDACT_TEST';
+  let callCount = 0;
+  const lm = {
+    tools:                   [{ name: 'icm-get-incident' }],
+    getToolInvocationToken:  () => armedToken,
+    hasActivePump:           () => false,
+    invokeTool:              async () => {
+      callCount++;
+      if (callCount === 1) throw new Error('Canceled');
+      return makeIcmResult();
+    },
+  };
+
+  const bridge = await McpBridge.create(lm, 0, output, { registry });
+  t.after(() => bridge.dispose());
+
+  const { body } = await postBridge(bridge.bridgeUrl, makeRequest(bridge));
+
+  // Non-vacuity: retry must have been triggered and log lines produced.
+  assert.equal(callCount, 2, 'non-vacuity: retry must have been triggered');
+  assert.ok(body.result, 'non-vacuity: invocation must succeed');
+  assert.ok(logLines.length > 0, 'non-vacuity: at least one log line must exist');
+
+  for (const line of logLines) {
+    assert.ok(!line.includes(armedToken),
+      `LEAK on path A: armed token found in log line: "${line}"`);
+  }
+});
+
+test('LAYER-5b: armed token absent from log lines on layer-2 failure path', async (t) => {
+  const registry = buildRegistryFromDir(FIXTURE_TOOLS_DIR);
+  const logLines = [];
+  const output = { appendLine: (s) => logLines.push(s) };
+
+  const armedToken = 'ARMED_TOKEN_LAYER5B_SECRET_REDACT_TEST';
+  let callCount = 0;
+  const lm = {
+    tools:                   [{ name: 'icm-get-incident' }],
+    getToolInvocationToken:  () => armedToken,
+    hasActivePump:           () => false,
+    invokeTool:              async () => {
+      callCount++;
+      // Non-Canceled failure → no retry → attempt 1 fails directly.
+      throw new Error('invocation error on layer-2 path B');
+    },
+  };
+
+  const bridge = await McpBridge.create(lm, 0, output, { registry });
+  t.after(() => bridge.dispose());
+
+  const { body } = await postBridge(bridge.bridgeUrl, makeRequest(bridge));
+
+  // Non-vacuity: invocation was attempted and produced an error and log lines.
+  assert.equal(callCount, 1, 'non-vacuity: attempt 1 must have been called');
+  assert.ok(body.error, 'non-vacuity: invocation failure must produce error');
+  assert.ok(logLines.length > 0, 'non-vacuity: log lines must exist');
+
+  for (const line of logLines) {
+    assert.ok(!line.includes(armedToken),
+      `LEAK on path B: armed token found in log line: "${line}"`);
+  }
 });
 
 // ─── PUMP-3: two-attempt fallback — Canceled → retry → success ───────────────

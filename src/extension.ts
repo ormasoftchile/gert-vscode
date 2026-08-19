@@ -127,15 +127,20 @@ export function activate(context: vscode.ExtensionContext) {
       if (isArmCommand(request.command)) {
         setToolToken(request.toolInvocationToken);
         response.markdown(
-          'ℹ️ **Token captured (diagnostic only).**\n\n' +
+          'ℹ️ **Token armed — best-effort MCP calls enabled.**\n\n' +
           'Accessing `request.toolInvocationToken` causes VS Code to auto-discover ' +
           'and start MCP servers (~60s on first use).\n\n' +
-          '**This token does NOT authorize deferred MCP calls.** ' +
-          'Token capture alone does not remain valid after the chat request returns ' +
-          '(proven by live-site test, 2026-08-18).\n\n' +
-          'Use `@gert /run <runbook>` to run a runbook. ' +
-          'The `/run` command drives tool invocations from inside the handler, ' +
-          'which is the only execution context VS Code accepts.',
+          '**Best-effort layer:** While this token is armed, Gert MCP tool calls ' +
+          'outside an active `/run` handler are attempted using this cached token. ' +
+          'This path is **unreliable** — live-site evidence (2026-08-18) showed it ' +
+          'can fail — but it is not forbidden. A failure surfaces as a named ' +
+          'category (`invocation_token_unavailable`, `invocation_error`, etc.) ' +
+          'rather than being silently dropped or confused with `no_active_run`.\n\n' +
+          '**Reliable path:** Use `@gert /run <runbook>` to run a runbook. ' +
+          'The `/run` handler uses the live token from inside the ChatRequestHandler, ' +
+          'which VS Code always accepts.\n\n' +
+          '**Re-arm when needed:** The token is cleared on rejection. ' +
+          'Run `/arm-mcp` again if deferred calls fail with `invocation_token_unavailable`.',
         );
         return {};
       }

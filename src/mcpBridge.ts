@@ -14,6 +14,7 @@ import * as http from 'http';
 import * as crypto from 'crypto';
 import type * as vscode from 'vscode';
 import { buildRegistryFromDir } from './toolDefinitionRegistry';
+import { invokeWithTwoAttempts, PendingInvocation } from './runPump';
 
 // ─── Wire types ──────────────────────────────────────────────────────────────
 
@@ -597,23 +598,63 @@ export class McpBridge {
         return this.errorResponse(req.request_id, 'deadline_exceeded', 'deadline already passed');
       }
 
-      // Gate: reject without invoking when no run pump is registered.
-      // Architecture rationale (2026-08-18): the old gate checked token
-      // presence, which was incorrect — token capture alone does not authorize
-      // after the chat request returns. Tool calls are valid only while the
-      // @gert /run handler is alive with an active pump.
-      if (this.lm.hasActivePump?.() === false) {
+      // Layered invocation model (restored from Petals precedent, 2026-08-18 regression fix):
+      //
+      //   Layer 1 (preferred): Active @gert /run pump — the pump's invokeTool
+      //     implementation in extension.ts routes through activePump.enqueue()
+      //     → pump processor → live ChatRequestHandler token. Most reliable.
+      //
+      //   Layer 2 (best-effort): No pump, cached token armed via /arm-mcp —
+      //     attempt via the same invokeWithTwoAttempts logic as the pump path.
+      //     May fail if VS Code has invalidated the token; failure surfaces as
+      //     a named category (e.g. invocation_token_unavailable), NOT no_active_run.
+      //
+      //   Layer 3 (floor): Neither pump nor cached token → no_active_run.
+      //
+      // Regression fixed: the old exclusive pump gate refused ALL calls when no
+      // pump was active, even when a cached token was armed — making /arm-mcp
+      // dead code and removing a working-sometimes capability (the gert.previewGraph
+      // webview path). The live-site failure proved unreliability, not impossibility.
+      const hasPump = this.lm.hasActivePump?.() !== false;
+      const cachedToken = this.lm.getToolInvocationToken();
+
+      if (!hasPump && cachedToken === undefined) {
         return this.errorResponse(req.request_id, 'no_active_run', safeMessage['no_active_run']);
       }
 
-      const toolToken = this.lm.getToolInvocationToken();
       let raw: LmToolResult;
       try {
-        raw = await this.lm.invokeTool(
-          spec.registeredName,
-          { input: req.args, toolInvocationToken: toolToken },
-          cts.token,
-        );
+        if (hasPump) {
+          // Layer 1: pump active; invokeTool routes to pump → live handler token.
+          // cachedToken is passed as toolInvocationToken; the pump-path implementation
+          // in extension.ts ignores it and uses the handler token instead.
+          raw = await this.lm.invokeTool(
+            spec.registeredName,
+            { input: req.args, toolInvocationToken: cachedToken },
+            cts.token,
+          );
+        } else {
+          // Layer 2: no pump, cached token — reuse invokeWithTwoAttempts (same as
+          // pump path) so layer 2 never drifts from layer 1's retry semantics.
+          raw = await new Promise<LmToolResult>((resolve, reject) => {
+            const item: PendingInvocation = {
+              toolName: spec.registeredName,
+              input: req.args,
+              resolve: (r) => resolve(r as LmToolResult),
+              reject,
+            };
+            void invokeWithTwoAttempts(
+              item,
+              cachedToken,
+              async (name, input, tok) => this.lm.invokeTool(
+                name,
+                { input, toolInvocationToken: tok },
+                cts.token,
+              ),
+              this.output,
+            );
+          });
+        }
       } catch (err: unknown) {
         if (timedOut || cts.token.isCancellationRequested) {
           return this.errorResponse(req.request_id, 'deadline_exceeded', 'invocation timed out');
