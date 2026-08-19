@@ -33,6 +33,7 @@ import { buildRegistryFromDir } from './toolDefinitionRegistry';
 import { pickServerRoot } from './serverRoot';
 import { setToolToken, getToolToken, clearToolToken } from './toolTokenStore';
 import { isArmCommand } from './chatParticipantGate';
+import { handleProbeToken } from './probeToken';
 import {
   CANCELLED,
   UNSET,
@@ -121,10 +122,28 @@ export function activate(context: vscode.ExtensionContext) {
         return {};
       }
 
+      if (request.command === 'probe-token') {
+        await handleProbeToken(
+          request.prompt,
+          request.toolInvocationToken,
+          vscode.lm.tools as unknown as readonly { name: string }[],
+          (name, options, cancellation) =>
+            vscode.lm.invokeTool(
+              name,
+              { input: options.input, toolInvocationToken: options.toolInvocationToken as never },
+              cancellation as vscode.CancellationToken,
+            ) as Promise<unknown>,
+          _token,
+          response,
+        );
+        return {};
+      }
+
       response.markdown(
         '**gert**: Unknown command.\n\n' +
         'Commands:\n' +
-        '- `/arm-mcp` — optional: capture a token for MCP dialog suppression\n',
+        '- `/arm-mcp` — optional: capture a token for MCP dialog suppression\n' +
+        '- `/probe-token <toolName> <jsonInput>` — diagnostic: test token lifetime across scheduling boundaries\n',
       );
       return {};
     },

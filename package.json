@@ -72,6 +72,10 @@
         {
           "name": "arm-mcp",
           "description": "Diagnostic only: capture a tool invocation token (causes VS Code to start MCP servers ~60s). Does NOT authorize deferred runs; use /run instead."
+        },
+        {
+          "name": "probe-token",
+          "description": "Diagnostic: test whether toolInvocationToken survives await boundaries. Usage: @gert /probe-token <toolName> {\"key\":\"val\"}. Reports ok/failed per scheduling tier. THROWAWAY — will be removed after measurement."
         }
         ]
       }
