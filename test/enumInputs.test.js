@@ -12,6 +12,7 @@ const test = require('node:test');
 const {
   chooseAffordance,
   extractInputDecls,
+  filterRequiredInputs,
   nfcEquals,
   parseVarPairs,
   deriveFailureMessage,
@@ -139,4 +140,46 @@ test('warningLines extracts only "gert: warning:" lines, code intact', () => {
 
 test('warningLines returns nothing for stderr with no warnings', () => {
   assert.deepEqual(warningLines('ENUM-008: bad value\n'), []);
+});
+
+// ─── filterRequiredInputs (RINP tests) ───────────────────────────────────────
+
+test('RINP-1: filterRequiredInputs returns only inputs with required===true', () => {
+  const decls = [
+    { name: 'a', required: true },
+    { name: 'b', required: false },
+    { name: 'c' }, // required absent
+    { name: 'd', required: true },
+  ];
+  const result = filterRequiredInputs(decls);
+  assert.deepEqual(result.map(d => d.name), ['a', 'd'],
+    'only inputs with required===true should be returned');
+});
+
+test('RINP-2: filterRequiredInputs returns empty array when no required inputs', () => {
+  const decls = [
+    { name: 'x', required: false },
+    { name: 'y' },
+  ];
+  const result = filterRequiredInputs(decls);
+  assert.deepEqual(result, []);
+});
+
+test('RINP-3: filterRequiredInputs returns all when all are required', () => {
+  const decls = [
+    { name: 'p', required: true },
+    { name: 'q', required: true },
+  ];
+  const result = filterRequiredInputs(decls);
+  assert.equal(result.length, 2);
+});
+
+test('RINP-4: filterRequiredInputs treats required===undefined as optional (not prompted)', () => {
+  const decls = [{ name: 'opt' }]; // required absent
+  assert.deepEqual(filterRequiredInputs(decls), [],
+    'an input without a required field must be treated as optional');
+});
+
+test('RINP-5: filterRequiredInputs on empty array returns empty array', () => {
+  assert.deepEqual(filterRequiredInputs([]), []);
 });

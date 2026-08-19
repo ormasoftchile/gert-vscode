@@ -43,6 +43,7 @@ import {
   InputDecl,
   chooseAffordance,
   extractInputDecls,
+  filterRequiredInputs,
   nfcEquals,
   parseVarPairs,
   stderrOf,
@@ -50,6 +51,8 @@ import {
   firstLine,
   warningLines,
 } from './enumInputs';
+import { stashPendingRun, claimPendingRun } from './pendingRunStore';
+import { parseRunArgs, resolveRunbookPath, buildRunChatQuery, formatRunStartLog } from './runbookArgParse';
 
 const pexec = promisify(execFile);
 
@@ -159,6 +162,7 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand('gert.preview', () => previewProse()),
     vscode.commands.registerCommand('gert.previewGraph', () => previewGraph()),
     vscode.commands.registerCommand('gert.validateInputs', () => validateInputs()),
+    vscode.commands.registerCommand('gert.runAuthenticated', () => runAuthenticated()),
     vscode.commands.registerCommand('gert.showServerLog', () => output?.show(true)),
     vscode.commands.registerCommand('gert.restartServer', async () => {
       serverManager?.dispose();
@@ -214,25 +218,34 @@ async function runRunbook(
   const handlerToken = request.toolInvocationToken;
 
   // Parse runbook path from prompt, falling back to the active editor.
-  const parts = request.prompt.trim().split(/\s+/).filter(Boolean);
-  let runbookPath: string | undefined;
-  if (parts.length > 0 && !parts[0].includes('=')) {
-    runbookPath = parts[0];
-  } else {
-    runbookPath = vscode.window.activeTextEditor?.document.fileName;
+  // Uses explicit parseRunArgs (replaces brittle positional parts[0].includes('=') heuristic).
+  const parsed = parseRunArgs(request.prompt);
+  let runbookPath: string | undefined = resolveRunbookPath(
+    parsed.runbookPath,
+    vscode.window.activeTextEditor?.document.fileName,
+  );
+
+  // Claim inputs from the pending-run store when a nonce is present.
+  // The nonce was stashed by gert.runAuthenticated before invoking the chat.
+  // Security: claimPendingRun removes the entry immediately (single-use).
+  let inputs: Record<string, string> = { ...parsed.inputs };
+  if (parsed.nonce !== undefined) {
+    const entry = claimPendingRun(parsed.nonce);
+    if (entry !== undefined) {
+      // Pending entry overrides path (it is the authoritative source) and
+      // merges its inputs with any prompt-supplied kv pairs (prompt wins on
+      // collision so an operator can override a single field at the prompt).
+      runbookPath = entry.runbookPath;
+      inputs = { ...entry.inputs, ...parsed.inputs };
+    }
+    // If entry is undefined (expired or already claimed), proceed with
+    // whatever the prompt supplied — the run may fail for missing inputs,
+    // which is the correct failure mode.
   }
 
   if (!runbookPath || !runbookPath.endsWith('.runbook.yaml')) {
     response.markdown('❌ Specify a `*.runbook.yaml` file: `@gert /run path/to/runbook.yaml`');
     return {};
-  }
-
-  // Parse key=value inputs from remaining args.
-  const inputParts = runbookPath === parts[0] ? parts.slice(1) : parts;
-  const inputs: Record<string, string> = {};
-  for (const pair of inputParts) {
-    const eq = pair.indexOf('=');
-    if (eq > 0) inputs[pair.slice(0, eq)] = pair.slice(eq + 1);
   }
 
   // Refresh registry and ensure server — preserves active-project scoping from
@@ -266,7 +279,7 @@ async function runRunbook(
   }
 
   response.markdown(`🏃 Run \`${runId}\` started.`);
-  output?.appendLine(`[gert run] run=${runId} runbook=${runbookPath}`);
+  output?.appendLine(formatRunStartLog(runId, runbookPath));
 
   const cancelPromise = new Promise<void>((resolve) => {
     token.onCancellationRequested(() => resolve());
@@ -301,7 +314,10 @@ async function runRunbook(
 
     switch (result.reason) {
       case 'terminal':
-        response.markdown(`✅ Run completed: \`${result.status}\``);
+        response.markdown(
+          `✅ Run completed: \`${result.status}\`\n\n` +
+          `[Open run document](${base}/runs/${encodeURIComponent(runId)}/document)`,
+        );
         break;
       case 'cancelled':
         response.markdown('⚠️ Run cancelled.');
@@ -397,6 +413,110 @@ async function validateInputs() {
     surfaceWarnings(stderrOf(err));
     reportEngineFailure('gert dry-run', err);
   }
+}
+
+// runAuthenticated implements the "Run authenticated" editor-title command
+// for *.runbook.yaml files.
+//
+// Flow:
+//   1. Determine runbook path: active editor if it is a .runbook.yaml, or a
+//      QuickPick of workspace *.runbook.yaml files (multi-root safe: uses
+//      vscode.workspace.findFiles which covers all workspace folders, not
+//      just workspaceFolders[0]).
+//   2. Fetch input declarations via `gert preview --format graphjson`.
+//   3. Prompt only for required inputs (filterRequiredInputs).
+//   4. Stash collected inputs in the pending-run store (values never appear
+//      in the chat query string — security requirement from the ask).
+//   5. Open the chat with '@gert /run <path> _nonce=<nonce>' so the existing
+//      chat handler drives the authenticated MCP execution path, keeping the
+//      toolInvocationToken alive inside a live ChatRequestHandler.
+//
+// Security: secret inputs are stashed in extension-host memory only. The
+// chat query contains only the nonce and the (non-sensitive) runbook path.
+// The pending entry is single-use and expires after 30 s.
+//
+// Item 4 architectural note: a plain VS Code command cannot obtain a
+// toolInvocationToken. By opening chat with '@gert /run ... _nonce=...',
+// the existing handler claims the stashed inputs and executes the run inside
+// the live ChatRequestHandler context where the token is valid.
+//
+// Chat open command: workbench.action.chat.open
+// Source: VS Code source export CHAT_OPEN_ACTION_ID in
+//   src/vs/workbench/contrib/chat/browser/actions/chatActions.ts (main branch)
+// Argument shape: IChatViewOpenOptions { query: string; isPartialQuery?: boolean }
+// Confirmed by: GitHub issue #210819 and VS Code source inspection.
+async function runAuthenticated() {
+  // Step 1 — resolve runbook path.
+  let runbookPath: string | undefined;
+  const activeFile = vscode.window.activeTextEditor?.document.fileName;
+  if (activeFile && activeFile.endsWith('.runbook.yaml')) {
+    runbookPath = activeFile;
+  } else {
+    // Multi-root QuickPick: vscode.workspace.findFiles covers all workspace
+    // folders equally — never scoped to workspaceFolders[0].
+    const found = await vscode.workspace.findFiles('**/*.runbook.yaml', '**/node_modules/**');
+    if (found.length === 0) {
+      void vscode.window.showWarningMessage('No *.runbook.yaml files found in the workspace.');
+      return;
+    }
+    // Build workspace-relative labels for readability.
+    const items = found.map((uri) => {
+      const abs = uri.fsPath;
+      // Find the shortest workspace-relative label across all roots.
+      const folders = vscode.workspace.workspaceFolders ?? [];
+      let label = abs;
+      for (const f of folders) {
+        const rel = path.relative(f.uri.fsPath, abs);
+        if (!rel.startsWith('..') && rel.length < label.length) {
+          label = rel;
+        }
+      }
+      return { label, description: abs, uri };
+    });
+    const picked = await vscode.window.showQuickPick(items, {
+      placeHolder: 'Select a runbook to run',
+      ignoreFocusOut: true,
+    });
+    if (!picked) return; // operator cancelled
+    runbookPath = picked.uri.fsPath;
+  }
+
+  // Step 2 — fetch input declarations (best-effort; skip on error).
+  // binaryPath is folder-scoped to the selected runbook's project.
+  const bin = vscode.workspace.getConfiguration('gert', vscode.Uri.file(runbookPath)).get<string>('binaryPath', 'gert');
+  let previewDoc: unknown;
+  try {
+    const { stdout } = await pexec(bin, ['preview', '--format', 'graphjson', runbookPath]);
+    previewDoc = JSON.parse(stdout);
+  } catch {
+    // Engine not available or runbook parse error: proceed without declarations.
+    // The run handler will attempt the run with whatever inputs are supplied.
+  }
+
+  // Step 3 — collect required inputs only.
+  const allDecls = previewDoc ? (extractInputDecls(previewDoc) ?? []) : [];
+  const requiredDecls = filterRequiredInputs(allDecls);
+
+  const collectedInputs: Record<string, string> = {};
+  for (const decl of requiredDecls) {
+    const result = await promptForInput(decl);
+    if (result === CANCELLED) return; // operator cancelled; abort silently
+    if (result !== UNSET) collectedInputs[decl.name] = result;
+  }
+
+  // Step 4 — stash inputs in extension-host memory; obtain nonce.
+  // Security: collectedInputs may contain secret values; they must never
+  // appear in the chat query string or any log line.
+  const nonce = stashPendingRun(runbookPath, collectedInputs);
+
+  // Step 5 — open chat with the nonce handoff query.
+  // The query contains only the runbook path (not sensitive) and the nonce.
+  // Input values remain in the pending-run store until claimed.
+  const query = buildRunChatQuery(nonce, runbookPath);
+  await vscode.commands.executeCommand('workbench.action.chat.open', {
+    query,
+    isPartialQuery: false,
+  });
 }
 
 // collectInputs prompts for a value per declared input (selector for

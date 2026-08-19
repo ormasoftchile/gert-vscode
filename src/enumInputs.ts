@@ -140,6 +140,15 @@ export function deriveFailureMessage(err: unknown): string {
   return String(err);
 }
 
+/** filterRequiredInputs returns only the declared inputs that are required
+ * (required === true). Optional inputs (false/absent) are excluded — the
+ * caller should only prompt the operator for inputs whose absence would
+ * block the run. An input with required: undefined or required: false is
+ * treated as optional and excluded. */
+export function filterRequiredInputs(decls: InputDecl[]): InputDecl[] {
+  return decls.filter((d) => d.required === true);
+}
+
 /** firstLine returns the first non-empty line of text, for compact
  * surfacing in a modal/toast while the full text still goes to a log. */
 export function firstLine(text: string): string {
