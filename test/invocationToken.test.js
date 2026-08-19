@@ -97,28 +97,34 @@ function makeLm({ getTokenFn, invokeToolFn, onTokenRejectedFn } = {}) {
 
 // ─── Test 1: Unarmed bridge rejects WITHOUT invoking ─────────────────────────
 
-test('INVTOKEN-1: unarmed bridge returns invocation_token_unavailable and never calls invokeTool', async (t) => {
+test('INVTOKEN-1: no-active-run gate returns no_active_run and never calls invokeTool', async (t) => {
+  // Architecture change (2026-08-18): the pre-invoke gate is no longer based
+  // on token presence (false premise — token capture alone does not authorize
+  // after the chat request returns). The gate is now based on whether an
+  // active run pump is registered. When hasActivePump() returns false, the
+  // bridge rejects without invoking.
   let invokeCount = 0;
 
   const lm = makeLm({
-    getTokenFn:    () => undefined,           // unarmed
+    getTokenFn:    () => undefined,           // unarmed — token absent
     invokeToolFn:  async () => { invokeCount++; return makeIcmResult(); },
   });
+  // Explicitly signal no active run pump (new gate condition).
+  lm.hasActivePump = () => false;
 
   const bridge = await McpBridge.create(lm, 0, undefined, { registry: fixtureRegistry });
   t.after(() => bridge.dispose());
 
   const { body } = await postBridge(bridge.bridgeUrl, makeRequest(bridge));
 
-  // Fail closed: coded error must be returned.
-  assert.ok(body.error, 'expected an error response from an unarmed bridge');
-  assert.equal(body.error.code, 'invocation_token_unavailable',
-    `error code must be invocation_token_unavailable, got: ${body.error.code}`);
-  assert.equal(body.result, undefined, 'result must be absent when unarmed');
+  assert.ok(body.error, 'expected an error response when no run is active');
+  assert.equal(body.error.code, 'no_active_run',
+    `error code must be no_active_run, got: ${body.error.code}`);
+  assert.equal(body.result, undefined, 'result must be absent when no run is active');
 
   // CRITICAL: invokeTool must never have been called.
   assert.equal(invokeCount, 0,
-    `invokeTool must NOT be called on an unarmed bridge (spy count = ${invokeCount})`);
+    `invokeTool must NOT be called when no run is active (spy count = ${invokeCount})`);
 });
 
 // ─── Test 2: Armed bridge invokes WITH the captured token ────────────────────

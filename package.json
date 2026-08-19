@@ -66,9 +66,13 @@
         "description": "Gert runbook assistant. Use /arm-mcp to arm the MCP bridge with a tool invocation token.",
         "commands": [
           {
-            "name": "arm-mcp",
-            "description": "Arm the MCP bridge with a tool invocation token from this chat turn."
-          }
+          "name": "run",
+          "description": "Run a runbook in-handler and drive MCP tool calls live. Usage: @gert /run <runbook.yaml> [key=val ...]"
+        },
+        {
+          "name": "arm-mcp",
+          "description": "Diagnostic only: capture a tool invocation token (causes VS Code to start MCP servers ~60s). Does NOT authorize deferred runs; use /run instead."
+        }
         ]
       }
     ],

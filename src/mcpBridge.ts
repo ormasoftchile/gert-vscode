@@ -82,19 +82,31 @@ export interface LmInterface {
     token: LmCancellationToken,
   ): Promise<LmToolResult>;
   /**
-   * Returns the toolInvocationToken captured from the most recent arm-mcp chat
-   * turn, or undefined when the bridge is unarmed. The bridge calls this before
-   * every invokeTool call; if the return value is undefined the call is
-   * rejected immediately with invocation_token_unavailable rather than
-   * forwarding undefined to VS Code and receiving an opaque API error.
+   * Returns the toolInvocationToken from the most recent arm-mcp or run
+   * chat turn.  The bridge passes this to invokeTool; the @gert /run handler
+   * uses the live handler token (not this store) when calling the real
+   * vscode.lm.invokeTool from inside the pump processor.
    */
   getToolInvocationToken(): unknown;
   /**
    * Called when VS Code rejects the supplied token (stale session or
    * re-authentication required). Implementations must clear the token store
-   * so the operator must re-arm via @gert /arm-mcp.
+   * so the operator must re-arm.
    */
   onTokenRejected?(): void;
+  /**
+   * Returns false when no @gert /run pump is active; the bridge rejects the
+   * request without invoking. When undefined (optional method not provided),
+   * the bridge proceeds — this preserves backward compatibility for tests
+   * that stub LmInterface without this method.
+   *
+   * Architecture rationale (2026-08-18 live-site finding): the old gate
+   * checked `getToolInvocationToken() === undefined`. That premise was wrong —
+   * token presence does not authorize invocations after the chat request
+   * returns. The new gate checks for an active run pump instead: tool calls
+   * are only valid while the @gert /run handler is alive and holding the pump.
+   */
+  hasActivePump?(): boolean;
 }
 
 // ─── Tool / action spec ────────────────────────────────────────────────────────
@@ -213,9 +225,10 @@ function redact(secret: string, text: string): string {
 // Allowlisted categories for vscode.lm.invokeTool failures.  Provider
 // exception text is NEVER forwarded; we classify from it and then drop it.
 //
-// invocation_token_unavailable — VS Code rejected the call because no
-//   toolInvocationToken was present (bridge runs outside a chat-participant
-//   handler; no token is available to supply).
+// invocation_token_unavailable — VS Code rejected the call because the
+//   toolInvocationToken was rejected (stale session or re-auth required).
+//   No longer used as a pre-invoke gate; now produced only by classifyInvocationError
+//   when VS Code throws a token-related error during an actual invocation.
 // authorization_unavailable    — auth/credential/forbidden failure from the
 //   provider or VS Code auth layer.
 // provider_input_rejected      — the provider rejected the supplied arguments
@@ -223,17 +236,26 @@ function redact(secret: string, text: string): string {
 //   guard which fires earlier as input_validation_error).
 // invocation_error             — any other or unrecognised exception; the safe
 //   conservative fallback.
+// no_active_run                — the bridge received a tool-call request but
+//   no @gert /run pump is active; the token-based gate has been replaced by this
+//   run-based gate (2026-08-18).
 
 export type InvocationErrorCategory =
   | 'invocation_token_unavailable'
   | 'authorization_unavailable'
   | 'provider_input_rejected'
-  | 'invocation_error';
+  | 'invocation_error'
+  | 'no_active_run';
 
 export function classifyInvocationError(err: unknown): InvocationErrorCategory {
   const msg = err instanceof Error ? err.message : String(err);
-  // Token-unavailable: VS Code requires a toolInvocationToken that only exists
-  // inside a ChatRequestHandler; calling with undefined triggers this.
+  // Defense-in-depth: if the hasActivePump gate somehow fails and invokeTool
+  // throws with this marker, classify it correctly.
+  if (/^gert:no_active_run/.test(msg)) {
+    return 'no_active_run';
+  }
+  // Token-unavailable: VS Code requires a toolInvocationToken; the call was
+  // rejected because the token was stale or absent.
   if (/invocation.?token|toolInvocationToken|no.*token.*invocation|token.*required/i.test(msg)) {
     return 'invocation_token_unavailable';
   }
@@ -560,14 +582,14 @@ export class McpBridge {
       }
     }
 
-    // Token pre-check: reject immediately before calling invokeTool when the
-    // bridge is unarmed. This avoids an opaque VS Code API error and surfaces
-    // a clear, actionable diagnostic. Type @gert /arm-mcp in Copilot Chat to arm.
+    // safeMessage: per-category text that is safe to return to Gert Core.
+    // Provider exception text is never forwarded; only the safe string is returned.
     const safeMessage: Record<InvocationErrorCategory, string> = {
-      invocation_token_unavailable: 'MCP tool invocation token is unavailable (bridge runs outside a chat-participant request)',
+      invocation_token_unavailable: 'MCP tool authorization is not available (token expired or rejected)',
       authorization_unavailable:    'MCP tool authorization is not available',
       provider_input_rejected:      'MCP tool provider rejected the supplied input',
       invocation_error:             'MCP invocation failed',
+      no_active_run:                'No @gert /run is currently active — tool calls are only valid inside an active run',
     };
 
     try {
@@ -575,12 +597,16 @@ export class McpBridge {
         return this.errorResponse(req.request_id, 'deadline_exceeded', 'deadline already passed');
       }
 
-      const toolToken = this.lm.getToolInvocationToken();
-      if (toolToken === undefined) {
-        return this.errorResponse(req.request_id, 'invocation_token_unavailable',
-          safeMessage['invocation_token_unavailable']);
+      // Gate: reject without invoking when no run pump is registered.
+      // Architecture rationale (2026-08-18): the old gate checked token
+      // presence, which was incorrect — token capture alone does not authorize
+      // after the chat request returns. Tool calls are valid only while the
+      // @gert /run handler is alive with an active pump.
+      if (this.lm.hasActivePump?.() === false) {
+        return this.errorResponse(req.request_id, 'no_active_run', safeMessage['no_active_run']);
       }
 
+      const toolToken = this.lm.getToolInvocationToken();
       let raw: LmToolResult;
       try {
         raw = await this.lm.invokeTool(

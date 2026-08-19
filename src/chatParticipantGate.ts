@@ -16,3 +16,15 @@
 export function isArmCommand(command: string | undefined): boolean {
   return command === 'arm-mcp';
 }
+
+/**
+ * Returns true only when command is exactly "run".
+ *
+ * The /run command drives a runbook from within the active handler, keeping
+ * the handler open until the run reaches a terminal state. This gate ensures
+ * the handler token is only used for actual runbook runs, not accidentally
+ * captured by other commands.
+ */
+export function isRunCommand(command: string | undefined): boolean {
+  return command === 'run';
+}
