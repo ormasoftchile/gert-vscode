@@ -316,42 +316,91 @@ test('PUMP-7: pump is closed when the run loop returns (no stale references acro
   }
 });
 
-// ─── PUMP-8: handler token must not appear in output-channel logs ─────────────
-// Mutation proof: add `output?.appendLine('token=' + handlerToken)` to
-// invokeWithTwoAttempts → logLines contains the token,
-// assert.equal(line.includes(FAKE_HANDLER_TOKEN), false) fails.
+// ─── PUMP-8 path matrix: token must not appear in output-channel logs ─────────
+//
+// invokeWithTwoAttempts has four execution paths:
+//   8a: attempt 1 succeeds
+//   8b: attempt 1 fails with non-Canceled error (no retry)
+//   8c: attempt 1 fails Canceled → attempt 2 succeeds
+//   8d: attempt 1 fails Canceled → attempt 2 also fails
+//
+// Each test injects a known token string, runs the specific path, collects
+// every log line written to the output channel, and asserts the token does
+// not appear. Non-vacuity: each asserts ≥1 log line was produced.
+//
+// Mutation proofs per path:
+//   8a: inject `output?.appendLine('token=' + handlerToken)` before the
+//       "attempt 1 succeeded" line → PUMP-8a fails.
+//   8b: inject before the "attempt 1 failed (no retry)" line → PUMP-8b fails.
+//   8c: inject before the "attempt 2 succeeded" line → PUMP-8c fails.
+//   8d: inject before the "attempt 2 failed" line → PUMP-8d fails.
 
-test('PUMP-8: handler token must not appear in output-channel logs from invokeWithTwoAttempts', async () => {
-  const FAKE_HANDLER_TOKEN = 'FAKE_HANDLER_TOKEN_REDACT_pumP8_zyx987';
+const FAKE_TOKEN_8 = 'FAKE_HANDLER_TOKEN_REDACT_pumP8_zyx987';
+
+function makeSpy8(realInvoke) {
   const logLines = [];
   const output = { appendLine: (s) => logLines.push(s) };
-
-  let callCount = 0;
-  const realInvoke = async () => {
-    callCount++;
-    if (callCount === 1) throw new Error('Canceled');  // triggers two-attempt retry
-    return { content: [{ value: '{}' }] };
+  const checkRedaction = (label) => {
+    assert.ok(logLines.length >= 1,
+      `${label}: must produce ≥1 log line (non-vacuity)`);
+    for (const line of logLines) {
+      assert.equal(line.includes(FAKE_TOKEN_8), false,
+        `${label}: token must not appear in log line: "${line.slice(0, 120)}"`);
+    }
   };
+  return { logLines, output, checkRedaction };
+}
 
+test('PUMP-8a: token absent on attempt-1 success path', async () => {
+  const { output, checkRedaction } = makeSpy8();
   const item = {
-    toolName: 'test-tool',
-    input:    { x: 1 },
-    resolve:  () => {},
-    reject:   (e) => { throw e; },
+    toolName: 'test-tool', input: {},
+    resolve: () => {}, reject: (e) => { throw e; },
   };
+  await invokeWithTwoAttempts(item, FAKE_TOKEN_8,
+    async () => ({ content: [{ value: '{}' }] }), output);
+  checkRedaction('PUMP-8a');
+});
 
-  await invokeWithTwoAttempts(item, FAKE_HANDLER_TOKEN, realInvoke, output);
+test('PUMP-8b: token absent on attempt-1 non-Canceled failure path', async () => {
+  const { output, checkRedaction } = makeSpy8();
+  let rejected = null;
+  const item = {
+    toolName: 'test-tool', input: {},
+    resolve: () => {},
+    reject: (e) => { rejected = e; },
+  };
+  await invokeWithTwoAttempts(item, FAKE_TOKEN_8,
+    async () => { throw new Error('Provider rejected: bad input'); }, output);
+  assert.ok(rejected instanceof Error, 'item must be rejected');
+  checkRedaction('PUMP-8b');
+});
 
-  // Non-vacuity: the Canceled path must have written at least two log lines.
-  assert.ok(logLines.length >= 2,
-    `expected ≥2 log lines (Canceled + retry), got ${logLines.length}`);
+test('PUMP-8c: token absent on Canceled retry → success path', async () => {
+  const { output, checkRedaction } = makeSpy8();
+  let callCount = 0;
+  const item = {
+    toolName: 'test-tool', input: {},
+    resolve: () => {}, reject: (e) => { throw e; },
+  };
+  await invokeWithTwoAttempts(item, FAKE_TOKEN_8, async () => {
+    if (++callCount === 1) throw new Error('Canceled');
+    return { content: [{ value: '{}' }] };
+  }, output);
+  assert.equal(callCount, 2, 'must make 2 attempts');
+  checkRedaction('PUMP-8c');
+});
 
-  // Non-vacuity control: a crafted string does contain the token.
-  const canary = `token=${FAKE_HANDLER_TOKEN}`;
-  assert.ok(canary.includes(FAKE_HANDLER_TOKEN), 'non-vacuity: scanner detects crafted leak');
-
-  for (const line of logLines) {
-    assert.equal(line.includes(FAKE_HANDLER_TOKEN), false,
-      `handler token must not appear in output channel log: "${line.slice(0, 120)}"`);
-  }
+test('PUMP-8d: token absent on Canceled retry → failure path', async () => {
+  const { output, checkRedaction } = makeSpy8();
+  let rejected = null;
+  const item = {
+    toolName: 'test-tool', input: {},
+    resolve: () => {},
+    reject: (e) => { rejected = e; },
+  };
+  await invokeWithTwoAttempts(item, FAKE_TOKEN_8,
+    async () => { throw new Error('Canceled'); }, output);
+  assert.ok(rejected instanceof Error, 'item must be rejected after attempt 2 also fails');
+  checkRedaction('PUMP-8d');
 });

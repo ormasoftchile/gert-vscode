@@ -143,9 +143,10 @@ function extractTestGlobs() {
   const globs = [];
   for (const cmd of Object.values(scripts)) {
     if (typeof cmd !== 'string') continue;
-    // Match `node --test <glob>` — glob may be bare, single-quoted, or
+    // Match `node --test [flags...] <glob>` — glob may be bare, single-quoted, or
     // double-quoted, and is terminated by whitespace or end of string.
-    const re = /node\s+--test\s+(['"]?)([^\s'"]+)\1/g;
+    // Flags (e.g. --test-timeout=5000) are optional between --test and the glob.
+    const re = /node\s+--test(?:\s+--[\w][\w=-]*)*\s+(['"]?)([^\s'"]+)\1/g;
     let m;
     while ((m = re.exec(cmd)) !== null) {
       globs.push(m[2].replace(/\\/g, '/'));

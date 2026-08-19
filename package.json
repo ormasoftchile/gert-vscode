@@ -117,7 +117,7 @@
     "compile": "tsc -p ./",
     "compile:test": "tsc -p tsconfig.test.json",
     "pretest": "npm run compile",
-    "test": "node --test test/*.test.js",
+    "test": "node --test --test-timeout=5000 test/*.test.js",
     "test:e2e": "npm run compile && npm run compile:test && vscode-test",
     "watch": "tsc -w -p ./",
     "vscode:prepublish": "npm run compile",
