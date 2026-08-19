@@ -43,11 +43,6 @@
       {
         "command": "gert.validateInputs",
         "title": "gert: Validate Runbook Inputs (Dry Run)"
-      },
-      {
-        "command": "gert.runAuthenticated",
-        "title": "gert: Run authenticated",
-        "icon": "$(run)"
       }
     ],
     "menus": {
@@ -61,18 +56,6 @@
           "command": "gert.previewGraph",
           "when": "resourceFilename =~ /\\.runbook\\.yaml$/",
           "group": "navigation@1"
-        },
-        {
-          "command": "gert.runAuthenticated",
-          "when": "resourceFilename =~ /\\.runbook\\.yaml$/",
-          "group": "navigation@3"
-        }
-      ],
-      "editor/context": [
-        {
-          "command": "gert.runAuthenticated",
-          "when": "resourceFilename =~ /\\.runbook\\.yaml$/",
-          "group": "gert"
         }
       ]
     },

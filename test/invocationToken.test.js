@@ -1,8 +1,8 @@
-// invocationToken.test.js — five mandatory SQL Live-Site tests for the
+// invocationToken.test.js — mandatory SQL Live-Site tests for the
 // toolInvocationToken lifecycle in the Gert VS Code extension.
 //
 // Tests:
-//   1. Unarmed bridge rejects WITHOUT invoking the MCP tool.
+//   1. Unarmed bridge STILL invokes invokeTool (token = undefined) — Petals model.
 //   2. Armed bridge invokes the registered MCP tool WITH the captured token.
 //   3. Token-rejection clears the cached token and forces rearming.
 //   4. Redaction: token text cannot appear in HTTP responses, output-channel
@@ -95,36 +95,38 @@ function makeLm({ getTokenFn, invokeToolFn, onTokenRejectedFn } = {}) {
   };
 }
 
-// ─── Test 1: Unarmed bridge rejects WITHOUT invoking ─────────────────────────
+// ─── Test 1: Unarmed bridge still invokes (Petals model — no pre-invoke gate) ─
 
-test('INVTOKEN-1: no-active-run gate returns no_active_run and never calls invokeTool', async (t) => {
-  // Architecture change (2026-08-18): the pre-invoke gate is no longer based
-  // on token presence (false premise — token capture alone does not authorize
-  // after the chat request returns). The gate is now based on whether an
-  // active run pump is registered. When hasActivePump() returns false, the
-  // bridge rejects without invoking.
+test('INVTOKEN-1: unarmed bridge still invokes invokeTool with toolInvocationToken: undefined', async (t) => {
+  // Petals fact (mcpBridge.ts comment at line 10): the token "is to avoid
+  // confirmation dialogs" — it is NOT an authorization credential.
+  // The bridge must NEVER refuse to invoke because no token is cached.
   let invokeCount = 0;
+  let receivedToken = 'sentinel-not-undefined'; // detect if it was set
 
   const lm = makeLm({
-    getTokenFn:    () => undefined,           // unarmed — token absent
-    invokeToolFn:  async () => { invokeCount++; return makeIcmResult(); },
+    getTokenFn:    () => undefined,           // unarmed — no cached token
+    invokeToolFn:  async (_name, opts) => {
+      invokeCount++;
+      receivedToken = opts.toolInvocationToken;
+      return makeIcmResult();
+    },
   });
-  // Explicitly signal no active run pump (new gate condition).
-  lm.hasActivePump = () => false;
 
   const bridge = await McpBridge.create(lm, 0, undefined, { registry: fixtureRegistry });
   t.after(() => bridge.dispose());
 
   const { body } = await postBridge(bridge.bridgeUrl, makeRequest(bridge));
 
-  assert.ok(body.error, 'expected an error response when no run is active');
-  assert.equal(body.error.code, 'no_active_run',
-    `error code must be no_active_run, got: ${body.error.code}`);
-  assert.equal(body.result, undefined, 'result must be absent when no run is active');
-
-  // CRITICAL: invokeTool must never have been called.
-  assert.equal(invokeCount, 0,
-    `invokeTool must NOT be called when no run is active (spy count = ${invokeCount})`);
+  // Petals model: invokeTool MUST be called even when no token is cached.
+  // The bridge never refuses to invoke because a token is absent.
+  assert.equal(invokeCount, 1,
+    `invokeTool MUST be called even when unarmed (spy count = ${invokeCount}); the bridge must never pre-invoke-refuse`);
+  assert.strictEqual(receivedToken, undefined,
+    'invokeTool must receive toolInvocationToken === undefined when unarmed');
+  // No no_active_run error — the bridge attempted and returned a result (or real error from provider).
+  assert.notEqual(body.error?.code, 'no_active_run',
+    'no_active_run must never appear — that gate has been removed');
 });
 
 // ─── Test 2: Armed bridge invokes WITH the captured token ────────────────────

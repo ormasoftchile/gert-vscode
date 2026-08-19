@@ -32,18 +32,13 @@ import { McpBridge } from './mcpBridge';
 import { buildRegistryFromDir } from './toolDefinitionRegistry';
 import { pickServerRoot } from './serverRoot';
 import { setToolToken, getToolToken, clearToolToken } from './toolTokenStore';
-import { isArmCommand, isRunCommand } from './chatParticipantGate';
-import { RunPump } from './runPump';
-import { invokeWithTwoAttempts } from './runPump';
-import { createRun, deleteRun as deleteRunHttp, waitForTerminalState } from './runClient';
-import { runLoop } from './runLoop';
+import { isArmCommand } from './chatParticipantGate';
 import {
   CANCELLED,
   UNSET,
   InputDecl,
   chooseAffordance,
   extractInputDecls,
-  filterRequiredInputs,
   nfcEquals,
   parseVarPairs,
   stderrOf,
@@ -51,9 +46,6 @@ import {
   firstLine,
   warningLines,
 } from './enumInputs';
-import { stashPendingRun, claimPendingRun } from './pendingRunStore';
-import { parseRunArgs, resolveRunbookPath, buildRunChatQuery, formatRunStartLog } from './runbookArgParse';
-import { performRunHandoff } from './runHandoff';
 
 const pexec = promisify(execFile);
 
@@ -61,10 +53,6 @@ let serverManager: ServerManager | null = null;
 let output: vscode.OutputChannel | null = null;
 let graphPanel: vscode.WebviewPanel | undefined;
 let mcpBridge: McpBridge | null = null;
-// activePump holds the RunPump for the currently active @gert /run handler.
-// Non-null only while a run handler is live; the bridge checks hasActivePump()
-// before forwarding tool calls.
-let activePump: RunPump | null = null;
 
 export function activate(context: vscode.ExtensionContext) {
   output = vscode.window.createOutputChannel('gert');
@@ -80,22 +68,14 @@ export function activate(context: vscode.ExtensionContext) {
     get tools() { return vscode.lm.tools as unknown as readonly import('./mcpBridge').LmToolInfo[]; },
     getToolInvocationToken() { return getToolToken(); },
     onTokenRejected() { clearToolToken(); },
-    /**
-     * Returns false when no @gert /run pump is active.
-     * The bridge checks this before calling invokeTool and returns no_active_run
-     * when false — tool calls are only valid while a /run handler is alive.
-     */
-    hasActivePump() { return activePump !== null && !activePump.closed; },
+    // Petals pattern: pass the cached token (may be undefined) directly.
+    // The bridge handles the two-attempt retry; this adapter is transparent.
     invokeTool(name, options, token) {
-      if (activePump && !activePump.closed) {
-        // Pump path: the @gert /run handler dequeues this and calls the real
-        // vscode.lm.invokeTool from its own execution context (with handler token).
-        // options.toolInvocationToken is ignored — the handler provides the token.
-        return activePump.enqueue(name, options.input as Record<string, unknown>) as Promise<import('./mcpBridge').LmToolResult>;
-      }
-      // Direct path (fallback): no active run, bridge should have gated this.
-      // Included for defense-in-depth; hasActivePump() should prevent reaching here.
-      return vscode.lm.invokeTool(name, { input: options.input, toolInvocationToken: options.toolInvocationToken as never }, token as vscode.CancellationToken) as Promise<import('./mcpBridge').LmToolResult>;
+      return vscode.lm.invokeTool(
+        name,
+        { input: options.input, toolInvocationToken: options.toolInvocationToken as never },
+        token as vscode.CancellationToken,
+      ) as Promise<import('./mcpBridge').LmToolResult>;
     },
   }, 0, output, {
     // Registry starts empty; it is refreshed from the active runbook's
@@ -124,37 +104,27 @@ export function activate(context: vscode.ExtensionContext) {
   //          discovery, but the token does NOT authorize deferred runs.
   const participant = vscode.chat.createChatParticipant(
     'gert.chat',
-    async (request, _ctx, response, token) => {
+    async (request, _ctx, response, _token) => {
       if (isArmCommand(request.command)) {
         setToolToken(request.toolInvocationToken);
         response.markdown(
-          'ℹ️ **Token armed — best-effort MCP calls enabled.**\n\n' +
+          'ℹ️ **Token armed — MCP dialog suppression enabled.**\n\n' +
           'Accessing `request.toolInvocationToken` causes VS Code to auto-discover ' +
           'and start MCP servers (~60s on first use).\n\n' +
-          '**Best-effort layer:** While this token is armed, Gert MCP tool calls ' +
-          'outside an active `/run` handler are attempted using this cached token. ' +
-          'This path is **unreliable** — live-site evidence (2026-08-18) showed it ' +
-          'can fail — but it is not forbidden. A failure surfaces as a named ' +
-          'category (`invocation_token_unavailable`, `invocation_error`, etc.) ' +
-          'rather than being silently dropped or confused with `no_active_run`.\n\n' +
-          '**Reliable path:** Use `@gert /run <runbook>` to run a runbook. ' +
-          'The `/run` handler uses the live token from inside the ChatRequestHandler, ' +
-          'which VS Code always accepts.\n\n' +
+          'The cached token is passed as `toolInvocationToken` on MCP tool calls to ' +
+          'suppress VS Code consent dialogs. If VS Code raises a `Canceled` error ' +
+          'with the token, the bridge retries once without it — the consent dialog ' +
+          'will appear instead. This token is NEVER an authorization credential.\n\n' +
           '**Re-arm when needed:** The token is cleared on rejection. ' +
-          'Run `/arm-mcp` again if deferred calls fail with `invocation_token_unavailable`.',
+          'Run `/arm-mcp` again if calls fail with `invocation_token_unavailable`.',
         );
         return {};
-      }
-
-      if (isRunCommand(request.command)) {
-        return runRunbook(request, response, token);
       }
 
       response.markdown(
         '**gert**: Unknown command.\n\n' +
         'Commands:\n' +
-        '- `/run <runbook.yaml> [key=val ...]` — run a runbook and drive MCP tool calls live\n' +
-        '- `/arm-mcp` — diagnostic only; capture a token to trigger MCP server discovery\n',
+        '- `/arm-mcp` — optional: capture a token for MCP dialog suppression\n',
       );
       return {};
     },
@@ -168,7 +138,6 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand('gert.preview', () => previewProse()),
     vscode.commands.registerCommand('gert.previewGraph', () => previewGraph()),
     vscode.commands.registerCommand('gert.validateInputs', () => validateInputs()),
-    vscode.commands.registerCommand('gert.runAuthenticated', () => runAuthenticated()),
     vscode.commands.registerCommand('gert.showServerLog', () => output?.show(true)),
     vscode.commands.registerCommand('gert.restartServer', async () => {
       serverManager?.dispose();
@@ -179,8 +148,6 @@ export function activate(context: vscode.ExtensionContext) {
 
 export function deactivate() {
   clearToolToken();
-  activePump?.close('deactivated');
-  activePump = null;
   serverManager?.dispose();
   serverManager = null;
   mcpBridge?.dispose();
@@ -199,151 +166,6 @@ function refreshBridgeRegistry(runbookPath: string): void {
   const registry = buildRegistryFromDir(projectRoot);
   mcpBridge.updateRegistry(registry);
   output?.appendLine(`[gert] MCP bridge registry refreshed from ${projectRoot}`);
-}
-
-// runRunbook runs a runbook in-handler using the @gert /run command.
-//
-// Architecture: keeps the handler open until the run reaches a terminal state by
-// holding a RunPump that the bridge uses to dispatch tool calls back into this
-// handler's execution context. Tool invocations are attempted with the live
-// handler token first (suppresses VS Code consent dialog), then retried without
-// the token on a Canceled response (Petals-derived two-attempt pattern).
-//
-// Empirically unproven: whether VS Code accepts an invokeTool call from an
-// awaited continuation (pump processor) within the handler versus strictly the
-// synchronous handler stack. If VS Code enforces strict call-stack context rather
-// than handler lifetime, the pump items will fail with an error classified as
-// invocation_error or Canceled. Only a live VS Code session can settle this.
-async function runRunbook(
-  request: vscode.ChatRequest,
-  response: vscode.ChatResponseStream,
-  token: vscode.CancellationToken,
-): Promise<vscode.ChatResult> {
-  // Accessing request.toolInvocationToken here causes VS Code to auto-discover
-  // and start MCP servers (~60s latency on first use per Petals observation).
-  const handlerToken = request.toolInvocationToken;
-
-  // Parse runbook path from prompt, falling back to the active editor.
-  // Uses explicit parseRunArgs (replaces brittle positional parts[0].includes('=') heuristic).
-  const parsed = parseRunArgs(request.prompt);
-  let runbookPath: string | undefined = resolveRunbookPath(
-    parsed.runbookPath,
-    vscode.window.activeTextEditor?.document.fileName,
-  );
-
-  // Claim inputs from the pending-run store when a nonce is present.
-  // The nonce was stashed by gert.runAuthenticated before invoking the chat.
-  // Security: claimPendingRun removes the entry immediately (single-use).
-  let inputs: Record<string, string> = { ...parsed.inputs };
-  if (parsed.nonce !== undefined) {
-    const entry = claimPendingRun(parsed.nonce);
-    if (entry !== undefined) {
-      // Pending entry overrides path (it is the authoritative source) and
-      // merges its inputs with any prompt-supplied kv pairs (prompt wins on
-      // collision so an operator can override a single field at the prompt).
-      runbookPath = entry.runbookPath;
-      inputs = { ...entry.inputs, ...parsed.inputs };
-    }
-    // If entry is undefined (expired or already claimed), proceed with
-    // whatever the prompt supplied — the run may fail for missing inputs,
-    // which is the correct failure mode.
-  }
-
-  if (!runbookPath || !runbookPath.endsWith('.runbook.yaml')) {
-    response.markdown('❌ Specify a `*.runbook.yaml` file: `@gert /run path/to/runbook.yaml`');
-    return {};
-  }
-
-  // Refresh registry and ensure server — preserves active-project scoping from
-  // commits 1cd7542/fadc2fa/08de611.
-  refreshBridgeRegistry(runbookPath);
-  let base: string;
-  try {
-    base = await serverManager!.ensureRunning(runbookPath);
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
-    response.markdown(`❌ Failed to start gert server: ${msg}`);
-    return {};
-  }
-
-  // Create the run pump and register it with the bridge.
-  const pump = new RunPump();
-  activePump = pump;
-
-  response.progress('Starting run…');
-
-  let runId: string;
-  try {
-    runId = await createRun(base, runbookPath, inputs);
-  } catch (err) {
-    activePump = null;
-    pump.close('create run failed');
-    const msg = err instanceof Error ? err.message : String(err);
-    response.markdown(`❌ Failed to create run: ${msg}`);
-    clearToolToken();
-    return {};
-  }
-
-  response.markdown(`🏃 Run \`${runId}\` started.`);
-  output?.appendLine(formatRunStartLog(runId, runbookPath));
-
-  const cancelPromise = new Promise<void>((resolve) => {
-    token.onCancellationRequested(() => resolve());
-  });
-
-  // realInvoke calls the real vscode.lm.invokeTool from inside this handler.
-  // Security: tok is either handlerToken or undefined (second attempt) — never
-  // logged; only the attempt index is written to the output channel.
-  const realInvoke = async (name: string, input: Record<string, unknown>, tok: unknown) => {
-    return vscode.lm.invokeTool(
-      name,
-      { input, toolInvocationToken: tok as never },
-      token,
-    ) as Promise<unknown>;
-  };
-
-  try {
-    const result = await runLoop(
-      pump,
-      runId,
-      {
-        waitForTerminal: (id, signal) => waitForTerminalState(base, id, signal),
-        deleteRun: (id) => deleteRunHttp(base, id),
-        onProgress: (msg) => { response.progress(msg); },
-      },
-      handlerToken,
-      realInvoke,
-      cancelPromise,
-      10 * 60 * 1000, // 10-minute bounded deadline
-      output ?? undefined,
-    );
-
-    switch (result.reason) {
-      case 'terminal':
-        response.markdown(
-          `✅ Run completed: \`${result.status}\`\n\n` +
-          `[Open run document](${base}/runs/${encodeURIComponent(runId)}/document)`,
-        );
-        break;
-      case 'cancelled':
-        response.markdown('⚠️ Run cancelled.');
-        break;
-      case 'deadline':
-        response.markdown('⚠️ Run deadline exceeded (10 min).');
-        break;
-      case 'server_dead':
-        response.markdown('⚠️ gert server became unreachable.');
-        break;
-    }
-  } finally {
-    // Clear the pump reference and the token store so the bridge gate fires
-    // for any subsequent requests after this handler exits.
-    activePump = null;
-    pump.close('handler returning');
-    clearToolToken();
-  }
-
-  return {};
 }
 
 // previewProse runs the gert CLI with --format prose against the active
@@ -419,98 +241,6 @@ async function validateInputs() {
     surfaceWarnings(stderrOf(err));
     reportEngineFailure('gert dry-run', err);
   }
-}
-
-// runAuthenticated implements the "Run authenticated" editor-title command
-// for *.runbook.yaml files.
-//
-// Flow:
-//   1. Determine runbook path: active editor if it is a .runbook.yaml, or a
-//      QuickPick of workspace *.runbook.yaml files (multi-root safe: uses
-//      vscode.workspace.findFiles which covers all workspace folders, not
-//      just workspaceFolders[0]).
-//   2. Fetch input declarations via `gert preview --format graphjson`.
-//   3. Prompt only for required inputs (filterRequiredInputs).
-//   4. Stash collected inputs in the pending-run store (values never appear
-//      in the chat query string — security requirement from the ask).
-//   5. Open the chat with '@gert /run <path> _nonce=<nonce>' so the existing
-//      chat handler drives the authenticated MCP execution path, keeping the
-//      toolInvocationToken alive inside a live ChatRequestHandler.
-//
-// Security: secret inputs are stashed in extension-host memory only. The
-// chat query contains only the nonce and the (non-sensitive) runbook path.
-// The pending entry is single-use and expires after 30 s.
-//
-// Item 4 architectural note: a plain VS Code command cannot obtain a
-// toolInvocationToken. By opening chat with '@gert /run ... _nonce=...',
-// the existing handler claims the stashed inputs and executes the run inside
-// the live ChatRequestHandler context where the token is valid.
-//
-// Chat open command: workbench.action.chat.open
-// Source: VS Code source export CHAT_OPEN_ACTION_ID in
-//   src/vs/workbench/contrib/chat/browser/actions/chatActions.ts (main branch)
-// Argument shape: IChatViewOpenOptions { query: string; isPartialQuery?: boolean }
-// Confirmed by: GitHub issue #210819 and VS Code source inspection.
-async function runAuthenticated() {
-  // Step 1 — resolve runbook path.
-  let runbookPath: string | undefined;
-  const activeFile = vscode.window.activeTextEditor?.document.fileName;
-  if (activeFile && activeFile.endsWith('.runbook.yaml')) {
-    runbookPath = activeFile;
-  } else {
-    // Multi-root QuickPick: vscode.workspace.findFiles covers all workspace
-    // folders equally — never scoped to workspaceFolders[0].
-    const found = await vscode.workspace.findFiles('**/*.runbook.yaml', '**/node_modules/**');
-    if (found.length === 0) {
-      void vscode.window.showWarningMessage('No *.runbook.yaml files found in the workspace.');
-      return;
-    }
-    // Build workspace-relative labels for readability.
-    const items = found.map((uri) => {
-      const abs = uri.fsPath;
-      // Find the shortest workspace-relative label across all roots.
-      const folders = vscode.workspace.workspaceFolders ?? [];
-      let label = abs;
-      for (const f of folders) {
-        const rel = path.relative(f.uri.fsPath, abs);
-        if (!rel.startsWith('..') && rel.length < label.length) {
-          label = rel;
-        }
-      }
-      return { label, description: abs, uri };
-    });
-    const picked = await vscode.window.showQuickPick(items, {
-      placeHolder: 'Select a runbook to run',
-      ignoreFocusOut: true,
-    });
-    if (!picked) return; // operator cancelled
-    runbookPath = picked.uri.fsPath;
-  }
-
-  // Step 2 — fetch input declarations (best-effort; skip on error).
-  // binaryPath is folder-scoped to the selected runbook's project.
-  const bin = vscode.workspace.getConfiguration('gert', vscode.Uri.file(runbookPath)).get<string>('binaryPath', 'gert');
-  let previewDoc: unknown;
-  try {
-    const { stdout } = await pexec(bin, ['preview', '--format', 'graphjson', runbookPath]);
-    previewDoc = JSON.parse(stdout);
-  } catch {
-    // Engine not available or runbook parse error: proceed without declarations.
-    // The run handler will attempt the run with whatever inputs are supplied.
-  }
-
-  // Steps 3-5 — collect required inputs, stash, build query, open chat.
-  // Delegated to performRunHandoff() in src/runHandoff.ts so the
-  // security-critical redaction sequence is testable without VS Code.
-  const allDecls = previewDoc ? (extractInputDecls(previewDoc) ?? []) : [];
-  const requiredDecls = filterRequiredInputs(allDecls);
-
-  await performRunHandoff(runbookPath, requiredDecls, {
-    promptForInput,
-    stashPendingRun,
-    buildRunChatQuery,
-    executeCommand: async (cmd, opts) => { await vscode.commands.executeCommand(cmd, opts); },
-  });
 }
 
 // collectInputs prompts for a value per declared input (selector for

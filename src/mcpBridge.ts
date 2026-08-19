@@ -14,7 +14,6 @@ import * as http from 'http';
 import * as crypto from 'crypto';
 import type * as vscode from 'vscode';
 import { buildRegistryFromDir } from './toolDefinitionRegistry';
-import { invokeWithTwoAttempts, PendingInvocation } from './runPump';
 
 // ─── Wire types ──────────────────────────────────────────────────────────────
 
@@ -83,10 +82,13 @@ export interface LmInterface {
     token: LmCancellationToken,
   ): Promise<LmToolResult>;
   /**
-   * Returns the toolInvocationToken from the most recent arm-mcp or run
-   * chat turn.  The bridge passes this to invokeTool; the @gert /run handler
-   * uses the live handler token (not this store) when calling the real
-   * vscode.lm.invokeTool from inside the pump processor.
+   * Returns the toolInvocationToken stored by the most recent @gert /arm-mcp
+   * chat turn.  The bridge passes this to invokeTool as dialog suppression.
+   * May return undefined when unarmed — the bridge still invokes in that case.
+   *
+   * Petals precedent (mcpBridge.ts:11-22): the token is "to avoid confirmation
+   * dialogs" — NOT an authorization credential.  The bridge NEVER refuses to
+   * invoke because the token is absent.
    */
   getToolInvocationToken(): unknown;
   /**
@@ -95,19 +97,6 @@ export interface LmInterface {
    * so the operator must re-arm.
    */
   onTokenRejected?(): void;
-  /**
-   * Returns false when no @gert /run pump is active; the bridge rejects the
-   * request without invoking. When undefined (optional method not provided),
-   * the bridge proceeds — this preserves backward compatibility for tests
-   * that stub LmInterface without this method.
-   *
-   * Architecture rationale (2026-08-18 live-site finding): the old gate
-   * checked `getToolInvocationToken() === undefined`. That premise was wrong —
-   * token presence does not authorize invocations after the chat request
-   * returns. The new gate checks for an active run pump instead: tool calls
-   * are only valid while the @gert /run handler is alive and holding the pump.
-   */
-  hasActivePump?(): boolean;
 }
 
 // ─── Tool / action spec ────────────────────────────────────────────────────────
@@ -228,8 +217,7 @@ function redact(secret: string, text: string): string {
 //
 // invocation_token_unavailable — VS Code rejected the call because the
 //   toolInvocationToken was rejected (stale session or re-auth required).
-//   No longer used as a pre-invoke gate; now produced only by classifyInvocationError
-//   when VS Code throws a token-related error during an actual invocation.
+//   Produced only when VS Code throws a token-related error during invocation.
 // authorization_unavailable    — auth/credential/forbidden failure from the
 //   provider or VS Code auth layer.
 // provider_input_rejected      — the provider rejected the supplied arguments
@@ -237,24 +225,15 @@ function redact(secret: string, text: string): string {
 //   guard which fires earlier as input_validation_error).
 // invocation_error             — any other or unrecognised exception; the safe
 //   conservative fallback.
-// no_active_run                — the bridge received a tool-call request but
-//   no @gert /run pump is active; the token-based gate has been replaced by this
-//   run-based gate (2026-08-18).
 
 export type InvocationErrorCategory =
   | 'invocation_token_unavailable'
   | 'authorization_unavailable'
   | 'provider_input_rejected'
-  | 'invocation_error'
-  | 'no_active_run';
+  | 'invocation_error';
 
 export function classifyInvocationError(err: unknown): InvocationErrorCategory {
   const msg = err instanceof Error ? err.message : String(err);
-  // Defense-in-depth: if the hasActivePump gate somehow fails and invokeTool
-  // throws with this marker, classify it correctly.
-  if (/^gert:no_active_run/.test(msg)) {
-    return 'no_active_run';
-  }
   // Token-unavailable: VS Code requires a toolInvocationToken; the call was
   // rejected because the token was stale or absent.
   if (/invocation.?token|toolInvocationToken|no.*token.*invocation|token.*required/i.test(msg)) {
@@ -270,6 +249,20 @@ export function classifyInvocationError(err: unknown): InvocationErrorCategory {
   }
   // Conservative fallback — unknown or ambiguous exception.
   return 'invocation_error';
+}
+
+// ─── Canceled-error predicate ─────────────────────────────────────────────────
+// Petals-derived (mcpBridgeGeneric.ts ~330):
+//   if (msg.includes("Canceled") && token !== undefined) { retry without token }
+//
+// VS Code raises an error whose message contains "Canceled" (capital C) when a
+// tool invocation dialog is dismissed. We match the exact word "Canceled" to
+// avoid false positives, and also "cancelled" (British spelling) defensively.
+//
+// Exported so tests can verify the predicate without a VS Code host.
+export function isCanceledError(err: unknown): boolean {
+  const msg = err instanceof Error ? err.message : String(err);
+  return /\bCanceled\b/.test(msg) || /\bcancelled\b/i.test(msg);
 }
 
 // ─── Input schema validation ──────────────────────────────────────────────────
@@ -590,7 +583,6 @@ export class McpBridge {
       authorization_unavailable:    'MCP tool authorization is not available',
       provider_input_rejected:      'MCP tool provider rejected the supplied input',
       invocation_error:             'MCP invocation failed',
-      no_active_run:                'No @gert /run is currently active — tool calls are only valid inside an active run',
     };
 
     try {
@@ -598,62 +590,39 @@ export class McpBridge {
         return this.errorResponse(req.request_id, 'deadline_exceeded', 'deadline already passed');
       }
 
-      // Layered invocation model (restored from Petals precedent, 2026-08-18 regression fix):
+      // Petals invocation model (mcpBridgeGeneric.ts:320-345):
       //
-      //   Layer 1 (preferred): Active @gert /run pump — the pump's invokeTool
-      //     implementation in extension.ts routes through activePump.enqueue()
-      //     → pump processor → live ChatRequestHandler token. Most reliable.
+      //   Attempt 1: invoke with cached token (may be undefined — that is fine).
+      //              Token suppresses VS Code consent dialogs when present.
+      //   Attempt 2: only when attempt 1 throws a Canceled-class error AND a
+      //              token was present — retry without token so VS Code may show
+      //              the consent dialog instead.
       //
-      //   Layer 2 (best-effort): No pump, cached token armed via /arm-mcp —
-      //     attempt via the same invokeWithTwoAttempts logic as the pump path.
-      //     May fail if VS Code has invalidated the token; failure surfaces as
-      //     a named category (e.g. invocation_token_unavailable), NOT no_active_run.
-      //
-      //   Layer 3 (floor): Neither pump nor cached token → no_active_run.
-      //
-      // Regression fixed: the old exclusive pump gate refused ALL calls when no
-      // pump was active, even when a cached token was armed — making /arm-mcp
-      // dead code and removing a working-sometimes capability (the gert.previewGraph
-      // webview path). The live-site failure proved unreliability, not impossibility.
-      const hasPump = this.lm.hasActivePump?.() !== false;
+      // The bridge NEVER refuses to invoke because no token is cached.
+      // Token presence is dialog suppression only, not authorization.
       const cachedToken = this.lm.getToolInvocationToken();
-
-      if (!hasPump && cachedToken === undefined) {
-        return this.errorResponse(req.request_id, 'no_active_run', safeMessage['no_active_run']);
-      }
 
       let raw: LmToolResult;
       try {
-        if (hasPump) {
-          // Layer 1: pump active; invokeTool routes to pump → live handler token.
-          // cachedToken is passed as toolInvocationToken; the pump-path implementation
-          // in extension.ts ignores it and uses the handler token instead.
+        try {
           raw = await this.lm.invokeTool(
             spec.registeredName,
             { input: req.args, toolInvocationToken: cachedToken },
             cts.token,
           );
-        } else {
-          // Layer 2: no pump, cached token — reuse invokeWithTwoAttempts (same as
-          // pump path) so layer 2 never drifts from layer 1's retry semantics.
-          raw = await new Promise<LmToolResult>((resolve, reject) => {
-            const item: PendingInvocation = {
-              toolName: spec.registeredName,
-              input: req.args,
-              resolve: (r) => resolve(r as LmToolResult),
-              reject,
-            };
-            void invokeWithTwoAttempts(
-              item,
-              cachedToken,
-              async (name, input, tok) => this.lm.invokeTool(
-                name,
-                { input, toolInvocationToken: tok },
-                cts.token,
-              ),
-              this.output,
+          this.log(`[mcpBridge] invokeTool "${spec.registeredName}": attempt 1 succeeded`);
+        } catch (firstErr: unknown) {
+          if (isCanceledError(firstErr) && cachedToken !== undefined) {
+            this.log(`[mcpBridge] invokeTool "${spec.registeredName}": attempt 1 Canceled — retrying without token`);
+            raw = await this.lm.invokeTool(
+              spec.registeredName,
+              { input: req.args, toolInvocationToken: undefined },
+              cts.token,
             );
-          });
+            this.log(`[mcpBridge] invokeTool "${spec.registeredName}": attempt 2 succeeded`);
+          } else {
+            throw firstErr;
+          }
         }
       } catch (err: unknown) {
         if (timedOut || cts.token.isCancellationRequested) {
@@ -661,9 +630,7 @@ export class McpBridge {
         }
         const category = classifyInvocationError(err);
         // If VS Code rejected the token (stale session), clear it so the operator
-        // must re-arm. This is the concrete definition of "token rejection":
-        // classifyInvocationError returns invocation_token_unavailable for any
-        // exception whose message matches the token-unavailable pattern.
+        // must re-arm.
         if (category === 'invocation_token_unavailable') {
           this.lm.onTokenRejected?.();
         }
