@@ -59,6 +59,19 @@
         }
       ]
     },
+    "chatParticipants": [
+      {
+        "id": "gert.chat",
+        "name": "gert",
+        "description": "Gert runbook assistant. Use /arm-mcp to arm the MCP bridge with a tool invocation token.",
+        "commands": [
+          {
+            "name": "arm-mcp",
+            "description": "Arm the MCP bridge with a tool invocation token from this chat turn."
+          }
+        ]
+      }
+    ],
     "configuration": {
       "title": "gert Preview",
       "properties": {

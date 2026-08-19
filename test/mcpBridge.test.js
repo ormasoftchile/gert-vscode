@@ -89,6 +89,7 @@ function makeLm(invokeToolFn, tools) {
     tools: tools ?? [
       { name: 'icm-get-incident' },
     ],
+    getToolInvocationToken: () => 'test-invocation-token',
     invokeTool: invokeToolFn ??
       (async (_name, _opts, _token) => makeIcmResult()),
   };
@@ -416,6 +417,7 @@ test('type-incompatible field: bridge returns normalization error', async (t) =>
 test('optional-field regression: "present" outcome (all fields) normalizes successfully', async (t) => {
   const lm = {
     tools: [{ name: 'ops-optional-probe' }],
+    getToolInvocationToken: () => 'test-invocation-token',
     invokeTool: async () => ({
       content: [{
         value: JSON.stringify({
@@ -443,6 +445,7 @@ test('optional-field regression: "present" outcome (all fields) normalizes succe
 test('optional-field regression: "absent" outcome (only required field) normalizes successfully', async (t) => {
   const lm = {
     tools: [{ name: 'ops-optional-probe' }],
+    getToolInvocationToken: () => 'test-invocation-token',
     invokeTool: async () => ({
       content: [{
         value: JSON.stringify({

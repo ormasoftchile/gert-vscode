@@ -97,6 +97,7 @@ test('McpBridge.updateRegistry: switching registry changes dispatch target', asy
       { name: 'tool-from-root-a' },
       { name: 'tool-from-root-b' },
     ],
+    getToolInvocationToken: () => 'test-invocation-token',
     invokeTool: async (name) => {
       callLog.push(name);
       return { content: [{ value: '{"result":"ok"}' }] };

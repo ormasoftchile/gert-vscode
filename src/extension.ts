@@ -31,6 +31,7 @@ import { ServerManager } from './serverManager';
 import { McpBridge } from './mcpBridge';
 import { buildRegistryFromDir } from './toolDefinitionRegistry';
 import { pickServerRoot } from './serverRoot';
+import { setToolToken, getToolToken, clearToolToken } from './toolTokenStore';
 import {
   CANCELLED,
   UNSET,
@@ -64,8 +65,10 @@ export function activate(context: vscode.ExtensionContext) {
   // will be ready before any runbook preview fires a tool call.
   McpBridge.create({
     get tools() { return vscode.lm.tools as unknown as readonly import('./mcpBridge').LmToolInfo[]; },
+    getToolInvocationToken() { return getToolToken(); },
+    onTokenRejected() { clearToolToken(); },
     invokeTool(name, options, token) {
-      return vscode.lm.invokeTool(name, { input: options.input, toolInvocationToken: undefined }, token as vscode.CancellationToken) as Promise<import('./mcpBridge').LmToolResult>;
+      return vscode.lm.invokeTool(name, { input: options.input, toolInvocationToken: options.toolInvocationToken as never }, token as vscode.CancellationToken) as Promise<import('./mcpBridge').LmToolResult>;
     },
   }, 0, output, {
     // Registry starts empty; it is refreshed from the active runbook's
@@ -86,9 +89,38 @@ export function activate(context: vscode.ExtensionContext) {
     output?.appendLine(`[gert] WARNING: MCP bridge failed to start — ${msg}`);
   });
 
+  // Chat participant — arms the MCP bridge with a valid toolInvocationToken.
+  // The token is captured ONLY on the explicit /arm-mcp command; all other
+  // commands are rejected so the token cannot be captured accidentally.
+  // Token lifecycle: cleared on deactivation and on VS Code token rejection.
+  // window-scoped: the participant is registered once per extension activation;
+  // there is no per-resource URI available at this point.
+  const participant = vscode.chat.createChatParticipant(
+    'gert.chat',
+    async (request, _ctx, response, _token) => {
+      if (request.command === 'arm-mcp') {
+        setToolToken(request.toolInvocationToken);
+        response.markdown(
+          '✅ **Gert MCP bridge armed.** The bridge will use this token for subsequent ' +
+          'tool invocations.\n\nYou may now run your runbook preview. ' +
+          'If the token expires or VS Code reports a token error, type `@gert /arm-mcp` again.',
+        );
+      } else {
+        response.markdown(
+          '**gert**: Unknown command.\n\n' +
+          'Use `/arm-mcp` to arm the MCP bridge with a tool invocation token:\n\n' +
+          '```\n@gert /arm-mcp\n```',
+        );
+      }
+      return {};
+    },
+  );
+  participant.iconPath = new vscode.ThemeIcon('run');
+
   context.subscriptions.push(
     output,
     { dispose: () => { serverManager?.dispose(); mcpBridge?.dispose(); mcpBridge = null; } },
+    participant,
     vscode.commands.registerCommand('gert.preview', () => previewProse()),
     vscode.commands.registerCommand('gert.previewGraph', () => previewGraph()),
     vscode.commands.registerCommand('gert.validateInputs', () => validateInputs()),
@@ -101,6 +133,7 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 export function deactivate() {
+  clearToolToken();
   serverManager?.dispose();
   serverManager = null;
   mcpBridge?.dispose();

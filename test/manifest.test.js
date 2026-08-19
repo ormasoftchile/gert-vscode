@@ -53,6 +53,33 @@ test('CE-C-02: no bundled schema, no editor schema-validation contribution, no Y
   }
 });
 
+// INVTOKEN-M-01: The manifest must declare the gert.chat participant so that
+// vscode.chat.createChatParticipant('gert.chat', ...) is reachable. A
+// participant registered in code but absent from the manifest is silently
+// inert — the exact bug class that has bitten this engagement twelve times.
+test('gert.chat participant is declared in contributes.chatParticipants', () => {
+  const participants = manifest.contributes.chatParticipants;
+  assert.ok(Array.isArray(participants) && participants.length > 0,
+    'contributes.chatParticipants must be a non-empty array');
+
+  const gert = participants.find((p) => p.id === 'gert.chat');
+  assert.ok(gert, 'a participant with id "gert.chat" must be declared in contributes.chatParticipants');
+  assert.equal(gert.id, 'gert.chat',
+    'participant id must match the id passed to vscode.chat.createChatParticipant in extension.ts');
+});
+
+// INVTOKEN-M-02: The arm-mcp slash command must be declared so VS Code
+// surfaces it in the command picker and routes /arm-mcp to the participant.
+test('gert.chat participant declares the arm-mcp command', () => {
+  const participants = manifest.contributes.chatParticipants ?? [];
+  const gert = participants.find((p) => p.id === 'gert.chat');
+  assert.ok(gert, 'gert.chat participant must be declared (see prior test)');
+  assert.ok(Array.isArray(gert.commands) && gert.commands.length > 0,
+    'gert.chat must declare at least one slash command');
+  const armCmd = gert.commands.find((c) => c.name === 'arm-mcp');
+  assert.ok(armCmd, 'gert.chat must declare the "arm-mcp" command');
+});
+
 test('CE-C-02: no vendored *.schema.json in the extension source tree', () => {
   const fs = require('node:fs');
   const path = require('node:path');

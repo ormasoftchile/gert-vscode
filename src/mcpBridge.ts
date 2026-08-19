@@ -81,6 +81,20 @@ export interface LmInterface {
     options: { input: Record<string, unknown>; toolInvocationToken?: unknown },
     token: LmCancellationToken,
   ): Promise<LmToolResult>;
+  /**
+   * Returns the toolInvocationToken captured from the most recent arm-mcp chat
+   * turn, or undefined when the bridge is unarmed. The bridge calls this before
+   * every invokeTool call; if the return value is undefined the call is
+   * rejected immediately with invocation_token_unavailable rather than
+   * forwarding undefined to VS Code and receiving an opaque API error.
+   */
+  getToolInvocationToken(): unknown;
+  /**
+   * Called when VS Code rejects the supplied token (stale session or
+   * re-authentication required). Implementations must clear the token store
+   * so the operator must re-arm via @gert /arm-mcp.
+   */
+  onTokenRejected?(): void;
 }
 
 // ─── Tool / action spec ────────────────────────────────────────────────────────
@@ -546,16 +560,32 @@ export class McpBridge {
       }
     }
 
+    // Token pre-check: reject immediately before calling invokeTool when the
+    // bridge is unarmed. This avoids an opaque VS Code API error and surfaces
+    // a clear, actionable diagnostic. Type @gert /arm-mcp in Copilot Chat to arm.
+    const safeMessage: Record<InvocationErrorCategory, string> = {
+      invocation_token_unavailable: 'MCP tool invocation token is unavailable (bridge runs outside a chat-participant request)',
+      authorization_unavailable:    'MCP tool authorization is not available',
+      provider_input_rejected:      'MCP tool provider rejected the supplied input',
+      invocation_error:             'MCP invocation failed',
+    };
+
     try {
       if (timedOut) {
         return this.errorResponse(req.request_id, 'deadline_exceeded', 'deadline already passed');
+      }
+
+      const toolToken = this.lm.getToolInvocationToken();
+      if (toolToken === undefined) {
+        return this.errorResponse(req.request_id, 'invocation_token_unavailable',
+          safeMessage['invocation_token_unavailable']);
       }
 
       let raw: LmToolResult;
       try {
         raw = await this.lm.invokeTool(
           spec.registeredName,
-          { input: req.args },
+          { input: req.args, toolInvocationToken: toolToken },
           cts.token,
         );
       } catch (err: unknown) {
@@ -563,16 +593,17 @@ export class McpBridge {
           return this.errorResponse(req.request_id, 'deadline_exceeded', 'invocation timed out');
         }
         const category = classifyInvocationError(err);
+        // If VS Code rejected the token (stale session), clear it so the operator
+        // must re-arm. This is the concrete definition of "token rejection":
+        // classifyInvocationError returns invocation_token_unavailable for any
+        // exception whose message matches the token-unavailable pattern.
+        if (category === 'invocation_token_unavailable') {
+          this.lm.onTokenRejected?.();
+        }
         // Log safe metadata only: class name + chosen category + request id.
         // Never log the exception message, args, or any result content.
         const className = err instanceof Error ? err.constructor.name : typeof err;
         this.log(`[mcpBridge] invocation error: category=${category} class=${className} request_id=${req.request_id}`);
-        const safeMessage: Record<InvocationErrorCategory, string> = {
-          invocation_token_unavailable: 'MCP tool invocation token is unavailable (bridge runs outside a chat-participant request)',
-          authorization_unavailable:    'MCP tool authorization is not available',
-          provider_input_rejected:      'MCP tool provider rejected the supplied input',
-          invocation_error:             'MCP invocation failed',
-        };
         return this.errorResponse(req.request_id, category, safeMessage[category]);
       }
 
