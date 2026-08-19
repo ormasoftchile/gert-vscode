@@ -19,11 +19,26 @@
 //   - The args passed to invokeTool are NEVER streamed or logged.
 //   - The tool RESULT CONTENT is NEVER streamed or logged.
 //   - The token never leaves the extension host.
+//
+// Diagnostic additions (safe):
+//   - The tool's declared inputSchema (public metadata) is streamed to the chat
+//     response. A schema mismatch is the most likely cause of consistent ~5s failures.
+//   - Raw error text (err.message, err.stack) is written to the OUTPUT CHANNEL ONLY
+//     when gert.diagnostics.unsafeErrorText is true.  It NEVER appears in the chat
+//     response, HTTP responses, run state, or child-process environment.
+//   - Short own-enumerable error properties (e.g. code, name) are always written to
+//     the output channel regardless of the setting.
 
 import * as http from 'http';
-import type * as vscode from 'vscode';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
+
+/** Public metadata shape for a registered LM tool (mirrors vscode.LanguageModelToolInformation). */
+export interface LmToolInfo {
+  name: string;
+  description?: string;
+  inputSchema?: unknown;
+}
 
 export interface ProbeAttemptRecord {
   label: string;
@@ -42,6 +57,80 @@ export interface ProbeResult {
 
 /** Elapsed ms above this threshold suggests a blocking dialog appeared. */
 const DIALOG_THRESHOLD_MS = 4_000;
+
+// ─── Schema dump ──────────────────────────────────────────────────────────────
+
+/**
+ * Build a Markdown section that dumps the tool's declared inputSchema and a
+ * one-line property-name verdict comparing the supplied input against it.
+ *
+ * Security: only property NAMES appear in the verdict — never property VALUES.
+ * The inputSchema itself is public tool metadata; streaming it is intentional.
+ */
+export function buildSchemaDump(
+  toolName: string,
+  toolInput: Record<string, unknown>,
+  tools: readonly LmToolInfo[],
+): string {
+  const info = tools.find((t) => t.name === toolName);
+  if (!info) {
+    return `> **Schema:** \`${toolName}\` not found in registry (unexpected — tool existence check passed).\n\n`;
+  }
+
+  const desc =
+    typeof info.description === 'string'
+      ? info.description.slice(0, 300)
+      : '*(no description)*';
+
+  const schemaJson = JSON.stringify(info.inputSchema ?? null, null, 2);
+
+  const verdict = schemaVerdict(toolInput, info.inputSchema);
+
+  return (
+    `### Declared schema for \`${toolName}\`\n\n` +
+    `**Description:** ${desc}\n\n` +
+    `**Input schema:**\n\`\`\`json\n${schemaJson}\n\`\`\`\n\n` +
+    `**Property-name verdict:** ${verdict}\n\n`
+  );
+}
+
+/**
+ * Compare the supplied toolInput keys against the declared JSON Schema.
+ * Reports only property NAMES — never property values.
+ */
+export function schemaVerdict(
+  toolInput: Record<string, unknown>,
+  inputSchema: unknown,
+): string {
+  const schema =
+    inputSchema !== null && typeof inputSchema === 'object'
+      ? (inputSchema as { required?: string[]; properties?: Record<string, unknown> })
+      : undefined;
+
+  const suppliedKeys = Object.keys(toolInput);
+  const requiredKeys: string[] = Array.isArray(schema?.required) ? schema!.required as string[] : [];
+  const schemaProps: string[] | null =
+    schema?.properties && typeof schema.properties === 'object'
+      ? Object.keys(schema.properties)
+      : null;
+
+  const missingRequired = requiredKeys.filter((k) => !suppliedKeys.includes(k));
+  const unknownSupplied = schemaProps
+    ? suppliedKeys.filter((k) => !schemaProps.includes(k))
+    : [];
+
+  const parts: string[] = [];
+  if (missingRequired.length > 0) {
+    parts.push(`missing required: ${missingRequired.map((k) => `\`${k}\``).join(', ')}`);
+  }
+  if (unknownSupplied.length > 0) {
+    parts.push(`not in schema: ${unknownSupplied.map((k) => `\`${k}\``).join(', ')}`);
+  }
+  if (parts.length === 0) {
+    return '✅ all required properties present; no unknown properties supplied.';
+  }
+  return '⚠️ ' + parts.join(' | ');
+}
 
 // ─── Argument parsing ─────────────────────────────────────────────────────────
 
@@ -100,11 +189,20 @@ export function parseProbeArgs(
 /**
  * Execute a single probe attempt.
  * Never logs, streams, or serialises the token, args, or result content.
+ *
+ * When outputChannel is provided:
+ *   - Always logs short own-enumerable error properties (e.g. code) — never
+ *     message or stack, which are free-text blobs.
+ *   - When unsafeErrorText is true, additionally logs err.message and err.stack
+ *     to the OUTPUT CHANNEL ONLY.  This text NEVER enters the chat response,
+ *     HTTP responses, run state, or child-process environment.
  */
 export async function runAttempt(
   label: string,
   invokeTool: (token: unknown) => Promise<unknown>,
   token: unknown,
+  outputChannel?: { appendLine(text: string): void } | null,
+  unsafeErrorText?: boolean,
 ): Promise<ProbeAttemptRecord> {
   const t0 = Date.now();
   try {
@@ -122,6 +220,27 @@ export async function runAttempt(
     const errorCode =
       typeof rawCode === 'string' && rawCode.length <= 64 ? rawCode : null;
     const dialogInferred = elapsedMs > DIALOG_THRESHOLD_MS;
+
+    if (outputChannel) {
+      // Always: log short own-enumerable symbolic properties (never message/stack).
+      if (err !== null && typeof err === 'object') {
+        for (const key of Object.keys(err as object)) {
+          if (key === 'message' || key === 'stack') continue; // free-text blobs — excluded
+          const val = (err as Record<string, unknown>)[key];
+          if ((typeof val === 'string' && val.length <= 64) || typeof val === 'number') {
+            outputChannel.appendLine(`[probe] ${label} err.${key} = ${String(val)}`);
+          }
+        }
+      }
+      // Opt-in: raw error text to output channel ONLY — never in chat/HTTP/state.
+      if (unsafeErrorText && err instanceof Error) {
+        outputChannel.appendLine(`[probe] ${label} err.message: ${err.message}`);
+        if (err.stack) {
+          outputChannel.appendLine(`[probe] ${label} err.stack: ${err.stack}`);
+        }
+      }
+    }
+
     return { label, ok: false, exceptionClass, errorCode, elapsedMs, dialogInferred };
   }
 }
@@ -177,27 +296,31 @@ export function loopbackRoundTrip(): Promise<void> {
  *
  * @param invokeToolFn  Wrapper around vscode.lm.invokeTool (injected for testability)
  * @param token         The toolInvocationToken from the live ChatRequestHandler
+ * @param outputChannel Optional output channel for error diagnostics (never chat/HTTP/state)
+ * @param unsafeErrorText When true, raw error text is written to outputChannel only
  */
 export async function runProbe(
   invokeToolFn: (token: unknown) => Promise<unknown>,
   token: unknown,
+  outputChannel?: { appendLine(text: string): void } | null,
+  unsafeErrorText?: boolean,
 ): Promise<ProbeAttemptRecord[]> {
   const results: ProbeAttemptRecord[] = [];
 
   // T1 — synchronous (no await before invocation)
-  results.push(await runAttempt('T1-synchronous', invokeToolFn, token));
+  results.push(await runAttempt('T1-synchronous', invokeToolFn, token, outputChannel, unsafeErrorText));
 
   // T2 — after a microtask
   await Promise.resolve();
-  results.push(await runAttempt('T2-microtask', invokeToolFn, token));
+  results.push(await runAttempt('T2-microtask', invokeToolFn, token, outputChannel, unsafeErrorText));
 
   // T3 — after a macrotask (250 ms)
   await new Promise<void>((r) => setTimeout(r, 250));
-  results.push(await runAttempt('T3-macrotask', invokeToolFn, token));
+  results.push(await runAttempt('T3-macrotask', invokeToolFn, token, outputChannel, unsafeErrorText));
 
   // T4 — after a real loopback HTTP round-trip
   await loopbackRoundTrip();
-  results.push(await runAttempt('T4-loopback', invokeToolFn, token));
+  results.push(await runAttempt('T4-loopback', invokeToolFn, token, outputChannel, unsafeErrorText));
 
   return results;
 }
@@ -243,15 +366,17 @@ export function renderProbeTable(toolName: string, attempts: ProbeAttemptRecord[
  *
  * @param promptText     request.prompt (text after the command name)
  * @param token          request.toolInvocationToken (the live handler token)
- * @param vscodeLmTools  vscode.lm.tools (for tool existence check)
+ * @param vscodeLmTools  vscode.lm.tools (for tool existence check and schema dump)
  * @param invokeRaw      vscode.lm.invokeTool (injected for testability; same signature)
  * @param cancellation   cancellation token from the chat request
  * @param response       chat response stream
+ * @param outputChannel  extension output channel for error diagnostics (never chat/HTTP/state)
+ * @param unsafeErrorText when true, raw err.message/stack are written to outputChannel only
  */
 export async function handleProbeToken(
   promptText: string,
   token: unknown,
-  vscodeLmTools: readonly { name: string }[],
+  vscodeLmTools: readonly LmToolInfo[],
   invokeRaw: (
     name: string,
     options: { input: Record<string, unknown>; toolInvocationToken: unknown },
@@ -259,6 +384,8 @@ export async function handleProbeToken(
   ) => Promise<unknown>,
   cancellation: unknown,
   response: { markdown(text: string): void },
+  outputChannel?: { appendLine(text: string): void } | null,
+  unsafeErrorText?: boolean,
 ): Promise<void> {
   const parsed = parseProbeArgs(promptText);
   if (!parsed.ok) {
@@ -281,6 +408,10 @@ export async function handleProbeToken(
     return;
   }
 
+  // Dump the tool's declared inputSchema (public metadata) and a property-name verdict.
+  // This is the highest-value datum: a schema mismatch explains consistent ~5s failures.
+  response.markdown(buildSchemaDump(toolName, toolInput, vscodeLmTools));
+
   // Build the invokeTool wrapper.
   // SECURITY: toolInput is captured in this closure and never streamed/logged.
   const invokeToolFn = (tok: unknown): Promise<unknown> =>
@@ -288,6 +419,6 @@ export async function handleProbeToken(
 
   response.markdown(`⏳ **probe-token**: running 4 attempts against \`${toolName}\`…\n`);
 
-  const attempts = await runProbe(invokeToolFn, token);
+  const attempts = await runProbe(invokeToolFn, token, outputChannel, unsafeErrorText ?? false);
   response.markdown(renderProbeTable(toolName, attempts));
 }

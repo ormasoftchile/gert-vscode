@@ -21,6 +21,8 @@ const {
   runAttempt,
   loopbackRoundTrip,
   handleProbeToken,
+  buildSchemaDump,
+  schemaVerdict,
 } = require('../out/probeToken');
 
 // ─── Test 1: all four attempts execute even when earlier attempts fail ────────
@@ -239,4 +241,163 @@ test('PROBE-5: tool not found in vscode.lm.tools → error, no invocations', asy
   assert.equal(callCount, 0, 'Zero invocations when tool is not registered');
   assert.ok(streamedChunks.join('').includes('not found') || streamedChunks.join('').includes('not registered'),
     'Error message must mention the tool is not found');
+});
+
+// ─── Test 6: schema dump renders property NAMES; supplied VALUES never appear ──
+//
+// Mutation under test: (b) printing a supplied input value in the verdict
+// → this test fails because SENTINEL_INPUT_VALUE appears in the streamed output.
+//
+// The sentinel flows through handleProbeToken → buildSchemaDump → schemaVerdict
+// (the REAL production path).  Non-vacuity is verified by asserting the verdict
+// actually contains the required-property name (proving schemaVerdict ran).
+
+test('PROBE-6: schema dump renders property names; supplied input values never appear', async () => {
+  const SENTINEL_INPUT_VALUE = 'PROBE6_INPUT_VAL_SENTINEL_8k4m2n9p';
+
+  const streamedChunks = [];
+  const response = { markdown: (text) => streamedChunks.push(text) };
+
+  // Tool has a schema with a required property 'requiredField' and one optional 'knownField'.
+  // The caller supplies only 'suppliedOnly' (not in schema) with the sentinel as its value.
+  // This produces both a "missing required" and a "not in schema" verdict line — both property
+  // names must appear; the sentinel value must not.
+  const vscodeLmTools = [{
+    name: 'schema-probe-tool',
+    description: 'Probe tool for schema dump test',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        requiredField: { type: 'string' },
+        knownField: { type: 'integer' },
+      },
+      required: ['requiredField'],
+    },
+  }];
+
+  const invokeRaw = async () => ({ content: [] });
+
+  await handleProbeToken(
+    `schema-probe-tool {"suppliedOnly":"${SENTINEL_INPUT_VALUE}"}`,
+    Symbol('probe6-token'),
+    vscodeLmTools,
+    invokeRaw,
+    null,
+    response,
+    null,   // no output channel needed for this assertion
+    false,  // unsafeErrorText off
+  );
+
+  const allStreamed = streamedChunks.join('\n');
+
+  // Non-vacuity: the verdict must have run and mention property names.
+  assert.ok(allStreamed.includes('requiredField'),
+    `Non-vacuity: "requiredField" (missing required property name) must appear in streamed output.\nStreamed:\n${allStreamed.slice(0, 500)}`);
+  assert.ok(allStreamed.includes('suppliedOnly'),
+    `Non-vacuity: "suppliedOnly" (unknown property name) must appear in streamed output.\nStreamed:\n${allStreamed.slice(0, 500)}`);
+
+  // Core assertion: the supplied input VALUE must never appear anywhere.
+  assert.equal(allStreamed.includes(SENTINEL_INPUT_VALUE), false,
+    `Supplied input value sentinel must NOT appear in streamed output.\nStreamed:\n${allStreamed.slice(0, 500)}`);
+
+  // Schema JSON block must be present (inputSchema is public metadata — streaming it is intentional).
+  assert.ok(allStreamed.includes('```json'),
+    'Schema fenced code block must appear in output');
+});
+
+// ─── Test 7: unsafeErrorText=false → raw error message appears NOWHERE ────────
+//
+// Mutation under test: (a) stream the raw error message into the chat response
+// → this test fails because the sentinel appears in streamedChunks.
+//
+// The sentinel is the Error message; it flows through handleProbeToken →
+// runProbe → runAttempt (the real production path).  The output channel is
+// a real mock so we can verify it stays empty too.
+
+test('PROBE-7: unsafeErrorText=false → raw error message appears NOWHERE (not in chat, not in output channel)', async () => {
+  const SENTINEL_MSG = 'PROBE7_ERR_MSG_SENTINEL_4v8x3y7z';
+
+  const streamedChunks = [];
+  const response = { markdown: (text) => streamedChunks.push(text) };
+  const outputLines = [];
+  const outputChannel = { appendLine: (line) => outputLines.push(line) };
+
+  const vscodeLmTools = [{ name: 'err-tool', description: 'x', inputSchema: { type: 'object', properties: { q: { type: 'string' } }, required: [] } }];
+
+  // invokeRaw always throws with the sentinel message.
+  const invokeRaw = async () => {
+    throw new Error(SENTINEL_MSG);
+  };
+
+  await handleProbeToken(
+    'err-tool {"q":"input"}',
+    Symbol('probe7-token'),
+    vscodeLmTools,
+    invokeRaw,
+    null,
+    response,
+    outputChannel,
+    false, // unsafeErrorText OFF
+  );
+
+  const allStreamed = streamedChunks.join('\n');
+  const allLogged  = outputLines.join('\n');
+
+  // Sentinel must not appear in chat response.
+  assert.equal(allStreamed.includes(SENTINEL_MSG), false,
+    `Raw error message must NOT appear in streamed markdown (unsafeErrorText=false).\nStreamed:\n${allStreamed.slice(0, 500)}`);
+
+  // Sentinel must not appear in output channel.
+  assert.equal(allLogged.includes(SENTINEL_MSG), false,
+    `Raw error message must NOT appear in output channel (unsafeErrorText=false).\nLogged:\n${allLogged.slice(0, 500)}`);
+
+  // Non-vacuity: the probe must have run (we should have a results table).
+  assert.ok(allStreamed.includes('T1-synchronous'),
+    'Non-vacuity: probe results table must be present in streamed output');
+});
+
+// ─── Test 8: unsafeErrorText=true → raw message in output channel ONLY ─────────
+//
+// Mutation under test: (a) stream the raw error message into the chat response
+// → this test fails because the sentinel appears in streamedChunks.
+
+test('PROBE-8: unsafeErrorText=true → raw error message in output channel only, never in chat', async () => {
+  const SENTINEL_MSG = 'PROBE8_ERR_MSG_SENTINEL_9w2r6s1t';
+
+  const streamedChunks = [];
+  const response = { markdown: (text) => streamedChunks.push(text) };
+  const outputLines = [];
+  const outputChannel = { appendLine: (line) => outputLines.push(line) };
+
+  const vscodeLmTools = [{ name: 'err-tool-2', description: 'y', inputSchema: { type: 'object', properties: { q: { type: 'string' } }, required: [] } }];
+
+  const invokeRaw = async () => {
+    throw new Error(SENTINEL_MSG);
+  };
+
+  await handleProbeToken(
+    'err-tool-2 {"q":"input2"}',
+    Symbol('probe8-token'),
+    vscodeLmTools,
+    invokeRaw,
+    null,
+    response,
+    outputChannel,
+    true, // unsafeErrorText ON
+  );
+
+  const allStreamed = streamedChunks.join('\n');
+  const allLogged  = outputLines.join('\n');
+
+  // Sentinel must NOT appear in the chat response.
+  assert.equal(allStreamed.includes(SENTINEL_MSG), false,
+    `Raw error message must NOT appear in streamed markdown (even when unsafeErrorText=true).\nStreamed:\n${allStreamed.slice(0, 500)}`);
+
+  // Sentinel MUST appear in the output channel.
+  assert.ok(allLogged.includes(SENTINEL_MSG),
+    `Raw error message MUST appear in output channel when unsafeErrorText=true.\nLogged:\n${allLogged.slice(0, 500)}`);
+
+  // Non-vacuity: the probe must have run.
+  assert.ok(allStreamed.includes('T1-synchronous'),
+    'Non-vacuity: probe results table must be present in streamed output');
 });

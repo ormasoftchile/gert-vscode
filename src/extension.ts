@@ -123,10 +123,12 @@ export function activate(context: vscode.ExtensionContext) {
       }
 
       if (request.command === 'probe-token') {
+        // window-scoped: unsafeErrorText is a diagnostics flag; no resource context at call time.
+        const unsafeErrorText = vscode.workspace.getConfiguration('gert').get<boolean>('diagnostics.unsafeErrorText', false);
         await handleProbeToken(
           request.prompt,
           request.toolInvocationToken,
-          vscode.lm.tools as unknown as readonly { name: string }[],
+          vscode.lm.tools as unknown as readonly { name: string; description?: string; inputSchema?: unknown }[],
           (name, options, cancellation) =>
             vscode.lm.invokeTool(
               name,
@@ -135,6 +137,8 @@ export function activate(context: vscode.ExtensionContext) {
             ) as Promise<unknown>,
           _token,
           response,
+          output,
+          unsafeErrorText,
         );
         return {};
       }
