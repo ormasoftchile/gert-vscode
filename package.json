@@ -2,7 +2,7 @@
   "name": "gert-preview",
   "displayName": "gert Runbook Preview",
   "description": "Preview gert runbooks (.runbook.yaml) as a structural graph in VS Code.",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "publisher": "ormasoftchile",
   "license": "MIT",
   "repository": {

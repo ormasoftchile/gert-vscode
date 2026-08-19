@@ -218,8 +218,16 @@ function redact(secret: string, text: string): string {
 // invocation_token_unavailable — VS Code rejected the call because the
 //   toolInvocationToken was rejected (stale session or re-auth required).
 //   Produced only when VS Code throws a token-related error during invocation.
+// provider_unavailable         — the MCP server itself is not running, could
+//   not be started, or is not reachable (including a 401 during MCP startup).
+//   Operator action: fix the MCP server's authentication/configuration, not Gert.
+//   PRECEDENCE NOTE: provider_unavailable is checked BEFORE authorization_unavailable.
+//   A startup failure that mentions "401" classifies here, not as authorization_unavailable,
+//   because the 401 came from the MCP server's own start-up, not from a Gert credential.
+//   The operator's required action (re-authenticate the MCP provider) is completely
+//   different from an authorization_unavailable action (check Gert/VS Code credentials).
 // authorization_unavailable    — auth/credential/forbidden failure from the
-//   provider or VS Code auth layer.
+//   provider or VS Code auth layer (after a successful MCP server start).
 // provider_input_rejected      — the provider rejected the supplied arguments
 //   (input-validation failure raised by the MCP server itself, not our schema
 //   guard which fires earlier as input_validation_error).
@@ -228,6 +236,7 @@ function redact(secret: string, text: string): string {
 
 export type InvocationErrorCategory =
   | 'invocation_token_unavailable'
+  | 'provider_unavailable'
   | 'authorization_unavailable'
   | 'provider_input_rejected'
   | 'invocation_error';
@@ -239,6 +248,13 @@ export function classifyInvocationError(err: unknown): InvocationErrorCategory {
   if (/invocation.?token|toolInvocationToken|no.*token.*invocation|token.*required/i.test(msg)) {
     return 'invocation_token_unavailable';
   }
+  // Provider unavailable: the MCP server itself did not start / has stopped /
+  // is not reachable.  Checked BEFORE authorization_unavailable because a
+  // server that returned 401 during startup is a provider-availability problem
+  // (fix the MCP server's sign-in), not a Gert credential problem.
+  if (/MCP server has stopped|MCP server could not be started|MCP server is not running|MCP server unavailable|server not running|server unavailable/i.test(msg)) {
+    return 'provider_unavailable';
+  }
   // Authorization / credential failure — preserve the existing category meaning.
   if (/auth|credential|unauthorized|forbidden/i.test(msg)) {
     return 'authorization_unavailable';
@@ -249,6 +265,67 @@ export function classifyInvocationError(err: unknown): InvocationErrorCategory {
   }
   // Conservative fallback — unknown or ambiguous exception.
   return 'invocation_error';
+}
+
+// ─── Provider hint extractor ──────────────────────────────────────────────────
+// Builds a SHORT, SAFE, strictly allowlisted hint from a provider error for
+// operator display.  This is an allowlist, NOT a denylist: the hint is assembled
+// only from recognised pieces; arbitrary provider text is never passed through.
+//
+// Allowed pieces (in order):
+//   1. A recognised fixed phrase from PROVIDER_HINT_PHRASES (canonical casing used).
+//   2. An HTTP error status code (4xx/5xx only) if present in the message.
+//   3. The ORIGIN ONLY of any URL (scheme + host — never path, query, or fragment).
+//
+// Hard cap: total hint length ≤ PROVIDER_HINT_MAX_LEN characters.
+// Never contains: tokens, secrets, tool arguments, result content, stack traces,
+// URL paths/queries, or arbitrary free text.
+
+/** Allowlisted phrases that are safe to surface verbatim in operator-facing hints. */
+const PROVIDER_HINT_PHRASES = [
+  'MCP server has stopped',
+  'MCP server could not be started',
+  'MCP server is not running',
+  'MCP server unavailable',
+  'server not running',
+  'server unavailable',
+] as const;
+
+const PROVIDER_HINT_MAX_LEN = 200;
+
+export function extractProviderHint(err: unknown): string | null {
+  const msg = err instanceof Error ? err.message : String(err);
+  const parts: string[] = [];
+
+  // 1. Recognised fixed phrase (use canonical casing from the allowlist).
+  for (const phrase of PROVIDER_HINT_PHRASES) {
+    if (new RegExp(phrase, 'i').test(msg)) {
+      parts.push(phrase);
+      break; // only one phrase per hint
+    }
+  }
+
+  // 2. HTTP error status code (4xx/5xx only — informative, not credential-bearing).
+  const statusMatch = msg.match(/\b([45]\d{2})\b/);
+  if (statusMatch) {
+    parts.push(`HTTP ${statusMatch[1]}`);
+  }
+
+  // 3. URL origin only (scheme + host — strip path, query, fragment).
+  const urlMatch = msg.match(/https?:\/\/[^\s/?#]*/);
+  if (urlMatch) {
+    try {
+      const u = new URL(urlMatch[0] + '/');
+      parts.push(`${u.protocol}//${u.host}`);
+    } catch {
+      // Unparseable URL fragment — skip entirely.
+    }
+  }
+
+  if (parts.length === 0) return null;
+
+  const hint = parts.join('; ');
+  return hint.length > PROVIDER_HINT_MAX_LEN ? hint.slice(0, PROVIDER_HINT_MAX_LEN) : hint;
 }
 
 // ─── Canceled-error predicate ─────────────────────────────────────────────────
@@ -578,8 +655,10 @@ export class McpBridge {
 
     // safeMessage: per-category text that is safe to return to Gert Core.
     // Provider exception text is never forwarded; only the safe string is returned.
+    // For provider_unavailable the message is augmented with the allowlisted hint below.
     const safeMessage: Record<InvocationErrorCategory, string> = {
       invocation_token_unavailable: 'MCP tool authorization is not available (token expired or rejected)',
+      provider_unavailable:         'the MCP provider is not running',
       authorization_unavailable:    'MCP tool authorization is not available',
       provider_input_rejected:      'MCP tool provider rejected the supplied input',
       invocation_error:             'MCP invocation failed',
@@ -638,7 +717,19 @@ export class McpBridge {
         // Never log the exception message, args, or any result content.
         const className = err instanceof Error ? err.constructor.name : typeof err;
         this.log(`[mcpBridge] invocation error: category=${category} class=${className} request_id=${req.request_id}`);
-        return this.errorResponse(req.request_id, category, safeMessage[category]);
+        // For provider_unavailable, build an actionable message with the allowlisted hint.
+        // The hint is assembled from a fixed-phrase allowlist, HTTP status code, and URL
+        // origin only — no arbitrary provider text passes through.
+        let errMsg = safeMessage[category];
+        if (category === 'provider_unavailable') {
+          const hint = extractProviderHint(err);
+          if (hint) {
+            errMsg = `${errMsg} (${hint}). Check \`MCP: List Servers\` in VS Code and re-authenticate the provider.`;
+          } else {
+            errMsg = `${errMsg}. Check \`MCP: List Servers\` in VS Code and re-authenticate the provider.`;
+          }
+        }
+        return this.errorResponse(req.request_id, category, errMsg);
       }
 
       const text = extractTextFromResult(raw);

@@ -401,3 +401,56 @@ test('PROBE-8: unsafeErrorText=true → raw error message in output channel only
   assert.ok(allStreamed.includes('T1-synchronous'),
     'Non-vacuity: probe results table must be present in streamed output');
 });
+
+// ─── Test 9: provider_unavailable failure populates category + hint in attempt record ─
+//
+// Mutation under test: strip category/providerHint from ProbeAttemptRecord (or always
+// set to null) → this test fails because the record fields are null/wrong.
+//
+// The sentinel flows through handleProbeToken → runProbe → runAttempt (real path).
+// Non-vacuity: assert the sentinel was actually received by the spy (proves the path ran).
+
+test('PROBE-9: provider_unavailable error populates category and providerHint in attempt record and table', async () => {
+  // Exact live string from T2/T3/T4 probe output.
+  const LIVE_ERROR = 'MCP server could not be started: 401 status sending message to https://icm-mcp-prod.azure-api.net/v1/:';
+
+  let invokeCallCount = 0;
+  const invokeToolFn = async (_tok) => {
+    invokeCallCount++;
+    throw new Error(LIVE_ERROR);
+  };
+
+  const token = Symbol('probe9-token');
+  const attempts = await runProbe(invokeToolFn, token);
+
+  // Non-vacuity: all four invocations must have been made.
+  assert.equal(invokeCallCount, 4, `Non-vacuity: expected 4 invocations, got ${invokeCallCount}`);
+
+  // Every attempt must be failed.
+  for (const a of attempts) {
+    assert.equal(a.ok, false, `${a.label} must be failed`);
+    // Category must be provider_unavailable — this goes through classifyInvocationError.
+    assert.equal(a.category, 'provider_unavailable',
+      `${a.label}: category must be provider_unavailable; got ${a.category}`);
+    // providerHint must include the matched phrase and HTTP status.
+    assert.ok(a.providerHint !== null,
+      `${a.label}: providerHint must not be null`);
+    assert.ok(a.providerHint.includes('MCP server could not be started'),
+      `${a.label}: providerHint must include the matched phrase. Got: ${a.providerHint}`);
+    assert.ok(a.providerHint.includes('HTTP 401'),
+      `${a.label}: providerHint must include HTTP 401. Got: ${a.providerHint}`);
+    // providerHint must NOT include URL path.
+    assert.equal(a.providerHint.includes('/v1/'), false,
+      `${a.label}: providerHint must NOT include URL path. Got: ${a.providerHint}`);
+  }
+
+  // Table rendering: category and hint columns must appear.
+  const table = renderProbeTable('test-tool', attempts);
+  assert.ok(table.includes('provider_unavailable'),
+    `Table must include "provider_unavailable". Table:\n${table.slice(0, 500)}`);
+  assert.ok(table.includes('MCP server could not be started'),
+    `Table must include the matched phrase hint. Table:\n${table.slice(0, 500)}`);
+  // Table must NOT include the raw live error message (arbitrary provider text).
+  assert.equal(table.includes('sending message to'), false,
+    `Table must NOT include arbitrary provider text "sending message to". Table:\n${table.slice(0, 500)}`);
+});

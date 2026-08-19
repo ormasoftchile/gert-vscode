@@ -1088,3 +1088,200 @@ test('redaction non-vacuity: scanner detects injected secret in a constructed re
   assert.equal(serialized.includes(INJECTED), true,
     'non-vacuity: injected secret must be detectable in a constructed body — if this fails the scanner is broken');
 });
+
+// ─── Deliverable F: provider_unavailable classification ───────────────────────
+// Tests for the new provider_unavailable category and extractProviderHint.
+// Fixtures use the EXACT live strings captured from Cristiano's diagnostic probe.
+
+const { extractProviderHint } = require('../out/mcpBridge');
+
+// ── F1: live strings classify correctly ──────────────────────────────────────
+
+test('classifier: live fixture T1 → provider_unavailable', () => {
+  // Exact T1 live string from the probe
+  assert.equal(
+    classifyInvocationError(new Error('MCP server has stopped')),
+    'provider_unavailable',
+  );
+});
+
+test('classifier: live fixture T2/T3/T4 → provider_unavailable', () => {
+  // Exact T2/T3/T4 live string from the probe
+  assert.equal(
+    classifyInvocationError(new Error(
+      'MCP server could not be started: 401 status sending message to https://icm-mcp-prod.azure-api.net/v1/:'
+    )),
+    'provider_unavailable',
+  );
+});
+
+test('classifier: server-unavailable phrasings → provider_unavailable', () => {
+  assert.equal(classifyInvocationError(new Error('MCP server is not running')),     'provider_unavailable');
+  assert.equal(classifyInvocationError(new Error('MCP server unavailable')),         'provider_unavailable');
+  assert.equal(classifyInvocationError(new Error('server not running at all')),      'provider_unavailable');
+  assert.equal(classifyInvocationError(new Error('server unavailable: timeout')),    'provider_unavailable');
+});
+
+// ── F2: startup-401 precedence: provider_unavailable, NOT authorization_unavailable ──
+
+test('classifier: startup 401 → provider_unavailable (not authorization_unavailable)', () => {
+  // A message that contains BOTH "MCP server could not be started" AND "Unauthorized".
+  // provider_unavailable must win because it is checked first.
+  assert.equal(
+    classifyInvocationError(new Error(
+      'MCP server could not be started: 401 Unauthorized sending message to https://example.com/'
+    )),
+    'provider_unavailable',
+    'startup 401 must classify as provider_unavailable, not authorization_unavailable',
+  );
+});
+
+// ── F3: unrecognised error still falls back ───────────────────────────────────
+
+test('classifier: unrecognised error → invocation_error fallback (unchanged)', () => {
+  assert.equal(classifyInvocationError(new Error('socket hang up')), 'invocation_error');
+});
+
+// ── F4: bridge returns provider_unavailable with actionable guidance ──────────
+
+test('bridge: provider_unavailable category with hint and remediation in message', async (t) => {
+  const lm = makeLm(async () => {
+    throw new Error('MCP server could not be started: 401 status sending message to https://icm-mcp-prod.azure-api.net/v1/:');
+  });
+  const bridge = await createBridge(lm);
+  t.after(() => bridge.dispose());
+
+  const { body } = await postBridge(bridge.bridgeUrl, makeRequest(bridge));
+  assert.ok(body.error, 'error must be present');
+  assert.equal(body.error.code, 'provider_unavailable');
+  // Message must name the remediation action.
+  assert.ok(body.error.message.includes('MCP: List Servers'),
+    `message must mention "MCP: List Servers"; got: ${body.error.message}`);
+  assert.ok(body.error.message.includes('re-authenticate'),
+    `message must mention "re-authenticate"; got: ${body.error.message}`);
+});
+
+// ── F5: extractProviderHint builds from allowlist only ────────────────────────
+
+test('extractProviderHint: live fixture T1 → phrase only', () => {
+  const hint = extractProviderHint(new Error('MCP server has stopped'));
+  assert.ok(hint !== null, 'hint must not be null');
+  assert.ok(hint.includes('MCP server has stopped'), 'hint must include the matched phrase');
+  assert.ok(hint.length <= 200, 'hint must not exceed 200 chars');
+});
+
+test('extractProviderHint: live fixture T2 → phrase + status + origin', () => {
+  const hint = extractProviderHint(new Error(
+    'MCP server could not be started: 401 status sending message to https://icm-mcp-prod.azure-api.net/v1/:'
+  ));
+  assert.ok(hint !== null, 'hint must not be null');
+  assert.ok(hint.includes('MCP server could not be started'), 'hint must include the matched phrase');
+  assert.ok(hint.includes('HTTP 401'),     'hint must include HTTP status');
+  assert.ok(hint.includes('https://icm-mcp-prod.azure-api.net'), 'hint must include URL origin');
+  assert.ok(!hint.includes('/v1/'),        'hint must NOT include URL path');
+  assert.ok(!hint.includes('sending'),     'hint must NOT include arbitrary provider text');
+  assert.ok(hint.length <= 200,            'hint must not exceed 200 chars');
+});
+
+test('extractProviderHint: unrecognised error → null (no arbitrary text leaks)', () => {
+  const SECRET_PROVIDER_TEXT = 'PROVIDER_FREE_TEXT_SENTINEL_xq9z7w4v';
+  const hint = extractProviderHint(new Error(`some unknown failure: ${SECRET_PROVIDER_TEXT}`));
+  assert.equal(hint, null, 'hint must be null for unrecognised error');
+});
+
+// ── F6: hint length cap enforced ─────────────────────────────────────────────
+
+test('extractProviderHint: cap at 200 chars even when all three pieces are present', () => {
+  // Build an error whose URL host is pathologically long.
+  const longHost = 'a'.repeat(200) + '.example.com';
+  const err = new Error(`MCP server has stopped at https://${longHost}/v1/foo`);
+  const hint = extractProviderHint(err);
+  assert.ok(hint !== null, 'hint must not be null');
+  assert.ok(hint.length <= 200, `hint must not exceed 200 chars; got ${hint.length}`);
+});
+
+// ── F7: redaction sentinel tests — no forbidden content in hint ───────────────
+// Each test embeds a forbidden sentinel in the error message and asserts the hint
+// contains NONE of it.  Tests run through the REAL extractProviderHint production
+// path so that a mutation to that function can be caught.
+//
+// Non-vacuity: each test also asserts the hint is non-null (meaning extractProviderHint
+// actually ran and returned something), OR asserts null when the whole error is unrecognised.
+
+test('extractProviderHint: bearer token in error message does not appear in hint', () => {
+  const SENTINEL_BEARER = 'BEARER_TOKEN_SENTINEL_5e9r2t7y';
+  const hint = extractProviderHint(new Error(
+    `MCP server has stopped; Authorization: Bearer ${SENTINEL_BEARER}`
+  ));
+  // hint should be non-null (phrase matched), but the bearer value must not appear.
+  assert.ok(hint !== null, 'non-vacuity: extractProviderHint returned null unexpectedly');
+  assert.equal(hint.includes(SENTINEL_BEARER), false,
+    `Bearer token sentinel must not appear in hint. Hint: ${hint}`);
+});
+
+test('extractProviderHint: capability secret does not appear in hint', () => {
+  const SENTINEL_SECRET = 'CAPABILITY_SECRET_SENTINEL_3f8h1j6k';
+  const hint = extractProviderHint(new Error(
+    `MCP server could not be started; capability=${SENTINEL_SECRET}`
+  ));
+  assert.ok(hint !== null, 'non-vacuity: extractProviderHint returned null unexpectedly');
+  assert.equal(hint.includes(SENTINEL_SECRET), false,
+    `Capability secret sentinel must not appear in hint. Hint: ${hint}`);
+});
+
+test('extractProviderHint: tool arguments do not appear in hint', () => {
+  const SENTINEL_ARG = 'TOOL_ARG_SENTINEL_9n4m7p2q';
+  const hint = extractProviderHint(new Error(
+    `MCP server has stopped; args={"incidentId":"${SENTINEL_ARG}"}`
+  ));
+  assert.ok(hint !== null, 'non-vacuity: extractProviderHint returned null unexpectedly');
+  assert.equal(hint.includes(SENTINEL_ARG), false,
+    `Tool arg sentinel must not appear in hint. Hint: ${hint}`);
+});
+
+test('extractProviderHint: URL path and query do not appear in hint', () => {
+  const SENTINEL_PATH = '/v1/secret-path';
+  const SENTINEL_QUERY = 'token=SENTINEL_QUERY_TOKEN_6x3z8w1v';
+  const hint = extractProviderHint(new Error(
+    `MCP server has stopped; url=https://example.com${SENTINEL_PATH}?${SENTINEL_QUERY}`
+  ));
+  assert.ok(hint !== null, 'non-vacuity: extractProviderHint returned null unexpectedly');
+  assert.equal(hint.includes(SENTINEL_PATH), false,
+    `URL path sentinel must not appear in hint. Hint: ${hint}`);
+  assert.equal(hint.includes(SENTINEL_QUERY), false,
+    `URL query sentinel must not appear in hint. Hint: ${hint}`);
+  // But the origin (example.com) IS allowed.
+  assert.ok(hint.includes('https://example.com'),
+    `URL origin must appear in hint. Hint: ${hint}`);
+});
+
+test('extractProviderHint: result content does not appear in hint', () => {
+  const SENTINEL_RESULT = 'RESULT_CONTENT_SENTINEL_2p7q4r9s';
+  // Error whose message has neither an allowlisted phrase, a 4xx/5xx code, nor a URL:
+  const hint = extractProviderHint(new Error(`partial result: ${SENTINEL_RESULT}`));
+  // Unrecognised → null (cannot pass text through).
+  assert.equal(hint, null, 'Unrecognised error must return null hint, not arbitrary content');
+});
+
+// ── F8: bridge: provider_unavailable redaction through full HTTP path ─────────
+// Verifies the full bridge code path doesn't leak provider text even for
+// provider_unavailable, using a sentinel embedded in the provider error message.
+
+test('bridge: provider_unavailable path: provider free text does not appear in response body', async (t) => {
+  const SENTINEL = 'PROVIDER_FREE_TEXT_FULL_PATH_SENTINEL_1a2b3c';
+  const logLines = [];
+  const output = { appendLine: (s) => logLines.push(s) };
+  const lm = makeLm(async () => {
+    throw new Error(`MCP server has stopped: internal reason: ${SENTINEL}`);
+  });
+  const bridge = await McpBridge.create(lm, 0, output, { registry: fixtureRegistry });
+  t.after(() => bridge.dispose());
+
+  const { body } = await postBridge(bridge.bridgeUrl, makeRequest(bridge));
+  const serialized = JSON.stringify(body);
+  assertNoSubstring(serialized, SENTINEL, 'response body (provider_unavailable full path)');
+  for (const line of logLines) assertNoSubstring(line, SENTINEL, 'output channel (provider_unavailable full path)');
+  // Code must be provider_unavailable (non-vacuity: we actually hit the right path).
+  assert.equal(body.error?.code, 'provider_unavailable',
+    'non-vacuity: error code must be provider_unavailable');
+});

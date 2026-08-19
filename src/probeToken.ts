@@ -12,7 +12,7 @@
 //
 // Per-attempt record:
 //   label | ok/failed | exception class | error code (if symbolic) | elapsed ms
-//   | dialog inferred (heuristic: elapsed > DIALOG_THRESHOLD_MS)
+//   | failure category | allowlisted provider hint
 //
 // Security invariants (non-negotiable — never relax):
 //   - The token itself is NEVER streamed, logged, or serialised.
@@ -30,6 +30,7 @@
 //     the output channel regardless of the setting.
 
 import * as http from 'http';
+import { classifyInvocationError, extractProviderHint } from './mcpBridge';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -46,17 +47,16 @@ export interface ProbeAttemptRecord {
   exceptionClass: string | null;
   errorCode: string | null;
   elapsedMs: number;
-  /** True when elapsed time exceeded DIALOG_THRESHOLD_MS; undefined when ok. */
-  dialogInferred: boolean | undefined;
+  /** Failure category from classifyInvocationError; null when ok. */
+  category: string | null;
+  /** Allowlisted provider hint from extractProviderHint; null when ok or no hint available. */
+  providerHint: string | null;
 }
 
 export interface ProbeResult {
   toolName: string;
   attempts: ProbeAttemptRecord[];
 }
-
-/** Elapsed ms above this threshold suggests a blocking dialog appeared. */
-const DIALOG_THRESHOLD_MS = 4_000;
 
 // ─── Schema dump ──────────────────────────────────────────────────────────────
 
@@ -208,7 +208,7 @@ export async function runAttempt(
   try {
     await invokeTool(token);
     const elapsedMs = Date.now() - t0;
-    return { label, ok: true, exceptionClass: null, errorCode: null, elapsedMs, dialogInferred: undefined };
+    return { label, ok: true, exceptionClass: null, errorCode: null, elapsedMs, category: null, providerHint: null };
   } catch (err: unknown) {
     const elapsedMs = Date.now() - t0;
     const exceptionClass =
@@ -219,7 +219,8 @@ export async function runAttempt(
       : undefined;
     const errorCode =
       typeof rawCode === 'string' && rawCode.length <= 64 ? rawCode : null;
-    const dialogInferred = elapsedMs > DIALOG_THRESHOLD_MS;
+    const category = classifyInvocationError(err);
+    const providerHint = extractProviderHint(err);
 
     if (outputChannel) {
       // Always: log short own-enumerable symbolic properties (never message/stack).
@@ -241,7 +242,7 @@ export async function runAttempt(
       }
     }
 
-    return { label, ok: false, exceptionClass, errorCode, elapsedMs, dialogInferred };
+    return { label, ok: false, exceptionClass, errorCode, elapsedMs, category, providerHint };
   }
 }
 
@@ -332,13 +333,9 @@ function formatRow(r: ProbeAttemptRecord): string {
   const status = r.ok ? '✅ ok' : '❌ failed';
   const exc = r.exceptionClass ?? '—';
   const code = r.errorCode ?? '—';
-  const dialog =
-    r.dialogInferred === undefined
-      ? '—'
-      : r.dialogInferred
-      ? '⚠️ likely (inferred from elapsed time)'
-      : 'no (inferred)';
-  return `| ${r.label} | ${status} | ${exc} | ${code} | ${r.elapsedMs} ms | ${dialog} |`;
+  const cat = r.category ?? '—';
+  const hint = r.providerHint ? r.providerHint : '—';
+  return `| ${r.label} | ${status} | ${exc} | ${code} | ${r.elapsedMs} ms | ${cat} | ${hint} |`;
 }
 
 /**
@@ -349,10 +346,8 @@ export function renderProbeTable(toolName: string, attempts: ProbeAttemptRecord[
   const header = [
     `### Token-lifetime probe: \`${toolName}\``,
     '',
-    '> **Dialog inferred** from elapsed time > 4 s — not API-detected.',
-    '',
-    '| Attempt | Result | Exception class | Error code | Elapsed | Dialog? |',
-    '|---------|--------|-----------------|------------|---------|---------|',
+    '| Attempt | Result | Exception class | Error code | Elapsed | Category | Provider hint |',
+    '|---------|--------|-----------------|------------|---------|----------|---------------|',
   ];
   const rows = attempts.map(formatRow);
   return [...header, ...rows, ''].join('\n');
