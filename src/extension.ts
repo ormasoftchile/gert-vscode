@@ -32,6 +32,7 @@ import { McpBridge } from './mcpBridge';
 import { buildRegistryFromDir } from './toolDefinitionRegistry';
 import { pickServerRoot } from './serverRoot';
 import { setToolToken, getToolToken, clearToolToken } from './toolTokenStore';
+import { isArmCommand } from './chatParticipantGate';
 import {
   CANCELLED,
   UNSET,
@@ -98,7 +99,7 @@ export function activate(context: vscode.ExtensionContext) {
   const participant = vscode.chat.createChatParticipant(
     'gert.chat',
     async (request, _ctx, response, _token) => {
-      if (request.command === 'arm-mcp') {
+      if (isArmCommand(request.command)) {
         setToolToken(request.toolInvocationToken);
         response.markdown(
           '✅ **Gert MCP bridge armed.** The bridge will use this token for subsequent ' +

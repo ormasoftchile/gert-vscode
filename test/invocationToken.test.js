@@ -30,6 +30,8 @@ const {
   _resetForTest,
 } = require('../out/toolTokenStore');
 
+const { isArmCommand } = require('../out/chatParticipantGate');
+
 const path = require('node:path');
 const FIXTURE_TOOLS_DIR = path.join(__dirname, 'fixtures', 'tools');
 const fixtureRegistry   = buildRegistryFromDir(FIXTURE_TOOLS_DIR);
@@ -307,41 +309,42 @@ test('INVTOKEN-5: token is captured only from the arm-mcp command (other command
   _resetForTest();
   assert.equal(isArmed(), false, 'store must start unarmed');
 
-  // --- Simulate a non-arm-mcp command (e.g., default prompt, no command) ---
-  // Mirrors: if (request.command !== 'arm-mcp') { /* do not capture */ }
+  // isArmCommand is the pure gate imported from chatParticipantGate.ts.
+  // Extension.ts calls isArmCommand(request.command) — patching that module
+  // IS what mutation 2 tests (it must cause this test to fail).
+  assert.equal(isArmCommand('arm-mcp'), true,
+    'arm-mcp must be recognized as the arm command');
+  assert.equal(isArmCommand(undefined), false,
+    'undefined (no slash command) must not be treated as arm-mcp');
+  assert.equal(isArmCommand('arm-mcp-extra'), false,
+    'a command that merely starts with arm-mcp must not gate');
+  assert.equal(isArmCommand('some-other-command'), false,
+    'any unrecognised command must not gate');
+  assert.equal(isArmCommand('ARM-MCP'), false,
+    'gate must be case-sensitive — ARM-MCP is not arm-mcp');
+
+  // Simulate the arm handler using the gate (mirrors extension.ts logic exactly).
   const simulateCommandHandler = (command, token) => {
-    if (command === 'arm-mcp') {
+    if (isArmCommand(command)) {
       setToolToken(token);
     }
-    // Any other command must NOT call setToolToken.
   };
 
   simulateCommandHandler(undefined, 'should-not-be-stored');
-  assert.equal(isArmed(), false,
-    'a prompt with no command must not arm the bridge');
-  assert.equal(getToolToken(), undefined,
-    'token store must remain empty after a non-arm command');
+  assert.equal(isArmed(), false, 'no-command prompt must not arm the bridge');
 
   simulateCommandHandler('some-other-command', 'should-not-be-stored-2');
-  assert.equal(isArmed(), false,
-    'an unrecognised command must not arm the bridge');
+  assert.equal(isArmed(), false, 'unrecognised command must not arm the bridge');
 
-  simulateCommandHandler('arm-mcp-extra', 'should-not-be-stored-3');
-  assert.equal(isArmed(), false,
-    'a command whose name merely starts with arm-mcp must not arm the bridge');
-
-  // --- Now simulate the explicit arm-mcp command ---
   const REAL_TOKEN = Symbol('real-captured-token');
   simulateCommandHandler('arm-mcp', REAL_TOKEN);
-  assert.equal(isArmed(), true,
-    'arm-mcp command must arm the bridge');
+  assert.equal(isArmed(), true, 'arm-mcp command must arm the bridge');
   assert.strictEqual(getToolToken(), REAL_TOKEN,
     'arm-mcp command must store the exact token from the chat request');
 
-  // --- A second non-arm command must not overwrite the armed token ---
   simulateCommandHandler(undefined, 'overwrite-attempt');
   assert.strictEqual(getToolToken(), REAL_TOKEN,
     'a subsequent non-arm command must not overwrite an already-captured token');
 
-  _resetForTest(); // cleanup
+  _resetForTest();
 });
