@@ -1001,6 +1001,39 @@ test('bridge: invocation_token_unavailable is returned with safe message', async
   assert.equal(body.result, undefined);
 });
 
+test('bridge: Canceled with cached token fails closed and never retries without token', async (t) => {
+  const logLines = [];
+  const output = { appendLine: (s) => logLines.push(s) };
+  const tokenValues = [];
+  let invokeCount = 0;
+  let rejectionCount = 0;
+  const cachedToken = 'cached-token-for-canceled-regression';
+
+  const lm = {
+    tools: [{ name: 'icm-get-incident' }],
+    getToolInvocationToken: () => cachedToken,
+    onTokenRejected: () => { rejectionCount++; },
+    invokeTool: async (_name, opts) => {
+      invokeCount++;
+      tokenValues.push(opts.toolInvocationToken);
+      throw new Error('Canceled');
+    },
+  };
+  const bridge = await McpBridge.create(lm, 0, output, { registry: fixtureRegistry });
+  t.after(() => bridge.dispose());
+
+  const { body } = await postBridge(bridge.bridgeUrl, makeRequest(bridge));
+
+  assert.equal(invokeCount, 1, 'old unsafe behavior made two calls; fail closed after the first Canceled');
+  assert.deepEqual(tokenValues, [cachedToken],
+    'the bridge must not make a second invokeTool call with toolInvocationToken undefined');
+  assert.equal(rejectionCount, 1, 'Canceled token path must clear/reject the cached token once');
+  assert.ok(body.error, 'Canceled token path must return a coded error');
+  assert.equal(body.error.code, 'invocation_token_unavailable');
+  assert.equal(body.result, undefined);
+  assert.equal(logLines.some((line) => line.includes('retrying without token')), false,
+    'logs must not contain the old silent unauthenticated retry message');
+});
 
 test('bridge: provider_input_rejected is returned with safe message', async (t) => {
   const lm = makeLm(async () => {

@@ -82,13 +82,13 @@ export interface LmInterface {
     token: LmCancellationToken,
   ): Promise<LmToolResult>;
   /**
-   * Returns the toolInvocationToken stored by the most recent @gert /arm-mcp
-   * chat turn.  The bridge passes this to invokeTool as dialog suppression.
-   * May return undefined when unarmed — the bridge still invokes in that case.
+   * Returns the toolInvocationToken captured from the current chat handler.
+   * The bridge passes this to invokeTool as VS Code's tool-invocation consent
+   * token. It is NOT an MCP authorization credential.
    *
-   * Petals precedent (mcpBridge.ts:11-22): the token is "to avoid confirmation
-   * dialogs" — NOT an authorization credential.  The bridge NEVER refuses to
-   * invoke because the token is absent.
+   * Safety invariant: absence or rejection of this token must fail closed.
+   * The bridge must not silently retry without it because that can trigger an
+   * interactive authentication/consent flow outside the armed path.
    */
   getToolInvocationToken(): unknown;
   /**
@@ -322,12 +322,11 @@ export function extractProviderHint(err: unknown): string | null {
 }
 
 // ─── Canceled-error predicate ─────────────────────────────────────────────────
-// Petals-derived (mcpBridgeGeneric.ts ~330):
-//   if (msg.includes("Canceled") && token !== undefined) { retry without token }
-//
 // VS Code raises an error whose message contains "Canceled" (capital C) when a
-// tool invocation dialog is dismissed. We match the exact word "Canceled" to
-// avoid false positives, and also "cancelled" (British spelling) defensively.
+// tool invocation is canceled by the VS Code LM/tool layer. Historically the
+// bridge treated this as permission to retry without toolInvocationToken; that
+// unsafe downgrade is now forbidden. Canceled is still recognized so the bridge
+// can fail closed with invocation_token_unavailable and clear the cached token.
 //
 // Exported so tests can verify the predicate without a VS Code host.
 export function isCanceledError(err: unknown): boolean {
@@ -662,47 +661,35 @@ export class McpBridge {
         return this.errorResponse(req.request_id, 'deadline_exceeded', 'deadline already passed');
       }
 
-      // Petals invocation model (mcpBridgeGeneric.ts:320-345):
+      // Fail-closed invocation model:
       //
-      //   Attempt 1: invoke with cached token (may be undefined — that is fine).
-      //              Token suppresses VS Code consent dialogs when present.
-      //   Attempt 2: only when attempt 1 throws a Canceled-class error AND a
-      //              token was present — retry without token so VS Code may show
-      //              the consent dialog instead.
+      //   Attempt 1: invoke with the cached toolInvocationToken.
+      //   No attempt 2: absence or rejection of the token is surfaced loudly.
       //
-      // The bridge NEVER refuses to invoke because no token is cached.
-      // Token presence is dialog suppression only, not authorization.
+      // The previous Petals-derived fallback retried Canceled failures without
+      // a token, which can trigger an interactive VS Code/MCP prompt. That is
+      // unsafe for live ICM use and must remain opt-in-only in any future design.
       const cachedToken = this.lm.getToolInvocationToken();
+      if (cachedToken === undefined) {
+        this.log(`[mcpBridge] invokeTool "${spec.registeredName}": no toolInvocationToken cached — refusing unsafe unauthenticated invocation`);
+        return this.errorResponse(req.request_id, 'invocation_token_unavailable', safeMessage.invocation_token_unavailable);
+      }
 
       let raw: LmToolResult;
       try {
-        try {
-          raw = await this.lm.invokeTool(
-            spec.registeredName,
-            { input: req.args, toolInvocationToken: cachedToken },
-            cts.token,
-          );
-          this.log(`[mcpBridge] invokeTool "${spec.registeredName}": attempt 1 succeeded`);
-        } catch (firstErr: unknown) {
-          if (isCanceledError(firstErr) && cachedToken !== undefined) {
-            this.log(`[mcpBridge] invokeTool "${spec.registeredName}": attempt 1 Canceled — retrying without token`);
-            raw = await this.lm.invokeTool(
-              spec.registeredName,
-              { input: req.args, toolInvocationToken: undefined },
-              cts.token,
-            );
-            this.log(`[mcpBridge] invokeTool "${spec.registeredName}": attempt 2 succeeded`);
-          } else {
-            throw firstErr;
-          }
-        }
+        raw = await this.lm.invokeTool(
+          spec.registeredName,
+          { input: req.args, toolInvocationToken: cachedToken },
+          cts.token,
+        );
+        this.log(`[mcpBridge] invokeTool "${spec.registeredName}": attempt 1 succeeded`);
       } catch (err: unknown) {
         if (timedOut || cts.token.isCancellationRequested) {
           return this.errorResponse(req.request_id, 'deadline_exceeded', 'invocation timed out');
         }
-        const category = classifyInvocationError(err);
-        // If VS Code rejected the token (stale session), clear it so the operator
-        // must re-arm.
+        const category = isCanceledError(err) ? 'invocation_token_unavailable' : classifyInvocationError(err);
+        // If VS Code rejected/canceled the token path, clear it so the operator
+        // must re-arm instead of silently falling back to an interactive prompt.
         if (category === 'invocation_token_unavailable') {
           this.lm.onTokenRejected?.();
         }

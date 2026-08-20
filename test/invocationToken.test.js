@@ -2,9 +2,9 @@
 // toolInvocationToken lifecycle in the Gert VS Code extension.
 //
 // Tests:
-//   1. Unarmed bridge STILL invokes invokeTool (token = undefined) — Petals model.
+//   1. Unarmed bridge fails closed before invokeTool — no implicit prompt path.
 //   2. Armed bridge invokes the registered MCP tool WITH the captured token.
-//   3. Token-rejection clears the cached token and forces rearming.
+//   3. Token rejection/cancellation clears the cached token and forces rearming.
 //   4. Redaction: token text cannot appear in HTTP responses, output-channel
 //      logs, errors, traces, OR child-process environment.
 //   5. Command/participant gate: token is captured ONLY from the explicit
@@ -95,20 +95,15 @@ function makeLm({ getTokenFn, invokeToolFn, onTokenRejectedFn } = {}) {
   };
 }
 
-// ─── Test 1: Unarmed bridge still invokes (Petals model — no pre-invoke gate) ─
+// ─── Test 1: Unarmed bridge fails closed before invokeTool ───────────────────
 
-test('INVTOKEN-1: unarmed bridge still invokes invokeTool with toolInvocationToken: undefined', async (t) => {
-  // Petals fact (mcpBridge.ts comment at line 10): the token "is to avoid
-  // confirmation dialogs" — it is NOT an authorization credential.
-  // The bridge must NEVER refuse to invoke because no token is cached.
+test('INVTOKEN-1: unarmed bridge fails closed and never invokes without a token', async (t) => {
   let invokeCount = 0;
-  let receivedToken = 'sentinel-not-undefined'; // detect if it was set
 
   const lm = makeLm({
-    getTokenFn:    () => undefined,           // unarmed — no cached token
-    invokeToolFn:  async (_name, opts) => {
+    getTokenFn:    () => undefined,
+    invokeToolFn:  async () => {
       invokeCount++;
-      receivedToken = opts.toolInvocationToken;
       return makeIcmResult();
     },
   });
@@ -118,15 +113,11 @@ test('INVTOKEN-1: unarmed bridge still invokes invokeTool with toolInvocationTok
 
   const { body } = await postBridge(bridge.bridgeUrl, makeRequest(bridge));
 
-  // Petals model: invokeTool MUST be called even when no token is cached.
-  // The bridge never refuses to invoke because a token is absent.
-  assert.equal(invokeCount, 1,
-    `invokeTool MUST be called even when unarmed (spy count = ${invokeCount}); the bridge must never pre-invoke-refuse`);
-  assert.strictEqual(receivedToken, undefined,
-    'invokeTool must receive toolInvocationToken === undefined when unarmed');
-  // No no_active_run error — the bridge attempted and returned a result (or real error from provider).
-  assert.notEqual(body.error?.code, 'no_active_run',
-    'no_active_run must never appear — that gate has been removed');
+  assert.equal(invokeCount, 0,
+    `invokeTool must NOT be called when no token is cached (spy count = ${invokeCount})`);
+  assert.ok(body.error, 'unarmed invocation must return a coded error');
+  assert.equal(body.error.code, 'invocation_token_unavailable');
+  assert.equal(body.result, undefined, 'result must be absent when invocation is refused');
 });
 
 // ─── Test 2: Armed bridge invokes WITH the captured token ────────────────────
@@ -196,6 +187,44 @@ test('INVTOKEN-3: token rejection clears the cached token (forces rearming)', as
     'token store must be cleared after rejection so the operator must re-arm');
 
   _resetForTest(); // cleanup
+});
+
+test('INVTOKEN-3b: Canceled from VS Code token path clears token and does not retry without token', async (t) => {
+  let rejectionCount = 0;
+  let invokeCount = 0;
+  const tokenValues = [];
+
+  const lm = makeLm({
+    getTokenFn: () => 'token-that-vscode-cancels',
+    invokeToolFn: async (_name, opts) => {
+      invokeCount++;
+      tokenValues.push(opts.toolInvocationToken);
+      throw new Error('Canceled');
+    },
+    onTokenRejectedFn: () => {
+      rejectionCount++;
+      clearToolToken();
+    },
+  });
+
+  const bridge = await McpBridge.create(lm, 0, undefined, { registry: fixtureRegistry });
+  t.after(() => bridge.dispose());
+
+  _resetForTest();
+  setToolToken('token-that-vscode-cancels');
+
+  const { body } = await postBridge(bridge.bridgeUrl, makeRequest(bridge));
+
+  assert.equal(invokeCount, 1, 'Canceled token path must not retry unauthenticated');
+  assert.deepEqual(tokenValues, ['token-that-vscode-cancels'],
+    'the only invokeTool call must use the cached token');
+  assert.ok(body.error, 'expected fail-closed error response');
+  assert.equal(body.error.code, 'invocation_token_unavailable');
+  assert.equal(body.result, undefined);
+  assert.equal(rejectionCount, 1, 'Canceled token path must clear the cached token exactly once');
+  assert.equal(isArmed(), false, 'token store must be cleared after Canceled token path');
+
+  _resetForTest();
 });
 
 // ─── Test 4: Redaction — token cannot appear in any output surface ───────────

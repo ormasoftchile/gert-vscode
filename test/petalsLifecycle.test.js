@@ -7,8 +7,8 @@
 //       package.json contributes.commands, menus.editor/title, and menus.editor/context.
 //   C3. No arguments enter logs or responses — sentinel must NOT appear in any
 //       output-channel line or HTTP response body. Tests the real bridge code path.
-//   C4. Unarmed state still attempts invocation: spy MUST be called with
-//       toolInvocationToken: undefined when no token is cached (never refuse pre-invoke).
+//   C4. Unarmed state fails closed before invocation: spy MUST NOT be called
+//       without toolInvocationToken because that path can trigger an auth prompt.
 //   C5. Non-MCP runs (validateInputs dry-run path) preserve current behaviour:
 //       the command is contributed and the enumInputs module is intact.
 //
@@ -86,7 +86,7 @@ test('C1: bridge delivers the EXACT submitted args to invokeTool (deep equality)
   let receivedInput = null;
   const lm = {
     tools: [{ name: 'icm-get-incident' }],
-    getToolInvocationToken: () => undefined,
+    getToolInvocationToken: () => 'test-token-for-payload-path',
     invokeTool: async (_name, opts) => {
       receivedInput = opts.input;
       return makeIcmResult();
@@ -152,7 +152,7 @@ test('C3: bridge never logs or echoes invocation arguments (sentinel probe)', as
   let invokeCallCount = 0;
   const lm = {
     tools: [{ name: 'icm-get-incident' }],
-    getToolInvocationToken: () => undefined,
+    getToolInvocationToken: () => 'test-token-for-redaction-path',
     // invokeTool is the actual production invocation path — the sentinel
     // flows through McpBridge.handle() → validateArgsAgainstSchema → invokeTool.
     invokeTool: async (_name, opts) => {
@@ -191,20 +191,16 @@ test('C3: bridge never logs or echoes invocation arguments (sentinel probe)', as
     `sentinel must not appear in HTTP response: ${serialized.slice(0, 200)}`);
 });
 
-// ─── C4: Unarmed state attempts invocation, never refuses ────────────────────
+// ─── C4: Unarmed state fails closed before invocation ────────────────────────
 
-test('C4: unarmed bridge (no cached token) still calls invokeTool with toolInvocationToken: undefined', async (t) => {
-  // This is the Petals invariant: no pre-invoke gate.  Token absence → pass
-  // toolInvocationToken: undefined to invokeTool.  Never refuse pre-invoke.
-  let invokeCount    = 0;
-  let receivedToken  = 'not-undefined-sentinel'; // detect if set to undefined
+test('C4: unarmed bridge (no cached token) fails closed before invokeTool', async (t) => {
+  let invokeCount = 0;
 
   const lm = {
     tools: [{ name: 'icm-get-incident' }],
-    getToolInvocationToken: () => undefined,   // explicitly unarmed
-    invokeTool: async (_name, opts) => {
+    getToolInvocationToken: () => undefined,
+    invokeTool: async () => {
       invokeCount++;
-      receivedToken = opts.toolInvocationToken;
       return makeIcmResult();
     },
   };
@@ -212,18 +208,16 @@ test('C4: unarmed bridge (no cached token) still calls invokeTool with toolInvoc
   const bridge = await McpBridge.create(lm, 0, undefined, { registry: fixtureRegistry });
   t.after(() => bridge.dispose());
 
-  await postBridge(bridge.bridgeUrl, makeRequest(bridge));
+  const { body } = await postBridge(bridge.bridgeUrl, makeRequest(bridge));
 
-  // Spy WAS called — never refused.
-  assert.equal(invokeCount, 1,
-    `invokeTool spy MUST be called when unarmed (never refuse pre-invoke); got invokeCount=${invokeCount}`);
-
-  // Token was passed as undefined (Petals: undefined is fine, dialog may appear).
-  assert.strictEqual(receivedToken, undefined,
-    'toolInvocationToken must be undefined when unarmed (passed through, not blocked)');
+  assert.equal(invokeCount, 0,
+    `invokeTool spy must NOT be called when unarmed; got invokeCount=${invokeCount}`);
+  assert.ok(body.error, 'expected fail-closed error from missing token');
+  assert.equal(body.error.code, 'invocation_token_unavailable');
+  assert.equal(body.result, undefined);
 });
 
-test('C4: error from unarmed invocation is a named category, never no_active_run', async (t) => {
+test('C4: unarmed failure is a named safety category, never no_active_run or provider auth', async (t) => {
   const lm = {
     tools: [{ name: 'icm-get-incident' }],
     getToolInvocationToken: () => undefined,
@@ -237,14 +231,10 @@ test('C4: error from unarmed invocation is a named category, never no_active_run
 
   const { body } = await postBridge(bridge.bridgeUrl, makeRequest(bridge));
 
-  // Error is a classified provider error, NOT the removed no_active_run code.
-  assert.ok(body.error, 'expected error from provider failure');
+  assert.ok(body.error, 'expected missing-token error before provider invocation');
   assert.notEqual(body.error.code, 'no_active_run',
-    'no_active_run must never be returned — the pre-invoke gate is removed');
-  // The error must be a legitimate category.
-  const validCodes = ['authorization_unavailable', 'invocation_token_unavailable', 'invocation_error'];
-  assert.ok(validCodes.includes(body.error.code),
-    `error code must be a real invocation category, got: ${body.error.code}`);
+    'no_active_run must never be returned — use the explicit token category');
+  assert.equal(body.error.code, 'invocation_token_unavailable');
 });
 
 // ─── C5: Non-MCP runs (validateInputs) preserve current behaviour ─────────────
@@ -257,9 +247,9 @@ test('C5: gert.validateInputs command is contributed (non-MCP dry-run path prese
   assert.match(cmd.title, /gert/i, 'validateInputs title must reference gert');
 });
 
-test('C5: isCanceledError predicate exported from mcpBridge is the Petals retry discriminator', () => {
+test('C5: isCanceledError predicate exported from mcpBridge is the fail-closed discriminator', () => {
   // Verify the Canceled-error predicate is present and correct.
-  // This is the Petals port of mcpBridgeGeneric.ts:330.
+  // It must never authorize an unauthenticated retry.
   assert.equal(typeof isCanceledError, 'function', 'isCanceledError must be exported from mcpBridge');
 
   // True positives (Petals pattern).
@@ -279,12 +269,12 @@ test('C5: isCanceledError predicate exported from mcpBridge is the Petals retry 
     'lowercase "canceled" must not match (VS Code uses capital C)');
 });
 
-// ─── Canceled retry path ──────────────────────────────────────────────────────
-// Verifies the Petals two-attempt pattern: Canceled + token present → retry without token.
+// ─── Canceled fail-closed path ───────────────────────────────────────────────
+// Verifies the safety invariant: Canceled + token present → fail, no tokenless retry.
 
-test('C5-retry: Canceled error with cached token retries without token', async (t) => {
+test('C5-fail-closed: Canceled error with cached token does not retry without token', async (t) => {
   let invokeCount  = 0;
-  let tokenValues  = [];
+  const tokenValues  = [];
 
   const CACHED_TOKEN = 'my-cached-token';
 
@@ -294,8 +284,7 @@ test('C5-retry: Canceled error with cached token retries without token', async (
     invokeTool: async (_name, opts) => {
       invokeCount++;
       tokenValues.push(opts.toolInvocationToken);
-      if (invokeCount === 1) throw new Error('Canceled');
-      return makeIcmResult();
+      throw new Error('Canceled');
     },
   };
 
@@ -304,21 +293,20 @@ test('C5-retry: Canceled error with cached token retries without token', async (
 
   const { body } = await postBridge(bridge.bridgeUrl, makeRequest(bridge));
 
-  assert.equal(invokeCount, 2, 'Canceled + token present must trigger retry (2 invocations)');
-  assert.strictEqual(tokenValues[0], CACHED_TOKEN,
-    'attempt 1 must use the cached token');
-  assert.strictEqual(tokenValues[1], undefined,
-    'attempt 2 must use toolInvocationToken: undefined');
-  assert.equal(body.error, undefined, 'retry must succeed');
-  assert.ok(body.result, 'result must be present after retry');
+  assert.equal(invokeCount, 1, 'Canceled + token present must NOT trigger a second invocation');
+  assert.deepEqual(tokenValues, [CACHED_TOKEN],
+    'the only invokeTool call must use the cached token; no undefined-token retry is allowed');
+  assert.ok(body.error, 'Canceled token path must fail closed');
+  assert.equal(body.error.code, 'invocation_token_unavailable');
+  assert.equal(body.result, undefined);
 });
 
-test('C5-retry: Canceled error WITHOUT cached token does NOT retry', async (t) => {
+test('C5-fail-closed: missing cached token refuses before invokeTool', async (t) => {
   let invokeCount = 0;
 
   const lm = {
     tools: [{ name: 'icm-get-incident' }],
-    getToolInvocationToken: () => undefined,  // no cached token
+    getToolInvocationToken: () => undefined,
     invokeTool: async () => {
       invokeCount++;
       throw new Error('Canceled');
@@ -330,9 +318,8 @@ test('C5-retry: Canceled error WITHOUT cached token does NOT retry', async (t) =
 
   const { body } = await postBridge(bridge.bridgeUrl, makeRequest(bridge));
 
-  assert.equal(invokeCount, 1, 'Canceled without token must NOT retry (1 invocation only)');
-  assert.ok(body.error, 'Canceled error must be returned');
-  // Classify as invocation_error (Canceled does not match token-unavailable pattern).
-  assert.equal(body.error.code, 'invocation_error',
-    'Canceled without token must surface as invocation_error, not trigger retry');
+  assert.equal(invokeCount, 0, 'missing token must prevent invokeTool entirely');
+  assert.ok(body.error, 'missing token must return a coded error');
+  assert.equal(body.error.code, 'invocation_token_unavailable');
+  assert.equal(body.result, undefined);
 });

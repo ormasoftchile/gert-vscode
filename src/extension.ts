@@ -68,8 +68,8 @@ export function activate(context: vscode.ExtensionContext) {
     get tools() { return vscode.lm.tools as unknown as readonly import('./mcpBridge').LmToolInfo[]; },
     getToolInvocationToken() { return getToolToken(); },
     onTokenRejected() { clearToolToken(); },
-    // Petals pattern: pass the cached token (may be undefined) directly.
-    // The bridge handles the two-attempt retry; this adapter is transparent.
+    // Pass the cached token directly. The bridge fails closed when the token
+    // is absent, rejected, or canceled; this adapter is transparent.
     invokeTool(name, options, token) {
       return vscode.lm.invokeTool(
         name,
@@ -122,10 +122,9 @@ export function activate(context: vscode.ExtensionContext) {
           'ℹ️ **Token armed — MCP dialog suppression enabled.**\n\n' +
           'Accessing `request.toolInvocationToken` causes VS Code to auto-discover ' +
           'and start MCP servers (~60s on first use).\n\n' +
-          'The cached token is passed as `toolInvocationToken` on MCP tool calls to ' +
-          'suppress VS Code consent dialogs. If VS Code raises a `Canceled` error ' +
-          'with the token, the bridge retries once without it — the consent dialog ' +
-          'will appear instead. This token is NEVER an authorization credential.\n\n' +
+          'The cached token is passed as `toolInvocationToken` on MCP tool calls. ' +
+          'If VS Code rejects or cancels that token path, the bridge fails closed ' +
+          'instead of retrying without a token. This token is NEVER an authorization credential.\n\n' +
           '**Re-arm when needed:** The token is cleared on rejection. ' +
           'Run `/arm-mcp` again if calls fail with `invocation_token_unavailable`.\n\n' +
           '**VS Code MCP tools visible right now:**\n\n' +
@@ -136,8 +135,8 @@ export function activate(context: vscode.ExtensionContext) {
 
       if (request.command === 'run') {
         // Access toolInvocationToken first — triggers VS Code to start MCP servers
-        // (~60s on first use) and caches the token for bridge dialog suppression.
-        // Petals model: store unconditionally; bridge decides whether to use it.
+        // (~60s on first use) and caches the token for bridge invocation consent.
+        // Store unconditionally; the bridge fails closed if VS Code rejects it.
         setToolToken(request.toolInvocationToken);
 
         const prompt = request.prompt.trim();
