@@ -33,6 +33,7 @@ import { buildRegistryFromDir } from './toolDefinitionRegistry';
 import { pickServerRoot } from './serverRoot';
 import { setToolToken, getToolToken, clearToolToken } from './toolTokenStore';
 import { isArmCommand } from './chatParticipantGate';
+import { executeRunHandoff } from './runHandoff';
 import {
   CANCELLED,
   UNSET,
@@ -162,36 +163,44 @@ export function activate(context: vscode.ExtensionContext) {
         // Refresh registry so the bridge dispatches against this runbook's tools.
         refreshBridgeRegistry(runbookPath);
 
-        const bin = vscode.workspace
-          .getConfiguration('gert', vscode.Uri.file(runbookPath))
-          .get<string>('binaryPath', 'gert');
-        const varArgs = varPairArgs.flatMap((p) => ['--var', p]);
-        const bridgeVars = mcpBridge
+        const cfg = vscode.workspace.getConfiguration('gert', vscode.Uri.file(runbookPath));
+        const bin = cfg.get<string>('binaryPath', 'gert');
+        const packageMapSetting = cfg.get<string>('packageMap', '');
+        const projectRoot = pickServerRoot(
+          runbookPath,
+          (vscode.workspace.workspaceFolders ?? []).map((folder) => folder.uri.fsPath),
+          path.dirname(runbookPath),
+        );
+        const bridgeVars: Record<string, string> = mcpBridge
           ? {
               GERT_VSCODE_BRIDGE_URL: mcpBridge.bridgeUrl,
               GERT_VSCODE_BRIDGE_TOKEN: mcpBridge.bridgeToken,
             }
           : {};
 
-        await new Promise<void>((resolve) => {
-          execFile(
+        try {
+          const result = await executeRunHandoff({
             bin,
-            ['run', ...varArgs, runbookPath],
-            { env: { ...process.env, ...bridgeVars }, maxBuffer: 10 * 1024 * 1024 },
-            (err, stdout, stderr) => {
-              if (stderr.trim()) output?.appendLine(`[gert run] ${stderr.trim()}`);
-              if (err) {
-                reportEngineFailure('gert run', err);
-                response.markdown(
-                  '❌ **gert run failed** — see the `gert` output channel for details.',
-                );
-              } else {
-                response.markdown(stdout.trim() || '✅ Runbook completed.');
-              }
-              resolve();
-            },
+            runbookPath,
+            varPairArgs,
+            projectRoot,
+            packageMapSetting,
+            bridgeVars,
+            baseEnv: process.env,
+            execFile,
+          });
+          if (result.packageMap.warning) output?.appendLine(`[gert run] WARNING: ${result.packageMap.warning}`);
+          if (result.stderr.trim()) output?.appendLine(`[gert run] ${result.stderr.trim()}`);
+          response.markdown(result.stdout.trim() || '✅ Runbook completed.');
+        } catch (err: unknown) {
+          const withOutput = err as { stderr?: string; packageMap?: { warning?: string } };
+          if (withOutput.packageMap?.warning) output?.appendLine(`[gert run] WARNING: ${withOutput.packageMap.warning}`);
+          if (withOutput.stderr?.trim()) output?.appendLine(`[gert run] ${withOutput.stderr.trim()}`);
+          reportEngineFailure('gert run', err);
+          response.markdown(
+            '❌ **gert run failed** — see the `gert` output channel for details.',
           );
-        });
+        }
         return {};
       }
 
