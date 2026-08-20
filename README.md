@@ -34,14 +34,22 @@ Three commands:
   This setting takes precedence over the name declared in the workspace's `.tool.yaml` definitions.
   The YAML-derived names are still used for all entries not listed here.
 
-## Build
+## Prerequisites
+
+- VS Code 1.95 or newer.
+- Node.js 20 or newer, including `npm`.
+- Go 1.25 or newer to build the sibling `gert` CLI repository.
+
+## Build and debug
+
+Open this repository in VS Code and press F5. The debug task installs npm dependencies when needed, compiles the extension, builds `..\gert\gert.exe`, and prepends `..\gert` to the Extension Development Host PATH.
+
+Manual build:
 
 ```sh
 npm ci
 npm run compile
 ```
-
-Then press F5 in VS Code to launch an Extension Development Host.
 
 ## Package (.vsix)
 

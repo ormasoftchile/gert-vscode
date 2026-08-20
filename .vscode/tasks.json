@@ -2,27 +2,44 @@
   "version": "2.0.0",
   "tasks": [
     {
+      "label": "gert-vscode: install dependencies",
+      "type": "process",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\scripts\\ensure-npm-deps.ps1",
+        "-ExtensionRoot",
+        "${workspaceFolder}"
+      ],
+      "problemMatcher": []
+    },
+    {
       "label": "gert-vscode: compile",
       "type": "shell",
       "command": "npm run compile",
       "options": {
         "cwd": "${workspaceFolder}"
       },
+      "dependsOn": "gert-vscode: install dependencies",
+      "dependsOrder": "sequence",
       "problemMatcher": "$tsc"
     },
     {
       "label": "gert-vscode: build CLI",
       "type": "process",
-      "command": "go",
+      "command": "powershell",
       "args": [
-        "build",
-        "-o",
-        "gert.exe",
-        "./cmd/gert"
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\scripts\\build-cli.ps1",
+        "-ExtensionRoot",
+        "${workspaceFolder}"
       ],
-      "options": {
-        "cwd": "${workspaceFolder}/../gert"
-      },
       "problemMatcher": "$go"
     },
     {
