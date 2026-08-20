@@ -82,7 +82,7 @@
         "gert.packageMap": {
           "type": "string",
           "default": "",
-          "markdownDescription": "Path to the package-map file passed to `gert serve --package-map`. Absolute or relative to the active runbook's project root (resolved via `pickServerRoot`, never `workspaceFolders[0]`). Leave empty to fall back to the project-root convention (`package-map.yaml`). If neither the setting path nor the convention file exists, `--package-map` is omitted."
+          "markdownDescription": "Path to the package-map file passed to `gert serve --package-map`. Absolute or relative to the active runbook's project root (resolved via `pickServerRoot`, never `workspaceFolders[0]`). For projects that also use `requires:` maps with `gert run`/`gert plan`, point this setting at the serve-compatible map (for example `*.serve-package-map.yaml`). Leave empty to fall back to the project-root convention (`package-map.yaml`). If neither the setting path nor the convention file exists, `--package-map` is omitted."
         },
         "gert.mcpBridge.toolNameOverrides": {
           "type": "object",

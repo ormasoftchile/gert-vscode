@@ -150,6 +150,22 @@ test('resolvePackageMapPath: setting beats convention when both exist', (t) => {
     'convention file must not override the explicit setting');
 });
 
+test('resolvePackageMapPath: explicit serve package-map wins when run and serve maps coexist', (t) => {
+  const root = makeTempRoot(t, [
+    'packages/incident-routing.vscode-mcp.package-map.yaml',
+    'packages/incident-routing.vscode-mcp.serve-package-map.yaml',
+  ]);
+  const result = resolvePackageMapPath(
+    root,
+    'packages/incident-routing.vscode-mcp.serve-package-map.yaml',
+  );
+  assert.equal(
+    result,
+    path.join(root, 'packages', 'incident-routing.vscode-mcp.serve-package-map.yaml'),
+    'resolver must use the explicit VS Code setting, not glob across package maps',
+  );
+});
+
 test('resolvePackageMapPath: missing setting file falls through to convention', (t) => {
   // Setting points to a non-existent file; convention file exists.
   // The chain must fall through silently (caller logs the warning).
@@ -214,14 +230,14 @@ test('multi-root relative-path guard: resolution is always against projectRoot',
 
 test('multi-root: scoped packageMap setting produces --package-map; unscoped does not', (t) => {
   // Simulate the active project root for the runbook's folder.
-  const activeRoot = makeTempRoot(t, ['packages/incident-routing.vscode-mcp.package-map.yaml']);
+  const activeRoot = makeTempRoot(t, ['packages/incident-routing.vscode-mcp.serve-package-map.yaml']);
 
   // folder 0 (wrong scope): has no gert.packageMap setting.
   const folder0Config = { binaryPath: 'gert', packageMap: '' };
   // Active runbook folder (correct scope): has the setting from SQL Live-Site.
   const activeFolderConfig = {
     binaryPath: 'gert',
-    packageMap: 'packages/incident-routing.vscode-mcp.package-map.yaml',
+    packageMap: 'packages/incident-routing.vscode-mcp.serve-package-map.yaml',
   };
 
   // ── Scoped path (the fix) ───────────────────────────────────────────────
@@ -236,7 +252,7 @@ test('multi-root: scoped packageMap setting produces --package-map; unscoped doe
     'scoped config: --package-map must be present when active folder has gert.packageMap');
   assert.equal(
     scopedArgs[flagIdx + 1],
-    path.join(activeRoot, 'packages', 'incident-routing.vscode-mcp.package-map.yaml'),
+    path.join(activeRoot, 'packages', 'incident-routing.vscode-mcp.serve-package-map.yaml'),
     '--package-map value must be the absolute path resolved against the active project root',
   );
   // Path must be a separate argv element, not fused to the flag.

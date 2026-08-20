@@ -17,8 +17,9 @@ Three commands:
   Absolute, or relative to the active runbook's project root. Leave empty to fall back to the
   project-root convention (`package-map.yaml`). If neither the setting path nor the convention
   file exists, `--package-map` is omitted. This is the correct way to select the `vscode-mcp`
-  binding when multiple bindings coexist (e.g. `package-map.yaml` for stdio, `package-map.mock.yaml`
-  for deterministic testing). Example: `"package-map.vscode.yaml"`.
+  binding when multiple bindings coexist (e.g. a `*.serve-package-map.yaml` file for `serve`,
+  while a separate `requires:`-based map remains available for `gert run`/`gert plan`). Example:
+  `"packages/incident-routing.vscode-mcp.serve-package-map.yaml"`.
 - `gert.binaryPath` — path to the `gert` CLI (default `gert`).
 - `gert.serverUrl` — base URL of the gert server (default `http://localhost:7778`).
 - `gert.autoStartServer` — start and manage `gert serve` automatically (default `true`).
