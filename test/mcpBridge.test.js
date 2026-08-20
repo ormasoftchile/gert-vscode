@@ -200,6 +200,14 @@ const OPS_OPT_SPEC = {
   },
 };
 
+const ICM_LIVE_TOOL_NAME = 'mcp_icm_mcp_serve_get_incident_details_by_id';
+const ICM_LIVE_REGISTRY = {
+  'icm/get-incident': {
+    ...ICM_SPEC,
+    registeredName: ICM_LIVE_TOOL_NAME,
+  },
+};
+
 // Inline registry for optional-field bridge regression tests.
 const OPS_OPT_REGISTRY = { 'ops-optional/probe': OPS_OPT_SPEC };
 
@@ -262,13 +270,20 @@ test('normalizeResult: optional field PRESENT but null → fails', () => {
   assert.match(result.reason, /null/);
 });
 
-test('normalizeResult: fails on unknown extra field (fail-closed)', () => {
+test('normalizeResult: ignores unknown MCP result fields', () => {
   const result = normalizeResult(
-    { title: 'T', service: 'S', environment: 'E', logical_server: 'L', database: 'D', extra: 'x' },
+    { title: 'T', service: 'S', environment: 'E', logical_server: 'L', database: 'D', summary: 'additive server field' },
     ICM_SPEC,
   );
-  assert.equal(result.ok, false);
-  assert.match(result.reason, /extra/);
+  assert.equal(result.ok, true, `expected ok but got reason: ${result.ok ? '' : result.reason}`);
+  assert.deepEqual(result.value, {
+    title: 'T',
+    service: 'S',
+    environment: 'E',
+    logical_server: 'L',
+    database: 'D',
+  });
+  assert.equal('summary' in result.value, false, 'unknown server field must not be forwarded');
 });
 
 test('normalizeResult: fails on type-incompatible value', () => {
@@ -409,6 +424,42 @@ test('type-incompatible field: bridge returns normalization error', async (t) =>
   assert.ok(body.error);
   assert.equal(body.error.code, 'result_normalization_error');
   assert.match(body.error.message, /title/);
+});
+
+test('additive MCP result field: bridge normalizes declared fields and ignores summary', async (t) => {
+  let invokeCount = 0;
+  let invokedName = '';
+  const lm = makeLm(async (name) => {
+    invokeCount++;
+    invokedName = name;
+    return {
+      content: [{
+        value: JSON.stringify({
+          title: 'CPU spike',
+          service: 'api-gateway',
+          environment: 'prod',
+          logical_server: 'srv-01',
+          database: 'db-primary',
+          summary: 'additive server field from live ICM-shaped payload',
+        }),
+      }],
+    };
+  }, [{ name: ICM_LIVE_TOOL_NAME }]);
+  const bridge = await createBridgeWithRegistry(ICM_LIVE_REGISTRY, lm);
+  t.after(() => bridge.dispose());
+
+  const { body } = await postBridge(bridge.bridgeUrl, makeRequest(bridge));
+  assert.equal(invokedName, ICM_LIVE_TOOL_NAME, 'fixture must exercise the exact live ICM MCP tool name');
+  assert.equal(invokeCount, 1, 'non-vacuity: bridge must call invokeTool exactly once');
+  assert.equal(body.error, undefined, `unexpected error: ${JSON.stringify(body.error)}`);
+  assert.deepEqual(body.result, {
+    title: 'CPU spike',
+    service: 'api-gateway',
+    environment: 'prod',
+    logical_server: 'srv-01',
+    database: 'db-primary',
+  });
+  assert.equal('summary' in body.result, false, 'unknown summary field must be ignored, not forwarded');
 });
 
 // Optional-field bridge regression: the bridge must handle BOTH outcomes —
@@ -949,6 +1000,7 @@ test('bridge: invocation_token_unavailable is returned with safe message', async
   assert.equal(body.error.code, 'invocation_token_unavailable');
   assert.equal(body.result, undefined);
 });
+
 
 test('bridge: provider_input_rejected is returned with safe message', async (t) => {
   const lm = makeLm(async () => {

@@ -137,13 +137,13 @@ export function resolveSpec(
 }
 
 // ─── Result normalizer ────────────────────────────────────────────────────────
-// Fail-closed with one explicit exception: a declared field marked
-// required: false may be absent (optional absent → OK). Any other deviation
-// is still an error:
+// Validate the declared output contract while tolerating additive MCP result
+// fields. A declared field marked required: false may be absent (optional
+// absent → OK). These remain errors:
 //   • present-but-null/undefined → error
 //   • present-but-wrong-type    → error
 //   • required field absent     → error
-//   • unknown extra field       → error (fail-closed policy)
+// Unknown extra fields are ignored; MCP Result is an extensible object.
 
 export function normalizeResult(
   raw: unknown,
@@ -153,13 +153,6 @@ export function normalizeResult(
     return { ok: false, reason: 'MCP result is not a JSON object' };
   }
   const obj = raw as Record<string, unknown>;
-
-  // Fail on any key not declared in outputFields.
-  for (const key of Object.keys(obj)) {
-    if (!(key in spec.outputFields)) {
-      return { ok: false, reason: `unexpected extra field in MCP result: "${key}"` };
-    }
-  }
 
   const out: Record<string, unknown> = {};
   for (const [field, fieldSpec] of Object.entries(spec.outputFields)) {
