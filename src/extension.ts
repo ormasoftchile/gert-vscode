@@ -467,7 +467,10 @@ async function previewGraph() {
     return;
   }
 
+  const config = vscode.workspace.getConfiguration('gert', editor.document.uri);
+  const initialStyle = config.get<string>('preview.nodeStyle', 'smooth-curves');
   const rbPath = encodeURIComponent(runbookPath);
+  const styleParam = encodeURIComponent(initialStyle);
   graphPanel?.dispose();
   const panel = vscode.window.createWebviewPanel(
     'gertPreviewGraph',
@@ -483,7 +486,7 @@ async function previewGraph() {
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; frame-src ${base}; style-src 'unsafe-inline'; script-src 'unsafe-inline';" />
 <style>html,body,iframe{margin:0;height:100vh;width:100vw;border:0}</style>
 </head><body>
-<iframe id="gert-frame" src="${base}/preview/?runbookPath=${rbPath}"></iframe>
+<iframe id="gert-frame" src="${base}/preview/?runbookPath=${rbPath}&style=${styleParam}"></iframe>
 <script>
   const vscodeApi = acquireVsCodeApi();
   window.addEventListener('message', (ev) => {
@@ -503,9 +506,18 @@ async function previewGraph() {
       void panel.webview.postMessage({ type: 'reload' });
     }
   });
+  // Forward configuration changes for the preview style into the webview.
+  const configSub = vscode.workspace.onDidChangeConfiguration((e) => {
+    if (e.affectsConfiguration('gert.preview.nodeStyle')) {
+      const updatedConfig = vscode.workspace.getConfiguration('gert', editor.document.uri);
+      const updatedStyle = updatedConfig.get<string>('preview.nodeStyle', 'smooth-curves');
+      void panel.webview.postMessage({ type: 'setStyle', style: updatedStyle });
+    }
+  });
   graphPanel = panel;
   panel.onDidDispose(() => {
     saveSub.dispose();
+    configSub.dispose();
     if (graphPanel === panel) graphPanel = undefined;
   });
 }

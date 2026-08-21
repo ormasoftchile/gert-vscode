@@ -4,16 +4,32 @@
     {
       "label": "gert-vscode: install dependencies",
       "type": "process",
-      "command": "powershell",
-      "args": [
-        "-NoProfile",
-        "-ExecutionPolicy",
-        "Bypass",
-        "-File",
-        "${workspaceFolder}\\scripts\\ensure-npm-deps.ps1",
-        "-ExtensionRoot",
-        "${workspaceFolder}"
-      ],
+      "windows": {
+        "command": "powershell",
+        "args": [
+          "-NoProfile",
+          "-ExecutionPolicy",
+          "Bypass",
+          "-File",
+          "${workspaceFolder}\\scripts\\ensure-npm-deps.ps1",
+          "-ExtensionRoot",
+          "${workspaceFolder}"
+        ]
+      },
+      "osx": {
+        "command": "bash",
+        "args": [
+          "${workspaceFolder}/scripts/ensure-npm-deps.sh",
+          "${workspaceFolder}"
+        ]
+      },
+      "linux": {
+        "command": "bash",
+        "args": [
+          "${workspaceFolder}/scripts/ensure-npm-deps.sh",
+          "${workspaceFolder}"
+        ]
+      },
       "problemMatcher": []
     },
     {
@@ -30,16 +46,32 @@
     {
       "label": "gert-vscode: build CLI",
       "type": "process",
-      "command": "powershell",
-      "args": [
-        "-NoProfile",
-        "-ExecutionPolicy",
-        "Bypass",
-        "-File",
-        "${workspaceFolder}\\scripts\\build-cli.ps1",
-        "-ExtensionRoot",
-        "${workspaceFolder}"
-      ],
+      "windows": {
+        "command": "powershell",
+        "args": [
+          "-NoProfile",
+          "-ExecutionPolicy",
+          "Bypass",
+          "-File",
+          "${workspaceFolder}\\scripts\\build-cli.ps1",
+          "-ExtensionRoot",
+          "${workspaceFolder}"
+        ]
+      },
+      "osx": {
+        "command": "bash",
+        "args": [
+          "${workspaceFolder}/scripts/build-cli.sh",
+          "${workspaceFolder}"
+        ]
+      },
+      "linux": {
+        "command": "bash",
+        "args": [
+          "${workspaceFolder}/scripts/build-cli.sh",
+          "${workspaceFolder}"
+        ]
+      },
       "problemMatcher": "$go"
     },
     {

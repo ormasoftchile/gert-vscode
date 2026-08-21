@@ -102,6 +102,21 @@
           "default": "http://localhost:7778",
           "description": "Base URL of the gert server. If autoStartServer is true and this is left at the default, the extension picks a free port and ignores this value."
         },
+        "gert.preview.nodeStyle": {
+          "type": "string",
+          "enum": [
+            "smooth-curves",
+            "minimalist",
+            "header-badges"
+          ],
+          "enumDescriptions": [
+            "Option 3: Modern Bauhaus smooth curves with continuous bezier geometry (default)",
+            "Option 1: Linear / Raycast dark minimalist with soft chamfers and side rails",
+            "Option 2: Vercel / Temporal workflow canvas with shape-coded header badges"
+          ],
+          "default": "smooth-curves",
+          "description": "Visual stereotype style for the React Flow runbook graph preview: smooth-curves (default), minimalist, or header-badges."
+        },
         "gert.autoStartServer": {
           "type": "boolean",
           "default": true,

@@ -11,8 +11,20 @@
       "outFiles": [
         "${workspaceFolder}/out/**/*.js"
       ],
-      "env": {
-        "PATH": "${workspaceFolder}\\..\\gert;${env:PATH}"
+      "windows": {
+        "env": {
+          "PATH": "${workspaceFolder}\\..\\gert;${env:PATH}"
+        }
+      },
+      "osx": {
+        "env": {
+          "PATH": "${workspaceFolder}/../gert:${env:PATH}"
+        }
+      },
+      "linux": {
+        "env": {
+          "PATH": "${workspaceFolder}/../gert:${env:PATH}"
+        }
       },
       "preLaunchTask": "gert-vscode: prepare debug"
     }
