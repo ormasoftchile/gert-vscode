@@ -133,6 +133,7 @@
     "compile:test": "tsc -p tsconfig.test.json",
     "pretest": "npm run compile",
     "test": "node --test --test-timeout=5000 test/*.test.js",
+    "test:cross-repo": "npm run compile && node --test --test-timeout=5000 test/crossRepoHostActionWire.js",
     "test:e2e": "npm run compile && npm run compile:test && vscode-test",
     "watch": "tsc -w -p ./",
     "vscode:prepublish": "npm run compile",
@@ -149,4 +150,3 @@
     "typescript": "^5.5.4"
   }
 }
-

@@ -46,6 +46,31 @@ jobs:
           path: gert-preview.vsix
           if-no-files-found: error
 
+  cross-repository-host-action-contract:
+    name: Cross-repository host-action contract
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/checkout@v4
+        with:
+        repository: ormasoftchile/gert
+        path: gert-core
+
+      - uses: actions/setup-node@v4
+        with:
+        node-version: '20'
+        cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify canonical wire compatibility
+        run: npm run test:cross-repo
+        env:
+        GERT_CORE_ROOT: ${{ github.workspace }}/gert-core
+
   # Integration tests (requires a real gert binary) are not currently wired.
   # There are no integration test files today — test:integration is not a
   # defined script precisely because rule6 would fail it if it were unwired.
@@ -65,6 +90,5 @@ jobs:
   #      The job MUST fail (never silently pass) when no binary is present —
   #      node --test with no matching files exits 0; add a check or ensure
   #      GERT_BIN is always set (e.g., via a "Download gert release" step).
-
 
 
