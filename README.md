@@ -11,6 +11,50 @@ Three commands:
 | **gert: Open Runbook Graph (React Flow)** (`gert.previewGraph`) | Opens a webview pointed at the gert server's `/preview/` page, which mounts the React Flow `<RunbookView>` component. | The extension starts `gert serve` automatically by default. |
 | **gert: Validate Runbook Inputs (Dry Run)** (`gert.validateInputs`) | Prompts for a value per declared runbook input, then runs `gert dry-run` against the real CLI. Enum-constrained inputs get a closed dropdown (declared order, nothing preselected unless `default` is itself a member); everything else — including redacted or not-yet-declared inputs — gets a free-text prompt whose value is submitted to the engine unchanged. Coded engine errors (`ENUM-0xx`) and warnings (`ENUM-W001`) are shown verbatim, never paraphrased. | `gert` CLI on PATH (or set `gert.binaryPath`). |
 
+## Preview host-action protocol
+
+The cross-origin `/preview/` iframe may request exactly one host capability. The
+wrapper accepts messages only from its current iframe at the configured gert
+server origin, and the extension statically maps the capability; a runbook can
+never choose a VS Code command ID.
+
+```json
+{
+  "type": "xts.host-action.request",
+  "capability": "xts.open-view",
+  "request": {
+    "view_path": "logical-view-name",
+    "environment": "prod",
+    "parameters": { "server": "server-name", "database": "database-name" },
+    "focus": true,
+    "correlation_id": "correlation-123",
+    "interaction_id": "interaction-123"
+  }
+}
+```
+
+`viewPath`/`correlationId`/`interactionId` are accepted as compatibility
+aliases, but conflicting aliases or undeclared fields are rejected. At the
+trusted extension boundary, the command is always
+`xts.openViewWithParameters` with exactly
+`{ viewPath, environment, parameters, focus, correlationId }`.
+
+The iframe receives a correlated acknowledgment:
+
+```json
+{
+  "type": "xts.host-action.ack",
+  "capability": "xts.open-view",
+  "correlation_id": "correlation-123",
+  "interaction_id": "interaction-123",
+  "status": "opened"
+}
+```
+
+The only statuses are `opened`, `view-not-found`, `environment-not-found`,
+`invalid-parameters`, and `execution-not-started`. The extension never
+includes a requested path, XTS row, or parameters in an acknowledgment.
+
 ## Settings
 
 - `gert.packageMap` — path to the package-map file passed to `gert serve --package-map`.

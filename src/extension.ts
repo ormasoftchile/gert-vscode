@@ -34,6 +34,7 @@ import { pickServerRoot } from './serverRoot';
 import { setToolToken, getToolToken, clearToolToken } from './toolTokenStore';
 import { isArmCommand } from './chatParticipantGate';
 import { executeRunHandoff } from './runHandoff';
+import { HostActionBridge } from './hostActionBridge';
 import {
   CANCELLED,
   UNSET,
@@ -478,9 +479,10 @@ async function previewGraph() {
     vscode.ViewColumn.Beside,
     { enableScripts: true, retainContextWhenHidden: true },
   );
+  const previewOrigin = new URL(base).origin;
   // The wrapper HTML hosts the iframe and forwards postMessage events
-  // from the extension into the iframe (cross-origin). The inner page
-  // listens for {type:'reload'} and re-fetches the runbook document.
+  // from the extension into the iframe (cross-origin). Host-action requests
+  // take the narrow, origin- and source-checked route back to VS Code.
   panel.webview.html = `<!doctype html>
 <html><head><meta charset="utf-8" />
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; frame-src ${base}; style-src 'unsafe-inline'; script-src 'unsafe-inline';" />
@@ -489,20 +491,44 @@ async function previewGraph() {
 <iframe id="gert-frame" src="${base}/preview/?runbookPath=${rbPath}&style=${styleParam}"></iframe>
 <script>
   const vscodeApi = acquireVsCodeApi();
+  const trustedOrigin = ${JSON.stringify(previewOrigin)};
   window.addEventListener('message', (ev) => {
     const f = document.getElementById('gert-frame');
-    if (f && f.contentWindow && ev.data) {
-      f.contentWindow.postMessage(ev.data, '*');
+    if (!f || !f.contentWindow || !ev.data) return;
+    if (ev.source === f.contentWindow) {
+      if (ev.origin !== trustedOrigin || typeof ev.data !== 'object') return;
+      if (ev.data.type === 'xts.host-action.request') {
+        vscodeApi.postMessage({ type: 'gert.host-action.request', payload: ev.data });
+      }
+      return;
     }
+    f.contentWindow.postMessage(ev.data, trustedOrigin);
   });
 </script>
 </body></html>`;
+
+  let disposed = false;
+  const hostActions = new HostActionBridge({
+    executeCommand(command, payload) {
+      return vscode.commands.executeCommand(command, payload);
+    },
+    postAcknowledgment(acknowledgment) {
+      if (disposed || graphPanel !== panel) return;
+      void panel.webview.postMessage(acknowledgment);
+    },
+  });
+  const messageSub = panel.webview.onDidReceiveMessage((message) => {
+    // The wrapper only emits this envelope after confirming the event came
+    // from the current iframe at the configured server origin.
+    void hostActions.receive(message);
+  });
 
   // Forward saves of this runbook into the webview so the inner page
   // reloads the document. The panel is tracked so we can dispose the
   // listener with the panel.
   const saveSub = vscode.workspace.onDidSaveTextDocument((doc) => {
     if (doc.fileName === runbookPath) {
+      hostActions.invalidate();
       void panel.webview.postMessage({ type: 'reload' });
     }
   });
@@ -516,9 +542,11 @@ async function previewGraph() {
   });
   graphPanel = panel;
   panel.onDidDispose(() => {
+    disposed = true;
+    hostActions.invalidate();
+    messageSub.dispose();
     saveSub.dispose();
     configSub.dispose();
     if (graphPanel === panel) graphPanel = undefined;
   });
 }
-
