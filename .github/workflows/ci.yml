@@ -55,13 +55,13 @@ jobs:
 
       - uses: actions/checkout@v4
         with:
-        repository: ormasoftchile/gert
-        path: gert-core
+          repository: ormasoftchile/gert
+          path: gert-core
 
       - uses: actions/setup-node@v4
         with:
-        node-version: '20'
-        cache: 'npm'
+          node-version: '20'
+          cache: 'npm'
 
       - name: Install dependencies
         run: npm ci
@@ -69,7 +69,7 @@ jobs:
       - name: Verify canonical wire compatibility
         run: npm run test:cross-repo
         env:
-        GERT_CORE_ROOT: ${{ github.workspace }}/gert-core
+          GERT_CORE_ROOT: ${{ github.workspace }}/gert-core
 
   # Integration tests (requires a real gert binary) are not currently wired.
   # There are no integration test files today — test:integration is not a
@@ -90,5 +90,4 @@ jobs:
   #      The job MUST fail (never silently pass) when no binary is present —
   #      node --test with no matching files exits 0; add a check or ensure
   #      GERT_BIN is always set (e.g., via a "Download gert release" step).
-
 
