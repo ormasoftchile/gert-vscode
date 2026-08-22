@@ -20,22 +20,25 @@ never choose a VS Code command ID.
 
 ```json
 {
-  "type": "xts.host-action.request",
-  "capability": "xts.open-view",
+  "type": "gert.host-action.request",
+  "version": 1,
+  "runID": "run-123",
+  "turnID": "turn-123",
+  "correlationID": "turn-123",
+  "previewSessionID": "preview-session-123",
+  "requestID": "preview-session-123:turn-123",
   "request": {
+    "capability": "xts.open-view",
     "view_path": "logical-view-name",
     "environment": "prod",
     "parameters": { "server": "server-name", "database": "database-name" },
-    "focus": true,
-    "correlation_id": "correlation-123",
-    "interaction_id": "interaction-123"
+    "focus": true
   }
 }
 ```
 
-`viewPath`/`correlationId`/`interactionId` are accepted as compatibility
-aliases, but conflicting aliases or undeclared fields are rejected. At the
-trusted extension boundary, the command is always
+The final Gert wire shape is closed: aliases and undeclared fields are
+rejected. At the trusted extension boundary, the command is always
 `xts.openViewWithParameters` with exactly
 `{ viewPath, environment, parameters, focus, correlationId }`.
 
@@ -43,10 +46,14 @@ The iframe receives a correlated acknowledgment:
 
 ```json
 {
-  "type": "xts.host-action.ack",
+  "type": "gert.host-action.ack",
+  "version": 1,
+  "runID": "run-123",
+  "turnID": "turn-123",
+  "correlationID": "turn-123",
+  "previewSessionID": "preview-session-123",
+  "requestID": "preview-session-123:turn-123",
   "capability": "xts.open-view",
-  "correlation_id": "correlation-123",
-  "interaction_id": "interaction-123",
   "status": "opened"
 }
 ```
@@ -54,6 +61,11 @@ The iframe receives a correlated acknowledgment:
 The only statuses are `opened`, `view-not-found`, `environment-not-found`,
 `invalid-parameters`, and `execution-not-started`. The extension never
 includes a requested path, XTS row, or parameters in an acknowledgment.
+Cancelling a matching tuple, reloading the preview, replacing its panel, or
+disposing it acknowledges that tuple as `execution-not-started`; late command
+results are ignored. Cancellation frames use their canonical
+`correlationID`/`previewSessionID`/`requestID` subset, which is resolved only
+against a pending full tuple.
 
 ## Settings
 

@@ -22,11 +22,24 @@ export interface XtsOpenViewPayload {
   correlationId: string;
 }
 
-export interface HostActionAcknowledgment {
-  type: 'xts.host-action.ack';
+interface HostActionIdentity {
+  runID: string;
+  turnID: string;
+  correlationID: string;
+  previewSessionID: string;
+  requestID: string;
+}
+
+interface HostActionCancellation {
+  correlationID: string;
+  previewSessionID: string;
+  requestID: string;
+}
+
+export interface HostActionAcknowledgment extends HostActionIdentity {
+  type: 'gert.host-action.ack';
+  version: 1;
   capability: typeof HOST_ACTION_CAPABILITY;
-  correlation_id: string;
-  interaction_id: string;
   status: HostActionStatus;
 }
 
@@ -37,14 +50,13 @@ export interface IframeMessageEvent {
 }
 
 interface ParsedRequest {
-  correlationId: string;
-  interactionId: string;
+  identity: HostActionIdentity;
   payload: XtsOpenViewPayload;
 }
 
 type ParseResult =
   | { ok: true; value: ParsedRequest }
-  | { ok: false; identity?: { correlationId: string; interactionId: string } };
+  | { ok: false; identity?: HostActionIdentity };
 
 export interface HostActionBridgeDependencies {
   executeCommand(command: typeof HOST_ACTION_COMMAND, payload: XtsOpenViewPayload): Thenable<unknown>;
@@ -59,20 +71,25 @@ const ALLOWED_OUTCOMES = new Set<HostActionStatus>([
   'execution-not-started',
 ]);
 
-const REQUEST_KEYS = new Set([
-  'view_path',
-  'viewPath',
-  'environment',
-  'parameters',
-  'focus',
-  'correlation_id',
-  'correlationId',
-  'interaction_id',
-  'interactionId',
+const REQUEST_MESSAGE_KEYS = new Set([
+  'type',
+  'version',
+  'runID',
+  'turnID',
+  'correlationID',
+  'previewSessionID',
+  'requestID',
+  'request',
 ]);
-
+const CANCEL_MESSAGE_KEYS = new Set([
+  'type',
+  'version',
+  'correlationID',
+  'previewSessionID',
+  'requestID',
+]);
+const REQUEST_KEYS = new Set(['capability', 'view_path', 'environment', 'parameters', 'focus']);
 const PARAMETERS_KEYS = new Set(['server', 'database']);
-const WIRE_MESSAGE_KEYS = new Set(['type', 'capability', 'request']);
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -90,36 +107,33 @@ function readString(value: unknown, maxLength: number): string | undefined {
 }
 
 function readIdentity(value: unknown): string | undefined {
-  const identity = readString(value, 128);
+  const identity = readString(value, 256);
   return identity !== undefined && /^[A-Za-z0-9._:-]+$/.test(identity) ? identity : undefined;
 }
 
-function readAliasedString(
-  record: Record<string, unknown>,
-  snakeCaseName: string,
-  camelCaseName: string,
-  reader: (value: unknown) => string | undefined,
-): string | undefined {
-  const snakeValue = record[snakeCaseName];
-  const camelValue = record[camelCaseName];
-  if (snakeValue !== undefined && camelValue !== undefined && snakeValue !== camelValue) return undefined;
-  return reader(snakeValue ?? camelValue);
-}
-
-function readAcknowledgmentIdentity(value: unknown): { correlationId: string; interactionId: string } | undefined {
+function readHostActionIdentity(value: unknown): HostActionIdentity | undefined {
   if (!isRecord(value)) return undefined;
-  const correlationId = readAliasedString(value, 'correlation_id', 'correlationId', readIdentity);
-  const interactionId = readAliasedString(value, 'interaction_id', 'interactionId', readIdentity);
-  return correlationId !== undefined && interactionId !== undefined ? { correlationId, interactionId } : undefined;
+  const runID = readIdentity(value.runID);
+  const turnID = readIdentity(value.turnID);
+  const correlationID = readIdentity(value.correlationID);
+  const previewSessionID = readIdentity(value.previewSessionID);
+  const requestID = readIdentity(value.requestID);
+  return runID !== undefined &&
+    turnID !== undefined &&
+    correlationID !== undefined &&
+    previewSessionID !== undefined &&
+    requestID !== undefined
+    ? { runID, turnID, correlationID, previewSessionID, requestID }
+    : undefined;
 }
 
 function parseIframeRequest(value: unknown): ParseResult {
-  const identity = isRecord(value) ? readAcknowledgmentIdentity(value.request) : undefined;
+  const identity = readHostActionIdentity(value);
   if (
     !isRecord(value) ||
-    !hasOnlyKeys(value, WIRE_MESSAGE_KEYS) ||
-    value.type !== 'xts.host-action.request' ||
-    value.capability !== HOST_ACTION_CAPABILITY
+    !hasOnlyKeys(value, REQUEST_MESSAGE_KEYS) ||
+    value.type !== 'gert.host-action.request' ||
+    value.version !== 1
   ) {
     return { ok: false, identity };
   }
@@ -127,15 +141,13 @@ function parseIframeRequest(value: unknown): ParseResult {
   const request = value.request;
   if (!isRecord(request) || !hasOnlyKeys(request, REQUEST_KEYS)) return { ok: false, identity };
 
-  const viewPath = readAliasedString(request, 'view_path', 'viewPath', (candidate) => readString(candidate, 2048));
+  const viewPath = readString(request.view_path, 2048);
   const environment = readString(request.environment, 256);
-  const correlationId = identity?.correlationId;
-  const interactionId = identity?.interactionId;
   if (
+    identity === undefined ||
+    request.capability !== HOST_ACTION_CAPABILITY ||
     viewPath === undefined ||
     environment === undefined ||
-    correlationId === undefined ||
-    interactionId === undefined ||
     typeof request.focus !== 'boolean' ||
     !isRecord(request.parameters) ||
     !hasOnlyKeys(request.parameters, PARAMETERS_KEYS)
@@ -150,48 +162,61 @@ function parseIframeRequest(value: unknown): ParseResult {
   return {
     ok: true,
     value: {
-      correlationId,
-      interactionId,
+      identity,
       payload: {
         viewPath,
         environment,
         parameters: { server, database },
         focus: request.focus,
-        correlationId,
+        correlationId: identity.correlationID,
       },
     },
   };
+}
+
+function parseIframeCancellation(value: unknown): HostActionCancellation | undefined {
+  if (
+    !isRecord(value) ||
+    !hasOnlyKeys(value, CANCEL_MESSAGE_KEYS) ||
+    value.type !== 'gert.host-action.cancel' ||
+    value.version !== 1
+  ) {
+    return undefined;
+  }
+  const correlationID = readIdentity(value.correlationID);
+  const previewSessionID = readIdentity(value.previewSessionID);
+  const requestID = readIdentity(value.requestID);
+  if (correlationID === undefined || previewSessionID === undefined || requestID === undefined) {
+    return undefined;
+  }
+  return { correlationID, previewSessionID, requestID };
 }
 
 function outcomeFrom(value: unknown): HostActionStatus {
   if (isRecord(value) && typeof value.status === 'string' && ALLOWED_OUTCOMES.has(value.status as HostActionStatus)) {
     return value.status as HostActionStatus;
   }
-  return 'opened';
-}
-
-function outcomeFromError(error: unknown): HostActionStatus {
-  if (isRecord(error)) {
-    const status = typeof error.status === 'string' ? error.status : error.code;
-    if (typeof status === 'string' && ALLOWED_OUTCOMES.has(status as HostActionStatus)) {
-      return status as HostActionStatus;
-    }
-  }
   return 'execution-not-started';
 }
 
-function acknowledgment(
-  correlationId: string,
-  interactionId: string,
-  status: HostActionStatus,
-): HostActionAcknowledgment {
+function acknowledgment(identity: HostActionIdentity, status: HostActionStatus): HostActionAcknowledgment {
   return {
-    type: 'xts.host-action.ack',
+    type: 'gert.host-action.ack',
+    version: 1,
+    ...identity,
     capability: HOST_ACTION_CAPABILITY,
-    correlation_id: correlationId,
-    interaction_id: interactionId,
     status,
   };
+}
+
+function identityKey(identity: HostActionIdentity): string {
+  return [
+    identity.runID,
+    identity.turnID,
+    identity.correlationID,
+    identity.previewSessionID,
+    identity.requestID,
+  ].join('\u0000');
 }
 
 // The wrapper calls this before handing an iframe request to VS Code. Keeping
@@ -205,52 +230,55 @@ export function isTrustedIframeHostActionMessage(
     event.source === expectedSource &&
     event.origin === expectedOrigin &&
     isRecord(event.data) &&
-    event.data.type === 'xts.host-action.request'
+    (event.data.type === 'gert.host-action.request' || event.data.type === 'gert.host-action.cancel')
   );
 }
 
-// The only accepted wrapper-to-extension envelope. The inner wire shape stays
-// here so upstream naming adjustments do not bleed into VS Code command calls.
-export function isHostActionWrapperMessage(
-  message: unknown,
-): message is { type: 'gert.host-action.request'; payload: unknown } {
+// The extension accepts only the wrapper's direct forwarding of a final Gert
+// wire message; it does not preserve a second, independently shaped envelope.
+export function isHostActionWrapperMessage(message: unknown): boolean {
   return isRecord(message) &&
-    message.type === 'gert.host-action.request' &&
-    Object.keys(message).length === 2 &&
-    'payload' in message;
+    (message.type === 'gert.host-action.request' || message.type === 'gert.host-action.cancel');
 }
 
 export class HostActionBridge {
   private generation = 0;
-  private readonly pending = new Set<string>();
+  private readonly pending = new Map<string, HostActionIdentity>();
   private readonly completed = new Set<string>();
 
   constructor(private readonly dependencies: HostActionBridgeDependencies) {}
 
   invalidate(): void {
     this.generation += 1;
+    for (const [key, identity] of this.pending) {
+      this.completed.add(key);
+      this.dependencies.postAcknowledgment(acknowledgment(identity, 'execution-not-started'));
+    }
     this.pending.clear();
-    this.completed.clear();
   }
 
   async receive(message: unknown): Promise<void> {
     if (!isHostActionWrapperMessage(message)) return;
-    const payload = message.payload;
-    const parsed = parseIframeRequest(payload);
+
+    const cancellation = parseIframeCancellation(message);
+    if (cancellation !== undefined) {
+      this.cancel(cancellation);
+      return;
+    }
+
+    const parsed = parseIframeRequest(message);
     if (!parsed.ok) {
       if (parsed.identity) {
-        this.dependencies.postAcknowledgment(
-          acknowledgment(parsed.identity.correlationId, parsed.identity.interactionId, 'invalid-parameters'),
-        );
+        this.dependencies.postAcknowledgment(acknowledgment(parsed.identity, 'invalid-parameters'));
       }
       return;
     }
 
-    const key = `${parsed.value.correlationId}\u0000${parsed.value.interactionId}`;
+    const key = identityKey(parsed.value.identity);
     if (this.pending.has(key) || this.completed.has(key)) return;
 
     const generation = this.generation;
-    this.pending.add(key);
+    this.pending.set(key, parsed.value.identity);
     let status: HostActionStatus;
     try {
       const result = await this.dependencies.executeCommand(
@@ -258,14 +286,25 @@ export class HostActionBridge {
         parsed.value.payload,
       );
       status = outcomeFrom(result);
-    } catch (error: unknown) {
-      status = outcomeFromError(error);
+    } catch {
+      status = 'execution-not-started';
     }
 
     if (generation !== this.generation || !this.pending.delete(key)) return;
     this.completed.add(key);
-    this.dependencies.postAcknowledgment(
-      acknowledgment(parsed.value.correlationId, parsed.value.interactionId, status),
+    this.dependencies.postAcknowledgment(acknowledgment(parsed.value.identity, status));
+  }
+
+  private cancel(cancellation: HostActionCancellation): void {
+    const pending = [...this.pending.entries()].find(([, identity]) =>
+      identity.correlationID === cancellation.correlationID &&
+      identity.previewSessionID === cancellation.previewSessionID &&
+      identity.requestID === cancellation.requestID,
     );
+    if (pending === undefined) return;
+    const [key, identity] = pending;
+    this.pending.delete(key);
+    this.completed.add(key);
+    this.dependencies.postAcknowledgment(acknowledgment(identity, 'execution-not-started'));
   }
 }

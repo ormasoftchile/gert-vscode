@@ -14,18 +14,31 @@ const {
 function request(overrides = {}) {
   return {
     type: 'gert.host-action.request',
-    payload: {
-      type: 'xts.host-action.request',
+    version: 1,
+    runID: 'run-1',
+    turnID: 'turn-1',
+    correlationID: 'correlation-1',
+    previewSessionID: 'preview-session-1',
+    requestID: 'preview-session-1:correlation-1',
+    request: {
       capability: 'xts.open-view',
-      request: {
-        view_path: 'incident-details',
-        environment: 'prod',
-        parameters: { server: 'api-01', database: 'operations' },
-        focus: true,
-        correlation_id: 'correlation-1',
-        interaction_id: 'interaction-1',
-      },
+      view_path: 'incident-details',
+      environment: 'prod',
+      parameters: { server: 'api-01', database: 'operations' },
+      focus: true,
     },
+    ...overrides,
+  };
+}
+
+function cancellation(overrides = {}) {
+  const message = request();
+  return {
+    type: 'gert.host-action.cancel',
+    version: 1,
+    correlationID: message.correlationID,
+    previewSessionID: message.previewSessionID,
+    requestID: message.requestID,
     ...overrides,
   };
 }
@@ -45,18 +58,21 @@ function bridge(executeCommand) {
   return { instance, calls, acknowledgments };
 }
 
-test('host action registry is static and translates aliases only at the trusted boundary', async () => {
-  assert.deepEqual(HOST_ACTION_REGISTRY, { 'xts.open-view': HOST_ACTION_COMMAND });
-  const subject = bridge(async () => undefined);
-  const message = request();
-  message.payload.request.viewPath = message.payload.request.view_path;
-  delete message.payload.request.view_path;
-  message.payload.request.correlationId = message.payload.request.correlation_id;
-  delete message.payload.request.correlation_id;
-  message.payload.request.interactionId = message.payload.request.interaction_id;
-  delete message.payload.request.interaction_id;
+function identity(message) {
+  const { type: _type, version: _version, request: _request, ...result } = message;
+  return result;
+}
 
-  await subject.instance.receive(message);
+function tuple(message) {
+  const { capability: _capability, status: _status, ...result } = identity(message);
+  return result;
+}
+
+test('host action registry is static and translates only validated XTS fields', async () => {
+  assert.deepEqual(HOST_ACTION_REGISTRY, { 'xts.open-view': HOST_ACTION_COMMAND });
+  const subject = bridge(async () => ({ status: 'opened' }));
+
+  await subject.instance.receive(request());
 
   assert.deepEqual(subject.calls, [{
     command: HOST_ACTION_COMMAND,
@@ -69,58 +85,43 @@ test('host action registry is static and translates aliases only at the trusted 
     },
   }]);
   assert.deepEqual(subject.acknowledgments, [{
-    type: 'xts.host-action.ack',
+    type: 'gert.host-action.ack',
+    version: 1,
+    ...identity(request()),
     capability: 'xts.open-view',
-    correlation_id: 'correlation-1',
-    interaction_id: 'interaction-1',
     status: 'opened',
   }]);
 });
 
-test('rejects unallowlisted capabilities and does not accept a runbook command ID', async () => {
-  const subject = bridge(async () => undefined);
-  const message = request();
-  message.payload.capability = 'workbench.action.openSettings';
-  message.payload.request.command = 'workbench.action.openSettings';
-
-  await subject.instance.receive(message);
-
-  assert.equal(subject.calls.length, 0);
-  assert.equal(subject.acknowledgments.length, 1);
-  assert.equal(subject.acknowledgments[0].status, 'invalid-parameters');
-});
-
-test('malformed payloads are rejected with a correlated invalid-parameters acknowledgment', async () => {
+test('strictly rejects malformed final-wire messages with a correlated status', async () => {
   const malformed = [
-    (message) => { delete message.payload.request.parameters.database; },
-    (message) => { message.payload.request.focus = 'yes'; },
-    (message) => { message.payload.request.view_path = ''; },
-    (message) => { message.payload.request.viewPath = 'different-view'; },
-    (message) => { message.payload.request.parameters.extra = 'not allowed'; },
-    (message) => { message.payload.request.interaction_id = 'contains spaces'; },
-    (message) => { message.payload.extra = 'not allowed'; },
+    (message) => { delete message.request.parameters.database; },
+    (message) => { message.request.focus = 'yes'; },
+    (message) => { message.request.view_path = ''; },
+    (message) => { message.request.command = 'workbench.action.openSettings'; },
+    (message) => { message.request.capability = 'workbench.action.openSettings'; },
+    (message) => { message.request.extra = true; },
+    (message) => { message.extra = true; },
+    (message) => { message.version = 2; },
   ];
 
   for (const mutate of malformed) {
-    const subject = bridge(async () => undefined);
+    const subject = bridge(async () => ({ status: 'opened' }));
     const message = request();
     mutate(message);
     await subject.instance.receive(message);
     assert.equal(subject.calls.length, 0);
-    if (message.payload.request.interaction_id === 'contains spaces') {
-      assert.equal(subject.acknowledgments.length, 0);
-    } else {
-      assert.equal(subject.acknowledgments.length, 1);
-      assert.equal(subject.acknowledgments[0].status, 'invalid-parameters');
-    }
+    assert.equal(subject.acknowledgments.length, 1);
+    assert.equal(subject.acknowledgments[0].status, 'invalid-parameters');
+    assert.deepEqual(tuple(subject.acknowledgments[0]), tuple(request()));
   }
 });
 
 test('wrapper envelope and iframe source/origin gates fail closed', () => {
   const iframe = {};
-  const data = request().payload;
-  assert.equal(isHostActionWrapperMessage(request()), true);
-  assert.equal(isHostActionWrapperMessage({ type: 'gert.host-action.request', payload: data, extra: true }), false);
+  const data = request();
+  assert.equal(isHostActionWrapperMessage(data), true);
+  assert.equal(isHostActionWrapperMessage({ ...data, extra: true }), true);
   assert.equal(isTrustedIframeHostActionMessage(
     { source: iframe, origin: 'http://127.0.0.1:7778', data },
     'http://127.0.0.1:7778',
@@ -139,30 +140,36 @@ test('wrapper envelope and iframe source/origin gates fail closed', () => {
 });
 
 for (const status of ['opened', 'view-not-found', 'environment-not-found', 'invalid-parameters', 'execution-not-started']) {
-  test(`returns the XTS ${status} outcome without exposing request data`, async () => {
+  test(`returns the ${status} outcome with the full tuple`, async () => {
     const subject = bridge(async () => ({ status }));
     await subject.instance.receive(request());
     assert.equal(subject.calls.length, 1);
-    assert.equal(subject.acknowledgments[0].status, status);
-    assert.deepEqual(Object.keys(subject.acknowledgments[0]).sort(), [
-      'capability', 'correlation_id', 'interaction_id', 'status', 'type',
-    ]);
+    assert.deepEqual(subject.acknowledgments[0], {
+      type: 'gert.host-action.ack',
+      version: 1,
+      ...identity(request()),
+      capability: 'xts.open-view',
+      status,
+    });
   });
 }
 
-test('maps thrown and rejected command executions to execution-not-started', async () => {
-  const thrown = bridge(() => { throw new Error('not started'); });
-  await thrown.instance.receive(request());
-  assert.equal(thrown.calls.length, 1);
-  assert.equal(thrown.acknowledgments[0].status, 'execution-not-started');
-
-  const rejected = bridge(async () => Promise.reject(new Error('rejected')));
-  await rejected.instance.receive(request());
-  assert.equal(rejected.calls.length, 1);
-  assert.equal(rejected.acknowledgments[0].status, 'execution-not-started');
+test('undefined, null, malformed, thrown, and rejected commands never report opened', async () => {
+  for (const execute of [
+    async () => undefined,
+    async () => null,
+    async () => ({}),
+    () => { throw new Error('not started'); },
+    async () => Promise.reject(new Error('rejected')),
+  ]) {
+    const subject = bridge(execute);
+    await subject.instance.receive(request());
+    assert.equal(subject.calls.length, 1);
+    assert.equal(subject.acknowledgments[0].status, 'execution-not-started');
+  }
 });
 
-test('duplicate requests execute once and result in one acknowledgment', async () => {
+test('duplicate requests invoke the host exactly once', async () => {
   let release;
   const waiting = new Promise((resolve) => { release = resolve; });
   const subject = bridge(async () => waiting);
@@ -174,16 +181,40 @@ test('duplicate requests execute once and result in one acknowledgment', async (
   assert.equal(subject.acknowledgments.length, 1);
 });
 
-test('reload, dispose, and replacement invalidation suppress late command completions', async () => {
-  for (const reason of ['reload', 'dispose', 'replacement']) {
+test('cancellation and invalidation emit execution-not-started and ignore late results', async () => {
+  for (const action of ['cancel', 'reload', 'dispose', 'replacement']) {
     let release;
     const waiting = new Promise((resolve) => { release = resolve; });
     const subject = bridge(async () => waiting);
     const pending = subject.instance.receive(request());
-    subject.instance.invalidate();
+    if (action === 'cancel') {
+      await subject.instance.receive(cancellation());
+    } else {
+      subject.instance.invalidate();
+    }
     release({ status: 'opened' });
     await pending;
-    assert.equal(subject.calls.length, 1, reason);
-    assert.equal(subject.acknowledgments.length, 0, reason);
+    assert.equal(subject.calls.length, 1, action);
+    assert.deepEqual(subject.acknowledgments, [{
+      type: 'gert.host-action.ack',
+      version: 1,
+      ...identity(request()),
+      capability: 'xts.open-view',
+      status: 'execution-not-started',
+    }], action);
   }
+});
+
+test('malformed cancellation cannot cancel a matching pending request', async () => {
+  let release;
+  const waiting = new Promise((resolve) => { release = resolve; });
+  const subject = bridge(async () => waiting);
+  const pending = subject.instance.receive(request());
+
+  await subject.instance.receive({ ...cancellation(), unexpected: true });
+  assert.equal(subject.acknowledgments.length, 0);
+
+  release({ status: 'opened' });
+  await pending;
+  assert.equal(subject.acknowledgments[0].status, 'opened');
 });

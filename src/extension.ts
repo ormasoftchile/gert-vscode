@@ -35,6 +35,7 @@ import { setToolToken, getToolToken, clearToolToken } from './toolTokenStore';
 import { isArmCommand } from './chatParticipantGate';
 import { executeRunHandoff } from './runHandoff';
 import { HostActionBridge } from './hostActionBridge';
+import { createPreviewWebviewHtml } from './previewWebview';
 import {
   CANCELLED,
   UNSET,
@@ -470,8 +471,6 @@ async function previewGraph() {
 
   const config = vscode.workspace.getConfiguration('gert', editor.document.uri);
   const initialStyle = config.get<string>('preview.nodeStyle', 'smooth-curves');
-  const rbPath = encodeURIComponent(runbookPath);
-  const styleParam = encodeURIComponent(initialStyle);
   graphPanel?.dispose();
   const panel = vscode.window.createWebviewPanel(
     'gertPreviewGraph',
@@ -479,33 +478,7 @@ async function previewGraph() {
     vscode.ViewColumn.Beside,
     { enableScripts: true, retainContextWhenHidden: true },
   );
-  const previewOrigin = new URL(base).origin;
-  // The wrapper HTML hosts the iframe and forwards postMessage events
-  // from the extension into the iframe (cross-origin). Host-action requests
-  // take the narrow, origin- and source-checked route back to VS Code.
-  panel.webview.html = `<!doctype html>
-<html><head><meta charset="utf-8" />
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; frame-src ${base}; style-src 'unsafe-inline'; script-src 'unsafe-inline';" />
-<style>html,body,iframe{margin:0;height:100vh;width:100vw;border:0}</style>
-</head><body>
-<iframe id="gert-frame" src="${base}/preview/?runbookPath=${rbPath}&style=${styleParam}"></iframe>
-<script>
-  const vscodeApi = acquireVsCodeApi();
-  const trustedOrigin = ${JSON.stringify(previewOrigin)};
-  window.addEventListener('message', (ev) => {
-    const f = document.getElementById('gert-frame');
-    if (!f || !f.contentWindow || !ev.data) return;
-    if (ev.source === f.contentWindow) {
-      if (ev.origin !== trustedOrigin || typeof ev.data !== 'object') return;
-      if (ev.data.type === 'xts.host-action.request') {
-        vscodeApi.postMessage({ type: 'gert.host-action.request', payload: ev.data });
-      }
-      return;
-    }
-    f.contentWindow.postMessage(ev.data, trustedOrigin);
-  });
-</script>
-</body></html>`;
+  panel.webview.html = createPreviewWebviewHtml(base, runbookPath, initialStyle);
 
   let disposed = false;
   const hostActions = new HostActionBridge({
@@ -518,8 +491,6 @@ async function previewGraph() {
     },
   });
   const messageSub = panel.webview.onDidReceiveMessage((message) => {
-    // The wrapper only emits this envelope after confirming the event came
-    // from the current iframe at the configured server origin.
     void hostActions.receive(message);
   });
 
