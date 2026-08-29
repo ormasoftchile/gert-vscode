@@ -14,6 +14,7 @@ const path = require('node:path');
 const test = require('node:test');
 
 const { buildRegistryFromDir, findToolYamls } = require('../out/toolDefinitionRegistry');
+const { buildRegistryForRun } = require('../out/toolDefinitionRegistry');
 
 const FIXTURE_TOOLS_DIR = path.join(__dirname, 'fixtures', 'tools');
 
@@ -93,6 +94,73 @@ test('buildRegistryFromDir: returns empty registry for empty directory', (t) => 
   // The 'tools' subdirectory WILL be scanned recursively — that's expected.
   // We just verify the call doesn't throw.
   assert.ok(typeof r === 'object');
+});
+
+test('buildRegistryForRun overlays external package-map bindings', (t) => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'gert-run-registry-'));
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  const project = path.join(root, 'project');
+  const external = path.join(root, 'external-package');
+  fs.mkdirSync(project, { recursive: true });
+  fs.mkdirSync(external, { recursive: true });
+  fs.writeFileSync(path.join(external, 'external.tool.yaml'), [
+    'apiVersion: tool/v1',
+    'name: external-tool',
+    'transport:',
+    '  mode: vscode-mcp',
+    '  vscode_tool: external-provider-tool',
+    'actions:',
+    '  - name: inspect',
+  ].join('\n'));
+  const packageMap = path.join(project, 'package-map.yaml');
+  fs.writeFileSync(packageMap, [
+    'apiVersion: config/v1',
+    'requires:',
+    '  - package: external.package',
+    '    version: "^1.0.0"',
+    '    path: ../external-package',
+  ].join('\n'));
+
+  const runRegistry = buildRegistryForRun(project, packageMap);
+  assert.equal(runRegistry['external-tool/inspect']?.registeredName, 'external-provider-tool');
+});
+
+test('buildRegistryForRun gives effective required packages precedence over project tool paths', (t) => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'gert-run-registry-tier-'));
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  const project = path.join(root, 'project');
+  const projectTools = path.join(root, 'project-tools');
+  const requiredPackage = path.join(root, 'required-package');
+  fs.mkdirSync(path.join(project, '.gert'), { recursive: true });
+  fs.mkdirSync(projectTools, { recursive: true });
+  fs.mkdirSync(requiredPackage, { recursive: true });
+  const toolYaml = (registeredName) => [
+    'apiVersion: tool/v1',
+    'name: shared-tool',
+    'transport:',
+    '  mode: vscode-mcp',
+    `  vscode_tool: ${registeredName}`,
+    'actions:',
+    '  - name: inspect',
+  ].join('\n');
+  fs.writeFileSync(path.join(projectTools, 'shared.tool.yaml'), toolYaml('project-provider'));
+  fs.writeFileSync(path.join(requiredPackage, 'shared.tool.yaml'), toolYaml('required-provider'));
+  fs.writeFileSync(path.join(project, '.gert', 'config.yaml'), [
+    'apiVersion: config/v1',
+    'tool-paths:',
+    '  - ../project-tools',
+  ].join('\n'));
+  const packageMap = path.join(project, 'package-map.yaml');
+  fs.writeFileSync(packageMap, [
+    'apiVersion: config/v1',
+    'requires:',
+    '  - package: required.package',
+    '    version: "^1.0.0"',
+    '    path: ../required-package',
+  ].join('\n'));
+
+  const runRegistry = buildRegistryForRun(project, packageMap);
+  assert.equal(runRegistry['shared-tool/inspect']?.registeredName, 'required-provider');
 });
 
 test('findToolYamls: returns tool yaml paths for known fixture dir', () => {

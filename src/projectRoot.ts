@@ -11,6 +11,7 @@ function hasDirectory(dir: string, name: string): boolean {
 
 function isGertProjectRoot(dir: string): boolean {
   const hasRunbooks = hasDirectory(dir, 'runbooks');
+  if (hasDirectory(dir, '.gert') && hasRunbooks) return true;
   if (hasDirectory(dir, 'packages') && hasRunbooks) return true;
 
   // A generic directory named "tools" (for example C:\tools) is not a Gert
@@ -29,10 +30,9 @@ function findGertProjectRoot(start: string): string | undefined {
   }
 }
 
-// pickServerRoot chooses the narrowest Gert project root for the active
-// runbook. Falling back to a broad workspace makes `gert serve` discover tool
-// definitions from unrelated projects, allowing duplicate tool names to win.
-export function pickServerRoot(
+// Choose the narrowest Gert project root for the active runbook so discovery
+// and package-map resolution cannot drift into unrelated workspace folders.
+export function pickProjectRoot(
   runbookPath: string,
   workspaceFolders: readonly string[],
   fallback: string,

@@ -403,6 +403,10 @@ export function validateArgsAgainstSchema(
 
 const BRIDGE_VERSION = 'vscode-mcp-bridge/v1';
 
+function httpStatusForBridgeResponse(response: BridgeResponse): number {
+  return response.error?.code === 'bridge_disconnected' ? 503 : 200;
+}
+
 export interface McpBridgeOptions {
   /** Pre-built registry. Takes precedence over registryDir when both are given. */
   registry?: Record<string, ToolActionSpec>;
@@ -421,6 +425,7 @@ export class McpBridge {
   private readonly secret: string;
   private readonly server: http.Server;
   private readonly inflight = new Map<string, Promise<BridgeResponse>>();
+  private readonly activeCancellations = new Map<string, { cancel(): void }>();
   private readonly completed = new Map<string, BridgeResponse>();
   private _port: number;
   private disposed = false;
@@ -493,6 +498,8 @@ export class McpBridge {
   dispose(): void {
     if (this.disposed) return;
     this.disposed = true;
+    for (const source of this.activeCancellations.values()) source.cancel();
+    this.activeCancellations.clear();
     this.server.close();
     this.inflight.clear();
     this.completed.clear();
@@ -529,6 +536,10 @@ export class McpBridge {
       parsed = JSON.parse(bodyText);
     } catch {
       return this.sendError(res, 400, 'malformed_request', 'Request body is not valid JSON', '');
+    }
+
+    if (this.disposed) {
+      return this.sendError(res, 503, 'bridge_disconnected', 'Bridge is shutting down', '');
     }
 
     if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
@@ -570,12 +581,13 @@ export class McpBridge {
 
     const cached = this.completed.get(request_id);
     if (cached) {
-      return this.sendJson(res, 200, cached);
+      return this.sendJson(res, httpStatusForBridgeResponse(cached), cached);
     }
 
     const inflight = this.inflight.get(request_id);
     if (inflight) {
-      return this.sendJson(res, 200, await inflight);
+      const result = await inflight;
+      return this.sendJson(res, httpStatusForBridgeResponse(result), result);
     }
 
     const promise = this.handle({
@@ -596,7 +608,7 @@ export class McpBridge {
       this.inflight.delete(request_id);
     }
     this.completed.set(request_id, result);
-    return this.sendJson(res, result.error?.code === 'bridge_disconnected' ? 503 : 200, result);
+    return this.sendJson(res, httpStatusForBridgeResponse(result), result);
   }
 
   // handle performs the authorized MCP invocation for a validated request.
@@ -629,6 +641,7 @@ export class McpBridge {
 
     // Set up deadline / cancellation.
     const cts = makeCancellationSource();
+    this.activeCancellations.set(req.request_id, cts);
     let deadlineTimer: ReturnType<typeof setTimeout> | undefined;
     let timedOut = false;
 
@@ -677,13 +690,30 @@ export class McpBridge {
 
       let raw: LmToolResult;
       try {
+        if (this.disposed || cts.token.isCancellationRequested) {
+          return this.errorResponse(
+            req.request_id,
+            this.disposed ? 'bridge_disconnected' : 'deadline_exceeded',
+            this.disposed ? 'Bridge is shutting down' : 'invocation timed out',
+          );
+        }
         raw = await this.lm.invokeTool(
           spec.registeredName,
           { input: req.args, toolInvocationToken: cachedToken },
           cts.token,
         );
+        if (this.disposed || cts.token.isCancellationRequested) {
+          return this.errorResponse(
+            req.request_id,
+            this.disposed ? 'bridge_disconnected' : 'deadline_exceeded',
+            this.disposed ? 'Bridge is shutting down' : 'invocation timed out',
+          );
+        }
         this.log(`[mcpBridge] invokeTool "${spec.registeredName}": attempt 1 succeeded`);
       } catch (err: unknown) {
+        if (this.disposed) {
+          return this.errorResponse(req.request_id, 'bridge_disconnected', 'Bridge is shutting down');
+        }
         if (timedOut || cts.token.isCancellationRequested) {
           return this.errorResponse(req.request_id, 'deadline_exceeded', 'invocation timed out');
         }
@@ -733,6 +763,9 @@ export class McpBridge {
       };
     } finally {
       if (deadlineTimer !== undefined) clearTimeout(deadlineTimer);
+      if (this.activeCancellations.get(req.request_id) === cts) {
+        this.activeCancellations.delete(req.request_id);
+      }
     }
   }
 

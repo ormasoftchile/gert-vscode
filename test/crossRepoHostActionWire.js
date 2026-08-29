@@ -5,64 +5,96 @@ const fs = require('node:fs');
 const path = require('node:path');
 const test = require('node:test');
 
-const {
-  HostActionBridge,
-  HOST_ACTION_COMMAND,
-  isHostActionWrapperMessage,
-} = require('../out/hostActionBridge');
+const { createHostActionBridge } = require('../out/hostActionBridge');
 
 const coreRoot = process.env.GERT_CORE_ROOT;
 if (!coreRoot) {
-  throw new Error('GERT_CORE_ROOT must name the Gert repository for the cross-repository wire test.');
+  throw new Error('GERT_CORE_ROOT must name a checked-out Gert repository for the cross-repository wire test.');
+}
+const fixturePath = path.join(
+  path.resolve(coreRoot),
+  'internal',
+  'serve',
+  'testdata',
+  'host_action_wire_v1.json',
+);
+if (!fs.existsSync(fixturePath)) {
+  throw new Error(`GERT_CORE_ROOT does not contain the canonical host-action fixture: ${fixturePath}`);
+}
+const wire = JSON.parse(fs.readFileSync(fixturePath, 'utf8'));
+
+function transport() {
+  const acks = [];
+  const cancels = [];
+  return {
+    acks,
+    cancels,
+    value: {
+      sendAck: (ack) => acks.push(ack),
+      sendCancel: (cancel) => cancels.push(cancel),
+    },
+  };
 }
 
-const wire = JSON.parse(fs.readFileSync(
-  path.join(coreRoot, 'internal', 'serve', 'testdata', 'host_action_wire_v1.json'),
-  'utf8',
-));
+test('canonical Gert request produces the exact generic VS Code acknowledgment', async () => {
+  const captured = transport();
+  let handlerArgs;
+  const bridge = createHostActionBridge(new Map([[
+    wire.request.capability,
+    {
+      handler: async (args) => {
+        handlerArgs = args;
+        return { status: 'completed', result: wire.acknowledgment.result };
+      },
+    },
+  ]]), captured.value);
 
-function bridge(executeCommand) {
-  const acknowledgments = [];
-  const calls = [];
-  const instance = new HostActionBridge({
-    executeCommand(command, payload) {
-      calls.push({ command, payload });
-      return executeCommand(command, payload);
-    },
-    postAcknowledgment(acknowledgment) {
-      acknowledgments.push(acknowledgment);
-    },
+  await bridge.receive(wire.request);
+
+  assert.deepEqual({
+    capability: handlerArgs.capability,
+    request: handlerArgs.request,
+    correlationId: handlerArgs.correlationId,
+    previewSessionId: handlerArgs.previewSessionId,
+    requestId: handlerArgs.requestId,
+    runId: handlerArgs.runId,
+    turnId: handlerArgs.turnId,
+  }, {
+    capability: wire.request.capability,
+    request: wire.request.request,
+    correlationId: wire.request.correlationId,
+    previewSessionId: wire.request.previewSessionId,
+    requestId: wire.request.requestId,
+    runId: wire.request.runId,
+    turnId: wire.request.turnId,
   });
-  return { instance, calls, acknowledgments };
-}
+  assert.deepEqual(captured.acks, [wire.acknowledgment]);
+  assert.deepEqual(captured.cancels, []);
+});
 
-test('canonical Gert preview request passes the strict VS Code bridge unchanged', async () => {
-  const subject = bridge(async () => ({ status: 'opened' }));
-
-  assert.equal(isHostActionWrapperMessage(wire.request), true);
-  await subject.instance.receive(wire.request);
-
-  assert.deepEqual(subject.calls, [{
-    command: HOST_ACTION_COMMAND,
-    payload: {
-      viewPath: 'incident-details',
-      environment: 'prod',
-      parameters: { server: 'api-01', database: 'operations' },
-      focus: true,
-      correlationId: 'correlation-1',
+test('canonical Gert cancellation stops the matching handler without an acknowledgment', async () => {
+  const captured = transport();
+  let handlerStarted;
+  const started = new Promise((resolve) => { handlerStarted = resolve; });
+  let cancellationObserved = false;
+  const bridge = createHostActionBridge(new Map([[
+    wire.request.capability,
+    {
+      handler: async (args) => {
+        handlerStarted();
+        await new Promise((resolve) => args.cancellationToken.onCancellationRequested(resolve));
+        cancellationObserved = args.cancellationToken.isCancellationRequested;
+        return { status: 'completed', result: wire.acknowledgment.result };
+      },
     },
-  }]);
-  assert.deepEqual(subject.acknowledgments, [wire.acknowledgment]);
+  ]]), captured.value);
 
-  let release;
-  const waiting = new Promise((resolve) => { release = resolve; });
-  const cancelled = bridge(async () => waiting);
-  const pending = cancelled.instance.receive(wire.request);
-  await cancelled.instance.receive(wire.cancellation);
-  release({ status: 'opened' });
+  const pending = bridge.receive(wire.request);
+  await started;
+  await bridge.receive(wire.cancellation);
   await pending;
-  assert.deepEqual(cancelled.acknowledgments, [{
-    ...wire.acknowledgment,
-    status: 'execution-not-started',
-  }]);
+
+  assert.equal(cancellationObserved, true);
+  assert.deepEqual(captured.acks, []);
+  assert.deepEqual(captured.cancels, []);
 });

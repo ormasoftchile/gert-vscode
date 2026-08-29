@@ -44,6 +44,17 @@ interface RawToolDef {
   [key: string]: unknown;
 }
 
+interface RawPackageRequirement {
+  package?: unknown;
+  path?: unknown;
+}
+
+interface RawProjectConfig {
+  apiVersion?: unknown;
+  requires?: unknown;
+  'tool-paths'?: unknown;
+}
+
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 const VALID_FIELD_TYPES = new Set<string>(['string', 'number', 'boolean', 'object', 'array']);
@@ -175,4 +186,60 @@ export function buildRegistryFromDir(dir: string): Record<string, ToolActionSpec
     }
   }
   return registry;
+}
+
+export function buildRegistryForRun(
+  projectRoot: string,
+  packageMapPath?: string,
+): Record<string, ToolActionSpec> {
+  const registry = buildRegistryFromDir(projectRoot);
+  const project = readProjectConfig(path.join(projectRoot, '.gert', 'config.yaml'), true);
+  const override = packageMapPath ? readProjectConfig(packageMapPath, false) : undefined;
+  const requirements = new Map<string, string>();
+  for (const requirement of project?.requires ?? []) {
+    requirements.set(requirement.package, requirement.path);
+  }
+  for (const requirement of override?.requires ?? []) {
+    requirements.set(requirement.package, requirement.path);
+  }
+  const roots = [
+    ...(project?.toolPaths ?? []),
+    ...(override?.toolPaths ?? []),
+    ...requirements.values(),
+  ];
+  for (const root of roots) {
+    Object.assign(registry, buildRegistryFromDir(path.resolve(projectRoot, root)));
+  }
+  return registry;
+}
+
+function readProjectConfig(
+  filePath: string,
+  optional: boolean,
+): { requires: Array<{ package: string; path: string }>; toolPaths: string[] } | undefined {
+  let content: string;
+  try {
+    content = fs.readFileSync(filePath, 'utf8');
+  } catch (error) {
+    if (optional && (error as NodeJS.ErrnoException).code === 'ENOENT') return undefined;
+    throw error;
+  }
+  const raw = yaml.load(content) as RawProjectConfig | undefined;
+  if (!raw || typeof raw !== 'object' || raw.apiVersion !== 'config/v1') {
+    throw new Error(`${filePath}: expected apiVersion config/v1`);
+  }
+  const requires = Array.isArray(raw.requires)
+    ? raw.requires.flatMap((value) => {
+        if (!value || typeof value !== 'object' || Array.isArray(value)) return [];
+        const requirement = value as RawPackageRequirement;
+        return typeof requirement.package === 'string' && requirement.package &&
+          typeof requirement.path === 'string' && requirement.path
+          ? [{ package: requirement.package, path: requirement.path }]
+          : [];
+      })
+    : [];
+  const toolPaths = Array.isArray(raw['tool-paths'])
+    ? raw['tool-paths'].filter((value): value is string => typeof value === 'string' && value.length > 0)
+    : [];
+  return { requires, toolPaths };
 }
