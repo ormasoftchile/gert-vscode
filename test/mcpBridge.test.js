@@ -603,6 +603,114 @@ test('cancellation: invokeTool cancellation token fires when deadline expires', 
   assert.equal(tokenCancelledDuringInvoke, true, 'cancellation token must be cancelled on deadline');
 });
 
+test('cancellation: disposing bridge cancels active invokeTool token', async () => {
+  let invocationStarted;
+  const started = new Promise((resolve) => { invocationStarted = resolve; });
+  let cancellationObserved;
+  const cancelled = new Promise((resolve) => { cancellationObserved = resolve; });
+  const lm = makeLm(async (_name, _opts, token) => {
+    invocationStarted();
+    await new Promise((resolve) => token.onCancellationRequested(resolve));
+    cancellationObserved(token.isCancellationRequested);
+    throw new Error('cancelled by bridge disposal');
+  });
+  const bridge = await createBridge(lm);
+  const request = postBridge(bridge.bridgeUrl, makeRequest(bridge)).catch(() => undefined);
+
+  await started;
+  bridge.dispose();
+
+  assert.equal(await cancelled, true);
+  await request;
+});
+
+test('cancellation: provider resolving after bridge disposal returns bridge_disconnected', async () => {
+  let invocationStarted;
+  const started = new Promise((resolve) => { invocationStarted = resolve; });
+  let resolveProvider;
+  const providerResult = new Promise((resolve) => { resolveProvider = resolve; });
+  let providerObservedCancellation = false;
+  const lm = makeLm(async (_name, _opts, token) => {
+    token.onCancellationRequested(() => { providerObservedCancellation = true; });
+    invocationStarted();
+    return providerResult;
+  });
+  const bridge = await createBridge(lm);
+  const request = postBridge(bridge.bridgeUrl, makeRequest(bridge));
+
+  await started;
+  bridge.dispose();
+  assert.equal(providerObservedCancellation, true, 'bridge disposal must cancel the provider token first');
+  resolveProvider(makeIcmResult());
+
+  const { status, body } = await request;
+  assert.equal(status, 503, 'a disconnected bridge must never return HTTP 200 success');
+  assert.equal(body.error?.code, 'bridge_disconnected');
+  assert.equal(body.result, undefined);
+});
+
+test('cancellation: provider rejecting after bridge disposal returns bridge_disconnected', async () => {
+  let invocationStarted;
+  const started = new Promise((resolve) => { invocationStarted = resolve; });
+  let rejectProvider;
+  const providerResult = new Promise((_resolve, reject) => { rejectProvider = reject; });
+  let providerObservedCancellation = false;
+  const lm = makeLm(async (_name, _opts, token) => {
+    token.onCancellationRequested(() => { providerObservedCancellation = true; });
+    invocationStarted();
+    return providerResult;
+  });
+  const bridge = await createBridge(lm);
+  const requestPayload = makeRequest(bridge);
+  const request = postBridge(bridge.bridgeUrl, requestPayload);
+
+  await started;
+  bridge.dispose();
+  assert.equal(providerObservedCancellation, true, 'bridge disposal must cancel the provider token first');
+  rejectProvider(new Error('cancelled by bridge disposal'));
+
+  const { status, body } = await request;
+  assert.equal(status, 503, 'a disconnected bridge must never return HTTP 200 success');
+  assert.deepEqual(body, {
+    version: 'vscode-mcp-bridge/v1',
+    request_id: requestPayload.request_id,
+    error: { code: 'bridge_disconnected', message: 'Bridge is shutting down' },
+  });
+});
+
+test('cancellation: disposing bridge while reading a request body prevents invokeTool', async () => {
+  let invokeCount = 0;
+  const bridge = await createBridge(makeLm(async () => {
+    invokeCount++;
+    return makeIcmResult();
+  }));
+  const request = new (require('node:events').EventEmitter)();
+  let status;
+  let responseBody = '';
+  const response = {
+    headersSent: false,
+    writeHead(nextStatus) {
+      status = nextStatus;
+      this.headersSent = true;
+    },
+    end(chunk = '') {
+      responseBody += String(chunk);
+    },
+  };
+  const payload = JSON.stringify(makeRequest(bridge));
+
+  const dispatched = bridge.dispatch(request, response);
+  request.emit('data', Buffer.from(payload.slice(0, 10)));
+  bridge.dispose();
+  request.emit('data', Buffer.from(payload.slice(10)));
+  request.emit('end');
+  await dispatched;
+
+  assert.equal(invokeCount, 0, 'invokeTool must not run after disposal crosses readBody');
+  assert.equal(status, 503);
+  assert.equal(JSON.parse(responseBody).error.code, 'bridge_disconnected');
+});
+
 test('duplicate request_id: invokeTool called exactly once', async (t) => {
   let invokeCount = 0;
   const lm = makeLm(async () => {
@@ -622,6 +730,61 @@ test('duplicate request_id: invokeTool called exactly once', async (t) => {
   assert.equal(r1.body.request_id, req.request_id);
   assert.equal(r2.body.request_id, req.request_id);
   assert.deepEqual(r1.body.result, r2.body.result);
+});
+
+test('duplicate request_id: disposal returns identical HTTP 503 bridge_disconnected responses', async () => {
+  let invokeCount = 0;
+  let invocationStarted;
+  const started = new Promise((resolve) => { invocationStarted = resolve; });
+  let resolveProvider;
+  const providerResult = new Promise((resolve) => { resolveProvider = resolve; });
+  const lm = makeLm(async () => {
+    invokeCount++;
+    invocationStarted();
+    return providerResult;
+  });
+  const bridge = await createBridge(lm);
+  const payload = makeRequest(bridge);
+
+  function startDispatch() {
+    const request = new (require('node:events').EventEmitter)();
+    let status;
+    let responseBody = '';
+    const response = {
+      headersSent: false,
+      writeHead(nextStatus) {
+        status = nextStatus;
+        this.headersSent = true;
+      },
+      end(chunk = '') {
+        responseBody += String(chunk);
+      },
+    };
+    const dispatched = bridge.dispatch(request, response);
+    request.emit('data', Buffer.from(JSON.stringify(payload)));
+    request.emit('end');
+    return {
+      dispatched,
+      result: () => ({ status, body: JSON.parse(responseBody) }),
+    };
+  }
+
+  const original = startDispatch();
+  await started;
+  const duplicate = startDispatch();
+  await Promise.resolve();
+
+  bridge.dispose();
+  resolveProvider(makeIcmResult());
+  await Promise.all([original.dispatched, duplicate.dispatched]);
+
+  const originalResult = original.result();
+  const duplicateResult = duplicate.result();
+  assert.equal(invokeCount, 1, 'coalesced callers must share one provider invocation');
+  assert.equal(originalResult.status, 503);
+  assert.equal(duplicateResult.status, 503);
+  assert.equal(originalResult.body.error?.code, 'bridge_disconnected');
+  assert.deepEqual(duplicateResult.body, originalResult.body);
 });
 
 test('capability rejection: wrong token → HTTP 403 capability_rejected', async (t) => {

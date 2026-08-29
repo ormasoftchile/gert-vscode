@@ -21,7 +21,7 @@ const path = require('node:path');
 const test = require('node:test');
 
 const { buildRegistryFromDir } = require('../out/toolDefinitionRegistry');
-const { pickServerRoot } = require('../out/serverRoot');
+const { pickProjectRoot } = require('../out/projectRoot');
 const { McpBridge } = require('../out/mcpBridge');
 
 const ROOT_A = path.join(__dirname, 'fixtures', 'multi-root-a');
@@ -29,22 +29,22 @@ const ROOT_B = path.join(__dirname, 'fixtures', 'multi-root-b');
 // Runbook physically inside root-b's runbooks dir.
 const RUNBOOK_IN_B = path.join(ROOT_B, 'runbooks', 'test.runbook.yaml');
 
-// ─── pickServerRoot selects the active runbook's project ─────────────────────
+// ─── pickProjectRoot selects the active runbook's project ────────────────────
 
-test('pickServerRoot: runbook in root-b selects root-b even when root-a is first workspace folder', () => {
+test('pickProjectRoot: runbook in root-b selects root-b even when root-a is first workspace folder', () => {
   // Workspace folders: [root-a, root-b] — root-a is first, which is the wrong choice.
-  const selected = pickServerRoot(RUNBOOK_IN_B, [ROOT_A, ROOT_B], ROOT_A);
+  const selected = pickProjectRoot(RUNBOOK_IN_B, [ROOT_A, ROOT_B], ROOT_A);
   assert.equal(selected, ROOT_B,
     'expected root-b because the runbook lives there, not the first workspace folder');
 });
 
-test('pickServerRoot: folder order is irrelevant — root-b is still chosen when [root-b, root-a]', () => {
+test('pickProjectRoot: folder order is irrelevant — root-b is still chosen when [root-b, root-a]', () => {
   // Reversed folder order: root-b first, root-a second.
   // This test WOULD pass for the wrong reason if the code picked the first
   // folder (it would accidentally pick root-b). Combining both ordering tests
   // makes the suite load-bearing: it must pass for BOTH orderings, and the
   // only way to satisfy both is to use the runbook path, not folder order.
-  const selected = pickServerRoot(RUNBOOK_IN_B, [ROOT_B, ROOT_A], ROOT_A);
+  const selected = pickProjectRoot(RUNBOOK_IN_B, [ROOT_B, ROOT_A], ROOT_A);
   assert.equal(selected, ROOT_B,
     'root-b must still be chosen when folder list is reversed — must not be traversal-order-dependent');
 });
@@ -69,9 +69,9 @@ test('registry from root-a has tool-from-root-a (control check)', () => {
 // ─── End-to-end: active-project selection feeds correct name into bridge ──────
 
 test('end-to-end: runbook-in-b chain yields tool-from-root-b in the bridge registry', () => {
-  // This is the integration path: pickServerRoot → buildRegistryFromDir → registry.
+  // This is the integration path: pickProjectRoot → buildRegistryFromDir → registry.
   // If any step used root-a (workspace[0]) instead of root-b, registeredName would be wrong.
-  const projectRoot = pickServerRoot(RUNBOOK_IN_B, [ROOT_A, ROOT_B], ROOT_A);
+  const projectRoot = pickProjectRoot(RUNBOOK_IN_B, [ROOT_A, ROOT_B], ROOT_A);
   const registry = buildRegistryFromDir(projectRoot);
   const spec = registry['shared-tool/run'];
   assert.ok(spec, 'shared-tool/run must be found after the full chain');

@@ -4,7 +4,14 @@
 .github/**
 src/**
 test/**
+webview/**
+out/test/**
+out/previewWebview.js
+out/serverLaunch.js
+out/serverManager.js
+out/serverRoot.js
 .runbook/**
+traces/**
 *.jsonl
 **/*.ts
 **/tsconfig.json

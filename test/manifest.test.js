@@ -19,6 +19,49 @@ test('React Flow preview is a visible editor title action for runbooks', () => {
   assert.match(menuItem.when, /runbook/);
 });
 
+test('React Flow preview placement is configurable and defaults to the runbook group', () => {
+  const setting = manifest.contributes.configuration.properties['gert.preview.openLocation'];
+
+  assert.ok(setting, 'gert.preview.openLocation must be contributed');
+  assert.equal(setting.type, 'string');
+  assert.deepEqual(setting.enum, ['beside', 'sameGroup']);
+  assert.equal(setting.default, 'sameGroup');
+});
+
+test('legacy SSE server commands and settings are not contributed', () => {
+  const commandIDs = manifest.contributes.commands.map((candidate) => candidate.command);
+  const properties = manifest.contributes.configuration.properties;
+
+  assert.ok(!commandIDs.includes('gert.previewLive'));
+  assert.ok(!commandIDs.includes('gert.restartServer'));
+  assert.equal(properties['gert.serverUrl'], undefined);
+  assert.equal(properties['gert.autoStartServer'], undefined);
+});
+
+test('XTS confirmation has no extension-modal preference', () => {
+  const properties = manifest.contributes.configuration.properties;
+
+  assert.equal(properties['gert.xts.showHandoffConfirmation'], undefined);
+});
+
+test('runbook server settings are resource-scoped for multi-root workspaces', () => {
+  const properties = manifest.contributes.configuration.properties;
+  const resourceSettings = [
+    'gert.packageMap',
+    'gert.binaryPath',
+    'gert.preview.nodeStyle',
+    'gert.preview.openLocation',
+  ];
+
+  for (const key of resourceSettings) {
+    assert.equal(
+      properties[key]?.scope,
+      'resource',
+      `${key} must resolve from the workspace folder containing the active runbook`,
+    );
+  }
+});
+
 test('gert.validateInputs is contributed as a Command Palette entry', () => {
   const command = manifest.contributes.commands.find(
     (candidate) => candidate.command === 'gert.validateInputs',

@@ -14,14 +14,29 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: actions/checkout@v4
+        with:
+          repository: ormasoftchile/gert
+          path: gert-core
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
 
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: gert-core/go.mod
+          cache-dependency-path: gert-core/go.sum
+
       - name: Install dependencies
         run: npm ci
+
+      - name: Build Gert core test binary
+        working-directory: gert-core
+        run: go build -o "$RUNNER_TEMP/gert" ./cmd/gert
 
       - name: Compile (tsc)
         run: npm run compile
@@ -36,8 +51,17 @@ jobs:
         #   - every node --test npm script is invoked by a CI workflow (rule6)
         run: npm test
 
+      - name: Source Extension Host tests
+        run: xvfb-run -a npm run test:e2e
+        env:
+          GERT_CORE_ROOT: ${{ github.workspace }}/gert-core
+          GERT_E2E_BINARY: ${{ runner.temp }}/gert
+
       - name: Package (vsce)
         run: npm run package
+
+      - name: Installed VSIX production-surface tests
+        run: xvfb-run -a npm run test:e2e:vsix
 
       - name: Upload .vsix artifact
         uses: actions/upload-artifact@v4

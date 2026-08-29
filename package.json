@@ -2,7 +2,7 @@
   "name": "gert-preview",
   "displayName": "gert Runbook Preview",
   "description": "Preview gert runbooks (.runbook.yaml) as a structural graph in VS Code.",
-  "version": "0.1.3",
+  "version": "0.2.5",
   "publisher": "ormasoftchile",
   "license": "MIT",
   "repository": {
@@ -34,11 +34,7 @@
       },
       {
         "command": "gert.showServerLog",
-        "title": "gert: Show Server Log"
-      },
-      {
-        "command": "gert.restartServer",
-        "title": "gert: Restart Server"
+        "title": "gert: Show Run Log"
       },
       {
         "command": "gert.validateInputs",
@@ -66,13 +62,13 @@
         "description": "Gert runbook assistant. Use /arm-mcp to arm the MCP bridge with a tool invocation token.",
         "commands": [
           {
-          "name": "run",
-          "description": "Run a runbook in-handler and drive MCP tool calls live. Usage: @gert /run <runbook.yaml> [key=val ...]"
-        },
-        {
-          "name": "arm-mcp",
-          "description": "Diagnostic only: capture a tool invocation token (causes VS Code to start MCP servers ~60s). Does NOT authorize deferred runs; use /run instead."
-        }
+            "name": "run",
+            "description": "Run a runbook in-handler and drive MCP tool calls live. Usage: @gert /run <runbook.yaml> [key=val ...]"
+          },
+          {
+            "name": "arm-mcp",
+            "description": "Diagnostic only: capture a tool invocation token (causes VS Code to start MCP servers ~60s). Does NOT authorize deferred runs; use /run instead."
+          }
         ]
       }
     ],
@@ -82,7 +78,8 @@
         "gert.packageMap": {
           "type": "string",
           "default": "",
-          "markdownDescription": "Path to the package-map file passed to `gert serve --package-map`. Absolute or relative to the active runbook's project root (resolved via `pickServerRoot`, never `workspaceFolders[0]`). For projects that also use `requires:` maps with `gert run`/`gert plan`, point this setting at the serve-compatible map (for example `*.serve-package-map.yaml`). Leave empty to fall back to the project-root convention (`package-map.yaml`). If neither the setting path nor the convention file exists, `--package-map` is omitted."
+          "scope": "resource",
+          "markdownDescription": "Path used to resolve the package map passed to direct `gert run` execution. Absolute or relative to the active runbook's project root. When this points to `*.serve-package-map.yaml`, a sibling `*.package-map.yaml` is preferred when present. Leave empty to use the project-root convention (`package-map.yaml`)."
         },
         "gert.mcpBridge.toolNameOverrides": {
           "type": "object",
@@ -95,15 +92,12 @@
         "gert.binaryPath": {
           "type": "string",
           "default": "gert",
+          "scope": "resource",
           "description": "Path to the gert CLI binary used for offline previews."
-        },
-        "gert.serverUrl": {
-          "type": "string",
-          "default": "http://localhost:7778",
-          "description": "Base URL of the gert server. If autoStartServer is true and this is left at the default, the extension picks a free port and ignores this value."
         },
         "gert.preview.nodeStyle": {
           "type": "string",
+          "scope": "resource",
           "enum": [
             "smooth-curves",
             "minimalist",
@@ -117,10 +111,19 @@
           "default": "smooth-curves",
           "description": "Visual stereotype style for the React Flow runbook graph preview: smooth-curves (default), minimalist, or header-badges."
         },
-        "gert.autoStartServer": {
-          "type": "boolean",
-          "default": true,
-          "description": "If true, the extension spawns `gert serve` automatically when you run a graph preview. Set to false to use an external server (configure gert.serverUrl)."
+        "gert.preview.openLocation": {
+          "type": "string",
+          "scope": "resource",
+          "enum": [
+            "beside",
+            "sameGroup"
+          ],
+          "enumDescriptions": [
+            "Open the React Flow preview in an editor group beside the runbook.",
+            "Open the React Flow preview as a tab in the runbook's editor group."
+          ],
+          "default": "sameGroup",
+          "description": "Controls where the React Flow runbook preview opens."
         }
       }
     }
@@ -129,24 +132,37 @@
     "js-yaml": "^4.1.0"
   },
   "scripts": {
-    "compile": "tsc -p ./",
+    "compile": "npm run compile:extension && npm run compile:webview",
+    "compile:extension": "tsc -p ./",
+    "compile:webview": "tsc -p tsconfig.webview.json --noEmit && esbuild webview/graph.tsx --bundle --format=iife --platform=browser --target=es2022 --outfile=media/graph.js",
     "compile:test": "tsc -p tsconfig.test.json",
     "pretest": "npm run compile",
     "test": "node --test --test-timeout=5000 test/*.test.js",
-    "test:cross-repo": "npm run compile && node --test --test-timeout=5000 test/crossRepoHostActionWire.js",
-    "test:e2e": "npm run compile && npm run compile:test && vscode-test",
+    "test:cross-repo": "npm run compile:extension && node --test test/crossRepoHostActionWire.js",
+    "test:e2e": "npm run compile && npm run compile:test && vscode-test --label source",
+    "test:e2e:only": "vscode-test",
+    "test:e2e:vsix": "vscode-test --label production-surface",
     "watch": "tsc -w -p ./",
     "vscode:prepublish": "npm run compile",
-    "package": "vsce package --no-dependencies -o gert-preview.vsix",
+    "package": "vsce package -o gert-preview.vsix",
     "package:clean": "rm -rf out && npm run compile && npm run package"
   },
   "devDependencies": {
+    "@dagrejs/dagre": "1.1.4",
     "@types/js-yaml": "^4.0.9",
+    "@types/mocha": "10.0.10",
     "@types/node": "^20.11.0",
+    "@types/react": "18.3.31",
+    "@types/react-dom": "18.3.7",
     "@types/vscode": "^1.95.0",
     "@vscode/test-cli": "^0.0.15",
     "@vscode/test-electron": "^3.1.0",
     "@vscode/vsce": "^2.32.0",
+    "esbuild": "0.28.2",
+    "lucide-react": "0.468.0",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "reactflow": "11.11.4",
     "typescript": "^5.5.4"
   }
 }

@@ -1,0 +1,12 @@
+{
+  "name": "gert-preview-vsix-test-harness",
+  "displayName": "Gert Preview VSIX Test Harness",
+  "version": "0.0.0",
+  "publisher": "gert-tests",
+  "private": true,
+  "engines": {
+    "vscode": "^1.95.0"
+  },
+  "main": "./extension.js",
+  "activationEvents": ["*"]
+}
