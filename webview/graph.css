@@ -16,6 +16,8 @@ button, input, select, textarea { font: inherit; }
 .identity span, .mode-label { color: var(--vscode-descriptionForeground); font-size: 11px; }
 .mode-label { text-transform: uppercase; }
 .run-actions { display: flex; align-items: center; justify-content: flex-end; gap: 6px; }
+.session-close-actions { display: inline-flex; align-items: center; gap: 4px; }
+.session-close-actions select { max-width: 112px; }
 .run-actions button, .run-actions select, .interaction-pane button { min-height: 26px; border: 1px solid var(--vscode-button-border, transparent); border-radius: 3px; color: var(--vscode-button-secondaryForeground); background: var(--vscode-button-secondaryBackground); }
 .run-actions button { display: inline-flex; align-items: center; gap: 5px; }
 .run-actions button svg { width: 14px; height: 14px; flex: 0 0 auto; }
@@ -34,6 +36,16 @@ button, input, select, textarea { font: inherit; }
 .run-inputs label, .collector-field { min-width: 150px; display: grid; gap: 3px; color: var(--vscode-descriptionForeground); font-size: 11px; }
 .run-inputs input, .run-inputs select, .collector-field input, .collector-field select, .collector-field textarea { min-width: 0; min-height: 26px; padding: 2px 6px; border: 1px solid var(--vscode-input-border, var(--vscode-panel-border)); border-radius: 2px; color: var(--vscode-input-foreground); background: var(--vscode-input-background); }
 .run-error { max-height: 72px; overflow: auto; padding: 6px 12px; border-bottom: 1px solid var(--vscode-inputValidation-errorBorder); color: var(--vscode-errorForeground); background: var(--vscode-inputValidation-errorBackground); font-size: 11px; white-space: pre-wrap; }
+.execution-position-strip { min-height: 42px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 6px 12px; border-bottom: 1px solid var(--vscode-panel-border); border-left: 4px solid var(--position-color); background: color-mix(in srgb, var(--position-color) 9%, var(--vscode-editor-background)); }
+.execution-position-strip.current { --position-color: var(--vscode-charts-green); }
+.execution-position-strip.last-reached { --position-color: var(--vscode-charts-blue); }
+.execution-position-strip > div { min-width: 0; display: flex; align-items: baseline; gap: 8px; }
+.execution-position-strip span { flex: none; color: var(--vscode-descriptionForeground); font-size: 10px; font-weight: 700; text-transform: uppercase; }
+.execution-position-strip strong { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; }
+.execution-position-strip code { flex: none; color: var(--vscode-descriptionForeground); font-size: 10px; }
+.execution-position-strip button { min-height: 28px; display: inline-flex; align-items: center; gap: 5px; padding: 3px 8px; border: 1px solid var(--vscode-button-border, transparent); border-radius: 3px; color: var(--vscode-button-foreground); background: var(--vscode-button-background); }
+.execution-position-strip button:hover { background: var(--vscode-button-hoverBackground); }
+.execution-position-strip button svg { width: 14px; height: 14px; }
 .route-view-strip { min-height: 48px; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 7px 12px; border-bottom: 1px solid var(--vscode-panel-border); border-left: 3px solid var(--vscode-focusBorder); background: color-mix(in srgb, var(--vscode-focusBorder) 8%, var(--vscode-editor-background)); }
 .route-view-copy { min-width: 0; display: grid; gap: 2px; }
 .route-view-copy strong { overflow: hidden; font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
@@ -122,6 +134,8 @@ button, input, select, textarea { font: inherit; }
 .inspector-metrics { min-height: 27px; display: flex; align-items: center; flex-wrap: wrap; gap: 5px 12px; padding: 5px 14px; border-bottom: 1px solid var(--vscode-panel-border); color: var(--vscode-descriptionForeground); font-size: 9px; }
 .inspector-metrics span { display: inline-flex; align-items: center; gap: 4px; }
 .inspector-metrics svg { width: 11px; height: 11px; }
+.occurrence-selector, .revision-selector { display: grid; gap: 4px; padding: 7px 14px; border-bottom: 1px solid var(--vscode-panel-border); color: var(--vscode-descriptionForeground); font-size: 10px; }
+.occurrence-selector select, .revision-selector select { width: 100%; min-width: 0; }
 .inspector-tabs { display: grid; grid-template-columns: repeat(3, 1fr); border-bottom: 1px solid var(--vscode-panel-border); background: var(--vscode-sideBar-background); }
 .inspector-tabs button { min-height: 31px; padding: 4px 8px; border: 0; border-bottom: 2px solid transparent; color: var(--vscode-descriptionForeground); background: transparent; font-size: 10px; }
 .inspector-tabs button:hover { color: var(--vscode-foreground); background: color-mix(in srgb, var(--vscode-foreground) 5%, transparent); }
@@ -252,6 +266,7 @@ button, input, select, textarea { font: inherit; }
 .node-locator { max-width: min(320px, 42vw); min-height: 30px; display: flex; align-items: center; gap: 6px; padding: 4px 7px; border: 2px solid var(--locator-color); border-radius: 3px; color: var(--vscode-foreground); background: color-mix(in srgb, var(--locator-color) 18%, var(--vscode-editor-background)); box-shadow: 0 3px 10px color-mix(in srgb, #000 30%, transparent); font-size: 11px; pointer-events: none; }
 .node-locator.focused { --locator-color: var(--vscode-charts-yellow); }
 .node-locator.current { --locator-color: var(--vscode-charts-green); }
+.node-locator.last-reached { --locator-color: var(--vscode-charts-blue); }
 .node-locator svg { width: 17px; height: 17px; flex: none; color: var(--locator-color); stroke-width: 3; }
 .node-locator span { flex: none; font-weight: 700; text-transform: uppercase; }
 .node-locator code { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--vscode-foreground); background: transparent; font-family: var(--vscode-editor-font-family); font-size: 12px; font-weight: 600; }
@@ -269,6 +284,8 @@ button, input, select, textarea { font: inherit; }
 .step-node.status-failed, .step-node.status-denied, .step-node.status-indeterminate { border-color: var(--vscode-charts-red); }
 .step-node.status-skipped { opacity: 0.55; }
 .step-node.selected { outline: 3px solid var(--vscode-charts-yellow); outline-offset: 3px; box-shadow: 0 0 0 7px color-mix(in srgb, var(--vscode-charts-yellow) 24%, transparent); }
+.step-node.execution-current { outline: 4px solid var(--vscode-charts-green); outline-offset: 5px; box-shadow: 0 0 0 10px color-mix(in srgb, var(--vscode-charts-green) 22%, transparent); }
+.step-node.execution-last { outline: 4px solid var(--vscode-charts-blue); outline-offset: 5px; box-shadow: 0 0 0 10px color-mix(in srgb, var(--vscode-charts-blue) 22%, transparent); }
 .kind-branch, .kind-decision, .kind-choice { --node-accent: var(--vscode-charts-yellow); }
 .kind-approve, .kind-assert { --node-accent: var(--vscode-charts-green); }
 .kind-end { --node-accent: var(--vscode-charts-red); }
@@ -287,18 +304,27 @@ button, input, select, textarea { font: inherit; }
 .react-flow__node-frameBox.include-frame { border-color: color-mix(in srgb, var(--vscode-charts-purple) 62%, transparent); background: color-mix(in srgb, var(--vscode-charts-purple) 6%, transparent); }
 .react-flow__node-frameBox.parallel-branch { border-color: color-mix(in srgb, var(--vscode-charts-blue) 62%, transparent); }
 .react-flow__node-frameBox.compensate-body { border-color: color-mix(in srgb, var(--vscode-charts-red) 62%, transparent); }
+.react-flow__node-frameBox.session-segment { border: 1px solid color-mix(in srgb, var(--vscode-focusBorder) 56%, var(--vscode-panel-border)); border-left-width: 3px; border-radius: 5px; background: color-mix(in srgb, var(--vscode-editorWidget-background) 34%, transparent); }
 .react-flow__node-frameBox.empty-group { border-style: dotted; background: color-mix(in srgb, var(--vscode-descriptionForeground) 4%, transparent); }
 .frame-content { width: 100%; height: 100%; position: relative; }
 .frame-content > span { position: absolute; top: -10px; left: 10px; max-width: calc(100% - 20px); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 1px 6px; border: 1px solid var(--vscode-panel-border); border-radius: 3px; color: var(--vscode-descriptionForeground); background: var(--vscode-editor-background); font-size: 10px; text-transform: uppercase; }
 .frame-content > em { position: absolute; inset: 0; display: grid; place-items: center; color: var(--vscode-descriptionForeground); font-size: 11px; font-style: normal; }
+.frame-content > em.segment-status { inset: auto 10px auto auto; top: -10px; display: block; padding: 1px 5px; border: 1px solid var(--vscode-panel-border); border-radius: 2px; color: var(--vscode-descriptionForeground); background: var(--vscode-editor-background); font-size: 9px; font-weight: 600; text-transform: uppercase; }
+.frame-content > em.segment-status.status-active { color: var(--vscode-charts-blue); }
+.frame-content > em.segment-status.status-completed, .frame-content > em.segment-status.status-handed_off { color: var(--vscode-charts-green); }
+.frame-content > em.segment-status.status-failed, .frame-content > em.segment-status.status-cancelled, .frame-content > em.segment-status.status-indeterminate { color: var(--vscode-errorForeground); }
 .react-flow__edge-text { fill: var(--vscode-descriptionForeground); font-size: 10px; }
 .react-flow__edge-textbg { fill: var(--vscode-editor-background); }
 .react-flow__edge.edge-running path { stroke: var(--vscode-charts-blue); stroke-width: 2; }
 .react-flow__edge.edge-completed path { stroke: var(--vscode-charts-green); stroke-width: 2; }
 .react-flow__edge.edge-failed path { stroke: var(--vscode-charts-red); stroke-width: 2; }
 .react-flow__edge.edge-route-inactive { opacity: 0.28; }
+.react-flow__edge.edge-session-transition path { stroke: var(--vscode-focusBorder); stroke-width: 2.5; stroke-dasharray: 7 4; }
+.react-flow__edge.edge-session-transition .react-flow__edge-text { fill: var(--vscode-foreground); font-weight: 600; }
 .branch-merge-node { width: 14px; height: 14px; display: grid; place-items: center; }
 .branch-merge-node > span { width: 8px; height: 8px; border: 1px solid var(--vscode-descriptionForeground); border-radius: 50%; background: var(--vscode-editor-background); }
+.session-entry-node { width: 14px; height: 14px; display: grid; place-items: center; }
+.session-entry-node > span { width: 10px; height: 10px; border: 2px solid var(--vscode-focusBorder); border-radius: 50%; background: var(--vscode-editor-background); }
 .react-flow__controls { box-shadow: none; border: 1px solid var(--vscode-panel-border); }
 .react-flow__controls-button { color: var(--vscode-foreground); background: var(--vscode-button-secondaryBackground); border-bottom-color: var(--vscode-panel-border); }
 .react-flow__controls-button:hover { background: var(--vscode-button-secondaryHoverBackground); }

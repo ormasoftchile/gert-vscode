@@ -8,6 +8,7 @@ const test = require('node:test');
 const {
   createDirectGraphWebviewHtml,
   graphMayRequireMcpBridge,
+  sessionMayRequireMcpBridge,
   graphPreviewArgs,
   loadGraphDocument,
   parseGraphDocument,
@@ -256,6 +257,8 @@ test('webview exposes literal route-through-step controls without focus-corridor
   assert.match(source, />To this step</);
   assert.match(source, />From this step</);
   assert.match(source, />Show full graph</);
+  assert.match(source, /const routeActionsDisabled = runActive && !sessionID/);
+  assert.match(source, /disabled=\{routeActionsDisabled\}/);
   assert.doesNotMatch(source, /focus corridor/i);
 });
 
@@ -265,20 +268,32 @@ test('webview identifies focused and current steps with distinct side arrows', (
 
   assert.match(source, /NodeToolbar\s+isVisible=\{selected\}\s+position=\{Position\.Left\}/);
   assert.match(source, /NodeToolbar\s+isVisible=\{isCurrent\}\s+position=\{Position\.Right\}/);
-  assert.match(source, /Focused step:\s*\$\{id\}/);
-  assert.match(source, /Current step:\s*\$\{id\}/);
+  assert.match(source, /const locatorText = title \|\| id/);
+  assert.match(source, /Focused step:\s*\$\{locatorText\}/);
+  assert.match(source, /Current step:\s*\$\{locatorText\}/);
+  assert.match(source, /<code title=\{id\}>\{locatorText\}<\/code>/);
+  assert.match(source, /executionPosition\.terminal \? 'Last reached' : 'Current'/);
+  assert.match(source, /className=\{`execution-position-strip/);
+  assert.match(source, />Locate<\/span>/);
+  assert.match(source, /executionNodeID=\{executionNodeID\}/);
+  assert.match(source, /setExecutionNodeID\(reachedNodeID\)/);
   assert.match(source, /className="node-locator focused"/);
-  assert.match(source, /className="node-locator current"/);
+  assert.match(source, /className=\{`node-locator \$\{executionPosition\.terminal \? 'last-reached' : 'current'\}`\}/);
   assert.match(source, /<ArrowRight/);
   assert.match(source, /<ArrowLeft/);
   assert.match(source, /const focusedNodeID = routeTargetID \?\? selectedId/);
   assert.match(source, /selected:\s*node\.id === focusedNodeID/);
-  assert.match(source, /nodeColor=\{\(node\) => node\.selected/);
+  assert.match(source, /nodeColor=\{\(node\) => node\.id === resolvedExecutionNodeID/);
+  assert.match(source, /: node\.selected \? 'var\(--vscode-charts-yellow\)'/);
   assert.match(styles, /\.node-locator\s*\{[^}]*color:\s*var\(--vscode-foreground\)/s);
   assert.match(styles, /\.node-locator\s*\{[^}]*background:\s*color-mix\(in srgb, var\(--locator-color\) 18%, var\(--vscode-editor-background\)\)/s);
   assert.match(styles, /\.node-locator\s*\{[^}]*border:\s*2px solid var\(--locator-color\)/s);
   assert.match(styles, /\.node-locator\.focused[^}]*var\(--vscode-charts-yellow\)/s);
   assert.match(styles, /\.node-locator\.current[^}]*var\(--vscode-charts-green\)/s);
+  assert.match(styles, /\.node-locator\.last-reached[^}]*var\(--vscode-charts-blue\)/s);
+  assert.match(styles, /\.step-node\.execution-current[^}]*outline:/s);
+  assert.match(styles, /\.step-node\.execution-last[^}]*outline:/s);
+  assert.match(styles, /\.execution-position-strip\s*\{/s);
   assert.match(styles, /\.node-locator code\s*\{[^}]*background:\s*transparent/s);
   assert.match(styles, /\.node-locator code\s*\{[^}]*font-weight:\s*600/s);
   assert.doesNotMatch(source, /\.setCenter\s*\(/);
@@ -408,6 +423,11 @@ test('route-test editor preserves skipped saved step outcomes', () => {
     assert.match(source, /function\s+NamedValueRows/);
     assert.match(source, /function\s+RuntimePane/);
     assert.match(source, /function\s+CommonDefinition/);
+    assert.match(source, /aria-label="Execution occurrence"/);
+    assert.match(source, /selectedOccurrence\?\.executionSource/);
+    assert.match(source, /aria-label="Graph revision"/);
+    assert.match(source, /title="Snapshot"/);
+    assert.match(source, /title="Handoffs"/);
   });
 
 test('webview renders graph groups as compound frame nodes', () => {
@@ -418,6 +438,8 @@ test('webview renders graph groups as compound frame nodes', () => {
   assert.match(source, /parentNode/);
   assert.match(source, /frameCount/);
   assert.match(source, /document\.groups/);
+  assert.match(source, /function\s+SessionEntryNode/);
+  assert.match(source, /kind === 'session-entry'/);
 });
 
 test('webview reconciles terminal state by exact node identity', () => {
@@ -489,6 +511,13 @@ test('MCP bridge starts only for vscode-mcp graph actions or unknown dynamic wor
   delete legacy.nodes[0].data.tool_name;
   delete legacy.nodes[0].data.tool_action;
   assert.equal(graphMayRequireMcpBridge(legacy, {}), true, 'older graphjson must remain conservative');
+});
+
+test('session MCP bridge is provisioned before a later handoff needs a configured action', () => {
+  const entry = JSON.parse(fs.readFileSync(path.join(root, 'test', 'fixtures', 'enum-preview-graphjson.json'), 'utf8'));
+  assert.equal(graphMayRequireMcpBridge(entry, { 'xts/open': {} }), false);
+  assert.equal(sessionMayRequireMcpBridge(entry, { 'xts/open': {} }), true);
+  assert.equal(sessionMayRequireMcpBridge(entry, {}), false);
 });
 
 test('parseGraphDocument validates discriminated step details', () => {

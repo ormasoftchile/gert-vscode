@@ -28,7 +28,7 @@ export interface RuntimeLogLine {
   line: string;
 }
 
-export interface InspectorRuntimeState {
+export interface InspectorRuntimeValueState {
   status: string;
   error?: string;
   durationMs?: number;
@@ -42,6 +42,27 @@ export interface InspectorRuntimeState {
   evidence?: unknown;
   logs?: RuntimeLogLine[];
   debugOverride?: Record<string, unknown>;
+}
+
+export interface InspectorRuntimeOccurrence extends InspectorRuntimeValueState {
+  occurrenceID: string;
+  runID: string;
+  segmentID: string;
+  qualifiedNodeID: string;
+  phase: string;
+  invocation: number;
+  retryAttempt: number;
+  occurrenceSequence: number;
+  executionSource: 'saved' | 'live';
+}
+
+export interface InspectorRuntimeState extends InspectorRuntimeValueState {
+  occurrenceID?: string;
+  runID?: string;
+  invocation?: number;
+  retryAttempt?: number;
+  executionSource?: 'saved' | 'live';
+  occurrences?: InspectorRuntimeOccurrence[];
 }
 
 export interface InspectorInputValue {
@@ -224,6 +245,7 @@ function DebugPane({ controls, override }: { controls: ReactNode; override: Reco
 export function RunOverview({
   document,
   runtimeNodes,
+  executionNodeID,
   runID,
   runStatus,
   inputs,
@@ -233,6 +255,7 @@ export function RunOverview({
 }: {
   document: GraphDocument;
   runtimeNodes: Readonly<Record<string, InspectorRuntimeState>>;
+  executionNodeID?: string;
   runID?: string;
   runStatus: string;
   inputs: InspectorInputValue[];
@@ -245,7 +268,7 @@ export function RunOverview({
   const completed = states.filter((status) => status === 'completed').length;
   const issues = states.filter(isIssueStepStatus).length;
   const skipped = states.filter((status) => status === 'skipped').length;
-  const active = document.nodes.find((node) => ['running', 'delaying'].includes(runtimeNodes[node.id]?.status));
+  const executionNode = document.nodes.find((node) => node.id === executionNodeID);
   const settled = states.filter(isSettledStepStatus).length;
   const terminal = isTerminalRunStatus(runStatus);
   const progress = terminal ? 100 : activeNodes.length === 0 ? 0 : Math.round((settled / activeNodes.length) * 100);
@@ -275,7 +298,7 @@ export function RunOverview({
       </div>
       <Section title="Run">
         <KeyValueRows rows={[
-          { label: 'Current', value: active?.data.title ?? active?.id, code: true },
+          { label: terminal ? 'Last reached' : 'Current', value: executionNode?.data.title ?? executionNode?.id, code: true },
           { label: 'Run ID', value: runID, code: true },
           { label: 'Steps', value: document.nodes.length },
           { label: 'Breakpoints', value: breakpointCount },
@@ -296,23 +319,45 @@ export function RunOverview({
 export function StepInspector({
   node,
   runtime,
+  availableGraphRevisions = [],
+  selectedGraphRevision,
+  onGraphRevisionChange,
   debugControls,
 }: {
   node: GraphNode;
   runtime: InspectorRuntimeState | undefined;
+  availableGraphRevisions?: readonly number[];
+  selectedGraphRevision?: number;
+  onGraphRevisionChange?(revision: number): void;
   debugControls: ReactNode;
 }) {
   type InspectorTab = 'definition' | 'run' | 'debug';
   const tabOrder: InspectorTab[] = ['definition', 'run', 'debug'];
   const [tab, setTab] = useState<InspectorTab>(runtime && runtime.status !== 'pending' ? 'run' : 'definition');
+  const [selectedOccurrenceID, setSelectedOccurrenceID] = useState<string>();
   const tabBaseID = useId();
   const tabRefs = useRef<Record<InspectorTab, HTMLButtonElement | null>>({ definition: null, run: null, debug: null });
-  useEffect(() => setTab(runtime && runtime.status !== 'pending' ? 'run' : 'definition'), [node.id]);
+  const occurrences = runtime?.occurrences ?? [];
+  const selectedOccurrence = occurrences.find((occurrence) => occurrence.occurrenceID === selectedOccurrenceID)
+    ?? occurrences.find((occurrence) => occurrence.occurrenceID === runtime?.occurrenceID)
+    ?? occurrences[occurrences.length - 1];
+  const displayedRuntime = selectedOccurrence ?? runtime;
   useEffect(() => {
-    if (runtime && runtime.status !== 'pending' && tab === 'definition') setTab('run');
-  }, [runtime?.status]);
+    setTab(displayedRuntime && displayedRuntime.status !== 'pending' ? 'run' : 'definition');
+    setSelectedOccurrenceID(undefined);
+  }, [node.id]);
+  useEffect(() => {
+    if (displayedRuntime && displayedRuntime.status !== 'pending' && tab === 'definition') setTab('run');
+  }, [displayedRuntime?.status]);
   const kind = String(node.data.kind ?? 'step');
   const title = String(node.data.title ?? node.data.step_id ?? node.id);
+  const displayNodeID = String(node.data.original_node_id ?? node.data.step_id ?? node.id);
+  const segmentOrdinal = typeof node.data.segment_ordinal === 'number' ? node.data.segment_ordinal : undefined;
+  const segmentStatus = typeof node.data.segment_status === 'string' ? node.data.segment_status : undefined;
+  const executionSource = selectedOccurrence?.executionSource ??
+    (typeof node.data.execution_source === 'string' ? node.data.execution_source : undefined);
+  const sessionRunID = selectedOccurrence?.runID ??
+    (typeof node.data.run_id === 'string' ? node.data.run_id : undefined);
   const onTabKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>) => {
     let nextIndex = tabOrder.indexOf(tab);
     if (event.key === 'ArrowRight') nextIndex = (nextIndex + 1) % tabOrder.length;
@@ -332,25 +377,106 @@ export function StepInspector({
       <div className="inspector-sticky">
         <header className="step-inspector-header">
           <div className="inspector-icon"><KindIcon kind={kind} /></div>
-          <div className="inspector-title"><span>{KIND_LABELS[kind] ?? kind}</span><h2>{title}</h2><code title={node.id}>{node.id}</code></div>
-          <StatusBadge status={runtime?.status ?? 'pending'} />
+          <div className="inspector-title"><span>{KIND_LABELS[kind] ?? kind}{segmentOrdinal ? ` | Segment ${segmentOrdinal}` : ''}</span><h2>{title}</h2><code title={node.id}>{displayNodeID}</code></div>
+          <StatusBadge status={displayedRuntime?.status ?? 'pending'} />
         </header>
         <div className="inspector-metrics">
-          <span><Clock3 aria-hidden="true" />{formatDuration(runtime?.durationMs)}</span>
-          {runtime?.attempt ? <span>Attempt {runtime.attempt}</span> : null}
+          <span><Clock3 aria-hidden="true" />{formatDuration(displayedRuntime?.durationMs)}</span>
+          {selectedOccurrence ? <span>Invocation {selectedOccurrence.invocation}</span> : null}
+          {selectedOccurrence?.retryAttempt && selectedOccurrence.retryAttempt > 1
+            ? <span>Retry {selectedOccurrence.retryAttempt}</span>
+            : displayedRuntime?.attempt ? <span>Attempt {displayedRuntime.attempt}</span> : null}
           {node.data.call_path && Array.isArray(node.data.call_path) && node.data.call_path.length > 0 ? <span>{node.data.call_path.length} levels deep</span> : null}
+          {executionSource ? <span>{executionSource === 'saved' ? 'Saved result' : 'Live execution'}</span> : null}
+          {segmentStatus ? <span>Segment {segmentStatus.replaceAll('_', ' ')}</span> : null}
+          {sessionRunID ? <span title={sessionRunID}>Run {sessionRunID.slice(0, 8)}</span> : null}
         </div>
+        {availableGraphRevisions.length > 1 && selectedGraphRevision !== undefined ? (
+          <label className="revision-selector">
+            <span>Graph revision</span>
+            <select
+              aria-label="Graph revision"
+              value={selectedGraphRevision}
+              onChange={(event) => onGraphRevisionChange?.(Number(event.target.value))}
+            >
+              {[...availableGraphRevisions].reverse().map((revision, index) => (
+                <option key={revision} value={revision}>
+                  Revision {revision}{index === 0 ? ' (latest)' : ''}
+                </option>
+              ))}
+            </select>
+          </label>
+        ) : null}
+        {occurrences.length > 1 ? (
+          <label className="occurrence-selector">
+            <span>Execution occurrence</span>
+            <select
+              aria-label="Execution occurrence"
+              value={selectedOccurrence?.occurrenceID ?? ''}
+              onChange={(event) => setSelectedOccurrenceID(event.target.value)}
+            >
+              {occurrences.map((occurrence) => (
+                <option key={occurrence.occurrenceID} value={occurrence.occurrenceID}>
+                  {occurrence.executionSource === 'saved' ? 'Saved' : 'Live'} | run {occurrence.runID.slice(0, 8)} | invocation {occurrence.invocation}
+                </option>
+              ))}
+            </select>
+          </label>
+        ) : null}
         <div className="inspector-tabs" role="tablist" aria-label="Step information">
           <button ref={(element) => { tabRefs.current.definition = element; }} id={tabID('definition')} type="button" role="tab" aria-controls={panelID('definition')} aria-selected={tab === 'definition'} tabIndex={tab === 'definition' ? 0 : -1} className={tab === 'definition' ? 'active' : ''} onKeyDown={onTabKeyDown} onClick={() => setTab('definition')}>Definition</button>
           <button ref={(element) => { tabRefs.current.run = element; }} id={tabID('run')} type="button" role="tab" aria-controls={panelID('run')} aria-selected={tab === 'run'} tabIndex={tab === 'run' ? 0 : -1} className={tab === 'run' ? 'active' : ''} onKeyDown={onTabKeyDown} onClick={() => setTab('run')}>Run</button>
           <button ref={(element) => { tabRefs.current.debug = element; }} id={tabID('debug')} type="button" role="tab" aria-controls={panelID('debug')} aria-selected={tab === 'debug'} tabIndex={tab === 'debug' ? 0 : -1} className={tab === 'debug' ? 'active' : ''} onKeyDown={onTabKeyDown} onClick={() => setTab('debug')}>Debug</button>
         </div>
       </div>
-      {tab === 'definition' ? <div id={panelID('definition')} role="tabpanel" aria-labelledby={tabID('definition')} tabIndex={0}><DefinitionPane details={node.data.details} /></div> : null}
-      {tab === 'run' ? <div id={panelID('run')} role="tabpanel" aria-labelledby={tabID('run')} tabIndex={0}><RuntimePane runtime={runtime} /></div> : null}
-      {tab === 'debug' ? <div id={panelID('debug')} role="tabpanel" aria-labelledby={tabID('debug')} tabIndex={0}><DebugPane controls={debugControls} override={runtime?.debugOverride} /></div> : null}
+      {tab === 'definition' ? <div id={panelID('definition')} role="tabpanel" aria-labelledby={tabID('definition')} tabIndex={0}><DefinitionPane details={node.data.details} /><SessionProvenance node={node} /></div> : null}
+      {tab === 'run' ? <div id={panelID('run')} role="tabpanel" aria-labelledby={tabID('run')} tabIndex={0}><RuntimePane runtime={displayedRuntime} /></div> : null}
+      {tab === 'debug' ? <div id={panelID('debug')} role="tabpanel" aria-labelledby={tabID('debug')} tabIndex={0}><DebugPane controls={debugControls} override={displayedRuntime?.debugOverride} /></div> : null}
     </div>
   );
+}
+
+function SessionProvenance({ node }: { node: GraphNode }) {
+  if (typeof node.data.session_id !== 'string') return null;
+  const transitions = [
+    ...recordList(node.data.incoming_transitions).map((transition) => ({ direction: 'From', transition })),
+    ...recordList(node.data.outgoing_transitions).map((transition) => ({ direction: 'To', transition })),
+  ];
+  return (
+    <div className="inspector-pane session-provenance">
+      <Section title="Snapshot">
+        <KeyValueRows rows={[
+          { label: 'Runbook', value: node.data.runbook_name ?? node.data.runbook_id },
+          { label: 'Runbook ID', value: node.data.runbook_id, code: true },
+          { label: 'Graph revision', value: node.data.graph_revision },
+          { label: 'Graph hash', value: node.data.graph_hash, code: true },
+          { label: 'Plan hash', value: node.data.plan_hash, code: true },
+          { label: 'Executable snapshot', value: node.data.executable_snapshot_hash, code: true },
+          { label: 'Catalog', value: node.data.catalog_digest, code: true },
+          { label: 'Package lock', value: node.data.package_lock_digest, code: true },
+          { label: 'Profile', value: node.data.profile_digest, code: true },
+        ]} />
+      </Section>
+      {transitions.length > 0 ? (
+        <Section title="Handoffs" count={transitions.length}>
+          <div className="compact-list">
+            {transitions.map(({ direction, transition }) => (
+              <div key={`${direction}:${String(transition.transition_id)}`}>
+                <strong>{direction} {String(direction === 'From' ? transition.source_segment_id : transition.target_segment_id)}</strong>
+                <span>{String(transition.reason_summary ?? transition.reason_code ?? transition.status ?? '')}</span>
+              </div>
+            ))}
+          </div>
+        </Section>
+      ) : null}
+    </div>
+  );
+}
+
+function recordList(value: unknown): Array<Record<string, unknown>> {
+  return Array.isArray(value)
+    ? value.filter((item): item is Record<string, unknown> => typeof item === 'object' && item !== null && !Array.isArray(item))
+    : [];
 }
 
 export function CommonDefinition({ common }: { common: CommonStepDetails | undefined }) {

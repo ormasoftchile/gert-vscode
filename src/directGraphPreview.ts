@@ -56,6 +56,10 @@ export interface GraphGroup {
   label?: string;
   index?: number;
   fallback?: boolean;
+  segment_id?: string;
+  segment_status?: string;
+  run_id?: string;
+  graph_loaded?: boolean;
 }
 
 export interface GraphDocument {
@@ -266,6 +270,14 @@ export function graphMayRequireMcpBridge(
     if (!toolName || !toolAction) return true;
     return `${toolName}/${toolAction}` in vscodeMcpActions;
   });
+}
+
+export function sessionMayRequireMcpBridge(
+  entryDocument: GraphDocument,
+  vscodeMcpActions: Readonly<Record<string, unknown>>,
+): boolean {
+  return Object.keys(vscodeMcpActions).length > 0 ||
+    graphMayRequireMcpBridge(entryDocument, vscodeMcpActions);
 }
 
 function plainObject(value: unknown, label: string): Record<string, unknown> {

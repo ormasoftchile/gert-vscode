@@ -23,7 +23,7 @@ import * as vscode from 'vscode';
 import { execFile, spawn } from 'child_process';
 import { promisify } from 'util';
 import * as path from 'path';
-import { randomBytes } from 'crypto';
+import { randomBytes, randomUUID } from 'crypto';
 import { resolveBinary } from './binaryResolver';
 import { McpBridge } from './mcpBridge';
 import { buildRegistryForRun, buildRegistryFromDir } from './toolDefinitionRegistry';
@@ -33,6 +33,28 @@ import { isArmCommand } from './chatParticipantGate';
 import { executeRunHandoff } from './runHandoff';
 import { resolveRunPackageMapPath } from './runHandoff';
 import { DirectRunSession, RunChildProcess, buildStdioRunArgs } from './directRunSession';
+import {
+  SessionStdioClient,
+  buildSessionAttachArgs,
+  buildSessionGraphArgs,
+  buildSessionStartArgs,
+  withSessionPackageMap,
+  type SessionCommandRequest,
+} from './sessionStdioClient';
+import { SessionGraphModel, type SessionGraphViewState } from './sessionCompositeGraph';
+import {
+  SESSION_GRAPH_CACHE_SCHEMA,
+  SESSION_WORKSPACE_STATE_KEY,
+  STORED_SESSION_SCHEMA,
+  CoalescedAsyncWriter,
+  SessionGraphCacheStore,
+  parseSessionGraphRevisionResponse,
+  parseStoredSessionDescriptor,
+  recoverySequence,
+  type CachedSegmentGraph,
+  type StoredSessionDescriptor,
+  type StoredSessionGraphCache,
+} from './sessionPanelState';
 import { parseDirectDebugConfig, validateDirectDebugTargets } from './directDebug';
 import {
   HostActionHandler,
@@ -49,6 +71,7 @@ import {
   graphMayRequireMcpBridge,
   GraphDocument,
   loadGraphDocument,
+  sessionMayRequireMcpBridge,
 } from './directGraphPreview';
 import { WORKSPACE_RUNBOOK_KEY, resolveRunbookPath } from './panelRecovery';
 import { resolvePreviewPanelTarget } from './previewPlacement';
@@ -93,6 +116,11 @@ interface DirectGraphTestHooks {
   onHostActionAck?: (ack: HostActionAckEnvelope) => void;
   showXtsReminder?: () => void;
   spawnRun?: (
+    binary: string,
+    args: string[],
+    options: Parameters<typeof spawn>[2],
+  ) => ReturnType<typeof spawn>;
+  spawnSession?: (
     binary: string,
     args: string[],
     options: Parameters<typeof spawn>[2],
@@ -322,6 +350,22 @@ export function activate(context: vscode.ExtensionContext) {
           vscode.commands.registerCommand(
             'gert.test.openDirectGraphPanel',
             (runbookPath: string, hooks?: DirectGraphTestHooks) => openDirectGraphPanelForRunbook(runbookPath, hooks),
+          ),
+          vscode.commands.registerCommand(
+            'gert.test.clearInvestigationSession',
+            async () => {
+              const stored = extensionContext?.workspaceState.get<unknown>(SESSION_WORKSPACE_STATE_KEY);
+              await extensionContext?.workspaceState.update(SESSION_WORKSPACE_STATE_KEY, undefined);
+              try {
+                const descriptor = parseStoredSessionDescriptor(stored);
+                const cache = new SessionGraphCacheStore(
+                  vscode.Uri.joinPath(extensionContext!.globalStorageUri, 'investigation-sessions').fsPath,
+                );
+                await cache.delete(descriptor.sessionID);
+              } catch {
+                // Missing or invalid test state requires no cache cleanup.
+              }
+            },
           ),
           vscode.commands.registerCommand('gert.test.getRuntimeState', () => ({
             mcpBridgeStarted: mcpBridge !== null || mcpBridgeStarting !== null,
@@ -827,6 +871,15 @@ async function openDirectGraphPanelForRunbook(
   let currentRunbookRelative: string | undefined;
   let currentPlanHash: string | undefined;
   let runSession: DirectRunSession | undefined;
+  let investigationClient: SessionStdioClient | undefined;
+  let investigationModel: SessionGraphModel | undefined;
+  let investigationDescriptor: StoredSessionDescriptor | undefined;
+  let investigationState: SessionGraphViewState | undefined;
+  let investigationGraphs: Record<string, CachedSegmentGraph> = {};
+  let investigationGraphHistory: Record<string, Record<string, CachedSegmentGraph>> = {};
+  let investigationRevision = 0;
+  let investigationStarting = false;
+  const investigationGraphLoads = new Map<string, Promise<SessionGraphViewState | undefined>>();
   let runBridge: McpBridge | undefined;
   let runStarting = false;
   let runStartRevision = 0;
@@ -834,6 +887,9 @@ async function openDirectGraphPanelForRunbook(
   let reloadPending = false;
   let activeRouteTest: { revision: number; artifact: RouteTestArtifact; outcome?: DirectRouteTestOutcome } | undefined;
   let latestMessage: { type: string; [key: string]: unknown } = { type: 'loading' };
+  const sessionCache = new SessionGraphCacheStore(
+    vscode.Uri.joinPath(extensionContext!.globalStorageUri, 'investigation-sessions').fsPath,
+  );
   const publish = (message: { type: string; [key: string]: unknown }) => {
     latestMessage = message;
     if (ready && !disposed) {
@@ -843,6 +899,376 @@ async function openDirectGraphPanelForRunbook(
   const publishReloadState = (active: boolean) => {
     if (ready && !disposed) {
       void panel.webview.postMessage({ type: 'graph.reload-state', active });
+    }
+  };
+  const reportInvestigationError = (message: string) => {
+    output?.appendLine(`[gert session] ${message}`);
+    if (ready && !disposed) void panel.webview.postMessage({ type: 'session.error', message });
+  };
+  const closedInvestigationStatus = (status: string | undefined) => (
+    status === 'resolved' || status === 'escalated' || status === 'cancelled' || status === 'abandoned'
+  );
+  const checkpointWriter = new CoalescedAsyncWriter<{
+    cache: StoredSessionGraphCache;
+    descriptor: StoredSessionDescriptor;
+  }>(async ({ cache, descriptor }) => {
+    await sessionCache.save(cache);
+    if (disposed || investigationDescriptor?.sessionID !== descriptor.sessionID) return;
+    await extensionContext!.workspaceState.update(SESSION_WORKSPACE_STATE_KEY, descriptor);
+    if (investigationDescriptor?.sessionID === descriptor.sessionID) investigationDescriptor = descriptor;
+  }, (error) => reportInvestigationError(`Could not persist session checkpoint: ${deriveFailureMessage(error)}`));
+  const persistInvestigationCheckpoint = (state: SessionGraphViewState, acceptedSequence: number) => {
+    if (!state.manifest || !investigationDescriptor || state.sequence !== acceptedSequence) {
+      reportInvestigationError('Accepted session cursor does not match the projected checkpoint.');
+      return;
+    }
+    const descriptor = { ...investigationDescriptor, acceptedSequence };
+    const cache: StoredSessionGraphCache = {
+      schemaVersion: SESSION_GRAPH_CACHE_SCHEMA,
+      sessionID: descriptor.sessionID,
+      sequence: acceptedSequence,
+      manifest: state.manifest,
+      segmentGraphs: { ...investigationGraphs },
+      segmentGraphHistory: Object.fromEntries(Object.entries(investigationGraphHistory).map(
+        ([segmentID, revisions]) => [segmentID, { ...revisions }],
+      )),
+      segmentGraphAvailability: state.segmentGraphAvailability as Record<string, Record<string, import('./sessionCompositeGraph').SessionSegment>>,
+      preparedTransitionTargets: state.preparedTransitionTargets,
+      runtimeNodes: state.runtimeNodes,
+      ...(state.executionNodeID ? { executionNodeID: state.executionNodeID } : {}),
+      ...(state.pending ? { pending: state.pending } : {}),
+    };
+    checkpointWriter.enqueue({ cache, descriptor });
+  };
+  const publishInvestigationState = (state: SessionGraphViewState) => {
+    const previousDocument = investigationState?.document;
+    investigationState = state;
+    if (state.document) currentDocument = state.document;
+    activeHostActionRunID = state.activeRunID;
+    if (ready && !disposed) {
+      const publishedState = state.document && state.document === previousDocument
+        ? { ...state, document: undefined }
+        : state;
+      void panel.webview.postMessage({ type: 'session.update', state: publishedState, style: currentStyle });
+    }
+  };
+  const ensureInvestigationGraph = (
+    segmentID: string,
+    revision: number,
+  ): Promise<SessionGraphViewState | undefined> => {
+    const key = `${segmentID}\u0000${revision}`;
+    const existing = investigationGraphLoads.get(key);
+    if (existing) return existing;
+    const load = (async () => {
+      if (!investigationDescriptor || !investigationModel) return undefined;
+      if (investigationModel.graphRevision(segmentID, revision)) return investigationModel.snapshot();
+      const descriptor = investigationDescriptor;
+      const requestRevision = investigationRevision;
+      const scopedConfig = vscode.workspace.getConfiguration('gert', vscode.Uri.file(runbookPath));
+      const workspaceFolders = (vscode.workspace.workspaceFolders ?? []).map((folder) => folder.uri.fsPath);
+      const configuredBinary = scopedConfig.get<string>('binaryPath', 'gert');
+      const binary = await resolveBinary(configuredBinary, output!, descriptor.projectRoot, workspaceFolders);
+      if (disposed || requestRevision !== investigationRevision || investigationDescriptor?.sessionID !== descriptor.sessionID) {
+        return undefined;
+      }
+      const { stdout } = await pexec(binary, buildSessionGraphArgs(descriptor.sessionID, segmentID, revision), {
+        cwd: descriptor.projectRoot,
+        maxBuffer: 192 * 1024 * 1024,
+        windowsHide: true,
+      });
+      const graph = parseSessionGraphRevisionResponse(stdout, descriptor.sessionID, segmentID, revision);
+      if (disposed || requestRevision !== investigationRevision || investigationDescriptor?.sessionID !== descriptor.sessionID) {
+        return undefined;
+      }
+      const state = investigationModel.loadGraphRevision(
+        graph.segmentSnapshot,
+        graph.revision,
+        graph.wholeBlobHash,
+        graph.document,
+      );
+      investigationGraphHistory[segmentID] = {
+        ...(investigationGraphHistory[segmentID] ?? {}),
+        [String(revision)]: graph,
+      };
+      if (state.manifest?.segments[segmentID]?.graph_revision === revision) {
+        investigationGraphs[segmentID] = graph;
+      }
+      publishInvestigationState(state);
+      persistInvestigationCheckpoint(state, state.sequence);
+      return state;
+    })().catch((error: unknown) => {
+      reportInvestigationError(`Could not load historical graph: ${deriveFailureMessage(error)}`);
+      return undefined;
+    }).finally(() => {
+      investigationGraphLoads.delete(key);
+    });
+    investigationGraphLoads.set(key, load);
+    return load;
+  };
+  const configureInvestigationClient = (
+    child: ReturnType<typeof spawn>,
+    descriptor: StoredSessionDescriptor,
+    afterSequence: number,
+    restored: Awaited<ReturnType<SessionGraphCacheStore['load']>>,
+    bridge: McpBridge | undefined,
+    revision: number,
+    startupConfiguration?: { commandID: string; inputs: Readonly<Record<string, string>> },
+  ) => {
+    const model = new SessionGraphModel(descriptor.sessionID);
+    investigationGraphs = {};
+    investigationGraphHistory = {};
+    if (restored && restored.sequence === afterSequence) {
+      investigationGraphs = { ...restored.segmentGraphs };
+      investigationGraphHistory = Object.fromEntries(Object.entries(restored.segmentGraphHistory).map(
+        ([segmentID, revisions]) => [segmentID, { ...revisions }],
+      ));
+      publishInvestigationState(model.restore(
+        afterSequence,
+        restored.manifest,
+        restored.segmentGraphs,
+        restored.runtimeNodes,
+        restored.executionNodeID,
+        restored.pending,
+        restored.segmentGraphHistory,
+        restored.preparedTransitionTargets,
+        restored.segmentGraphAvailability,
+      ));
+    }
+    investigationModel = model;
+    let client: SessionStdioClient;
+    let startupConfigurationSent = false;
+    client = new SessionStdioClient(child as RunChildProcess, {
+      sessionID: descriptor.sessionID,
+      afterSequence,
+      onGroup: (group) => {
+        if (disposed || revision !== investigationRevision) return;
+        const state = model.applyGroup(group);
+        for (const segmentID of state.unloadedSegmentIDs) delete investigationGraphs[segmentID];
+        for (const graph of group.graphs) {
+          const segmentSnapshot = state.manifest?.segments[graph.segmentID];
+          if (!segmentSnapshot) throw new Error('Accepted graph revision has no segment snapshot.');
+          investigationGraphs[graph.segmentID] = {
+            revision: graph.revision,
+            wholeBlobHash: graph.wholeBlobHash,
+            encodedDocument: graph.encodedDocument,
+            document: graph.document,
+            segmentSnapshot: {
+              ...segmentSnapshot,
+              attempt_run_ids: [...segmentSnapshot.attempt_run_ids],
+            },
+          };
+          investigationGraphHistory[graph.segmentID] = {
+            ...(investigationGraphHistory[graph.segmentID] ?? {}),
+            [String(graph.revision)]: investigationGraphs[graph.segmentID],
+          };
+        }
+        publishInvestigationState(state);
+    if (group.handshake && startupConfiguration && !startupConfigurationSent) {
+      startupConfigurationSent = true;
+      client.send({
+      type: 'session.configure',
+      commandID: startupConfiguration.commandID,
+      payload: { inputs: startupConfiguration.inputs },
+      });
+    }
+      },
+      onAcceptedSequence: (acceptedSequence) => {
+        if (disposed || revision !== investigationRevision || !investigationDescriptor) return;
+        if (investigationState) persistInvestigationCheckpoint(investigationState, acceptedSequence);
+      },
+      onError: (message) => {
+        if (revision === investigationRevision) reportInvestigationError(message);
+      },
+      onStderr: (text) => {
+        if (revision !== investigationRevision) return;
+        output?.append(text);
+        if (ready && !disposed) void panel.webview.postMessage({ type: 'session.stderr', text });
+      },
+      onExit: (code, signal) => {
+        if (revision !== investigationRevision) return;
+        if (investigationClient === client) investigationClient = undefined;
+        if (bridge && runBridge === bridge) {
+          runBridge.dispose();
+          runBridge = undefined;
+        }
+        if (ready && !disposed) void panel.webview.postMessage({ type: 'session.exit', code, signal });
+        applyDeferredReload();
+      },
+    });
+    investigationClient = client;
+  };
+  const spawnInvestigation = async (
+    descriptor: StoredSessionDescriptor,
+    args: string[],
+    afterSequence: number,
+    restored?: Awaited<ReturnType<SessionGraphCacheStore['load']>>,
+    startupConfiguration?: { commandID: string; inputs: Readonly<Record<string, string>> },
+  ) => {
+    const revision = ++investigationRevision;
+    const isCurrent = () => !disposed && revision === investigationRevision;
+    let bridge: McpBridge | undefined;
+    let child: ReturnType<typeof spawn> | undefined;
+    let ownershipTransferred = false;
+    const scopedConfig = vscode.workspace.getConfiguration('gert', vscode.Uri.file(runbookPath));
+    const workspaceFolders = (vscode.workspace.workspaceFolders ?? []).map((folder) => folder.uri.fsPath);
+    const packageMap = resolveRunPackageMapPath(
+      descriptor.projectRoot,
+      scopedConfig.get<string>('packageMap', ''),
+    );
+    if (packageMap.warning) output?.appendLine(`[gert session] WARNING: ${packageMap.warning}`);
+    const vscodeMcpActions = currentDocument
+      ? buildRegistryForRun(descriptor.projectRoot, packageMap.path)
+      : {};
+    try {
+      bridge = currentDocument && sessionMayRequireMcpBridge(currentDocument, vscodeMcpActions)
+        ? await createMcpBridge(vscodeMcpActions, vscode.Uri.file(runbookPath))
+        : undefined;
+      if (!isCurrent()) return;
+      const configuredBinary = scopedConfig.get<string>('binaryPath', 'gert');
+      const binary = testHooks?.spawnSession
+        ? configuredBinary
+        : await resolveBinary(configuredBinary, output!, descriptor.projectRoot, workspaceFolders);
+      if (!isCurrent()) return;
+	  const launchArgs = withSessionPackageMap(args, packageMap.path);
+      const spawnOptions: Parameters<typeof spawn>[2] = {
+        cwd: descriptor.projectRoot,
+        env: {
+          ...process.env,
+          ...(bridge ? {
+            GERT_VSCODE_BRIDGE_URL: bridge.bridgeUrl,
+            GERT_VSCODE_BRIDGE_TOKEN: bridge.bridgeToken,
+          } : {}),
+        },
+        stdio: ['pipe', 'pipe', 'pipe'],
+        windowsHide: true,
+      };
+      child = testHooks?.spawnSession
+        ? testHooks.spawnSession(binary, launchArgs, spawnOptions)
+        : spawn(binary, launchArgs, spawnOptions);
+      if (!isCurrent()) return;
+      if (!child.stdin || !child.stdout || !child.stderr) {
+        throw new Error('gert session process did not expose stdin, stdout, and stderr pipes');
+      }
+      configureInvestigationClient(child, descriptor, afterSequence, restored, bridge, revision, startupConfiguration);
+      runBridge = bridge;
+      ownershipTransferred = true;
+    } finally {
+      if (!ownershipTransferred) {
+        if (child && child.exitCode === null && !child.killed) child.kill();
+        bridge?.dispose();
+        if (runBridge === bridge) runBridge = undefined;
+      }
+    }
+  };
+  const startInvestigation = async (rawInputs: unknown) => {
+    if (disposed || runStarting || runSession || investigationClient || investigationDescriptor || investigationStarting) {
+      reportInvestigationError('Another run or session is already active.');
+      return;
+    }
+    if (!currentDocument) {
+      reportInvestigationError('The runbook graph is not loaded.');
+      return;
+    }
+    const inputs = directRunInputs(rawInputs);
+    const privateInputNames = directSecretInputNames(currentDocument);
+    const privateInputs = Object.fromEntries(
+      [...privateInputNames].filter((name) => inputs[name] !== undefined).map((name) => [name, inputs[name]]),
+    );
+    const workspaceFolders = (vscode.workspace.workspaceFolders ?? []).map((folder) => folder.uri.fsPath);
+    const projectRoot = pickProjectRoot(runbookPath, workspaceFolders, path.dirname(runbookPath));
+    const descriptor: StoredSessionDescriptor = {
+      schemaVersion: STORED_SESSION_SCHEMA,
+      sessionID: randomUUID(),
+      creationCommandID: randomUUID(),
+      configurationCommandID: randomUUID(),
+      runbookPath,
+      projectRoot,
+      acceptedSequence: 0,
+    };
+    investigationStarting = true;
+    const startRevision = ++investigationRevision;
+    try {
+      await checkpointWriter.flush();
+      await extensionContext!.workspaceState.update(SESSION_WORKSPACE_STATE_KEY, descriptor);
+    } catch (error) {
+      investigationStarting = false;
+      reportInvestigationError(deriveFailureMessage(error));
+      return;
+    }
+    if (disposed || startRevision !== investigationRevision) {
+      investigationStarting = false;
+      return;
+    }
+    investigationDescriptor = descriptor;
+    investigationState = undefined;
+    investigationGraphs = {};
+    investigationGraphHistory = {};
+    if (ready && !disposed) void panel.webview.postMessage({ type: 'session.starting', sessionID: descriptor.sessionID });
+    try {
+      await spawnInvestigation(
+        descriptor,
+        buildSessionStartArgs(
+          runbookPath,
+          descriptor.sessionID,
+          descriptor.creationCommandID,
+          inputs,
+          privateInputNames,
+          projectRoot,
+        ),
+        0,
+        undefined,
+        { commandID: descriptor.configurationCommandID!, inputs: privateInputs },
+      );
+    } catch (error) {
+      reportInvestigationError(deriveFailureMessage(error));
+    } finally {
+      investigationStarting = false;
+    }
+  };
+  const reconnectInvestigation = async () => {
+    if (disposed || investigationClient || runSession || !currentDocument) return;
+    let descriptor: StoredSessionDescriptor;
+    try {
+      descriptor = parseStoredSessionDescriptor(
+        extensionContext!.workspaceState.get<unknown>(SESSION_WORKSPACE_STATE_KEY),
+      );
+    } catch {
+      return;
+    }
+    if (path.resolve(descriptor.runbookPath) !== path.resolve(runbookPath)) return;
+    investigationDescriptor = descriptor;
+    const cache = await sessionCache.load(descriptor.sessionID);
+    const afterSequence = recoverySequence(descriptor, cache);
+    if (cache && cache.sequence === afterSequence && closedInvestigationStatus(cache.manifest.session.status)) {
+      investigationGraphs = { ...cache.segmentGraphs };
+      investigationGraphHistory = Object.fromEntries(Object.entries(cache.segmentGraphHistory).map(
+        ([segmentID, revisions]) => [segmentID, { ...revisions }],
+      ));
+      const model = new SessionGraphModel(descriptor.sessionID);
+      investigationModel = model;
+      publishInvestigationState(model.restore(
+        afterSequence,
+        cache.manifest,
+        cache.segmentGraphs,
+        cache.runtimeNodes,
+        cache.executionNodeID,
+        cache.pending,
+        cache.segmentGraphHistory,
+        cache.preparedTransitionTargets,
+        cache.segmentGraphAvailability,
+      ));
+      return;
+    }
+    if (ready && !disposed) void panel.webview.postMessage({ type: 'session.reconnecting', sessionID: descriptor.sessionID });
+    try {
+      await spawnInvestigation(
+        descriptor,
+        buildSessionAttachArgs(descriptor.sessionID, afterSequence, descriptor.projectRoot),
+        afterSequence,
+        cache,
+      );
+    } catch (error) {
+      reportInvestigationError(deriveFailureMessage(error));
     }
   };
   const loadSavedRouteTests = async (projectRoot: string, runbookRelative: string, planHash: string) => {
@@ -952,7 +1378,7 @@ async function openDirectGraphPanelForRunbook(
     }
   };
   const requestReload = () => {
-    if (runStarting || runSession) {
+    if (runStarting || runSession || investigationClient || investigationDescriptor) {
       reloadPending = true;
       return;
     }
@@ -1018,7 +1444,7 @@ async function openDirectGraphPanelForRunbook(
       });
       return;
     }
-    if ((runStarting || runSession) && reservedRevision === undefined) {
+    if ((runStarting || runSession || investigationClient || investigationDescriptor) && reservedRevision === undefined) {
       void panel.webview.postMessage({ type: 'run.error', message: 'A run is already active.' });
       return;
     }
@@ -1225,7 +1651,7 @@ async function openDirectGraphPanelForRunbook(
       }
       let reservedRevision: number | undefined;
       if (run) {
-        if (runStarting || runSession) throw new Error('A run is already active.');
+        if (runStarting || runSession || investigationClient || investigationDescriptor) throw new Error('A run is already active.');
         runStarting = true;
         reservedRevision = ++runStartRevision;
         activeRouteTest = {
@@ -1257,7 +1683,116 @@ async function openDirectGraphPanelForRunbook(
     if (candidate.type === 'ready') {
       ready = true;
       void panel.webview.postMessage(latestMessage);
+      if (investigationState) {
+        void panel.webview.postMessage({ type: 'session.update', state: investigationState, style: currentStyle });
+      }
       void panel.webview.postMessage({ type: 'graph.reload-state', active: loadController !== undefined });
+      return;
+    }
+    if (candidate.type === 'session.start') {
+      void startInvestigation(candidate.inputs);
+      return;
+    }
+    if (candidate.type === 'session.command') {
+      if (!investigationClient || typeof candidate.command !== 'object' || candidate.command === null || Array.isArray(candidate.command)) {
+        reportInvestigationError('No investigation session is attached.');
+        return;
+      }
+      const command = candidate.command as Record<string, unknown>;
+      const supported = new Set<SessionCommandRequest['type']>([
+        'session.configure', 'interaction.answer', 'session.cancel', 'session.detach',
+        'session.resume', 'session.continue_live', 'session.close',
+      ]);
+      if (typeof command.type !== 'string' || !supported.has(command.type as SessionCommandRequest['type'])) {
+        reportInvestigationError('Unsupported investigation session command.');
+        return;
+      }
+      const request: SessionCommandRequest = {
+        type: command.type as SessionCommandRequest['type'],
+        commandID: randomUUID(),
+        ...(typeof command.segmentID === 'string' ? { segmentID: command.segmentID } : {}),
+        ...(typeof command.runID === 'string' ? { runID: command.runID } : {}),
+        ...(typeof command.turnID === 'string' ? { turnID: command.turnID } : {}),
+        ...(command.payload !== undefined ? { payload: command.payload } : {}),
+      };
+      investigationClient.send(request);
+      return;
+    }
+    if (candidate.type === 'session.graph-revision') {
+      const requestID = typeof candidate.requestID === 'string' ? candidate.requestID : '';
+      const segmentID = typeof candidate.segmentID === 'string' ? candidate.segmentID : '';
+      const originalNodeID = typeof candidate.originalNodeID === 'string' ? candidate.originalNodeID : '';
+      const revision = candidate.revision;
+      if (!requestID || requestID.length > 1024 || !segmentID || segmentID.length > 1024 ||
+          !originalNodeID || originalNodeID.length > 4096 || !Number.isSafeInteger(revision) ||
+          (revision as number) < 1 || !investigationModel) {
+        reportInvestigationError('Historical graph revision request is invalid.');
+        return;
+      }
+      void ensureInvestigationGraph(segmentID, revision as number).then(() => {
+        const node = investigationModel?.graphRevisionNode(segmentID, revision as number, originalNodeID);
+        if (ready && !disposed) {
+          void panel.webview.postMessage({
+            type: 'session.graph-revision', requestID,
+            ...(node ? { node } : { error: 'The selected node is unavailable in that graph revision.' }),
+          });
+        }
+      });
+      return;
+    }
+    if (candidate.type === 'session.load-segment') {
+      const segmentID = typeof candidate.segmentID === 'string' ? candidate.segmentID : '';
+      const revision = candidate.revision;
+      if (!segmentID || segmentID.length > 1024 || !Number.isSafeInteger(revision) || (revision as number) < 1) {
+        reportInvestigationError('Historical segment request is invalid.');
+        return;
+      }
+      void ensureInvestigationGraph(segmentID, revision as number);
+      return;
+    }
+    if (candidate.type === 'session.load-route') {
+      const targetSegmentID = typeof candidate.targetSegmentID === 'string' ? candidate.targetSegmentID : '';
+      const manifest = investigationState?.manifest;
+      const targetOrdinal = manifest?.segments[targetSegmentID]?.ordinal;
+      if (!manifest || targetOrdinal === undefined) {
+        reportInvestigationError('Historical route request is invalid.');
+        return;
+      }
+      const missing = investigationState?.unloadedSegmentIDs ?? [];
+      void (async () => {
+        for (const segmentID of missing
+          .filter((id) => (manifest.segments[id]?.ordinal ?? Number.MAX_SAFE_INTEGER) <= targetOrdinal)
+          .sort((left, right) => manifest.segments[left].ordinal - manifest.segments[right].ordinal)) {
+          const revision = manifest.segments[segmentID].graph_revision;
+          if (revision) await ensureInvestigationGraph(segmentID, revision);
+        }
+      })();
+      return;
+    }
+    if (candidate.type === 'session.reset') {
+      if (investigationClient && !closedInvestigationStatus(investigationState?.sessionStatus)) {
+        reportInvestigationError('Close or detach the active investigation before resetting it.');
+        return;
+      }
+      investigationClient?.dispose();
+      investigationClient = undefined;
+      const resetSessionID = investigationDescriptor?.sessionID;
+      investigationRevision += 1;
+      investigationStarting = false;
+      investigationDescriptor = undefined;
+      investigationModel = undefined;
+      investigationState = undefined;
+      investigationGraphs = {};
+      investigationGraphHistory = {};
+      runBridge?.dispose();
+      runBridge = undefined;
+      void checkpointWriter.flush()
+        .then(async () => {
+          await extensionContext!.workspaceState.update(SESSION_WORKSPACE_STATE_KEY, undefined);
+          if (resetSessionID) await sessionCache.delete(resetSessionID);
+        })
+        .then(() => reload())
+        .catch((error: unknown) => reportInvestigationError(`Could not reset investigation: ${deriveFailureMessage(error)}`));
       return;
     }
     if (candidate.type === 'run.start') {
@@ -1323,10 +1858,18 @@ async function openDirectGraphPanelForRunbook(
   directGraphPanel = panel;
   panel.onDidDispose(() => {
     disposed = true;
+    investigationRevision += 1;
+    investigationStarting = false;
     runStartRevision += 1;
     loadRevision += 1;
     loadController?.abort();
     runSession?.dispose();
+    const attachedInvestigation = investigationClient;
+    if (attachedInvestigation) {
+      attachedInvestigation.send({ type: 'session.detach', commandID: randomUUID() });
+      const forceStop = setTimeout(() => attachedInvestigation.dispose(), 30_000);
+      forceStop.unref();
+    }
     runBridge?.dispose();
     hostActions.dispose();
     confirmedHostActionRequests.clear();
@@ -1337,6 +1880,6 @@ async function openDirectGraphPanelForRunbook(
       directGraphPanel = undefined;
     }
   });
-  void reload();
+  void reload().then(() => reconnectInvestigation());
   return panel;
 }

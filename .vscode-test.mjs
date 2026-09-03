@@ -43,6 +43,19 @@ const vsixPath = resolve(__dirname, 'gert-preview.vsix');
 // or the installed VSIX will not be found.
 const vsixRunId      = Date.now().toString(36);
 const vsixUserDataDir = join(__dirname, '.vscode-test', `vsix-ud-${vsixRunId}`);
+const sourceUserDataDir = join(__dirname, '.vscode-test', `source-ud-${vsixRunId}`);
+const sourceExtensionsDir = join(__dirname, '.vscode-test', `source-ext-${vsixRunId}`);
+
+const hermeticLaunchArgs = (userDataDir) => [
+  `--user-data-dir=${userDataDir}`,
+  '--disable-extension=GitHub.copilot-chat',
+  '--disable-extension=vscode.github',
+  '--disable-extension=vscode.github-authentication',
+  '--disable-extension=vscode.microsoft-authentication',
+  '--disable-workspace-trust',
+  '--skip-welcome',
+  '--skip-release-notes',
+];
 
 export default defineConfig([
   {
@@ -53,8 +66,13 @@ export default defineConfig([
     files: [
       'out/test/suite/extension.test.js',
       'out/test/suite/hostActionBridge.test.js',
+      'out/test/suite/sessionGraph.test.js',
     ],
     workspaceFolder: '.',
+    launchArgs: [
+      ...hermeticLaunchArgs(sourceUserDataDir),
+      `--extensions-dir=${sourceExtensionsDir}`,
+    ],
     mocha: {
       timeout: 90000,
       ...(process.env.GERT_TEST_GREP ? { grep: process.env.GERT_TEST_GREP } : {}),
@@ -85,9 +103,7 @@ export default defineConfig([
     // Unique per-invocation user-data-dir — see comment above vsixRunId.
     // extensions-dir is the default (.vscode-test/extensions/) to match the
     // directory where installExtensions places the VSIX artifact.
-    launchArgs: [
-      `--user-data-dir=${vsixUserDataDir}`,
-    ],
+    launchArgs: hermeticLaunchArgs(vsixUserDataDir),
     mocha: {
       timeout: 120000,
       ...(process.env.GERT_TEST_GREP ? { grep: process.env.GERT_TEST_GREP } : {}),

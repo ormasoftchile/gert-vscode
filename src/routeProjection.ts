@@ -1,4 +1,5 @@
 import type { GraphDocument, GraphGroup, GraphNode } from './directGraphPreview';
+import { edgeRuntimeState, type BranchRuntimeState } from './branchTopology';
 
 export type RouteProjectionScope = 'through' | 'to' | 'from';
 
@@ -195,4 +196,182 @@ export function projectRouteDocument(
     groups,
     frames: document.frames.filter((frame) => frameIDs.has(frame.id)),
   };
+}
+
+export function computeSessionRouteProjection(
+  document: GraphDocument,
+  targetID: string,
+  scope: RouteProjectionScope,
+  index: RouteProjectionIndex = buildRouteProjectionIndex(document),
+): RouteProjection | undefined {
+  const projection = computeRouteProjection(document, targetID, scope, index);
+  if (!projection) return undefined;
+  const targetSegmentID = stringProperty(index.nodeByID.get(targetID)?.data.segment_id);
+  if (!targetSegmentID) return projection;
+
+  const nodeIDs = new Set(projection.nodeIDs);
+  if (scope === 'from') {
+    const prerequisites = computeRouteProjection(document, targetID, 'to', index);
+    for (const nodeID of prerequisites?.nodeIDs ?? []) nodeIDs.add(nodeID);
+  }
+
+  const edgeIDs = new Set<string>();
+  const boundaryEdges: RouteBoundaryEdge[] = [];
+  for (const edge of document.edges) {
+    const sourceVisible = nodeIDs.has(edge.source);
+    const targetVisible = nodeIDs.has(edge.target);
+    if (sourceVisible && targetVisible) {
+      edgeIDs.add(edge.id);
+    } else if (sourceVisible !== targetVisible) {
+      boundaryEdges.push({
+        edgeID: edge.id,
+        visibleNodeID: sourceVisible ? edge.source : edge.target,
+        hiddenNodeID: sourceVisible ? edge.target : edge.source,
+        direction: sourceVisible ? 'outgoing' : 'incoming',
+      });
+    }
+  }
+  return {
+    ...projection,
+    nodeIDs,
+    edgeIDs,
+    hiddenNodeCount: document.nodes.filter((node) => node.data.synthetic !== true && !nodeIDs.has(node.id)).length,
+    boundaryEdges,
+  };
+}
+
+export function sessionRouteDocument(
+  document: GraphDocument,
+  runtimeNodes: Readonly<Record<string, SessionRouteRuntimeState>>,
+  targetID?: string,
+): GraphDocument {
+  const segmentGroups = document.groups.filter((group) => group.kind === 'session-segment' && group.segment_id);
+  const historicalSegments = new Set(segmentGroups.flatMap((group) => (
+    group.kind === 'session-segment' &&
+    ['handed_off', 'completed', 'failed', 'cancelled', 'indeterminate'].includes(group.segment_status ?? '') &&
+    group.segment_id
+      ? [group.segment_id]
+      : []
+  )));
+  if (historicalSegments.size === 0) return document;
+
+  const targetSegmentID = stringProperty(document.nodes.find((node) => node.id === targetID)?.data.segment_id);
+  const targetOrdinal = segmentGroups.find((group) => group.segment_id === targetSegmentID)?.index;
+  const segmentOrdinal = new Map(segmentGroups.flatMap((group) => (
+    group.segment_id && typeof group.index === 'number' ? [[group.segment_id, group.index] as const] : []
+  )));
+
+  const transitionEndpoints = new Set<string>();
+  for (const edge of document.edges) {
+    if (edge.type !== 'session-transition') continue;
+    const sourceSegment = stringProperty(document.nodes.find((node) => node.id === edge.source)?.data.segment_id);
+    const destinationSegment = stringProperty(document.nodes.find((node) => node.id === edge.target)?.data.segment_id);
+    if (targetOrdinal !== undefined &&
+        ((segmentOrdinal.get(sourceSegment) ?? Infinity) > targetOrdinal ||
+         (segmentOrdinal.get(destinationSegment) ?? Infinity) > targetOrdinal)) continue;
+    transitionEndpoints.add(edge.source);
+    transitionEndpoints.add(edge.target);
+  }
+  const nodeIDs = new Set(document.nodes.flatMap((node) => {
+    const segmentID = stringProperty(node.data.segment_id);
+    if (targetOrdinal !== undefined && (segmentOrdinal.get(segmentID) ?? Infinity) > targetOrdinal) return [];
+    if (node.data.synthetic === true || node.data.kind === 'session-entry' || segmentID === targetSegmentID ||
+      !historicalSegments.has(segmentID) || transitionEndpoints.has(node.id)) {
+      return [node.id];
+    }
+    const status = runtimeNodes[node.id]?.status;
+    if (status === 'skipped' && document.edges.some((edge) => (
+      edge.routeKind === 'no-match' && edge.runtimeNodeID === node.id && routeEdgeExecuted(edge, runtimeNodes)
+    ))) return [node.id];
+    return status && status !== 'pending' && status !== 'skipped' ? [node.id] : [];
+  }));
+  const executedPairs = new Set<string>();
+  for (const [nodeID, state] of Object.entries(runtimeNodes)) {
+    for (const occurrence of state.occurrences ?? []) {
+      if (occurrence.predecessorNodeID) {
+        executedPairs.add(`${occurrence.predecessorNodeID}\u0000${nodeID}`);
+      }
+    }
+  }
+  const nodeByID = new Map(document.nodes.map((node) => [node.id, node]));
+  const edgeIDs = new Set<string>();
+  const historicalEdge = (sourceID: string, targetIDValue: string): boolean => {
+    const sourceSegment = stringProperty(nodeByID.get(sourceID)?.data.segment_id);
+    const targetSegment = stringProperty(nodeByID.get(targetIDValue)?.data.segment_id);
+    return historicalSegments.has(sourceSegment) && sourceSegment === targetSegment &&
+      sourceSegment !== targetSegmentID;
+  };
+  for (const edge of document.edges) {
+    if (!nodeIDs.has(edge.source) || !nodeIDs.has(edge.target)) continue;
+    if (edge.type === 'session-transition' || !historicalEdge(edge.source, edge.target)) {
+      edgeIDs.add(edge.id);
+      continue;
+    }
+    if (edge.type === 'session-entry') {
+      if (runtimeExecuted(runtimeNodes[edge.target])) edgeIDs.add(edge.id);
+      continue;
+    }
+    if (nodeByID.get(edge.source)?.data.kind === 'parallel' && runtimeExecuted(runtimeNodes[edge.target])) {
+      edgeIDs.add(edge.id);
+      continue;
+    }
+    if (executedPairs.has(`${edge.source}\u0000${edge.target}`) ||
+        routeEdgeExecuted(edge, runtimeNodes)) {
+      edgeIDs.add(edge.id);
+    }
+  }
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (const edge of document.edges) {
+      if (edgeIDs.has(edge.id) || !nodeIDs.has(edge.source) || !nodeIDs.has(edge.target) ||
+          !historicalEdge(edge.source, edge.target)) continue;
+      const source = nodeByID.get(edge.source);
+      if (source?.data.synthetic !== true || !runtimeExecuted(runtimeNodes[edge.target])) continue;
+      if (document.edges.some((incoming) => incoming.target === edge.source && edgeIDs.has(incoming.id))) {
+        edgeIDs.add(edge.id);
+        changed = true;
+      }
+    }
+  }
+  return projectRouteDocument(document, {
+    targetID: '',
+    scope: 'through',
+    nodeIDs,
+    edgeIDs,
+    predecessorCount: 0,
+    successorCount: 0,
+    hiddenNodeCount: document.nodes.length - nodeIDs.size,
+    boundaryEdges: [],
+  });
+}
+
+function stringProperty(value: unknown): string {
+  return typeof value === 'string' ? value : '';
+}
+
+interface SessionRouteOccurrence extends BranchRuntimeState {
+  predecessorNodeID?: string;
+}
+
+interface SessionRouteRuntimeState extends BranchRuntimeState {
+  occurrences?: readonly SessionRouteOccurrence[];
+}
+
+function runtimeExecuted(state: SessionRouteRuntimeState | undefined): boolean {
+  return !!state && state.status !== 'pending' && state.status !== 'skipped';
+}
+
+function routeEdgeExecuted(
+  edge: GraphDocument['edges'][number],
+  runtimeNodes: Readonly<Record<string, SessionRouteRuntimeState>>,
+): boolean {
+  if (!edge.routeKind && !edge.runtimeNodeID) return false;
+  const runtimeNodeID = edge.runtimeNodeID ?? edge.target;
+  const occurrences = runtimeNodes[runtimeNodeID]?.occurrences ?? [];
+  if (occurrences.length === 0) return edgeRuntimeState(edge, runtimeNodes) !== undefined;
+  return occurrences.some((occurrence) => edgeRuntimeState(edge, {
+    ...runtimeNodes,
+    [runtimeNodeID]: occurrence,
+  }) !== undefined);
 }
