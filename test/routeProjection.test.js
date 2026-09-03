@@ -3,7 +3,8 @@
 const assert = require('node:assert/strict');
 const test = require('node:test');
 
-const { computeRouteProjection, projectRouteDocument } = require('../out/routeProjection');
+const { computeRouteProjection, projectRouteDocument, sessionRouteDocument } = require('../out/routeProjection');
+const { withBranchMerges } = require('../out/branchTopology');
 
 function node(id) {
   return {
@@ -13,24 +14,28 @@ function node(id) {
   };
 }
 
-function edge(id, source, target) {
-  return { id, source, target };
+function edge(id, source, target, type, label = '') {
+  return { id, source, target, ...(type ? { type } : {}), ...(label ? { label } : {}) };
 }
 
-function document() {
+function document(
+  nodes = ['load', 'inspect', 'target', 'verify', 'done', 'unrelated'].map(node),
+  groups = [],
+  edges = [
+    edge('load-inspect', 'load', 'inspect'),
+    edge('inspect-target', 'inspect', 'target'),
+    edge('target-verify', 'target', 'verify'),
+    edge('verify-done', 'verify', 'done'),
+    edge('done-verify', 'done', 'verify'),
+  ],
+) {
   return {
     schema_version: '1',
     runbook: { id: 'route-test' },
     frames: [],
-    groups: [],
-    nodes: ['load', 'inspect', 'target', 'verify', 'done', 'unrelated'].map(node),
-    edges: [
-      edge('load-inspect', 'load', 'inspect'),
-      edge('inspect-target', 'inspect', 'target'),
-      edge('target-verify', 'target', 'verify'),
-      edge('verify-done', 'verify', 'done'),
-      edge('done-verify', 'done', 'verify'),
-    ],
+    groups,
+    nodes,
+    edges,
   };
 }
 
@@ -140,4 +145,71 @@ test('projection retains required parallel siblings and their common join', () =
   const continuationProjection = computeRouteProjection(source, 'after', 'to');
   assert.ok(continuationProjection);
   assert.deepEqual([...continuationProjection.nodeIDs].sort(), ['a', 'after', 'b', 'parallel']);
+});
+
+test('historical route edges follow committed branch decisions, not cumulative visited nodes', () => {
+  const source = document(
+    [
+      { ...node('branch'), data: { ...node('branch').data, kind: 'branch', segment_id: 'segment' } },
+      { ...node('selected'), data: { ...node('selected').data, group_id: 'arm-selected', segment_id: 'segment' } },
+      { ...node('old-arm'), data: { ...node('old-arm').data, group_id: 'arm-old', segment_id: 'segment' } },
+      { ...node('done'), data: { ...node('done').data, segment_id: 'segment' } },
+    ],
+    [
+      { id: 'segment-group', kind: 'session-segment', parent_node_id: '', frame_id: 'root', index: 1, segment_id: 'segment', segment_status: 'completed' },
+      { id: 'arm-selected', kind: 'branch-arm', parent_node_id: 'branch', frame_id: 'root', index: 0 },
+      { id: 'arm-old', kind: 'branch-arm', parent_node_id: 'branch', frame_id: 'root', index: 1 },
+    ],
+    [
+      edge('selected-entry', 'branch', 'selected', 'branch-arm'),
+      edge('old-entry', 'branch', 'old-arm', 'branch-arm'),
+      edge('continue', 'branch', 'done', 'sequence'),
+    ],
+  );
+  const graph = withBranchMerges(source);
+  const runtime = {
+    branch: {
+      status: 'completed', output: { matched_arm_index: 0 },
+      occurrences: [{ status: 'completed', output: { matched_arm_index: 0 } }],
+    },
+    selected: { status: 'completed', occurrences: [{ status: 'completed', predecessorNodeID: 'branch' }] },
+    'old-arm': { status: 'completed', occurrences: [{ status: 'completed' }] },
+    done: { status: 'completed', occurrences: [{ status: 'completed', predecessorNodeID: 'selected' }] },
+  };
+
+  const filtered = sessionRouteDocument(graph, runtime);
+  assert.ok(filtered.edges.some((candidate) => candidate.runtimeArmIndex === 0));
+  assert.ok(!filtered.edges.some((candidate) => candidate.runtimeArmIndex === 1));
+  const projection = computeRouteProjection(filtered, 'done', 'to');
+  assert.ok(projection);
+  assert.ok(projection.nodeIDs.has('selected'));
+  assert.ok(!projection.nodeIDs.has('old-arm'));
+
+  const noMatch = sessionRouteDocument(graph, {
+    branch: { status: 'skipped', occurrences: [{ status: 'skipped' }] },
+    done: { status: 'completed', occurrences: [{ status: 'completed', predecessorNodeID: 'branch' }] },
+  });
+  assert.ok(noMatch.edges.some((candidate) => candidate.routeKind === 'no-match'));
+  const noMatchProjection = computeRouteProjection(noMatch, 'done', 'to');
+  assert.ok(noMatchProjection?.nodeIDs.has('branch'));
+  assert.ok(!noMatchProjection?.nodeIDs.has('selected'));
+  assert.ok(!noMatchProjection?.nodeIDs.has('old-arm'));
+});
+
+test('historical route retains every executed parallel arm', () => {
+  const source = document(
+    [
+      { ...node('parallel'), data: { ...node('parallel').data, kind: 'parallel', segment_id: 'segment' } },
+      { ...node('a'), data: { ...node('a').data, segment_id: 'segment' } },
+      { ...node('b'), data: { ...node('b').data, segment_id: 'segment' } },
+    ],
+    [{ id: 'segment-group', kind: 'session-segment', parent_node_id: '', frame_id: 'root', index: 1, segment_id: 'segment', segment_status: 'completed' }],
+    [edge('parallel-a', 'parallel', 'a'), edge('parallel-b', 'parallel', 'b')],
+  );
+  const filtered = sessionRouteDocument(source, {
+    parallel: { status: 'completed', occurrences: [{ status: 'completed', startedEventSequence: 1 }] },
+    a: { status: 'completed', occurrences: [{ status: 'completed', predecessorNodeID: 'parallel', startedEventSequence: 2 }] },
+    b: { status: 'completed', occurrences: [{ status: 'completed', startedEventSequence: 3 }] },
+  });
+  assert.deepEqual(filtered.edges.map((candidate) => candidate.id).sort(), ['parallel-a', 'parallel-b']);
 });

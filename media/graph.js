@@ -27378,6 +27378,16 @@
     ["path", { d: "M13 18h8", key: "oe0vm4" }]
   ]);
 
+  // node_modules/lucide-react/dist/esm/icons/locate-fixed.js
+  var LocateFixed = createLucideIcon("LocateFixed", [
+    ["line", { x1: "2", x2: "5", y1: "12", y2: "12", key: "bvdh0s" }],
+    ["line", { x1: "19", x2: "22", y1: "12", y2: "12", key: "1tbv5k" }],
+    ["line", { x1: "12", x2: "12", y1: "2", y2: "5", key: "11lu5j" }],
+    ["line", { x1: "12", x2: "12", y1: "19", y2: "22", key: "x3vr5v" }],
+    ["circle", { cx: "12", cy: "12", r: "7", key: "fim9np" }],
+    ["circle", { cx: "12", cy: "12", r: "3", key: "1v7zrd" }]
+  ]);
+
   // node_modules/lucide-react/dist/esm/icons/message-square-text.js
   var MessageSquareText = createLucideIcon("MessageSquareText", [
     ["path", { d: "M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z", key: "1lielz" }],
@@ -34898,6 +34908,7 @@
   function RunOverview({
     document: document2,
     runtimeNodes,
+    executionNodeID,
     runID,
     runStatus,
     inputs,
@@ -34910,7 +34921,7 @@
     const completed = states.filter((status) => status === "completed").length;
     const issues = states.filter(isIssueStepStatus).length;
     const skipped = states.filter((status) => status === "skipped").length;
-    const active = document2.nodes.find((node) => ["running", "delaying"].includes(runtimeNodes[node.id]?.status));
+    const executionNode = document2.nodes.find((node) => node.id === executionNodeID);
     const settled = states.filter(isSettledStepStatus).length;
     const terminal = isTerminalRunStatus(runStatus);
     const progress = terminal ? 100 : activeNodes.length === 0 ? 0 : Math.round(settled / activeNodes.length * 100);
@@ -34927,7 +34938,7 @@
       },
       /* @__PURE__ */ import_react9.default.createElement("span", { style: { width: `${progress}%` } })
     ), /* @__PURE__ */ import_react9.default.createElement("div", { className: "overview-stats" }, /* @__PURE__ */ import_react9.default.createElement("div", null, /* @__PURE__ */ import_react9.default.createElement("strong", null, completed), /* @__PURE__ */ import_react9.default.createElement("span", null, "Done")), /* @__PURE__ */ import_react9.default.createElement("div", null, /* @__PURE__ */ import_react9.default.createElement("strong", null, issues), /* @__PURE__ */ import_react9.default.createElement("span", null, "Issues")), /* @__PURE__ */ import_react9.default.createElement("div", null, /* @__PURE__ */ import_react9.default.createElement("strong", null, skipped), /* @__PURE__ */ import_react9.default.createElement("span", null, "Skipped")), /* @__PURE__ */ import_react9.default.createElement("div", null, /* @__PURE__ */ import_react9.default.createElement("strong", null, activeNodes.length - settled), /* @__PURE__ */ import_react9.default.createElement("span", null, terminal ? "Unvisited" : "Remaining"))), /* @__PURE__ */ import_react9.default.createElement(Section, { title: "Run" }, /* @__PURE__ */ import_react9.default.createElement(KeyValueRows, { rows: [
-      { label: "Current", value: active?.data.title ?? active?.id, code: true },
+      { label: terminal ? "Last reached" : "Current", value: executionNode?.data.title ?? executionNode?.id, code: true },
       { label: "Run ID", value: runID, code: true },
       { label: "Steps", value: document2.nodes.length },
       { label: "Breakpoints", value: breakpointCount },
@@ -34937,18 +34948,33 @@
   function StepInspector({
     node,
     runtime,
+    availableGraphRevisions = [],
+    selectedGraphRevision,
+    onGraphRevisionChange,
     debugControls
   }) {
     const tabOrder = ["definition", "run", "debug"];
     const [tab, setTab] = (0, import_react9.useState)(runtime && runtime.status !== "pending" ? "run" : "definition");
+    const [selectedOccurrenceID, setSelectedOccurrenceID] = (0, import_react9.useState)();
     const tabBaseID = (0, import_react9.useId)();
     const tabRefs = (0, import_react9.useRef)({ definition: null, run: null, debug: null });
-    (0, import_react9.useEffect)(() => setTab(runtime && runtime.status !== "pending" ? "run" : "definition"), [node.id]);
+    const occurrences = runtime?.occurrences ?? [];
+    const selectedOccurrence = occurrences.find((occurrence) => occurrence.occurrenceID === selectedOccurrenceID) ?? occurrences.find((occurrence) => occurrence.occurrenceID === runtime?.occurrenceID) ?? occurrences[occurrences.length - 1];
+    const displayedRuntime = selectedOccurrence ?? runtime;
     (0, import_react9.useEffect)(() => {
-      if (runtime && runtime.status !== "pending" && tab === "definition") setTab("run");
-    }, [runtime?.status]);
+      setTab(displayedRuntime && displayedRuntime.status !== "pending" ? "run" : "definition");
+      setSelectedOccurrenceID(void 0);
+    }, [node.id]);
+    (0, import_react9.useEffect)(() => {
+      if (displayedRuntime && displayedRuntime.status !== "pending" && tab === "definition") setTab("run");
+    }, [displayedRuntime?.status]);
     const kind = String(node.data.kind ?? "step");
     const title = String(node.data.title ?? node.data.step_id ?? node.id);
+    const displayNodeID = String(node.data.original_node_id ?? node.data.step_id ?? node.id);
+    const segmentOrdinal = typeof node.data.segment_ordinal === "number" ? node.data.segment_ordinal : void 0;
+    const segmentStatus = typeof node.data.segment_status === "string" ? node.data.segment_status : void 0;
+    const executionSource = selectedOccurrence?.executionSource ?? (typeof node.data.execution_source === "string" ? node.data.execution_source : void 0);
+    const sessionRunID = selectedOccurrence?.runID ?? (typeof node.data.run_id === "string" ? node.data.run_id : void 0);
     const onTabKeyDown = (event) => {
       let nextIndex = tabOrder.indexOf(tab);
       if (event.key === "ArrowRight") nextIndex = (nextIndex + 1) % tabOrder.length;
@@ -34963,13 +34989,50 @@
     };
     const tabID = (value) => `${tabBaseID}-${value}-tab`;
     const panelID = (value) => `${tabBaseID}-${value}-panel`;
-    return /* @__PURE__ */ import_react9.default.createElement("div", { className: "step-inspector" }, /* @__PURE__ */ import_react9.default.createElement("div", { className: "inspector-sticky" }, /* @__PURE__ */ import_react9.default.createElement("header", { className: "step-inspector-header" }, /* @__PURE__ */ import_react9.default.createElement("div", { className: "inspector-icon" }, /* @__PURE__ */ import_react9.default.createElement(KindIcon, { kind })), /* @__PURE__ */ import_react9.default.createElement("div", { className: "inspector-title" }, /* @__PURE__ */ import_react9.default.createElement("span", null, KIND_LABELS[kind] ?? kind), /* @__PURE__ */ import_react9.default.createElement("h2", null, title), /* @__PURE__ */ import_react9.default.createElement("code", { title: node.id }, node.id)), /* @__PURE__ */ import_react9.default.createElement(StatusBadge, { status: runtime?.status ?? "pending" })), /* @__PURE__ */ import_react9.default.createElement("div", { className: "inspector-metrics" }, /* @__PURE__ */ import_react9.default.createElement("span", null, /* @__PURE__ */ import_react9.default.createElement(Clock3, { "aria-hidden": "true" }), formatDuration(runtime?.durationMs)), runtime?.attempt ? /* @__PURE__ */ import_react9.default.createElement("span", null, "Attempt ", runtime.attempt) : null, node.data.call_path && Array.isArray(node.data.call_path) && node.data.call_path.length > 0 ? /* @__PURE__ */ import_react9.default.createElement("span", null, node.data.call_path.length, " levels deep") : null), /* @__PURE__ */ import_react9.default.createElement("div", { className: "inspector-tabs", role: "tablist", "aria-label": "Step information" }, /* @__PURE__ */ import_react9.default.createElement("button", { ref: (element) => {
+    return /* @__PURE__ */ import_react9.default.createElement("div", { className: "step-inspector" }, /* @__PURE__ */ import_react9.default.createElement("div", { className: "inspector-sticky" }, /* @__PURE__ */ import_react9.default.createElement("header", { className: "step-inspector-header" }, /* @__PURE__ */ import_react9.default.createElement("div", { className: "inspector-icon" }, /* @__PURE__ */ import_react9.default.createElement(KindIcon, { kind })), /* @__PURE__ */ import_react9.default.createElement("div", { className: "inspector-title" }, /* @__PURE__ */ import_react9.default.createElement("span", null, KIND_LABELS[kind] ?? kind, segmentOrdinal ? ` | Segment ${segmentOrdinal}` : ""), /* @__PURE__ */ import_react9.default.createElement("h2", null, title), /* @__PURE__ */ import_react9.default.createElement("code", { title: node.id }, displayNodeID)), /* @__PURE__ */ import_react9.default.createElement(StatusBadge, { status: displayedRuntime?.status ?? "pending" })), /* @__PURE__ */ import_react9.default.createElement("div", { className: "inspector-metrics" }, /* @__PURE__ */ import_react9.default.createElement("span", null, /* @__PURE__ */ import_react9.default.createElement(Clock3, { "aria-hidden": "true" }), formatDuration(displayedRuntime?.durationMs)), selectedOccurrence ? /* @__PURE__ */ import_react9.default.createElement("span", null, "Invocation ", selectedOccurrence.invocation) : null, selectedOccurrence?.retryAttempt && selectedOccurrence.retryAttempt > 1 ? /* @__PURE__ */ import_react9.default.createElement("span", null, "Retry ", selectedOccurrence.retryAttempt) : displayedRuntime?.attempt ? /* @__PURE__ */ import_react9.default.createElement("span", null, "Attempt ", displayedRuntime.attempt) : null, node.data.call_path && Array.isArray(node.data.call_path) && node.data.call_path.length > 0 ? /* @__PURE__ */ import_react9.default.createElement("span", null, node.data.call_path.length, " levels deep") : null, executionSource ? /* @__PURE__ */ import_react9.default.createElement("span", null, executionSource === "saved" ? "Saved result" : "Live execution") : null, segmentStatus ? /* @__PURE__ */ import_react9.default.createElement("span", null, "Segment ", segmentStatus.replaceAll("_", " ")) : null, sessionRunID ? /* @__PURE__ */ import_react9.default.createElement("span", { title: sessionRunID }, "Run ", sessionRunID.slice(0, 8)) : null), availableGraphRevisions.length > 1 && selectedGraphRevision !== void 0 ? /* @__PURE__ */ import_react9.default.createElement("label", { className: "revision-selector" }, /* @__PURE__ */ import_react9.default.createElement("span", null, "Graph revision"), /* @__PURE__ */ import_react9.default.createElement(
+      "select",
+      {
+        "aria-label": "Graph revision",
+        value: selectedGraphRevision,
+        onChange: (event) => onGraphRevisionChange?.(Number(event.target.value))
+      },
+      [...availableGraphRevisions].reverse().map((revision, index) => /* @__PURE__ */ import_react9.default.createElement("option", { key: revision, value: revision }, "Revision ", revision, index === 0 ? " (latest)" : ""))
+    )) : null, occurrences.length > 1 ? /* @__PURE__ */ import_react9.default.createElement("label", { className: "occurrence-selector" }, /* @__PURE__ */ import_react9.default.createElement("span", null, "Execution occurrence"), /* @__PURE__ */ import_react9.default.createElement(
+      "select",
+      {
+        "aria-label": "Execution occurrence",
+        value: selectedOccurrence?.occurrenceID ?? "",
+        onChange: (event) => setSelectedOccurrenceID(event.target.value)
+      },
+      occurrences.map((occurrence) => /* @__PURE__ */ import_react9.default.createElement("option", { key: occurrence.occurrenceID, value: occurrence.occurrenceID }, occurrence.executionSource === "saved" ? "Saved" : "Live", " | run ", occurrence.runID.slice(0, 8), " | invocation ", occurrence.invocation))
+    )) : null, /* @__PURE__ */ import_react9.default.createElement("div", { className: "inspector-tabs", role: "tablist", "aria-label": "Step information" }, /* @__PURE__ */ import_react9.default.createElement("button", { ref: (element) => {
       tabRefs.current.definition = element;
     }, id: tabID("definition"), type: "button", role: "tab", "aria-controls": panelID("definition"), "aria-selected": tab === "definition", tabIndex: tab === "definition" ? 0 : -1, className: tab === "definition" ? "active" : "", onKeyDown: onTabKeyDown, onClick: () => setTab("definition") }, "Definition"), /* @__PURE__ */ import_react9.default.createElement("button", { ref: (element) => {
       tabRefs.current.run = element;
     }, id: tabID("run"), type: "button", role: "tab", "aria-controls": panelID("run"), "aria-selected": tab === "run", tabIndex: tab === "run" ? 0 : -1, className: tab === "run" ? "active" : "", onKeyDown: onTabKeyDown, onClick: () => setTab("run") }, "Run"), /* @__PURE__ */ import_react9.default.createElement("button", { ref: (element) => {
       tabRefs.current.debug = element;
-    }, id: tabID("debug"), type: "button", role: "tab", "aria-controls": panelID("debug"), "aria-selected": tab === "debug", tabIndex: tab === "debug" ? 0 : -1, className: tab === "debug" ? "active" : "", onKeyDown: onTabKeyDown, onClick: () => setTab("debug") }, "Debug"))), tab === "definition" ? /* @__PURE__ */ import_react9.default.createElement("div", { id: panelID("definition"), role: "tabpanel", "aria-labelledby": tabID("definition"), tabIndex: 0 }, /* @__PURE__ */ import_react9.default.createElement(DefinitionPane, { details: node.data.details })) : null, tab === "run" ? /* @__PURE__ */ import_react9.default.createElement("div", { id: panelID("run"), role: "tabpanel", "aria-labelledby": tabID("run"), tabIndex: 0 }, /* @__PURE__ */ import_react9.default.createElement(RuntimePane, { runtime })) : null, tab === "debug" ? /* @__PURE__ */ import_react9.default.createElement("div", { id: panelID("debug"), role: "tabpanel", "aria-labelledby": tabID("debug"), tabIndex: 0 }, /* @__PURE__ */ import_react9.default.createElement(DebugPane, { controls: debugControls, override: runtime?.debugOverride })) : null);
+    }, id: tabID("debug"), type: "button", role: "tab", "aria-controls": panelID("debug"), "aria-selected": tab === "debug", tabIndex: tab === "debug" ? 0 : -1, className: tab === "debug" ? "active" : "", onKeyDown: onTabKeyDown, onClick: () => setTab("debug") }, "Debug"))), tab === "definition" ? /* @__PURE__ */ import_react9.default.createElement("div", { id: panelID("definition"), role: "tabpanel", "aria-labelledby": tabID("definition"), tabIndex: 0 }, /* @__PURE__ */ import_react9.default.createElement(DefinitionPane, { details: node.data.details }), /* @__PURE__ */ import_react9.default.createElement(SessionProvenance, { node })) : null, tab === "run" ? /* @__PURE__ */ import_react9.default.createElement("div", { id: panelID("run"), role: "tabpanel", "aria-labelledby": tabID("run"), tabIndex: 0 }, /* @__PURE__ */ import_react9.default.createElement(RuntimePane, { runtime: displayedRuntime })) : null, tab === "debug" ? /* @__PURE__ */ import_react9.default.createElement("div", { id: panelID("debug"), role: "tabpanel", "aria-labelledby": tabID("debug"), tabIndex: 0 }, /* @__PURE__ */ import_react9.default.createElement(DebugPane, { controls: debugControls, override: displayedRuntime?.debugOverride })) : null);
+  }
+  function SessionProvenance({ node }) {
+    if (typeof node.data.session_id !== "string") return null;
+    const transitions = [
+      ...recordList(node.data.incoming_transitions).map((transition2) => ({ direction: "From", transition: transition2 })),
+      ...recordList(node.data.outgoing_transitions).map((transition2) => ({ direction: "To", transition: transition2 }))
+    ];
+    return /* @__PURE__ */ import_react9.default.createElement("div", { className: "inspector-pane session-provenance" }, /* @__PURE__ */ import_react9.default.createElement(Section, { title: "Snapshot" }, /* @__PURE__ */ import_react9.default.createElement(KeyValueRows, { rows: [
+      { label: "Runbook", value: node.data.runbook_name ?? node.data.runbook_id },
+      { label: "Runbook ID", value: node.data.runbook_id, code: true },
+      { label: "Graph revision", value: node.data.graph_revision },
+      { label: "Graph hash", value: node.data.graph_hash, code: true },
+      { label: "Plan hash", value: node.data.plan_hash, code: true },
+      { label: "Executable snapshot", value: node.data.executable_snapshot_hash, code: true },
+      { label: "Catalog", value: node.data.catalog_digest, code: true },
+      { label: "Package lock", value: node.data.package_lock_digest, code: true },
+      { label: "Profile", value: node.data.profile_digest, code: true }
+    ] })), transitions.length > 0 ? /* @__PURE__ */ import_react9.default.createElement(Section, { title: "Handoffs", count: transitions.length }, /* @__PURE__ */ import_react9.default.createElement("div", { className: "compact-list" }, transitions.map(({ direction, transition: transition2 }) => /* @__PURE__ */ import_react9.default.createElement("div", { key: `${direction}:${String(transition2.transition_id)}` }, /* @__PURE__ */ import_react9.default.createElement("strong", null, direction, " ", String(direction === "From" ? transition2.source_segment_id : transition2.target_segment_id)), /* @__PURE__ */ import_react9.default.createElement("span", null, String(transition2.reason_summary ?? transition2.reason_code ?? transition2.status ?? "")))))) : null);
+  }
+  function recordList(value) {
+    return Array.isArray(value) ? value.filter((item) => typeof item === "object" && item !== null && !Array.isArray(item)) : [];
   }
   function CommonDefinition({ common }) {
     if (!common) return null;
@@ -35261,7 +35324,8 @@
           frame_id: nodeFrameID(branch),
           order: nodeOrder(continuationNode) - 0.5,
           synthetic: true,
-          merge_for: branchID
+          merge_for: branchID,
+          ...typeof branch?.data.segment_id === "string" ? { segment_id: branch.data.segment_id } : {}
         },
         position: { x: 0, y: 0 }
       });
@@ -35524,6 +35588,172 @@
       groups,
       frames: document2.frames.filter((frame2) => frameIDs.has(frame2.id))
     };
+  }
+  function computeSessionRouteProjection(document2, targetID, scope, index = buildRouteProjectionIndex(document2)) {
+    const projection = computeRouteProjection(document2, targetID, scope, index);
+    if (!projection) return void 0;
+    const targetSegmentID = stringProperty(index.nodeByID.get(targetID)?.data.segment_id);
+    if (!targetSegmentID) return projection;
+    const nodeIDs = new Set(projection.nodeIDs);
+    if (scope === "from") {
+      const prerequisites = computeRouteProjection(document2, targetID, "to", index);
+      for (const nodeID of prerequisites?.nodeIDs ?? []) nodeIDs.add(nodeID);
+    }
+    const edgeIDs = /* @__PURE__ */ new Set();
+    const boundaryEdges = [];
+    for (const edge of document2.edges) {
+      const sourceVisible = nodeIDs.has(edge.source);
+      const targetVisible = nodeIDs.has(edge.target);
+      if (sourceVisible && targetVisible) {
+        edgeIDs.add(edge.id);
+      } else if (sourceVisible !== targetVisible) {
+        boundaryEdges.push({
+          edgeID: edge.id,
+          visibleNodeID: sourceVisible ? edge.source : edge.target,
+          hiddenNodeID: sourceVisible ? edge.target : edge.source,
+          direction: sourceVisible ? "outgoing" : "incoming"
+        });
+      }
+    }
+    return {
+      ...projection,
+      nodeIDs,
+      edgeIDs,
+      hiddenNodeCount: document2.nodes.filter((node) => node.data.synthetic !== true && !nodeIDs.has(node.id)).length,
+      boundaryEdges
+    };
+  }
+  function sessionRouteDocument(document2, runtimeNodes, targetID) {
+    const segmentGroups = document2.groups.filter((group) => group.kind === "session-segment" && group.segment_id);
+    const historicalSegments = new Set(segmentGroups.flatMap((group) => group.kind === "session-segment" && ["handed_off", "completed", "failed", "cancelled", "indeterminate"].includes(group.segment_status ?? "") && group.segment_id ? [group.segment_id] : []));
+    if (historicalSegments.size === 0) return document2;
+    const targetSegmentID = stringProperty(document2.nodes.find((node) => node.id === targetID)?.data.segment_id);
+    const targetOrdinal = segmentGroups.find((group) => group.segment_id === targetSegmentID)?.index;
+    const segmentOrdinal = new Map(segmentGroups.flatMap((group) => group.segment_id && typeof group.index === "number" ? [[group.segment_id, group.index]] : []));
+    const transitionEndpoints = /* @__PURE__ */ new Set();
+    for (const edge of document2.edges) {
+      if (edge.type !== "session-transition") continue;
+      const sourceSegment = stringProperty(document2.nodes.find((node) => node.id === edge.source)?.data.segment_id);
+      const destinationSegment = stringProperty(document2.nodes.find((node) => node.id === edge.target)?.data.segment_id);
+      if (targetOrdinal !== void 0 && ((segmentOrdinal.get(sourceSegment) ?? Infinity) > targetOrdinal || (segmentOrdinal.get(destinationSegment) ?? Infinity) > targetOrdinal)) continue;
+      transitionEndpoints.add(edge.source);
+      transitionEndpoints.add(edge.target);
+    }
+    const nodeIDs = new Set(document2.nodes.flatMap((node) => {
+      const segmentID = stringProperty(node.data.segment_id);
+      if (targetOrdinal !== void 0 && (segmentOrdinal.get(segmentID) ?? Infinity) > targetOrdinal) return [];
+      if (node.data.synthetic === true || node.data.kind === "session-entry" || segmentID === targetSegmentID || !historicalSegments.has(segmentID) || transitionEndpoints.has(node.id)) {
+        return [node.id];
+      }
+      const status = runtimeNodes[node.id]?.status;
+      if (status === "skipped" && document2.edges.some((edge) => edge.routeKind === "no-match" && edge.runtimeNodeID === node.id && routeEdgeExecuted(edge, runtimeNodes))) return [node.id];
+      return status && status !== "pending" && status !== "skipped" ? [node.id] : [];
+    }));
+    const executedPairs = /* @__PURE__ */ new Set();
+    for (const [nodeID, state] of Object.entries(runtimeNodes)) {
+      for (const occurrence of state.occurrences ?? []) {
+        if (occurrence.predecessorNodeID) {
+          executedPairs.add(`${occurrence.predecessorNodeID}\0${nodeID}`);
+        }
+      }
+    }
+    const nodeByID = new Map(document2.nodes.map((node) => [node.id, node]));
+    const edgeIDs = /* @__PURE__ */ new Set();
+    const historicalEdge = (sourceID, targetIDValue) => {
+      const sourceSegment = stringProperty(nodeByID.get(sourceID)?.data.segment_id);
+      const targetSegment = stringProperty(nodeByID.get(targetIDValue)?.data.segment_id);
+      return historicalSegments.has(sourceSegment) && sourceSegment === targetSegment && sourceSegment !== targetSegmentID;
+    };
+    for (const edge of document2.edges) {
+      if (!nodeIDs.has(edge.source) || !nodeIDs.has(edge.target)) continue;
+      if (edge.type === "session-transition" || !historicalEdge(edge.source, edge.target)) {
+        edgeIDs.add(edge.id);
+        continue;
+      }
+      if (edge.type === "session-entry") {
+        if (runtimeExecuted(runtimeNodes[edge.target])) edgeIDs.add(edge.id);
+        continue;
+      }
+      if (nodeByID.get(edge.source)?.data.kind === "parallel" && runtimeExecuted(runtimeNodes[edge.target])) {
+        edgeIDs.add(edge.id);
+        continue;
+      }
+      if (executedPairs.has(`${edge.source}\0${edge.target}`) || routeEdgeExecuted(edge, runtimeNodes)) {
+        edgeIDs.add(edge.id);
+      }
+    }
+    let changed = true;
+    while (changed) {
+      changed = false;
+      for (const edge of document2.edges) {
+        if (edgeIDs.has(edge.id) || !nodeIDs.has(edge.source) || !nodeIDs.has(edge.target) || !historicalEdge(edge.source, edge.target)) continue;
+        const source = nodeByID.get(edge.source);
+        if (source?.data.synthetic !== true || !runtimeExecuted(runtimeNodes[edge.target])) continue;
+        if (document2.edges.some((incoming) => incoming.target === edge.source && edgeIDs.has(incoming.id))) {
+          edgeIDs.add(edge.id);
+          changed = true;
+        }
+      }
+    }
+    return projectRouteDocument(document2, {
+      targetID: "",
+      scope: "through",
+      nodeIDs,
+      edgeIDs,
+      predecessorCount: 0,
+      successorCount: 0,
+      hiddenNodeCount: document2.nodes.length - nodeIDs.size,
+      boundaryEdges: []
+    });
+  }
+  function stringProperty(value) {
+    return typeof value === "string" ? value : "";
+  }
+  function runtimeExecuted(state) {
+    return !!state && state.status !== "pending" && state.status !== "skipped";
+  }
+  function routeEdgeExecuted(edge, runtimeNodes) {
+    if (!edge.routeKind && !edge.runtimeNodeID) return false;
+    const runtimeNodeID = edge.runtimeNodeID ?? edge.target;
+    const occurrences = runtimeNodes[runtimeNodeID]?.occurrences ?? [];
+    if (occurrences.length === 0) return edgeRuntimeState(edge, runtimeNodes) !== void 0;
+    return occurrences.some((occurrence) => edgeRuntimeState(edge, {
+      ...runtimeNodes,
+      [runtimeNodeID]: occurrence
+    }) !== void 0);
+  }
+
+  // src/sessionCompositeGraph.ts
+  function sessionGraphTopologyKey(document2) {
+    return JSON.stringify({
+      nodes: document2.nodes.map((node) => ({
+        id: node.id,
+        kind: node.data.kind ?? "",
+        groupID: node.data.group_id ?? "",
+        frameID: node.data.frame_id ?? "",
+        parentNode: node.parentNode ?? ""
+      })),
+      edges: document2.edges.map((edge) => ({
+        id: edge.id,
+        source: edge.source,
+        target: edge.target,
+        type: edge.type ?? "",
+        routeKind: edge.routeKind ?? "",
+        runtimeNodeID: edge.runtimeNodeID ?? "",
+        runtimeArmIndex: edge.runtimeArmIndex ?? -1
+      })),
+      groups: document2.groups.map((group) => ({
+        id: group.id,
+        kind: group.kind,
+        parentNodeID: group.parent_node_id,
+        frameID: group.frame_id
+      })),
+      frames: document2.frames.map((frame2) => ({
+        id: frame2.id,
+        parentIncludeNodeID: frame2.parent_include_node_id ?? "",
+        depth: frame2.depth
+      }))
+    });
   }
 
   // src/hostActionWebviewProtocol.ts
@@ -36062,6 +36292,12 @@
   var DEFAULT_INSPECTOR_RATIO = 0.31;
   var MIN_INSPECTOR_RATIO = 0.2;
   var MAX_INSPECTOR_RATIO = 0.65;
+  function isClosedSessionStatus(status) {
+    return ["resolved", "escalated", "cancelled", "abandoned"].includes(status);
+  }
+  function revisionNodeKey(segmentID, revision, originalNodeID) {
+    return JSON.stringify([segmentID, revision, originalNodeID]);
+  }
   function clampInspectorRatio(value) {
     return Math.min(MAX_INSPECTOR_RATIO, Math.max(MIN_INSPECTOR_RATIO, value));
   }
@@ -36097,12 +36333,14 @@
   };
   var RuntimeNodesContext = (0, import_react11.createContext)({});
   var DebugBreakpointsContext = (0, import_react11.createContext)(/* @__PURE__ */ new Set());
+  var ExecutionPositionContext = (0, import_react11.createContext)({ terminal: false });
   function breakpointKey(nodeID, phase) {
     return `${nodeID}:${phase}`;
   }
   function StepNode({ data, selected }) {
     const runtimeNodes = (0, import_react11.useContext)(RuntimeNodesContext);
     const debugBreakpoints = (0, import_react11.useContext)(DebugBreakpointsContext);
+    const executionPosition = (0, import_react11.useContext)(ExecutionPositionContext);
     const kind = typeof data.kind === "string" ? data.kind : "step";
     const id2 = typeof data.id === "string" ? data.id : "";
     const title = typeof data.title === "string" ? data.title : "";
@@ -36112,18 +36350,25 @@
     const error = runtime?.error ?? (typeof data.error === "string" ? data.error : "");
     const hasBeforeBreakpoint = debugBreakpoints.has(breakpointKey(id2, "before"));
     const hasAfterBreakpoint = debugBreakpoints.has(breakpointKey(id2, "after"));
-    const isCurrent = status === "running" || status === "delaying";
-    const focusedLabel = `Focused step: ${id2}`;
-    const currentLabel = `Current step: ${id2}`;
-    return /* @__PURE__ */ import_react11.default.createElement(import_react11.default.Fragment, null, /* @__PURE__ */ import_react11.default.createElement(NodeToolbar, { isVisible: selected, position: Position.Left, align: "center", offset: 12 }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "node-locator focused", role: "status", "aria-label": focusedLabel, title: focusedLabel }, /* @__PURE__ */ import_react11.default.createElement("span", null, "Focused"), /* @__PURE__ */ import_react11.default.createElement("code", null, id2), /* @__PURE__ */ import_react11.default.createElement(ArrowRight, { "aria-hidden": "true" }))), /* @__PURE__ */ import_react11.default.createElement(NodeToolbar, { isVisible: isCurrent, position: Position.Right, align: "center", offset: 12 }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "node-locator current", role: "status", "aria-label": currentLabel, title: currentLabel }, /* @__PURE__ */ import_react11.default.createElement(ArrowLeft, { "aria-hidden": "true" }), /* @__PURE__ */ import_react11.default.createElement("span", null, "Current"), /* @__PURE__ */ import_react11.default.createElement("code", null, id2))), /* @__PURE__ */ import_react11.default.createElement("div", { className: `step-node kind-${kind} status-${status}${selected ? " selected" : ""}` }, /* @__PURE__ */ import_react11.default.createElement(Handle$1, { type: "target", position: Position.Top }), /* @__PURE__ */ import_react11.default.createElement("div", { className: "step-heading" }, /* @__PURE__ */ import_react11.default.createElement("span", { className: "kind-mark", "aria-hidden": "true" }, kind.slice(0, 2).toUpperCase()), /* @__PURE__ */ import_react11.default.createElement("span", null, kindLabels2[kind] ?? kind)), /* @__PURE__ */ import_react11.default.createElement("div", { className: "debug-node-markers" }, hasBeforeBreakpoint ? /* @__PURE__ */ import_react11.default.createElement("span", { "aria-label": "Before breakpoint", title: "Pause before execution" }, /* @__PURE__ */ import_react11.default.createElement(CircleDot, { className: "debug-before-marker", "aria-hidden": "true" })) : null, hasAfterBreakpoint ? /* @__PURE__ */ import_react11.default.createElement("span", { "aria-label": "After breakpoint", title: "Pause after execution" }, /* @__PURE__ */ import_react11.default.createElement(CircleDot, { className: "debug-after-marker", "aria-hidden": "true" })) : null, runtime?.debugOverride ? /* @__PURE__ */ import_react11.default.createElement("span", { "aria-label": "Debug override applied", title: "Debug override applied" }, /* @__PURE__ */ import_react11.default.createElement(Bug, { className: "debug-override-marker", "aria-hidden": "true" })) : null), /* @__PURE__ */ import_react11.default.createElement("div", { className: "step-id" }, id2), title && title !== id2 ? /* @__PURE__ */ import_react11.default.createElement("div", { className: "step-title" }, title) : null, status !== "pending" ? /* @__PURE__ */ import_react11.default.createElement("div", { className: "step-status" }, status, error ? `: ${error}` : "") : null, !isTerminal ? /* @__PURE__ */ import_react11.default.createElement(Handle$1, { type: "source", position: Position.Bottom }) : null));
+    const isCurrent = executionPosition.nodeID === id2;
+    const locatorText = title || id2;
+    const focusedLabel = `Focused step: ${locatorText}`;
+    const currentLabel = `Current step: ${locatorText}`;
+    const executionLabel = executionPosition.terminal ? "Last reached" : "Current";
+    const executionAriaLabel = executionPosition.terminal ? `Last reached step: ${locatorText}` : currentLabel;
+    return /* @__PURE__ */ import_react11.default.createElement(import_react11.default.Fragment, null, /* @__PURE__ */ import_react11.default.createElement(NodeToolbar, { isVisible: selected, position: Position.Left, align: "center", offset: 12 }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "node-locator focused", role: "status", "aria-label": focusedLabel, title: focusedLabel }, /* @__PURE__ */ import_react11.default.createElement("span", null, "Focused"), /* @__PURE__ */ import_react11.default.createElement("code", { title: id2 }, locatorText), /* @__PURE__ */ import_react11.default.createElement(ArrowRight, { "aria-hidden": "true" }))), /* @__PURE__ */ import_react11.default.createElement(NodeToolbar, { isVisible: isCurrent, position: Position.Right, align: "center", offset: 12 }, /* @__PURE__ */ import_react11.default.createElement("div", { className: `node-locator ${executionPosition.terminal ? "last-reached" : "current"}`, role: "status", "aria-label": executionAriaLabel, title: executionAriaLabel }, /* @__PURE__ */ import_react11.default.createElement(ArrowLeft, { "aria-hidden": "true" }), /* @__PURE__ */ import_react11.default.createElement("span", null, executionLabel), /* @__PURE__ */ import_react11.default.createElement("code", { title: id2 }, locatorText))), /* @__PURE__ */ import_react11.default.createElement("div", { className: `step-node kind-${kind} status-${status}${selected ? " selected" : ""}${isCurrent ? executionPosition.terminal ? " execution-last" : " execution-current" : ""}` }, /* @__PURE__ */ import_react11.default.createElement(Handle$1, { type: "target", position: Position.Top }), /* @__PURE__ */ import_react11.default.createElement("div", { className: "step-heading" }, /* @__PURE__ */ import_react11.default.createElement("span", { className: "kind-mark", "aria-hidden": "true" }, kind.slice(0, 2).toUpperCase()), /* @__PURE__ */ import_react11.default.createElement("span", null, kindLabels2[kind] ?? kind)), /* @__PURE__ */ import_react11.default.createElement("div", { className: "debug-node-markers" }, hasBeforeBreakpoint ? /* @__PURE__ */ import_react11.default.createElement("span", { "aria-label": "Before breakpoint", title: "Pause before execution" }, /* @__PURE__ */ import_react11.default.createElement(CircleDot, { className: "debug-before-marker", "aria-hidden": "true" })) : null, hasAfterBreakpoint ? /* @__PURE__ */ import_react11.default.createElement("span", { "aria-label": "After breakpoint", title: "Pause after execution" }, /* @__PURE__ */ import_react11.default.createElement(CircleDot, { className: "debug-after-marker", "aria-hidden": "true" })) : null, runtime?.debugOverride ? /* @__PURE__ */ import_react11.default.createElement("span", { "aria-label": "Debug override applied", title: "Debug override applied" }, /* @__PURE__ */ import_react11.default.createElement(Bug, { className: "debug-override-marker", "aria-hidden": "true" })) : null), /* @__PURE__ */ import_react11.default.createElement("div", { className: "step-id" }, id2), title && title !== id2 ? /* @__PURE__ */ import_react11.default.createElement("div", { className: "step-title" }, title) : null, status !== "pending" ? /* @__PURE__ */ import_react11.default.createElement("div", { className: "step-status" }, status, error ? `: ${error}` : "") : null, !isTerminal ? /* @__PURE__ */ import_react11.default.createElement(Handle$1, { type: "source", position: Position.Bottom }) : null));
   }
   function FrameNode({ data }) {
-    return /* @__PURE__ */ import_react11.default.createElement("div", { className: "frame-content" }, /* @__PURE__ */ import_react11.default.createElement("span", null, String(data.label ?? data.kind ?? "")), data.empty ? /* @__PURE__ */ import_react11.default.createElement("em", null, "Empty route") : null);
+    const segmentStatus = typeof data.segment_status === "string" ? data.segment_status : "";
+    return /* @__PURE__ */ import_react11.default.createElement("div", { className: "frame-content" }, /* @__PURE__ */ import_react11.default.createElement("span", null, String(data.label ?? data.kind ?? "")), segmentStatus ? /* @__PURE__ */ import_react11.default.createElement("em", { className: `segment-status status-${segmentStatus}` }, segmentStatus.replaceAll("_", " ")) : null, data.graph_loaded === false ? /* @__PURE__ */ import_react11.default.createElement("em", null, "Load on demand") : null, data.empty ? /* @__PURE__ */ import_react11.default.createElement("em", null, "Empty route") : null);
   }
   function BranchMergeNode() {
     return /* @__PURE__ */ import_react11.default.createElement("div", { className: "branch-merge-node", title: "Branch merge" }, /* @__PURE__ */ import_react11.default.createElement(Handle$1, { type: "target", position: Position.Top }), /* @__PURE__ */ import_react11.default.createElement("span", { "aria-hidden": "true" }), /* @__PURE__ */ import_react11.default.createElement(Handle$1, { type: "source", position: Position.Bottom }));
   }
-  var nodeTypes = { gertStep: StepNode, branchMerge: BranchMergeNode, frameBox: FrameNode };
+  function SessionEntryNode() {
+    return /* @__PURE__ */ import_react11.default.createElement("div", { className: "session-entry-node", title: "Segment entry" }, /* @__PURE__ */ import_react11.default.createElement(Handle$1, { type: "target", position: Position.Top }), /* @__PURE__ */ import_react11.default.createElement("span", { "aria-hidden": "true" }), /* @__PURE__ */ import_react11.default.createElement(Handle$1, { type: "source", position: Position.Bottom }));
+  }
+  var nodeTypes = { gertStep: StepNode, branchMerge: BranchMergeNode, sessionEntry: SessionEntryNode, frameBox: FrameNode };
   function InputsForm({
     declarations,
     values,
@@ -36478,7 +36723,7 @@
     ))), validationError ? /* @__PURE__ */ import_react11.default.createElement("div", { className: "interaction-error", role: "alert" }, validationError) : null, /* @__PURE__ */ import_react11.default.createElement("button", { type: "submit", disabled: submitting }, "Review answers")) : null);
   }
   function nodeDimensions(kind, style2) {
-    if (kind === "merge") return { width: 14, height: 14 };
+    if (kind === "merge" || kind === "session-entry") return { width: 14, height: 14 };
     if (style2 === "minimalist") {
       if (kind === "end") return { width: 164, height: 48 };
       if (kind === "branch" || kind === "decision" || kind === "choice") return { width: 190, height: 66 };
@@ -36650,7 +36895,10 @@
           label: groupLabel(bounds.group),
           frame_id: bounds.group.frame_id,
           parent_group_id: bounds.parentGroupID,
-          empty: bounds.empty
+          empty: bounds.empty,
+          segment_id: bounds.group.segment_id,
+          segment_status: bounds.group.segment_status,
+          run_id: bounds.group.run_id
         },
         selectable: false,
         draggable: false,
@@ -36663,7 +36911,7 @@
       const parentBounds = groupID ? groupBounds.get(groupID) : void 0;
       return {
         id: node.id,
-        type: node.data.synthetic === true ? "branchMerge" : "gertStep",
+        type: node.data.kind === "session-entry" ? "sessionEntry" : node.data.synthetic === true ? "branchMerge" : "gertStep",
         position: {
           x: position.x - (parentBounds?.x ?? 0),
           y: position.y - (parentBounds?.y ?? 0)
@@ -36694,6 +36942,47 @@
         markerEnd: { type: MarkerType.ArrowClosed },
         data: { graphEdge: edge }
       }))
+    };
+  }
+  function refreshLayoutMetadata(layout, document2, style2) {
+    const nodeByID = new Map(document2.nodes.map((node) => [node.id, node]));
+    const groupByID = new Map(document2.groups.map((group) => [group.id, group]));
+    const edgeByID = new Map(document2.edges.map((edge) => [edge.id, edge]));
+    return {
+      nodes: layout.nodes.map((node) => {
+        if (node.type === "frameBox") {
+          const group = groupByID.get(node.id);
+          return group ? {
+            ...node,
+            className: `${group.kind}${node.data.empty ? " empty-group" : ""}`,
+            data: {
+              ...node.data,
+              kind: group.kind,
+              label: groupLabel(group),
+              frame_id: group.frame_id,
+              segment_id: group.segment_id,
+              segment_status: group.segment_status,
+              run_id: group.run_id,
+              graph_loaded: group.graph_loaded
+            }
+          } : node;
+        }
+        const source = nodeByID.get(node.id);
+        return source ? {
+          ...node,
+          data: {
+            ...source.data,
+            id: source.data.id ?? source.id,
+            graph_parent_node: source.parentNode ?? "",
+            graph_extent: source.extent ?? "",
+            nodeStyle: style2
+          }
+        } : node;
+      }),
+      edges: layout.edges.map((edge) => {
+        const source = edgeByID.get(edge.id);
+        return source ? { ...edge, label: source.label, data: { graphEdge: source } } : edge;
+      })
     };
   }
   function runtimeEdgeClass(edge, runtimeNodes) {
@@ -36865,9 +37154,16 @@
     testMode,
     style: style2,
     runtimeNodes,
+    executionNodeID,
     breakpoints,
     watches,
     pending,
+    sessionID,
+    sessionStatus,
+    sessionAttached,
+    segmentGraphRevisions,
+    unloadedSegmentIDs,
+    revisionNodes,
     runID,
     runStatus,
     runStarting,
@@ -36877,6 +37173,10 @@
     inputValues,
     onInputChange,
     onRun,
+    onStartSession,
+    onResumeSession,
+    onCloseSession,
+    onRequestGraphRevision,
     onDebugRun,
     onReset,
     onCancel,
@@ -36900,6 +37200,9 @@
     const [routeTargetID, setRouteTargetID] = (0, import_react11.useState)();
     const [routeScope, setRouteScope] = (0, import_react11.useState)("through");
     const [routeTestEditor, setRouteTestEditor] = (0, import_react11.useState)();
+    const [locateNodeID, setLocateNodeID] = (0, import_react11.useState)();
+    const [closeStatus, setCloseStatus] = (0, import_react11.useState)("resolved");
+    const [inspectionRevision, setInspectionRevision] = (0, import_react11.useState)();
     const flowRef = (0, import_react11.useRef)();
     const canvasRef = (0, import_react11.useRef)(null);
     const workspaceRef = (0, import_react11.useRef)(null);
@@ -36907,23 +37210,35 @@
     const restoreViewportRef = (0, import_react11.useRef)();
     const declarations = (0, import_react11.useMemo)(() => graphInputDeclarations(document2), [document2]);
     const structuralDocument = (0, import_react11.useMemo)(() => withBranchMerges(document2), [document2]);
-    const routeIndex2 = (0, import_react11.useMemo)(() => buildRouteProjectionIndex(structuralDocument), [structuralDocument]);
+    const routeSourceDocument = (0, import_react11.useMemo)(
+      () => sessionID ? sessionRouteDocument(structuralDocument, runtimeNodes, routeTargetID) : structuralDocument,
+      [routeTargetID, runtimeNodes, sessionID, structuralDocument]
+    );
+    const routeIndex2 = (0, import_react11.useMemo)(() => buildRouteProjectionIndex(routeSourceDocument), [routeSourceDocument]);
     const routeProjection = (0, import_react11.useMemo)(
-      () => routeTargetID ? computeRouteProjection(structuralDocument, routeTargetID, routeScope, routeIndex2) : void 0,
-      [routeIndex2, routeScope, routeTargetID, structuralDocument]
+      () => routeTargetID ? sessionID ? computeSessionRouteProjection(routeSourceDocument, routeTargetID, routeScope, routeIndex2) : computeRouteProjection(routeSourceDocument, routeTargetID, routeScope, routeIndex2) : void 0,
+      [routeIndex2, routeScope, routeSourceDocument, routeTargetID, sessionID]
     );
     const prerequisiteProjection = (0, import_react11.useMemo)(
-      () => routeTargetID ? computeRouteProjection(structuralDocument, routeTargetID, "to", routeIndex2) : void 0,
-      [routeIndex2, routeTargetID, structuralDocument]
+      () => routeTargetID ? sessionID ? computeSessionRouteProjection(routeSourceDocument, routeTargetID, "to", routeIndex2) : computeRouteProjection(routeSourceDocument, routeTargetID, "to", routeIndex2) : void 0,
+      [routeIndex2, routeSourceDocument, routeTargetID, sessionID]
     );
     const displayDocument = (0, import_react11.useMemo)(
-      () => routeProjection ? projectRouteDocument(structuralDocument, routeProjection) : structuralDocument,
-      [routeProjection, structuralDocument]
+      () => routeProjection ? projectRouteDocument(routeSourceDocument, routeProjection) : structuralDocument,
+      [routeProjection, routeSourceDocument, structuralDocument]
     );
-    const layout = (0, import_react11.useMemo)(() => layoutDocument(displayDocument, style2), [displayDocument, style2]);
+    const layoutTopologyKey = (0, import_react11.useMemo)(() => sessionGraphTopologyKey(displayDocument), [displayDocument]);
+    const layoutGeometry = (0, import_react11.useMemo)(() => layoutDocument(displayDocument, style2), [layoutTopologyKey, style2]);
+    const layout = (0, import_react11.useMemo)(
+      () => refreshLayoutMetadata(layoutGeometry, displayDocument, style2),
+      [displayDocument, layoutGeometry, style2]
+    );
     const runtimeEdges = (0, import_react11.useMemo)(() => layout.edges.map((edge) => ({
       ...edge,
-      className: edge.data?.graphEdge ? runtimeEdgeClass(edge.data.graphEdge, runtimeNodes) : void 0
+      className: edge.data?.graphEdge ? [
+        edge.data.graphEdge.type === "session-transition" ? "edge-session-transition" : "",
+        runtimeEdgeClass(edge.data.graphEdge, runtimeNodes) ?? ""
+      ].filter(Boolean).join(" ") || void 0 : void 0
     })), [layout.edges, runtimeNodes]);
     const focusedNodeID = routeTargetID ?? selectedId;
     const displayNodes = (0, import_react11.useMemo)(() => layout.nodes.map((node) => ({
@@ -36931,11 +37246,25 @@
       selected: node.id === focusedNodeID
     })), [focusedNodeID, layout.nodes]);
     const activeNodeIDs = (0, import_react11.useMemo)(() => activeGraphNodeIDs(structuralDocument, runtimeNodes), [structuralDocument, runtimeNodes]);
+    const executionNode = executionNodeID ? document2.nodes.find((node) => node.id === executionNodeID) ?? document2.nodes.find((node) => node.data.step_id === executionNodeID) : void 0;
+    const resolvedExecutionNodeID = executionNode?.id;
+    const executionTerminal = isTerminalRunStatus(runStatus);
+    const executionPosition = (0, import_react11.useMemo)(
+      () => ({ nodeID: resolvedExecutionNodeID, terminal: executionTerminal }),
+      [executionTerminal, resolvedExecutionNodeID]
+    );
     const breakpointKeys = (0, import_react11.useMemo)(
       () => new Set(breakpoints.map((breakpoint) => breakpointKey(breakpoint.nodeID, breakpoint.phase))),
       [breakpoints]
     );
     const selected = document2.nodes.find((node) => node.id === selectedId);
+    const selectedSegmentID = typeof selected?.data.segment_id === "string" ? selected.data.segment_id : "";
+    const selectedOriginalNodeID = typeof selected?.data.original_node_id === "string" ? selected.data.original_node_id : selected?.id ?? "";
+    const availableGraphRevisions = selectedSegmentID ? segmentGraphRevisions[selectedSegmentID] ?? [] : [];
+    const latestGraphRevision = availableGraphRevisions[availableGraphRevisions.length - 1];
+    const selectedGraphRevision = inspectionRevision && inspectionRevision.nodeID === selected?.id ? inspectionRevision.revision : latestGraphRevision;
+    const revisionRequestID = selected && selectedSegmentID && selectedGraphRevision !== void 0 ? revisionNodeKey(selectedSegmentID, selectedGraphRevision, selectedOriginalNodeID) : "";
+    const inspectedNode = selectedGraphRevision === latestGraphRevision ? selected : revisionNodes[revisionRequestID];
     const routeTarget = document2.nodes.find((node) => node.id === routeTargetID);
     const routeTargetName = String(routeTarget?.data.title || routeTarget?.data.id || routeTarget?.id || "selected step");
     const routeTestCandidates = (0, import_react11.useMemo)(() => {
@@ -36950,7 +37279,12 @@
       return [`${String(node.data.title || node.data.id || node.id)} (${dynamicInclude ? "dynamic include" : kind})`];
     }), [document2, prerequisiteProjection, routeTargetID]);
     const savedRouteTests = routeTarget ? routeTests.filter(({ artifact }) => routeTestMatchesTarget(artifact, routeTarget)) : [];
-    const runActive = runStarting || !!runID && !isTerminalRunStatus(runStatus);
+    const sessionClosed = !!sessionID && isClosedSessionStatus(sessionStatus ?? "");
+    const sessionPaused = !!sessionID && !!runID && ["paused", "paused_at_boundary", "handoff_pending"].includes(runStatus);
+    const runActive = runStarting || !!runID && !isTerminalRunStatus(runStatus) && !sessionPaused;
+    const sessionSegmentCount = document2.groups.filter((group) => group.kind === "session-segment").length;
+    const routeActionsDisabled = runActive && !sessionID;
+    const canCloseSession = !!sessionID && sessionAttached && !sessionClosed && (!runID || sessionPaused || ["completed", "failed", "cancelled", "indeterminate"].includes(runStatus));
     const routeTestContextKey = `${document2.hash}:${routeTestContext?.planHash ?? ""}`;
     const currentRouteTestEditor = routeTestEditor?.contextKey === routeTestContextKey ? routeTestEditor : void 0;
     const routeTestReviewOpen = currentRouteTestEditor !== void 0;
@@ -36959,11 +37293,22 @@
       setRouteScope("through");
       setRouteTargetID(nodeID);
       setSelectedId(nodeID);
+      const target = document2.nodes.find((node) => node.id === nodeID);
+      if (sessionID && typeof target?.data.segment_id === "string") {
+        vscode.postMessage({ type: "session.load-route", targetSegmentID: target.data.segment_id });
+      }
     };
     const showFullGraph = () => {
       setSelectedId(routeTargetID);
       setRouteTargetID(void 0);
       setRouteTestEditor(void 0);
+    };
+    const locateExecutionNode = () => {
+      if (!resolvedExecutionNodeID) return;
+      setRouteTargetID(void 0);
+      setRouteTestEditor(void 0);
+      setSelectedId(resolvedExecutionNodeID);
+      setLocateNodeID(resolvedExecutionNodeID);
     };
     const resizeInspectorFromClientX = (clientX) => {
       const bounds = workspaceRef.current?.getBoundingClientRect();
@@ -36982,6 +37327,12 @@
       setInspectorRatio(clampInspectorRatio(next));
     };
     (0, import_react11.useEffect)(() => persistInspectorRatio(inspectorRatio), [inspectorRatio]);
+    (0, import_react11.useEffect)(() => {
+      if (!sessionID || !selectedSegmentID || selected?.data.graph_loaded !== false || !unloadedSegmentIDs.includes(selectedSegmentID)) return;
+      const revision = segmentGraphRevisions[selectedSegmentID]?.at(-1);
+      if (revision) vscode.postMessage({ type: "session.load-segment", segmentID: selectedSegmentID, revision });
+    }, [selected?.id, selected?.data.graph_loaded, selectedSegmentID, sessionID, segmentGraphRevisions, unloadedSegmentIDs]);
+    (0, import_react11.useEffect)(() => setInspectionRevision(void 0), [selected?.id]);
     (0, import_react11.useEffect)(() => {
       if (pending?.nodeID || pending?.stepID) setSelectedId(pending.nodeID ?? pending.stepID);
     }, [pending?.turnID, pending?.nodeID, pending?.stepID]);
@@ -37025,6 +37376,26 @@
       return () => cancelAnimationFrame(frame2);
     }, [layout.edges.length, layout.nodes.length, routeScope, routeTargetID]);
     (0, import_react11.useEffect)(() => {
+      if (!locateNodeID || routeTargetID) return;
+      let frame2 = 0;
+      let attempts = 0;
+      const locate = () => {
+        frame2 = requestAnimationFrame(() => {
+          const target = flowRef.current?.getNode(locateNodeID);
+          const targetReady = target && typeof target.width === "number" && target.width > 0 && typeof target.height === "number" && target.height > 0;
+          attempts += 1;
+          if (!targetReady && attempts < 4) {
+            locate();
+            return;
+          }
+          setLocateNodeID(void 0);
+          if (targetReady) flowRef.current?.fitView({ nodes: [target], padding: 1.2, duration: 250, maxZoom: 1.2 });
+        });
+      };
+      locate();
+      return () => cancelAnimationFrame(frame2);
+    }, [locateNodeID, routeTargetID]);
+    (0, import_react11.useEffect)(() => {
       if (!routeTargetID) return;
       let frame2 = 0;
       const refit = () => {
@@ -37065,7 +37436,7 @@
         if (secondFrame) cancelAnimationFrame(secondFrame);
       };
     }, [document2, layout.nodes.length, layout.edges.length, style2, testMode]);
-    return /* @__PURE__ */ import_react11.default.createElement("main", { className: `app style-${style2}${showPanel ? "" : " panel-hidden"} has-panel-content` }, /* @__PURE__ */ import_react11.default.createElement("header", { className: "toolbar" }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "identity" }, /* @__PURE__ */ import_react11.default.createElement("strong", null, document2.runbook.name ?? document2.runbook.id ?? "Runbook"), /* @__PURE__ */ import_react11.default.createElement("span", null, document2.nodes.length, " steps")), /* @__PURE__ */ import_react11.default.createElement("div", { className: "run-actions" }, /* @__PURE__ */ import_react11.default.createElement("span", { className: `run-status status-${runStatus}`, role: "status", "aria-live": "polite" }, runStarting ? "starting" : runStatus), !runActive ? /* @__PURE__ */ import_react11.default.createElement(
+    return /* @__PURE__ */ import_react11.default.createElement("main", { className: `app style-${style2}${showPanel ? "" : " panel-hidden"} has-panel-content` }, /* @__PURE__ */ import_react11.default.createElement("header", { className: "toolbar" }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "identity" }, /* @__PURE__ */ import_react11.default.createElement("strong", null, document2.runbook.name ?? document2.runbook.id ?? "Runbook"), /* @__PURE__ */ import_react11.default.createElement("span", null, sessionID ? `${sessionSegmentCount} segments | ${document2.nodes.length} steps` : `${document2.nodes.length} steps`)), /* @__PURE__ */ import_react11.default.createElement("div", { className: "run-actions" }, /* @__PURE__ */ import_react11.default.createElement("span", { className: `run-status status-${runStatus}`, role: "status", "aria-live": "polite" }, runStarting ? "starting" : runStatus), !runActive && !sessionID ? /* @__PURE__ */ import_react11.default.createElement(
       "button",
       {
         className: "primary",
@@ -37076,7 +37447,18 @@
       },
       /* @__PURE__ */ import_react11.default.createElement(Play, { "aria-hidden": "true" }),
       "Run"
-    ) : null, !runActive ? /* @__PURE__ */ import_react11.default.createElement(
+    ) : null, !runActive && !sessionID ? /* @__PURE__ */ import_react11.default.createElement(
+      "button",
+      {
+        className: "session-run",
+        type: "button",
+        disabled: routeTestReviewOpen || reloading,
+        title: "Start a durable investigation session",
+        onClick: onStartSession
+      },
+      /* @__PURE__ */ import_react11.default.createElement(Workflow, { "aria-hidden": "true" }),
+      /* @__PURE__ */ import_react11.default.createElement("span", null, "Start session")
+    ) : null, !runActive && !sessionID ? /* @__PURE__ */ import_react11.default.createElement(
       "button",
       {
         className: "debug-run",
@@ -37087,10 +37469,21 @@
       },
       /* @__PURE__ */ import_react11.default.createElement(Bug, { "aria-hidden": "true" }),
       /* @__PURE__ */ import_react11.default.createElement("span", null, "Debug Run")
-    ) : null, !runActive && isTerminalRunStatus(runStatus) ? /* @__PURE__ */ import_react11.default.createElement("button", { className: "reset-run", type: "button", onClick: () => {
+    ) : null, !runActive && (sessionID ? sessionClosed || !sessionAttached && !runStarting : isTerminalRunStatus(runStatus)) ? /* @__PURE__ */ import_react11.default.createElement("button", { className: "reset-run", type: "button", onClick: () => {
       setRouteTestEditor(void 0);
       onReset();
-    } }, /* @__PURE__ */ import_react11.default.createElement(RotateCcw, { "aria-hidden": "true" }), "Reset") : null, runActive && runID ? /* @__PURE__ */ import_react11.default.createElement("button", { className: "danger", type: "button", onClick: onCancel }, /* @__PURE__ */ import_react11.default.createElement(Square, { "aria-hidden": "true" }), "Cancel") : null, /* @__PURE__ */ import_react11.default.createElement(
+    } }, /* @__PURE__ */ import_react11.default.createElement(RotateCcw, { "aria-hidden": "true" }), "Reset") : null, sessionID && sessionPaused && sessionAttached ? /* @__PURE__ */ import_react11.default.createElement("button", { className: "primary", type: "button", onClick: onResumeSession }, /* @__PURE__ */ import_react11.default.createElement(Play, { "aria-hidden": "true" }), "Resume") : null, canCloseSession ? /* @__PURE__ */ import_react11.default.createElement("div", { className: "session-close-actions" }, /* @__PURE__ */ import_react11.default.createElement(
+      "select",
+      {
+        "aria-label": "Investigation outcome",
+        value: closeStatus,
+        onChange: (event) => setCloseStatus(event.target.value)
+      },
+      /* @__PURE__ */ import_react11.default.createElement("option", { value: "resolved" }, "Resolved"),
+      /* @__PURE__ */ import_react11.default.createElement("option", { value: "escalated" }, "Escalated"),
+      /* @__PURE__ */ import_react11.default.createElement("option", { value: "cancelled" }, "Cancelled"),
+      /* @__PURE__ */ import_react11.default.createElement("option", { value: "abandoned" }, "Abandoned")
+    ), /* @__PURE__ */ import_react11.default.createElement("button", { className: "primary", type: "button", onClick: () => onCloseSession(closeStatus) }, /* @__PURE__ */ import_react11.default.createElement(CircleCheck, { "aria-hidden": "true" }), "Close")) : null, runActive && runID ? /* @__PURE__ */ import_react11.default.createElement("button", { className: "danger", type: "button", onClick: onCancel }, /* @__PURE__ */ import_react11.default.createElement(Square, { "aria-hidden": "true" }), "Cancel") : null, /* @__PURE__ */ import_react11.default.createElement(
       "select",
       {
         "aria-label": "Graph style",
@@ -37108,14 +37501,14 @@
         disabled: runActive,
         onChange: onInputChange
       }
-    ), runError ? /* @__PURE__ */ import_react11.default.createElement("div", { className: "run-error", role: "alert" }, runError) : null, routeTargetID && routeProjection ? /* @__PURE__ */ import_react11.default.createElement("section", { className: "route-view-strip", "aria-label": `Routes through ${routeTargetName}` }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "route-view-copy" }, /* @__PURE__ */ import_react11.default.createElement("strong", null, "Showing routes through: ", routeTargetName), /* @__PURE__ */ import_react11.default.createElement("span", null, routeProjection.predecessorCount, " steps lead to it, ", routeProjection.successorCount, " follow it, ", routeProjection.boundaryEdges.length, " hidden dependencies")), /* @__PURE__ */ import_react11.default.createElement("div", { className: "route-view-actions" }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "route-scope", role: "radiogroup", "aria-label": "Visible routes" }, /* @__PURE__ */ import_react11.default.createElement("button", { type: "button", role: "radio", "aria-checked": routeScope === "through", onClick: () => setRouteScope("through") }, "Through this step"), /* @__PURE__ */ import_react11.default.createElement("button", { type: "button", role: "radio", "aria-checked": routeScope === "to", onClick: () => setRouteScope("to") }, "To this step"), /* @__PURE__ */ import_react11.default.createElement("button", { type: "button", role: "radio", "aria-checked": routeScope === "from", onClick: () => setRouteScope("from") }, "From this step")), /* @__PURE__ */ import_react11.default.createElement("button", { type: "button", disabled: runActive, onClick: showFullGraph }, "Show full graph"))) : null, currentRouteTestEditor ? /* @__PURE__ */ import_react11.default.createElement("div", { className: "route-test-global-safety", role: "status" }, routeTestOutcome?.passed ? "Route test completed - external actions were blocked" : routeTestRunning ? "Testing route - XTS and external actions are blocked" : "Reviewing route test - protected execution starts only when you run this route test") : null, /* @__PURE__ */ import_react11.default.createElement(
+    ), runError ? /* @__PURE__ */ import_react11.default.createElement("div", { className: "run-error", role: "alert" }, runError) : null, executionNode ? /* @__PURE__ */ import_react11.default.createElement("section", { className: `execution-position-strip ${executionTerminal ? "last-reached" : "current"}`, "aria-live": "polite" }, /* @__PURE__ */ import_react11.default.createElement("div", null, /* @__PURE__ */ import_react11.default.createElement("span", null, executionTerminal ? "Last reached" : "Current step"), /* @__PURE__ */ import_react11.default.createElement("strong", null, String(executionNode.data.title || executionNode.data.step_id || executionNode.id)), /* @__PURE__ */ import_react11.default.createElement("code", { title: executionNode.id }, String(executionNode.data.step_id || executionNode.id))), /* @__PURE__ */ import_react11.default.createElement("button", { type: "button", onClick: locateExecutionNode, title: `Locate ${String(executionNode.data.title || executionNode.id)} on the graph` }, /* @__PURE__ */ import_react11.default.createElement(LocateFixed, { "aria-hidden": "true" }), /* @__PURE__ */ import_react11.default.createElement("span", null, "Locate"))) : null, routeTargetID && routeProjection ? /* @__PURE__ */ import_react11.default.createElement("section", { className: "route-view-strip", "aria-label": `Routes through ${routeTargetName}` }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "route-view-copy" }, /* @__PURE__ */ import_react11.default.createElement("strong", null, "Showing routes through: ", routeTargetName), /* @__PURE__ */ import_react11.default.createElement("span", null, routeProjection.predecessorCount, " steps lead to it, ", routeProjection.successorCount, " follow it, ", routeProjection.boundaryEdges.length, " hidden dependencies")), /* @__PURE__ */ import_react11.default.createElement("div", { className: "route-view-actions" }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "route-scope", role: "radiogroup", "aria-label": "Visible routes" }, /* @__PURE__ */ import_react11.default.createElement("button", { type: "button", role: "radio", "aria-checked": routeScope === "through", onClick: () => setRouteScope("through") }, "Through this step"), /* @__PURE__ */ import_react11.default.createElement("button", { type: "button", role: "radio", "aria-checked": routeScope === "to", onClick: () => setRouteScope("to") }, "To this step"), /* @__PURE__ */ import_react11.default.createElement("button", { type: "button", role: "radio", "aria-checked": routeScope === "from", onClick: () => setRouteScope("from") }, "From this step")), /* @__PURE__ */ import_react11.default.createElement("button", { type: "button", disabled: routeActionsDisabled, onClick: showFullGraph }, "Show full graph"))) : null, currentRouteTestEditor ? /* @__PURE__ */ import_react11.default.createElement("div", { className: "route-test-global-safety", role: "status" }, routeTestOutcome?.passed ? "Route test completed - external actions were blocked" : routeTestRunning ? "Testing route - XTS and external actions are blocked" : "Reviewing route test - protected execution starts only when you run this route test") : null, /* @__PURE__ */ import_react11.default.createElement(
       "div",
       {
         ref: workspaceRef,
         className: "workspace",
         style: { "--inspector-width": `${inspectorRatio * 100}%` }
       },
-      /* @__PURE__ */ import_react11.default.createElement("section", { ref: canvasRef, className: "canvas", "aria-label": "Runbook structure" }, /* @__PURE__ */ import_react11.default.createElement(RuntimeNodesContext.Provider, { value: runtimeNodes }, /* @__PURE__ */ import_react11.default.createElement(DebugBreakpointsContext.Provider, { value: breakpointKeys }, /* @__PURE__ */ import_react11.default.createElement(ReactFlowProvider, null, /* @__PURE__ */ import_react11.default.createElement(
+      /* @__PURE__ */ import_react11.default.createElement("section", { ref: canvasRef, className: "canvas", "aria-label": "Runbook structure" }, /* @__PURE__ */ import_react11.default.createElement(RuntimeNodesContext.Provider, { value: runtimeNodes }, /* @__PURE__ */ import_react11.default.createElement(ExecutionPositionContext.Provider, { value: executionPosition }, /* @__PURE__ */ import_react11.default.createElement(DebugBreakpointsContext.Provider, { value: breakpointKeys }, /* @__PURE__ */ import_react11.default.createElement(ReactFlowProvider, null, /* @__PURE__ */ import_react11.default.createElement(
         ReactFlow,
         {
           nodes: displayNodes,
@@ -37142,12 +37535,12 @@
             pannable: true,
             zoomable: true,
             ariaLabel: "Runbook overview",
-            nodeColor: (node) => node.selected ? "var(--vscode-charts-yellow)" : ["running", "delaying"].includes(runtimeNodes[node.id]?.status ?? "") ? "var(--vscode-charts-green)" : "var(--vscode-foreground)",
+            nodeColor: (node) => node.id === resolvedExecutionNodeID ? executionTerminal ? "var(--vscode-charts-blue)" : "var(--vscode-charts-green)" : node.selected ? "var(--vscode-charts-yellow)" : ["running", "delaying"].includes(runtimeNodes[node.id]?.status ?? "") ? "var(--vscode-charts-green)" : "var(--vscode-foreground)",
             nodeStrokeColor: (node) => node.selected ? "var(--vscode-editor-background)" : "transparent",
             nodeStrokeWidth: 3
           }
         )
-      ))))),
+      )))))),
       showPanel ? /* @__PURE__ */ import_react11.default.createElement(
         "div",
         {
@@ -37210,7 +37603,7 @@
           onStop: onCancel,
           onClose: () => setRouteTestEditor(void 0)
         }
-      ) : selected ? /* @__PURE__ */ import_react11.default.createElement("div", { className: "selected-step-panel" }, !routeTargetID || routeTargetID !== selected.id ? /* @__PURE__ */ import_react11.default.createElement("div", { className: "route-context-action" }, /* @__PURE__ */ import_react11.default.createElement("button", { type: "button", disabled: runActive, onClick: () => showRoutesThrough(selected.id) }, "Show routes through this step")) : null, routeTargetID === selected.id && routeTestContext ? /* @__PURE__ */ import_react11.default.createElement("section", { className: "route-test-launcher", "aria-label": "Route tests" }, /* @__PURE__ */ import_react11.default.createElement(
+      ) : selected ? /* @__PURE__ */ import_react11.default.createElement("div", { className: "selected-step-panel" }, !routeTargetID || routeTargetID !== selected.id ? /* @__PURE__ */ import_react11.default.createElement("div", { className: "route-context-action" }, /* @__PURE__ */ import_react11.default.createElement("button", { type: "button", disabled: routeActionsDisabled, onClick: () => showRoutesThrough(selected.id) }, "Show routes through this step")) : null, routeTargetID === selected.id && routeTestContext ? /* @__PURE__ */ import_react11.default.createElement("section", { className: "route-test-launcher", "aria-label": "Route tests" }, /* @__PURE__ */ import_react11.default.createElement(
         "button",
         {
           type: "button",
@@ -37234,12 +37627,25 @@
         },
         /* @__PURE__ */ import_react11.default.createElement("span", null, saved.artifact.name),
         /* @__PURE__ */ import_react11.default.createElement("small", null, saved.needsReview ? "Needs review" : saved.artifact.last_result?.status ?? "Draft")
-      ))) : null) : null, /* @__PURE__ */ import_react11.default.createElement(
+      ))) : null) : null, inspectedNode ? /* @__PURE__ */ import_react11.default.createElement(
         StepInspector,
         {
-          node: selected,
+          node: inspectedNode,
           runtime: runtimeNodes[selected.id],
-          debugControls: /* @__PURE__ */ import_react11.default.createElement(
+          availableGraphRevisions,
+          selectedGraphRevision,
+          onGraphRevisionChange: (revision) => {
+            setInspectionRevision({ nodeID: selected.id, revision });
+            if (revision !== latestGraphRevision) {
+              onRequestGraphRevision(
+                revisionNodeKey(selectedSegmentID, revision, selectedOriginalNodeID),
+                selectedSegmentID,
+                revision,
+                selectedOriginalNodeID
+              );
+            }
+          },
+          debugControls: selectedGraphRevision === latestGraphRevision ? /* @__PURE__ */ import_react11.default.createElement(
             DebugSelectionControls,
             {
               document: document2,
@@ -37250,13 +37656,14 @@
               onToggle: onToggleBreakpoint,
               onWatchesChange
             }
-          )
+          ) : /* @__PURE__ */ import_react11.default.createElement("p", { className: "debug-protected" }, "Historical graph revisions are read-only.")
         }
-      )) : /* @__PURE__ */ import_react11.default.createElement(
+      ) : /* @__PURE__ */ import_react11.default.createElement("div", { className: "inspector-blank", role: "status" }, "Loading graph revision...")) : /* @__PURE__ */ import_react11.default.createElement(
         RunOverview,
         {
           document: document2,
           runtimeNodes,
+          executionNodeID: resolvedExecutionNodeID,
           runID,
           runStatus: runStarting ? "starting" : runStatus,
           inputs: declarations.map((declaration) => ({
@@ -37279,11 +37686,18 @@
     const [error, setError] = (0, import_react11.useState)();
     const [runError, setRunError] = (0, import_react11.useState)();
     const [runDiagnostics, setRunDiagnostics] = (0, import_react11.useState)("");
+    const [sessionID, setSessionID] = (0, import_react11.useState)();
+    const [sessionStatus, setSessionStatus] = (0, import_react11.useState)();
+    const [sessionAttached, setSessionAttached] = (0, import_react11.useState)(false);
+    const [segmentGraphRevisions, setSegmentGraphRevisions] = (0, import_react11.useState)({});
+    const [unloadedSegmentIDs, setUnloadedSegmentIDs] = (0, import_react11.useState)([]);
+    const [revisionNodes, setRevisionNodes] = (0, import_react11.useState)({});
     const [runID, setRunID] = (0, import_react11.useState)();
     const [runStatus, setRunStatus] = (0, import_react11.useState)("idle");
     const [runStarting, setRunStarting] = (0, import_react11.useState)(false);
     const [reloading, setReloading] = (0, import_react11.useState)(false);
     const [runtimeNodes, setRuntimeNodes] = (0, import_react11.useState)({});
+    const [executionNodeID, setExecutionNodeID] = (0, import_react11.useState)();
     const [breakpoints, setBreakpoints] = (0, import_react11.useState)([]);
     const [watches, setWatches] = (0, import_react11.useState)("");
     const [pending, setPending] = (0, import_react11.useState)();
@@ -37296,6 +37710,8 @@
     const [xtsOpened, setXtsOpened] = (0, import_react11.useState)(false);
     const pendingRef = (0, import_react11.useRef)();
     const runIDRef = (0, import_react11.useRef)();
+    const sessionIDRef = (0, import_react11.useRef)();
+    const sessionStatusRef = (0, import_react11.useRef)();
     const runFinishedRef = (0, import_react11.useRef)(false);
     const hostSessionRef = (0, import_react11.useRef)(globalThis.crypto.randomUUID());
     const hostRequestRef = (0, import_react11.useRef)();
@@ -37305,6 +37721,12 @@
     (0, import_react11.useEffect)(() => {
       runIDRef.current = runID;
     }, [runID]);
+    (0, import_react11.useEffect)(() => {
+      sessionIDRef.current = sessionID;
+    }, [sessionID]);
+    (0, import_react11.useEffect)(() => {
+      sessionStatusRef.current = sessionStatus;
+    }, [sessionStatus]);
     const clearActiveRun = () => {
       hostRequestRef.current = void 0;
       pendingRef.current = void 0;
@@ -37335,6 +37757,67 @@
           setStyle(message.style);
           setLoading(false);
           setError(void 0);
+        } else if (message.type === "session.starting" || message.type === "session.reconnecting") {
+          clearActiveRun();
+          setSegmentGraphRevisions({});
+          setUnloadedSegmentIDs([]);
+          setRevisionNodes({});
+          sessionIDRef.current = message.sessionID;
+          sessionStatusRef.current = "active";
+          setSessionID(message.sessionID);
+          setSessionStatus("active");
+          setSessionAttached(false);
+          setRunStarting(true);
+          setRunStatus(message.type === "session.starting" ? "starting" : "reconnecting");
+          setRunError(void 0);
+          setRunDiagnostics("");
+          setRuntimeNodes({});
+          setExecutionNodeID(void 0);
+        } else if (message.type === "session.update") {
+          const state = message.state;
+          sessionIDRef.current = state.sessionID;
+          sessionStatusRef.current = state.sessionStatus;
+          runIDRef.current = state.activeRunID;
+          pendingRef.current = state.pending;
+          setSessionID(state.sessionID);
+          setSessionStatus(state.sessionStatus);
+          setSessionAttached(true);
+          setSegmentGraphRevisions(state.segmentGraphRevisions ?? {});
+          setUnloadedSegmentIDs(state.unloadedSegmentIDs ?? []);
+          if (state.document) setDocument(state.document);
+          setStyle(message.style);
+          setRouteTestContext(void 0);
+          setRouteTests([]);
+          setRouteTestOutcome(void 0);
+          setRouteTestRunning(false);
+          setRouteTestError(void 0);
+          setRuntimeNodes(state.runtimeNodes);
+          setExecutionNodeID(state.executionNodeID);
+          setPending(state.pending);
+          setRunID(state.activeRunID);
+          setRunStatus(state.runStatus);
+          setRunStarting(false);
+          setRunError(void 0);
+          setLoading(false);
+          setError(void 0);
+          runFinishedRef.current = isClosedSessionStatus(state.sessionStatus);
+        } else if (message.type === "session.graph-revision") {
+          if (message.node) {
+            setRevisionNodes((current) => ({ ...current, [message.requestID]: message.node }));
+          } else if (message.error) {
+            setRunError(message.error);
+          }
+        } else if (message.type === "session.error") {
+          setRunStarting(false);
+          setRunError(message.message);
+        } else if (message.type === "session.stderr") {
+          setRunDiagnostics((current) => `${current}${message.text}`.slice(-16 * 1024));
+        } else if (message.type === "session.exit") {
+          setSessionAttached(false);
+          setRunStarting(false);
+          if (!runFinishedRef.current && !["paused", "indeterminate", "failed"].includes(sessionStatusRef.current ?? "")) {
+            setRunError((current) => current ?? (message.code === 0 ? "The session process exited before detaching." : `The session process exited with code ${message.code ?? "unknown"}`));
+          }
         } else if (message.type === "graph.reload-state") {
           setReloading(message.active);
         } else if (message.type === "style") {
@@ -37351,6 +37834,7 @@
           setRunError(void 0);
           setRunDiagnostics("");
           setRuntimeNodes({});
+          setExecutionNodeID(void 0);
           if (message.routeTest) {
             setRouteTestOutcome(void 0);
             setRouteTestError(void 0);
@@ -37364,6 +37848,10 @@
             if (!pendingRef.current) setRunStatus("running");
           } else if (frame2.type === "run.event" && frame2.event) {
             setRuntimeNodes((current) => applyRuntimeEvent(current, frame2.event));
+            if (frame2.event.kind === "step/started" || frame2.event.kind === "step/resumed") {
+              const reachedNodeID = eventNodeID(frame2.event);
+              if (reachedNodeID) setExecutionNodeID(reachedNodeID);
+            }
             if (frame2.event.kind === "run/started" && !pendingRef.current) setRunStatus("running");
             else if (frame2.event.kind === "run/completed") {
               clearActiveRun();
@@ -37381,6 +37869,7 @@
           } else if (frame2.type === "interaction.pending" && frame2.interaction) {
             pendingRef.current = frame2.interaction;
             setPending(frame2.interaction);
+            setExecutionNodeID(frame2.interaction.nodeID ?? frame2.interaction.stepID);
             setRunStatus("waiting");
           } else if (frame2.type === "interaction.resolved") {
             if (hostRequestRef.current?.turnID === frame2.turnID) hostRequestRef.current = void 0;
@@ -37436,21 +37925,30 @@
           if (response.type === "gert.host-action.ack" && response.status === "completed" && response.result?.status === "opened") {
             setXtsOpened(true);
           }
-          vscode.postMessage({
+          const answer = {
+            kind: "host_action",
+            runID: runIDRef.current,
+            turnID: interaction.turnID,
+            correlationID: hostRequest.correlationID,
+            capability: interaction.host_action.capability,
+            status: response.status,
+            result: response.type === "gert.host-action.ack" ? response.result ?? void 0 : void 0
+          };
+          vscode.postMessage(sessionIDRef.current ? {
+            type: "session.command",
+            command: {
+              type: "interaction.answer",
+              runID: runIDRef.current,
+              turnID: interaction.turnID,
+              payload: answer
+            }
+          } : {
             type: "run.command",
             command: {
               type: "interaction.answer",
               runID: runIDRef.current,
               turnID: interaction.turnID,
-              answer: {
-                kind: "host_action",
-                runID: runIDRef.current,
-                turnID: interaction.turnID,
-                correlationID: hostRequest.correlationID,
-                capability: interaction.host_action.capability,
-                status: response.status,
-                result: response.type === "gert.host-action.ack" ? response.result ?? void 0 : void 0
-              }
+              answer
             }
           });
           hostRequestRef.current = void 0;
@@ -37525,6 +38023,7 @@
       runIDRef.current = void 0;
       setRunID(void 0);
       setRuntimeNodes({});
+      setExecutionNodeID(void 0);
       setPending(void 0);
       vscode.postMessage({
         type: "run.start",
@@ -37538,7 +38037,40 @@
         } : {}
       });
     };
+    const startSession = () => {
+      if (!document2 || sessionID) return;
+      const declarations = graphInputDeclarations(document2);
+      const missing = declarations.find((declaration) => declaration.required && !inputValues[declaration.name]);
+      if (missing) {
+        setRunError(`${missing.name} is required.`);
+        return;
+      }
+      setRunError(void 0);
+      vscode.postMessage({ type: "session.start", inputs: inputValues });
+    };
+    const resumeSession = () => {
+      if (!sessionID || !sessionAttached) return;
+      vscode.postMessage({ type: "session.command", command: { type: "session.resume" } });
+    };
+    const closeSession = (status) => {
+      if (!sessionID || !sessionAttached) return;
+      vscode.postMessage({
+        type: "session.command",
+        command: { type: "session.close", payload: { status } }
+      });
+    };
     const cancelRun = () => {
+      if (sessionID && sessionAttached) {
+        vscode.postMessage({
+          type: "session.command",
+          command: {
+            type: "session.cancel",
+            ...runID ? { runID } : {},
+            payload: { reason: "operator cancelled" }
+          }
+        });
+        return;
+      }
       if (!runID) return;
       const hostRequest = hostRequestRef.current;
       if (hostRequest) {
@@ -37559,6 +38091,25 @@
       });
     };
     const resetRun = () => {
+      if (sessionID) {
+        vscode.postMessage({ type: "session.reset" });
+        clearActiveRun();
+        sessionIDRef.current = void 0;
+        sessionStatusRef.current = void 0;
+        setSessionID(void 0);
+        setSessionStatus(void 0);
+        setSessionAttached(false);
+        setSegmentGraphRevisions({});
+        setUnloadedSegmentIDs([]);
+        setRevisionNodes({});
+        setRunStatus("idle");
+        setRunStarting(false);
+        setRunError(void 0);
+        setRunDiagnostics("");
+        setRuntimeNodes({});
+        setExecutionNodeID(void 0);
+        return;
+      }
       if (runStarting || !isTerminalRunStatus(runStatus)) return;
       vscode.postMessage({ type: "run.reset" });
       clearActiveRun();
@@ -37569,12 +38120,21 @@
       setRunError(void 0);
       setRunDiagnostics("");
       setRuntimeNodes({});
+      setExecutionNodeID(void 0);
       setRouteTestOutcome(void 0);
       setRouteTestError(void 0);
     };
     const submitInteraction = (answer) => {
       if (!pending || !runID) return;
-      vscode.postMessage({
+      vscode.postMessage(sessionID ? {
+        type: "session.command",
+        command: {
+          type: "interaction.answer",
+          runID,
+          turnID: pending.turnID,
+          payload: answer
+        }
+      } : {
         type: "run.command",
         command: {
           type: "interaction.answer",
@@ -37675,6 +38235,9 @@
       const frame2 = requestAnimationFrame(() => {
         vscode.postMessage({
           type: "ui.state",
+          sessionID,
+          sessionStatus,
+          sessionAttached,
           runID,
           runStatus,
           runStarting,
@@ -37685,6 +38248,9 @@
           pendingTurnID: pending?.turnID,
           inputCount: document2 ? graphInputDeclarations(document2).length : 0,
           graphNodeIDs: document2?.nodes.map((node) => node.id) ?? [],
+          segmentCount: document2?.groups.filter((group) => group.kind === "session-segment").length ?? 0,
+          handoffEdgeCount: document2?.edges.filter((edge) => edge.type === "session-transition").length ?? 0,
+          visibleGraphNodeIDs: Array.from(window.document.querySelectorAll(".react-flow__node-gertStep")).map((node) => node.dataset.id).filter(Boolean),
           inputValues: Object.fromEntries(Object.entries(inputValues).map(([name, value]) => {
             const declaration = document2 ? graphInputDeclarations(document2).find((input) => input.name === name) : void 0;
             return [name, declaration?.type === "secret" && value ? "<redacted>" : value];
@@ -37704,11 +38270,16 @@
           savedRouteTestResults: Object.fromEntries(routeTests.map(({ artifact }) => [artifact.id, artifact.last_result?.status])),
           collectorReviewVisible: window.document.querySelector(".collector-review") !== null,
           visibleButtons: Array.from(window.document.querySelectorAll("button")).map((button) => button.textContent?.trim()).filter(Boolean),
-          nodeStatuses: Object.fromEntries(Object.entries(runtimeNodes).map(([id2, state]) => [id2, state.status]))
+          nodeStatuses: Object.fromEntries(Object.entries(runtimeNodes).map(([id2, state]) => [id2, state.status])),
+          executionNodeID,
+          executionPositionLabel: window.document.querySelector(".execution-position-strip > div > span")?.textContent?.trim(),
+          executionPositionTitle: window.document.querySelector(".execution-position-strip strong")?.textContent?.trim(),
+          currentExecutionMarkerCount: window.document.querySelectorAll(".step-node.execution-current").length,
+          lastExecutionMarkerCount: window.document.querySelectorAll(".step-node.execution-last").length
         });
       });
       return () => cancelAnimationFrame(frame2);
-    }, [document2, inputValues, runID, runStatus, runStarting, reloading, runError, pending?.turnID, runtimeNodes, breakpoints, routeTestContext?.planHash, routeTestOutcome, routeTestError, routeTests, testMode]);
+    }, [document2, inputValues, sessionID, sessionStatus, sessionAttached, runID, runStatus, runStarting, reloading, runError, pending?.turnID, runtimeNodes, executionNodeID, breakpoints, routeTestContext?.planHash, routeTestOutcome, routeTestError, routeTests, testMode]);
     if (loading) return /* @__PURE__ */ import_react11.default.createElement("div", { className: "state", role: "status" }, "Loading runbook...");
     if (error) return /* @__PURE__ */ import_react11.default.createElement("div", { className: "state error", role: "alert" }, error);
     if (!document2) return /* @__PURE__ */ import_react11.default.createElement("div", { className: "state", role: "status" }, "No graph loaded");
@@ -37719,9 +38290,16 @@
         testMode,
         style: style2,
         runtimeNodes,
+        executionNodeID,
         breakpoints,
         watches,
         pending,
+        sessionID,
+        sessionStatus,
+        sessionAttached,
+        segmentGraphRevisions,
+        unloadedSegmentIDs,
+        revisionNodes,
         runID,
         runStatus,
         runStarting,
@@ -37731,6 +38309,16 @@
         inputValues,
         onInputChange: (name, value) => setInputValues((current) => ({ ...current, [name]: value })),
         onRun: () => startRun(false),
+        onStartSession: startSession,
+        onResumeSession: resumeSession,
+        onCloseSession: closeSession,
+        onRequestGraphRevision: (requestID, segmentID, revision, originalNodeID) => vscode.postMessage({
+          type: "session.graph-revision",
+          requestID,
+          segmentID,
+          revision,
+          originalNodeID
+        }),
         onDebugRun: () => startRun(true),
         onReset: resetRun,
         onCancel: cancelRun,
@@ -37846,6 +38434,7 @@ lucide-react/dist/esm/icons/file-input.js:
 lucide-react/dist/esm/icons/flag.js:
 lucide-react/dist/esm/icons/git-branch.js:
 lucide-react/dist/esm/icons/list-checks.js:
+lucide-react/dist/esm/icons/locate-fixed.js:
 lucide-react/dist/esm/icons/message-square-text.js:
 lucide-react/dist/esm/icons/package-open.js:
 lucide-react/dist/esm/icons/panel-right.js:

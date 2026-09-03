@@ -229,6 +229,7 @@ export function withBranchMerges(document: GraphDocument): GraphDocument {
         order: nodeOrder(continuationNode) - 0.5,
         synthetic: true,
         merge_for: branchID,
+        ...(typeof branch?.data.segment_id === 'string' ? { segment_id: branch.data.segment_id } : {}),
       },
       position: { x: 0, y: 0 },
     });

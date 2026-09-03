@@ -1,5 +1,5 @@
 import dagre from '@dagrejs/dagre';
-import { ArrowLeft, ArrowRight, Bug, CircleDot, PanelRight, Play, RotateCcw, Square } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Bug, CheckCircle2, CircleDot, LocateFixed, PanelRight, Play, RotateCcw, Square, Workflow } from 'lucide-react';
 import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import ReactFlow, {
@@ -39,10 +39,13 @@ import { isTerminalRunStatus } from '../src/runStatus';
 import {
   buildRouteProjectionIndex,
   computeRouteProjection,
+  computeSessionRouteProjection,
   projectRouteDocument,
+  sessionRouteDocument,
   type RouteProjectionScope,
 } from '../src/routeProjection';
 import type { RouteTestArtifact } from '../src/routeTestTypes';
+import { sessionGraphTopologyKey, type SessionGraphViewState } from '../src/sessionCompositeGraph';
 import { parseHostActionResponse, type HostActionResponseEnvelope } from '../src/hostActionWebviewProtocol';
 import {
   collectorInputType,
@@ -76,6 +79,13 @@ type HostMessage =
   | { type: 'run.error'; message: string }
   | { type: 'run.stderr'; text: string }
   | { type: 'run.exit'; code: number | null; signal: string | null }
+  | { type: 'session.starting'; sessionID: string }
+  | { type: 'session.reconnecting'; sessionID: string }
+  | { type: 'session.update'; state: SessionGraphViewState; style: NodeStyle }
+  | { type: 'session.graph-revision'; requestID: string; node?: GraphNode; error?: string }
+  | { type: 'session.error'; message: string }
+  | { type: 'session.stderr'; text: string }
+  | { type: 'session.exit'; code: number | null; signal: string | null }
   | { type: 'route-tests'; routeTests: SavedRouteTestView[] }
   | { type: 'route-test.saved'; artifact: RouteTestArtifact; running: boolean }
   | { type: 'route-test.error'; message: string }
@@ -222,6 +232,14 @@ const DEFAULT_INSPECTOR_RATIO = 0.31;
 const MIN_INSPECTOR_RATIO = 0.2;
 const MAX_INSPECTOR_RATIO = 0.65;
 
+function isClosedSessionStatus(status: string): boolean {
+  return ['resolved', 'escalated', 'cancelled', 'abandoned'].includes(status);
+}
+
+function revisionNodeKey(segmentID: string, revision: number, originalNodeID: string): string {
+  return JSON.stringify([segmentID, revision, originalNodeID]);
+}
+
 function clampInspectorRatio(value: number): number {
   return Math.min(MAX_INSPECTOR_RATIO, Math.max(MIN_INSPECTOR_RATIO, value));
 }
@@ -265,6 +283,7 @@ const kindLabels: Record<string, string> = {
 
 const RuntimeNodesContext = createContext<Readonly<Record<string, RuntimeNodeState>>>({});
 const DebugBreakpointsContext = createContext<ReadonlySet<string>>(new Set());
+const ExecutionPositionContext = createContext<{ nodeID?: string; terminal: boolean }>({ terminal: false });
 
 function breakpointKey(nodeID: string, phase: DirectDebugPhase): string {
   return `${nodeID}:${phase}`;
@@ -273,6 +292,7 @@ function breakpointKey(nodeID: string, phase: DirectDebugPhase): string {
 function StepNode({ data, selected }: NodeProps<GraphNodeData>) {
   const runtimeNodes = useContext(RuntimeNodesContext);
   const debugBreakpoints = useContext(DebugBreakpointsContext);
+  const executionPosition = useContext(ExecutionPositionContext);
   const kind = typeof data.kind === 'string' ? data.kind : 'step';
   const id = typeof data.id === 'string' ? data.id : '';
   const title = typeof data.title === 'string' ? data.title : '';
@@ -282,27 +302,30 @@ function StepNode({ data, selected }: NodeProps<GraphNodeData>) {
   const error = runtime?.error ?? (typeof data.error === 'string' ? data.error : '');
   const hasBeforeBreakpoint = debugBreakpoints.has(breakpointKey(id, 'before'));
   const hasAfterBreakpoint = debugBreakpoints.has(breakpointKey(id, 'after'));
-  const isCurrent = status === 'running' || status === 'delaying';
-  const focusedLabel = `Focused step: ${id}`;
-  const currentLabel = `Current step: ${id}`;
+  const isCurrent = executionPosition.nodeID === id;
+  const locatorText = title || id;
+  const focusedLabel = `Focused step: ${locatorText}`;
+  const currentLabel = `Current step: ${locatorText}`;
+  const executionLabel = executionPosition.terminal ? 'Last reached' : 'Current';
+  const executionAriaLabel = executionPosition.terminal ? `Last reached step: ${locatorText}` : currentLabel;
 
   return (
     <>
       <NodeToolbar isVisible={selected} position={Position.Left} align="center" offset={12}>
         <div className="node-locator focused" role="status" aria-label={focusedLabel} title={focusedLabel}>
           <span>Focused</span>
-          <code>{id}</code>
+          <code title={id}>{locatorText}</code>
           <ArrowRight aria-hidden="true" />
         </div>
       </NodeToolbar>
       <NodeToolbar isVisible={isCurrent} position={Position.Right} align="center" offset={12}>
-        <div className="node-locator current" role="status" aria-label={currentLabel} title={currentLabel}>
+        <div className={`node-locator ${executionPosition.terminal ? 'last-reached' : 'current'}`} role="status" aria-label={executionAriaLabel} title={executionAriaLabel}>
           <ArrowLeft aria-hidden="true" />
-          <span>Current</span>
-          <code>{id}</code>
+          <span>{executionLabel}</span>
+          <code title={id}>{locatorText}</code>
         </div>
       </NodeToolbar>
-      <div className={`step-node kind-${kind} status-${status}${selected ? ' selected' : ''}`}>
+      <div className={`step-node kind-${kind} status-${status}${selected ? ' selected' : ''}${isCurrent ? executionPosition.terminal ? ' execution-last' : ' execution-current' : ''}`}>
         <Handle type="target" position={Position.Top} />
         <div className="step-heading">
           <span className="kind-mark" aria-hidden="true">{kind.slice(0, 2).toUpperCase()}</span>
@@ -323,9 +346,12 @@ function StepNode({ data, selected }: NodeProps<GraphNodeData>) {
 }
 
 function FrameNode({ data }: NodeProps<GraphNodeData>) {
+  const segmentStatus = typeof data.segment_status === 'string' ? data.segment_status : '';
   return (
     <div className="frame-content">
       <span>{String(data.label ?? data.kind ?? '')}</span>
+      {segmentStatus ? <em className={`segment-status status-${segmentStatus}`}>{segmentStatus.replaceAll('_', ' ')}</em> : null}
+      {data.graph_loaded === false ? <em>Load on demand</em> : null}
       {data.empty ? <em>Empty route</em> : null}
     </div>
   );
@@ -341,7 +367,17 @@ function BranchMergeNode() {
   );
 }
 
-const nodeTypes = { gertStep: StepNode, branchMerge: BranchMergeNode, frameBox: FrameNode };
+function SessionEntryNode() {
+  return (
+    <div className="session-entry-node" title="Segment entry">
+      <Handle type="target" position={Position.Top} />
+      <span aria-hidden="true" />
+      <Handle type="source" position={Position.Bottom} />
+    </div>
+  );
+}
+
+const nodeTypes = { gertStep: StepNode, branchMerge: BranchMergeNode, sessionEntry: SessionEntryNode, frameBox: FrameNode };
 
 function InputsForm({
   declarations,
@@ -903,7 +939,7 @@ interface GroupBounds {
 }
 
 function nodeDimensions(kind: string, style: NodeStyle): Dimensions {
-  if (kind === 'merge') return { width: 14, height: 14 };
+  if (kind === 'merge' || kind === 'session-entry') return { width: 14, height: 14 };
   if (style === 'minimalist') {
     if (kind === 'end') return { width: 164, height: 48 };
     if (kind === 'branch' || kind === 'decision' || kind === 'choice') return { width: 190, height: 66 };
@@ -1093,6 +1129,9 @@ function layoutDocument(
           frame_id: bounds.group.frame_id,
           parent_group_id: bounds.parentGroupID,
           empty: bounds.empty,
+          segment_id: bounds.group.segment_id,
+          segment_status: bounds.group.segment_status,
+          run_id: bounds.group.run_id,
         },
         selectable: false,
         draggable: false,
@@ -1105,7 +1144,7 @@ function layoutDocument(
     const parentBounds = groupID ? groupBounds.get(groupID) : undefined;
     return {
       id: node.id,
-      type: node.data.synthetic === true ? 'branchMerge' : 'gertStep',
+      type: node.data.kind === 'session-entry' ? 'sessionEntry' : node.data.synthetic === true ? 'branchMerge' : 'gertStep',
       position: {
         x: position.x - (parentBounds?.x ?? 0),
         y: position.y - (parentBounds?.y ?? 0),
@@ -1136,6 +1175,52 @@ function layoutDocument(
       markerEnd: { type: MarkerType.ArrowClosed },
       data: { graphEdge: edge },
     })),
+  };
+}
+
+function refreshLayoutMetadata(
+  layout: ReturnType<typeof layoutDocument>,
+  document: GraphDocument,
+  style: NodeStyle,
+): ReturnType<typeof layoutDocument> {
+  const nodeByID = new Map(document.nodes.map((node) => [node.id, node]));
+  const groupByID = new Map(document.groups.map((group) => [group.id, group]));
+  const edgeByID = new Map(document.edges.map((edge) => [edge.id, edge]));
+  return {
+    nodes: layout.nodes.map((node) => {
+      if (node.type === 'frameBox') {
+        const group = groupByID.get(node.id);
+        return group ? {
+          ...node,
+          className: `${group.kind}${node.data.empty ? ' empty-group' : ''}`,
+          data: {
+            ...node.data,
+            kind: group.kind,
+            label: groupLabel(group),
+            frame_id: group.frame_id,
+            segment_id: group.segment_id,
+            segment_status: group.segment_status,
+            run_id: group.run_id,
+            graph_loaded: group.graph_loaded,
+          },
+        } : node;
+      }
+      const source = nodeByID.get(node.id);
+      return source ? {
+        ...node,
+        data: {
+          ...source.data,
+          id: source.data.id ?? source.id,
+          graph_parent_node: source.parentNode ?? '',
+          graph_extent: source.extent ?? '',
+          nodeStyle: style,
+        },
+      } : node;
+    }),
+    edges: layout.edges.map((edge) => {
+      const source = edgeByID.get(edge.id);
+      return source ? { ...edge, label: source.label, data: { graphEdge: source } } : edge;
+    }),
   };
 }
 
@@ -1379,9 +1464,16 @@ function GraphView({
   testMode,
   style,
   runtimeNodes,
+  executionNodeID,
   breakpoints,
   watches,
   pending,
+  sessionID,
+  sessionStatus,
+  sessionAttached,
+  segmentGraphRevisions,
+  unloadedSegmentIDs,
+  revisionNodes,
   runID,
   runStatus,
   runStarting,
@@ -1391,6 +1483,10 @@ function GraphView({
   inputValues,
   onInputChange,
   onRun,
+  onStartSession,
+  onResumeSession,
+  onCloseSession,
+  onRequestGraphRevision,
   onDebugRun,
   onReset,
   onCancel,
@@ -1412,9 +1508,16 @@ function GraphView({
   testMode: boolean;
   style: NodeStyle;
   runtimeNodes: Readonly<Record<string, RuntimeNodeState>>;
+  executionNodeID?: string;
   breakpoints: DebugBreakpointView[];
   watches: string;
   pending?: PendingInteraction;
+  sessionID?: string;
+  sessionStatus?: string;
+  sessionAttached: boolean;
+  segmentGraphRevisions: Readonly<Record<string, readonly number[]>>;
+  unloadedSegmentIDs: readonly string[];
+  revisionNodes: Readonly<Record<string, GraphNode>>;
   runID?: string;
   runStatus: string;
   runStarting: boolean;
@@ -1424,6 +1527,10 @@ function GraphView({
   inputValues: Record<string, string>;
   onInputChange(name: string, value: string): void;
   onRun(): void;
+  onStartSession(): void;
+  onResumeSession(): void;
+  onCloseSession(status: 'resolved' | 'escalated' | 'cancelled' | 'abandoned'): void;
+  onRequestGraphRevision(requestID: string, segmentID: string, revision: number, originalNodeID: string): void;
   onDebugRun(): void;
   onReset(): void;
   onCancel(): void;
@@ -1447,6 +1554,9 @@ function GraphView({
   const [routeTargetID, setRouteTargetID] = useState<string>();
   const [routeScope, setRouteScope] = useState<RouteProjectionScope>('through');
   const [routeTestEditor, setRouteTestEditor] = useState<{ artifact?: RouteTestArtifact; needsReview?: boolean; key: string; contextKey: string }>();
+  const [locateNodeID, setLocateNodeID] = useState<string>();
+  const [closeStatus, setCloseStatus] = useState<'resolved' | 'escalated' | 'cancelled' | 'abandoned'>('resolved');
+  const [inspectionRevision, setInspectionRevision] = useState<{ nodeID: string; revision: number }>();
   const flowRef = useRef<ReactFlowInstance<GraphNodeData>>();
   const canvasRef = useRef<HTMLElement>(null);
   const workspaceRef = useRef<HTMLDivElement>(null);
@@ -1454,23 +1564,45 @@ function GraphView({
   const restoreViewportRef = useRef<Viewport>();
   const declarations = useMemo(() => graphInputDeclarations(document), [document]);
   const structuralDocument = useMemo(() => withBranchMerges(document), [document]);
-  const routeIndex = useMemo(() => buildRouteProjectionIndex(structuralDocument), [structuralDocument]);
+  const routeSourceDocument = useMemo(
+    () => sessionID ? sessionRouteDocument(structuralDocument, runtimeNodes, routeTargetID) : structuralDocument,
+    [routeTargetID, runtimeNodes, sessionID, structuralDocument],
+  );
+  const routeIndex = useMemo(() => buildRouteProjectionIndex(routeSourceDocument), [routeSourceDocument]);
   const routeProjection = useMemo(
-    () => routeTargetID ? computeRouteProjection(structuralDocument, routeTargetID, routeScope, routeIndex) : undefined,
-    [routeIndex, routeScope, routeTargetID, structuralDocument],
+    () => routeTargetID
+      ? sessionID
+        ? computeSessionRouteProjection(routeSourceDocument, routeTargetID, routeScope, routeIndex)
+        : computeRouteProjection(routeSourceDocument, routeTargetID, routeScope, routeIndex)
+      : undefined,
+    [routeIndex, routeScope, routeSourceDocument, routeTargetID, sessionID],
   );
   const prerequisiteProjection = useMemo(
-    () => routeTargetID ? computeRouteProjection(structuralDocument, routeTargetID, 'to', routeIndex) : undefined,
-    [routeIndex, routeTargetID, structuralDocument],
+    () => routeTargetID
+      ? sessionID
+        ? computeSessionRouteProjection(routeSourceDocument, routeTargetID, 'to', routeIndex)
+        : computeRouteProjection(routeSourceDocument, routeTargetID, 'to', routeIndex)
+      : undefined,
+    [routeIndex, routeSourceDocument, routeTargetID, sessionID],
   );
   const displayDocument = useMemo(
-    () => routeProjection ? projectRouteDocument(structuralDocument, routeProjection) : structuralDocument,
-    [routeProjection, structuralDocument],
+    () => routeProjection ? projectRouteDocument(routeSourceDocument, routeProjection) : structuralDocument,
+    [routeProjection, routeSourceDocument, structuralDocument],
   );
-  const layout = useMemo(() => layoutDocument(displayDocument, style), [displayDocument, style]);
+  const layoutTopologyKey = useMemo(() => sessionGraphTopologyKey(displayDocument), [displayDocument]);
+  const layoutGeometry = useMemo(() => layoutDocument(displayDocument, style), [layoutTopologyKey, style]);
+  const layout = useMemo(
+    () => refreshLayoutMetadata(layoutGeometry, displayDocument, style),
+    [displayDocument, layoutGeometry, style],
+  );
   const runtimeEdges = useMemo(() => layout.edges.map((edge) => ({
     ...edge,
-    className: edge.data?.graphEdge ? runtimeEdgeClass(edge.data.graphEdge, runtimeNodes) : undefined,
+    className: edge.data?.graphEdge
+      ? [
+          edge.data.graphEdge.type === 'session-transition' ? 'edge-session-transition' : '',
+          runtimeEdgeClass(edge.data.graphEdge, runtimeNodes) ?? '',
+        ].filter(Boolean).join(' ') || undefined
+      : undefined,
   })), [layout.edges, runtimeNodes]);
   const focusedNodeID = routeTargetID ?? selectedId;
   const displayNodes = useMemo(() => layout.nodes.map((node) => ({
@@ -1478,11 +1610,36 @@ function GraphView({
     selected: node.id === focusedNodeID,
   })), [focusedNodeID, layout.nodes]);
   const activeNodeIDs = useMemo(() => activeGraphNodeIDs(structuralDocument, runtimeNodes), [structuralDocument, runtimeNodes]);
+  const executionNode = executionNodeID
+    ? document.nodes.find((node) => node.id === executionNodeID) ??
+      document.nodes.find((node) => node.data.step_id === executionNodeID)
+    : undefined;
+  const resolvedExecutionNodeID = executionNode?.id;
+  const executionTerminal = isTerminalRunStatus(runStatus);
+  const executionPosition = useMemo(
+    () => ({ nodeID: resolvedExecutionNodeID, terminal: executionTerminal }),
+    [executionTerminal, resolvedExecutionNodeID],
+  );
   const breakpointKeys = useMemo(
     () => new Set(breakpoints.map((breakpoint) => breakpointKey(breakpoint.nodeID, breakpoint.phase))),
     [breakpoints],
   );
   const selected = document.nodes.find((node) => node.id === selectedId);
+  const selectedSegmentID = typeof selected?.data.segment_id === 'string' ? selected.data.segment_id : '';
+  const selectedOriginalNodeID = typeof selected?.data.original_node_id === 'string'
+    ? selected.data.original_node_id
+    : selected?.id ?? '';
+  const availableGraphRevisions = selectedSegmentID ? segmentGraphRevisions[selectedSegmentID] ?? [] : [];
+  const latestGraphRevision = availableGraphRevisions[availableGraphRevisions.length - 1];
+  const selectedGraphRevision = inspectionRevision && inspectionRevision.nodeID === selected?.id
+    ? inspectionRevision.revision
+    : latestGraphRevision;
+  const revisionRequestID = selected && selectedSegmentID && selectedGraphRevision !== undefined
+    ? revisionNodeKey(selectedSegmentID, selectedGraphRevision, selectedOriginalNodeID)
+    : '';
+  const inspectedNode = selectedGraphRevision === latestGraphRevision
+    ? selected
+    : revisionNodes[revisionRequestID];
   const routeTarget = document.nodes.find((node) => node.id === routeTargetID);
   const routeTargetName = String(routeTarget?.data.title || routeTarget?.data.id || routeTarget?.id || 'selected step');
   const routeTestCandidates = useMemo(() => {
@@ -1499,7 +1656,13 @@ function GraphView({
     return [`${String(node.data.title || node.data.id || node.id)} (${dynamicInclude ? 'dynamic include' : kind})`];
   }), [document, prerequisiteProjection, routeTargetID]);
   const savedRouteTests = routeTarget ? routeTests.filter(({ artifact }) => routeTestMatchesTarget(artifact, routeTarget)) : [];
-  const runActive = runStarting || (!!runID && !isTerminalRunStatus(runStatus));
+  const sessionClosed = !!sessionID && isClosedSessionStatus(sessionStatus ?? '');
+  const sessionPaused = !!sessionID && !!runID && ['paused', 'paused_at_boundary', 'handoff_pending'].includes(runStatus);
+  const runActive = runStarting || (!!runID && !isTerminalRunStatus(runStatus) && !sessionPaused);
+  const sessionSegmentCount = document.groups.filter((group) => group.kind === 'session-segment').length;
+  const routeActionsDisabled = runActive && !sessionID;
+  const canCloseSession = !!sessionID && sessionAttached && !sessionClosed &&
+    (!runID || sessionPaused || ['completed', 'failed', 'cancelled', 'indeterminate'].includes(runStatus));
   const routeTestContextKey = `${document.hash}:${routeTestContext?.planHash ?? ''}`;
   const currentRouteTestEditor = routeTestEditor?.contextKey === routeTestContextKey ? routeTestEditor : undefined;
   const routeTestReviewOpen = currentRouteTestEditor !== undefined;
@@ -1509,11 +1672,22 @@ function GraphView({
     setRouteScope('through');
     setRouteTargetID(nodeID);
     setSelectedId(nodeID);
+    const target = document.nodes.find((node) => node.id === nodeID);
+    if (sessionID && typeof target?.data.segment_id === 'string') {
+      vscode.postMessage({ type: 'session.load-route', targetSegmentID: target.data.segment_id });
+    }
   };
   const showFullGraph = () => {
     setSelectedId(routeTargetID);
     setRouteTargetID(undefined);
     setRouteTestEditor(undefined);
+  };
+  const locateExecutionNode = () => {
+    if (!resolvedExecutionNodeID) return;
+    setRouteTargetID(undefined);
+    setRouteTestEditor(undefined);
+    setSelectedId(resolvedExecutionNodeID);
+    setLocateNodeID(resolvedExecutionNodeID);
   };
 
   const resizeInspectorFromClientX = (clientX: number) => {
@@ -1535,6 +1709,15 @@ function GraphView({
   };
 
   useEffect(() => persistInspectorRatio(inspectorRatio), [inspectorRatio]);
+
+  useEffect(() => {
+    if (!sessionID || !selectedSegmentID || selected?.data.graph_loaded !== false ||
+        !unloadedSegmentIDs.includes(selectedSegmentID)) return;
+    const revision = segmentGraphRevisions[selectedSegmentID]?.at(-1);
+    if (revision) vscode.postMessage({ type: 'session.load-segment', segmentID: selectedSegmentID, revision });
+  }, [selected?.id, selected?.data.graph_loaded, selectedSegmentID, sessionID, segmentGraphRevisions, unloadedSegmentIDs]);
+
+  useEffect(() => setInspectionRevision(undefined), [selected?.id]);
 
   useEffect(() => {
     if (pending?.nodeID || pending?.stepID) setSelectedId(pending.nodeID ?? pending.stepID);
@@ -1583,6 +1766,28 @@ function GraphView({
   }, [layout.edges.length, layout.nodes.length, routeScope, routeTargetID]);
 
   useEffect(() => {
+    if (!locateNodeID || routeTargetID) return;
+    let frame = 0;
+    let attempts = 0;
+    const locate = () => {
+      frame = requestAnimationFrame(() => {
+        const target = flowRef.current?.getNode(locateNodeID);
+        const targetReady = target && typeof target.width === 'number' && target.width > 0 &&
+          typeof target.height === 'number' && target.height > 0;
+        attempts += 1;
+        if (!targetReady && attempts < 4) {
+          locate();
+          return;
+        }
+        setLocateNodeID(undefined);
+        if (targetReady) flowRef.current?.fitView({ nodes: [target], padding: 1.2, duration: 250, maxZoom: 1.2 });
+      });
+    };
+    locate();
+    return () => cancelAnimationFrame(frame);
+  }, [locateNodeID, routeTargetID]);
+
+  useEffect(() => {
     if (!routeTargetID) return;
     let frame = 0;
     const refit = () => {
@@ -1628,11 +1833,11 @@ function GraphView({
       <header className="toolbar">
         <div className="identity">
           <strong>{document.runbook.name ?? document.runbook.id ?? 'Runbook'}</strong>
-          <span>{document.nodes.length} steps</span>
+          <span>{sessionID ? `${sessionSegmentCount} segments | ${document.nodes.length} steps` : `${document.nodes.length} steps`}</span>
         </div>
         <div className="run-actions">
           <span className={`run-status status-${runStatus}`} role="status" aria-live="polite">{runStarting ? 'starting' : runStatus}</span>
-          {!runActive ? (
+          {!runActive && !sessionID ? (
             <button
               className="primary"
               type="button"
@@ -1642,7 +1847,18 @@ function GraphView({
             >
               <Play aria-hidden="true" />Run</button>
           ) : null}
-          {!runActive ? (
+          {!runActive && !sessionID ? (
+            <button
+              className="session-run"
+              type="button"
+              disabled={routeTestReviewOpen || reloading}
+              title="Start a durable investigation session"
+              onClick={onStartSession}
+            >
+              <Workflow aria-hidden="true" /><span>Start session</span>
+            </button>
+          ) : null}
+          {!runActive && !sessionID ? (
             <button
               className="debug-run"
               type="button"
@@ -1659,13 +1875,35 @@ function GraphView({
               <Bug aria-hidden="true" /><span>Debug Run</span>
             </button>
           ) : null}
-          {!runActive && isTerminalRunStatus(runStatus) ? (
+          {!runActive && (sessionID ? sessionClosed || (!sessionAttached && !runStarting) : isTerminalRunStatus(runStatus)) ? (
             <button className="reset-run" type="button" onClick={() => {
               setRouteTestEditor(undefined);
               onReset();
             }}>
               <RotateCcw aria-hidden="true" />Reset
             </button>
+          ) : null}
+          {sessionID && sessionPaused && sessionAttached ? (
+            <button className="primary" type="button" onClick={onResumeSession}>
+              <Play aria-hidden="true" />Resume
+            </button>
+          ) : null}
+          {canCloseSession ? (
+            <div className="session-close-actions">
+              <select
+                aria-label="Investigation outcome"
+                value={closeStatus}
+                onChange={(event) => setCloseStatus(event.target.value as typeof closeStatus)}
+              >
+                <option value="resolved">Resolved</option>
+                <option value="escalated">Escalated</option>
+                <option value="cancelled">Cancelled</option>
+                <option value="abandoned">Abandoned</option>
+              </select>
+              <button className="primary" type="button" onClick={() => onCloseSession(closeStatus)}>
+                <CheckCircle2 aria-hidden="true" />Close
+              </button>
+            </div>
           ) : null}
           {runActive && runID ? <button className="danger" type="button" onClick={onCancel}><Square aria-hidden="true" />Cancel</button> : null}
           <select
@@ -1689,6 +1927,18 @@ function GraphView({
         onChange={onInputChange}
       />
       {runError ? <div className="run-error" role="alert">{runError}</div> : null}
+      {executionNode ? (
+        <section className={`execution-position-strip ${executionTerminal ? 'last-reached' : 'current'}`} aria-live="polite">
+          <div>
+            <span>{executionTerminal ? 'Last reached' : 'Current step'}</span>
+            <strong>{String(executionNode.data.title || executionNode.data.step_id || executionNode.id)}</strong>
+            <code title={executionNode.id}>{String(executionNode.data.step_id || executionNode.id)}</code>
+          </div>
+          <button type="button" onClick={locateExecutionNode} title={`Locate ${String(executionNode.data.title || executionNode.id)} on the graph`}>
+            <LocateFixed aria-hidden="true" /><span>Locate</span>
+          </button>
+        </section>
+      ) : null}
       {routeTargetID && routeProjection ? (
         <section className="route-view-strip" aria-label={`Routes through ${routeTargetName}`}>
           <div className="route-view-copy">
@@ -1703,7 +1953,7 @@ function GraphView({
               <button type="button" role="radio" aria-checked={routeScope === 'to'} onClick={() => setRouteScope('to')}>To this step</button>
               <button type="button" role="radio" aria-checked={routeScope === 'from'} onClick={() => setRouteScope('from')}>From this step</button>
             </div>
-            <button type="button" disabled={runActive} onClick={showFullGraph}>Show full graph</button>
+            <button type="button" disabled={routeActionsDisabled} onClick={showFullGraph}>Show full graph</button>
           </div>
         </section>
       ) : null}
@@ -1723,8 +1973,9 @@ function GraphView({
       >
         <section ref={canvasRef} className="canvas" aria-label="Runbook structure">
           <RuntimeNodesContext.Provider value={runtimeNodes}>
-            <DebugBreakpointsContext.Provider value={breakpointKeys}>
-              <ReactFlowProvider>
+            <ExecutionPositionContext.Provider value={executionPosition}>
+              <DebugBreakpointsContext.Provider value={breakpointKeys}>
+                <ReactFlowProvider>
                 <ReactFlow
                   nodes={displayNodes}
                   edges={runtimeEdges}
@@ -1744,8 +1995,9 @@ function GraphView({
                     pannable
                     zoomable
                     ariaLabel="Runbook overview"
-                    nodeColor={(node) => node.selected
-                      ? 'var(--vscode-charts-yellow)'
+                    nodeColor={(node) => node.id === resolvedExecutionNodeID
+                      ? executionTerminal ? 'var(--vscode-charts-blue)' : 'var(--vscode-charts-green)'
+                      : node.selected ? 'var(--vscode-charts-yellow)'
                       : ['running', 'delaying'].includes(runtimeNodes[node.id]?.status ?? '')
                         ? 'var(--vscode-charts-green)'
                         : 'var(--vscode-foreground)'}
@@ -1753,8 +2005,9 @@ function GraphView({
                     nodeStrokeWidth={3}
                   />
                 </ReactFlow>
-              </ReactFlowProvider>
-            </DebugBreakpointsContext.Provider>
+                </ReactFlowProvider>
+              </DebugBreakpointsContext.Provider>
+            </ExecutionPositionContext.Provider>
           </RuntimeNodesContext.Provider>
         </section>
         {showPanel ? (
@@ -1821,7 +2074,7 @@ function GraphView({
             <div className="selected-step-panel">
               {!routeTargetID || routeTargetID !== selected.id ? (
                 <div className="route-context-action">
-                  <button type="button" disabled={runActive} onClick={() => showRoutesThrough(selected.id)}>Show routes through this step</button>
+                  <button type="button" disabled={routeActionsDisabled} onClick={() => showRoutesThrough(selected.id)}>Show routes through this step</button>
                 </div>
               ) : null}
               {routeTargetID === selected.id && routeTestContext ? (
@@ -1855,11 +2108,24 @@ function GraphView({
                   ) : null}
                 </section>
               ) : null}
-              <StepInspector
-                node={selected}
+              {inspectedNode ? <StepInspector
+                node={inspectedNode}
                 runtime={runtimeNodes[selected.id]}
+                availableGraphRevisions={availableGraphRevisions}
+                selectedGraphRevision={selectedGraphRevision}
+                onGraphRevisionChange={(revision) => {
+                  setInspectionRevision({ nodeID: selected.id, revision });
+                  if (revision !== latestGraphRevision) {
+                    onRequestGraphRevision(
+                      revisionNodeKey(selectedSegmentID, revision, selectedOriginalNodeID),
+                      selectedSegmentID,
+                      revision,
+                      selectedOriginalNodeID,
+                    );
+                  }
+                }}
                 debugControls={(
-                  <DebugSelectionControls
+                  selectedGraphRevision === latestGraphRevision ? <DebugSelectionControls
                     document={document}
                     node={selected}
                     breakpoints={breakpoints}
@@ -1867,14 +2133,15 @@ function GraphView({
                     disabled={runActive}
                     onToggle={onToggleBreakpoint}
                     onWatchesChange={onWatchesChange}
-                  />
+                  /> : <p className="debug-protected">Historical graph revisions are read-only.</p>
                 )}
-              />
+              /> : <div className="inspector-blank" role="status">Loading graph revision...</div>}
             </div>
           ) : (
             <RunOverview
               document={document}
               runtimeNodes={runtimeNodes}
+              executionNodeID={resolvedExecutionNodeID}
               runID={runID}
               runStatus={runStarting ? 'starting' : runStatus}
               inputs={declarations.map((declaration) => ({
@@ -1901,11 +2168,18 @@ function App() {
   const [error, setError] = useState<string>();
   const [runError, setRunError] = useState<string>();
   const [runDiagnostics, setRunDiagnostics] = useState('');
+  const [sessionID, setSessionID] = useState<string>();
+  const [sessionStatus, setSessionStatus] = useState<string>();
+  const [sessionAttached, setSessionAttached] = useState(false);
+  const [segmentGraphRevisions, setSegmentGraphRevisions] = useState<Record<string, readonly number[]>>({});
+  const [unloadedSegmentIDs, setUnloadedSegmentIDs] = useState<readonly string[]>([]);
+  const [revisionNodes, setRevisionNodes] = useState<Record<string, GraphNode>>({});
   const [runID, setRunID] = useState<string>();
   const [runStatus, setRunStatus] = useState('idle');
   const [runStarting, setRunStarting] = useState(false);
   const [reloading, setReloading] = useState(false);
   const [runtimeNodes, setRuntimeNodes] = useState<Record<string, RuntimeNodeState>>({});
+  const [executionNodeID, setExecutionNodeID] = useState<string>();
   const [breakpoints, setBreakpoints] = useState<DebugBreakpointView[]>([]);
   const [watches, setWatches] = useState('');
   const [pending, setPending] = useState<PendingInteraction>();
@@ -1918,6 +2192,8 @@ function App() {
   const [xtsOpened, setXtsOpened] = useState(false);
   const pendingRef = useRef<PendingInteraction>();
   const runIDRef = useRef<string>();
+  const sessionIDRef = useRef<string>();
+  const sessionStatusRef = useRef<string>();
   const runFinishedRef = useRef(false);
   const hostSessionRef = useRef(globalThis.crypto.randomUUID());
   const hostRequestRef = useRef<{
@@ -1930,6 +2206,8 @@ function App() {
 
   useEffect(() => { pendingRef.current = pending; }, [pending]);
   useEffect(() => { runIDRef.current = runID; }, [runID]);
+  useEffect(() => { sessionIDRef.current = sessionID; }, [sessionID]);
+  useEffect(() => { sessionStatusRef.current = sessionStatus; }, [sessionStatus]);
 
   const clearActiveRun = () => {
     hostRequestRef.current = undefined;
@@ -1962,6 +2240,69 @@ function App() {
         setStyle(message.style);
         setLoading(false);
         setError(undefined);
+      } else if (message.type === 'session.starting' || message.type === 'session.reconnecting') {
+        clearActiveRun();
+        setSegmentGraphRevisions({});
+        setUnloadedSegmentIDs([]);
+        setRevisionNodes({});
+        sessionIDRef.current = message.sessionID;
+        sessionStatusRef.current = 'active';
+        setSessionID(message.sessionID);
+        setSessionStatus('active');
+        setSessionAttached(false);
+        setRunStarting(true);
+        setRunStatus(message.type === 'session.starting' ? 'starting' : 'reconnecting');
+        setRunError(undefined);
+        setRunDiagnostics('');
+        setRuntimeNodes({});
+        setExecutionNodeID(undefined);
+      } else if (message.type === 'session.update') {
+        const state = message.state;
+        sessionIDRef.current = state.sessionID;
+        sessionStatusRef.current = state.sessionStatus;
+        runIDRef.current = state.activeRunID;
+        pendingRef.current = state.pending as unknown as PendingInteraction | undefined;
+        setSessionID(state.sessionID);
+        setSessionStatus(state.sessionStatus);
+        setSessionAttached(true);
+        setSegmentGraphRevisions(state.segmentGraphRevisions ?? {});
+        setUnloadedSegmentIDs(state.unloadedSegmentIDs ?? []);
+        if (state.document) setDocument(state.document);
+        setStyle(message.style);
+        setRouteTestContext(undefined);
+        setRouteTests([]);
+        setRouteTestOutcome(undefined);
+        setRouteTestRunning(false);
+        setRouteTestError(undefined);
+        setRuntimeNodes(state.runtimeNodes as Record<string, RuntimeNodeState>);
+        setExecutionNodeID(state.executionNodeID);
+        setPending(state.pending as unknown as PendingInteraction | undefined);
+        setRunID(state.activeRunID);
+        setRunStatus(state.runStatus);
+        setRunStarting(false);
+        setRunError(undefined);
+        setLoading(false);
+        setError(undefined);
+        runFinishedRef.current = isClosedSessionStatus(state.sessionStatus);
+      } else if (message.type === 'session.graph-revision') {
+        if (message.node) {
+          setRevisionNodes((current) => ({ ...current, [message.requestID]: message.node! }));
+        } else if (message.error) {
+          setRunError(message.error);
+        }
+      } else if (message.type === 'session.error') {
+        setRunStarting(false);
+        setRunError(message.message);
+      } else if (message.type === 'session.stderr') {
+        setRunDiagnostics((current) => `${current}${message.text}`.slice(-16 * 1024));
+      } else if (message.type === 'session.exit') {
+        setSessionAttached(false);
+        setRunStarting(false);
+        if (!runFinishedRef.current && !['paused', 'indeterminate', 'failed'].includes(sessionStatusRef.current ?? '')) {
+          setRunError((current) => current ?? (message.code === 0
+            ? 'The session process exited before detaching.'
+            : `The session process exited with code ${message.code ?? 'unknown'}`));
+        }
       } else if (message.type === 'graph.reload-state') {
         setReloading(message.active);
       } else if (message.type === 'style') {
@@ -1978,6 +2319,7 @@ function App() {
         setRunError(undefined);
         setRunDiagnostics('');
         setRuntimeNodes({});
+        setExecutionNodeID(undefined);
         if (message.routeTest) {
           setRouteTestOutcome(undefined);
           setRouteTestError(undefined);
@@ -1991,6 +2333,10 @@ function App() {
           if (!pendingRef.current) setRunStatus('running');
         } else if (frame.type === 'run.event' && frame.event) {
           setRuntimeNodes((current) => applyRuntimeEvent(current, frame.event!));
+          if (frame.event.kind === 'step/started' || frame.event.kind === 'step/resumed') {
+            const reachedNodeID = eventNodeID(frame.event);
+            if (reachedNodeID) setExecutionNodeID(reachedNodeID);
+          }
           if (frame.event.kind === 'run/started' && !pendingRef.current) setRunStatus('running');
           else if (frame.event.kind === 'run/completed') { clearActiveRun(); setRunStatus('completed'); }
           else if (frame.event.kind === 'run/failed') { clearActiveRun(); setRunStatus('failed'); }
@@ -1999,6 +2345,7 @@ function App() {
         } else if (frame.type === 'interaction.pending' && frame.interaction) {
           pendingRef.current = frame.interaction;
           setPending(frame.interaction);
+          setExecutionNodeID(frame.interaction.nodeID ?? frame.interaction.stepID);
           setRunStatus('waiting');
         } else if (frame.type === 'interaction.resolved') {
           if (hostRequestRef.current?.turnID === frame.turnID) hostRequestRef.current = undefined;
@@ -2065,13 +2412,7 @@ function App() {
         if (response.type === 'gert.host-action.ack' && response.status === 'completed' && response.result?.status === 'opened') {
           setXtsOpened(true);
         }
-        vscode.postMessage({
-          type: 'run.command',
-          command: {
-            type: 'interaction.answer',
-            runID: runIDRef.current,
-            turnID: interaction.turnID,
-            answer: {
+        const answer = {
               kind: 'host_action',
               runID: runIDRef.current,
               turnID: interaction.turnID,
@@ -2079,7 +2420,22 @@ function App() {
               capability: interaction.host_action.capability,
               status: response.status,
               result: response.type === 'gert.host-action.ack' ? response.result ?? undefined : undefined,
-            },
+        };
+        vscode.postMessage(sessionIDRef.current ? {
+          type: 'session.command',
+          command: {
+            type: 'interaction.answer',
+            runID: runIDRef.current,
+            turnID: interaction.turnID,
+            payload: answer,
+          },
+        } : {
+          type: 'run.command',
+          command: {
+            type: 'interaction.answer',
+            runID: runIDRef.current,
+            turnID: interaction.turnID,
+            answer,
           },
         });
         hostRequestRef.current = undefined;
@@ -2162,6 +2518,7 @@ function App() {
     runIDRef.current = undefined;
     setRunID(undefined);
     setRuntimeNodes({});
+    setExecutionNodeID(undefined);
     setPending(undefined);
     vscode.postMessage({
       type: 'run.start',
@@ -2176,7 +2533,43 @@ function App() {
     });
   };
 
+  const startSession = () => {
+    if (!document || sessionID) return;
+    const declarations = graphInputDeclarations(document);
+    const missing = declarations.find((declaration) => declaration.required && !inputValues[declaration.name]);
+    if (missing) {
+      setRunError(`${missing.name} is required.`);
+      return;
+    }
+    setRunError(undefined);
+    vscode.postMessage({ type: 'session.start', inputs: inputValues });
+  };
+
+  const resumeSession = () => {
+    if (!sessionID || !sessionAttached) return;
+    vscode.postMessage({ type: 'session.command', command: { type: 'session.resume' } });
+  };
+
+  const closeSession = (status: 'resolved' | 'escalated' | 'cancelled' | 'abandoned') => {
+    if (!sessionID || !sessionAttached) return;
+    vscode.postMessage({
+      type: 'session.command',
+      command: { type: 'session.close', payload: { status } },
+    });
+  };
+
   const cancelRun = () => {
+    if (sessionID && sessionAttached) {
+      vscode.postMessage({
+        type: 'session.command',
+        command: {
+          type: 'session.cancel',
+          ...(runID ? { runID } : {}),
+          payload: { reason: 'operator cancelled' },
+        },
+      });
+      return;
+    }
     if (!runID) return;
     const hostRequest = hostRequestRef.current;
     if (hostRequest) {
@@ -2198,6 +2591,25 @@ function App() {
   };
 
   const resetRun = () => {
+    if (sessionID) {
+      vscode.postMessage({ type: 'session.reset' });
+      clearActiveRun();
+      sessionIDRef.current = undefined;
+      sessionStatusRef.current = undefined;
+      setSessionID(undefined);
+      setSessionStatus(undefined);
+      setSessionAttached(false);
+      setSegmentGraphRevisions({});
+      setUnloadedSegmentIDs([]);
+      setRevisionNodes({});
+      setRunStatus('idle');
+      setRunStarting(false);
+      setRunError(undefined);
+      setRunDiagnostics('');
+      setRuntimeNodes({});
+      setExecutionNodeID(undefined);
+      return;
+    }
     if (runStarting || !isTerminalRunStatus(runStatus)) return;
     vscode.postMessage({ type: 'run.reset' });
     clearActiveRun();
@@ -2208,13 +2620,22 @@ function App() {
     setRunError(undefined);
     setRunDiagnostics('');
     setRuntimeNodes({});
+    setExecutionNodeID(undefined);
     setRouteTestOutcome(undefined);
     setRouteTestError(undefined);
   };
 
   const submitInteraction = (answer: Record<string, unknown>) => {
     if (!pending || !runID) return;
-    vscode.postMessage({
+    vscode.postMessage(sessionID ? {
+      type: 'session.command',
+      command: {
+        type: 'interaction.answer',
+        runID,
+        turnID: pending.turnID,
+        payload: answer,
+      },
+    } : {
       type: 'run.command',
       command: {
         type: 'interaction.answer',
@@ -2323,6 +2744,9 @@ function App() {
     const frame = requestAnimationFrame(() => {
       vscode.postMessage({
         type: 'ui.state',
+        sessionID,
+        sessionStatus,
+        sessionAttached,
         runID,
         runStatus,
         runStarting,
@@ -2333,6 +2757,9 @@ function App() {
         pendingTurnID: pending?.turnID,
         inputCount: document ? graphInputDeclarations(document).length : 0,
         graphNodeIDs: document?.nodes.map((node) => node.id) ?? [],
+        segmentCount: document?.groups.filter((group) => group.kind === 'session-segment').length ?? 0,
+        handoffEdgeCount: document?.edges.filter((edge) => edge.type === 'session-transition').length ?? 0,
+        visibleGraphNodeIDs: Array.from(window.document.querySelectorAll<HTMLElement>('.react-flow__node-gertStep')).map((node) => node.dataset.id).filter(Boolean),
         inputValues: Object.fromEntries(Object.entries(inputValues).map(([name, value]) => {
           const declaration = document ? graphInputDeclarations(document).find((input) => input.name === name) : undefined;
           return [name, declaration?.type === 'secret' && value ? '<redacted>' : value];
@@ -2353,10 +2780,15 @@ function App() {
         collectorReviewVisible: window.document.querySelector('.collector-review') !== null,
         visibleButtons: Array.from(window.document.querySelectorAll<HTMLButtonElement>('button')).map((button) => button.textContent?.trim()).filter(Boolean),
         nodeStatuses: Object.fromEntries(Object.entries(runtimeNodes).map(([id, state]) => [id, state.status])),
+        executionNodeID,
+        executionPositionLabel: window.document.querySelector('.execution-position-strip > div > span')?.textContent?.trim(),
+        executionPositionTitle: window.document.querySelector('.execution-position-strip strong')?.textContent?.trim(),
+        currentExecutionMarkerCount: window.document.querySelectorAll('.step-node.execution-current').length,
+        lastExecutionMarkerCount: window.document.querySelectorAll('.step-node.execution-last').length,
       });
     });
     return () => cancelAnimationFrame(frame);
-  }, [document, inputValues, runID, runStatus, runStarting, reloading, runError, pending?.turnID, runtimeNodes, breakpoints, routeTestContext?.planHash, routeTestOutcome, routeTestError, routeTests, testMode]);
+  }, [document, inputValues, sessionID, sessionStatus, sessionAttached, runID, runStatus, runStarting, reloading, runError, pending?.turnID, runtimeNodes, executionNodeID, breakpoints, routeTestContext?.planHash, routeTestOutcome, routeTestError, routeTests, testMode]);
 
   if (loading) return <div className="state" role="status">Loading runbook...</div>;
   if (error) return <div className="state error" role="alert">{error}</div>;
@@ -2367,9 +2799,16 @@ function App() {
       testMode={testMode}
       style={style}
       runtimeNodes={runtimeNodes}
+      executionNodeID={executionNodeID}
       breakpoints={breakpoints}
       watches={watches}
       pending={pending}
+      sessionID={sessionID}
+      sessionStatus={sessionStatus}
+      sessionAttached={sessionAttached}
+      segmentGraphRevisions={segmentGraphRevisions}
+      unloadedSegmentIDs={unloadedSegmentIDs}
+      revisionNodes={revisionNodes}
       runID={runID}
       runStatus={runStatus}
       runStarting={runStarting}
@@ -2379,6 +2818,12 @@ function App() {
       inputValues={inputValues}
       onInputChange={(name, value) => setInputValues((current) => ({ ...current, [name]: value }))}
       onRun={() => startRun(false)}
+      onStartSession={startSession}
+      onResumeSession={resumeSession}
+      onCloseSession={closeSession}
+      onRequestGraphRevision={(requestID, segmentID, revision, originalNodeID) => vscode.postMessage({
+        type: 'session.graph-revision', requestID, segmentID, revision, originalNodeID,
+      })}
       onDebugRun={() => startRun(true)}
       onReset={resetRun}
       onCancel={cancelRun}

@@ -675,6 +675,27 @@ suite('gert extension smoke tests', () => {
     const fixtureUri = vscode.Uri.joinPath(workspaceFolder.uri, 'test', 'fixtures', 'enum-preview-graphjson.json');
     const fixture = JSON.parse(Buffer.from(await vscode.workspace.fs.readFile(fixtureUri)).toString('utf8'));
     fixture.inputs.push({ name: 'access_token', type: 'secret', required: true });
+    const nodeTemplate = fixture.nodes[0];
+    const executionNode = (id: string, stepID: string, title: string, kind: string, order: number) => ({
+      ...nodeTemplate,
+      id,
+      type: kind === 'end' ? 'terminal' : 'step',
+      data: { ...nodeTemplate.data, id, step_id: stepID, title, kind, order },
+    });
+    fixture.nodes = [
+      executionNode('fallback-before-canonical', 'canonical-started', 'Wrong fallback match', 'display', 0),
+      executionNode('canonical-started', 'started', 'Canonical start', 'display', 1),
+      executionNode('choice-node', 'choice', 'Choose next action', 'choice', 2),
+      executionNode('parent-container', 'parent', 'Parent workflow', 'include', 3),
+      executionNode('resumed-node', 'resumed', 'Resume workflow', 'display', 4),
+      executionNode('host-node', 'host', 'Open supporting tool', 'host_action', 5),
+      executionNode('end', 'end', 'Finish workflow', 'end', 6),
+    ];
+    fixture.edges = fixture.nodes.slice(1).map((node: { id: string }, index: number) => ({
+      id: `execution-edge-${index}`,
+      source: fixture.nodes[index].id,
+      target: node.id,
+    }));
     await vscode.workspace.fs.writeFile(runbookUri, Buffer.from('apiVersion: runbook/v1\nid: direct-run\nsteps: []\n'));
 
     let loadCount = 0;
@@ -717,17 +738,23 @@ suite('gert extension smoke tests', () => {
           if (answer?.kind === 'choice') {
             writeFrame({ type: 'interaction.resolved', runID: 'run-ui', turnID: 'turn-choice' });
             writeFrame({
-              type: 'interaction.pending',
+              type: 'run.event',
               runID: 'run-ui',
-              turnID: 'turn-host',
-              interaction: {
-                type: 'pending',
-                runID: 'run-ui',
-                turnID: 'turn-host',
-                stepID: 'end',
-                kind: 'host_action',
-                correlationID: 'corr-host',
-                host_action: { capability: 'test.echo', request: { echo: 'hello' } },
+              event: {
+                kind: 'step/completed',
+                run_id: 'run-ui',
+                sequence: 2,
+                payload: { node_id: 'parent-container', step_id: 'parent' },
+              },
+            });
+            writeFrame({
+              type: 'run.event',
+              runID: 'run-ui',
+              event: {
+                kind: 'step/resumed',
+                run_id: 'run-ui',
+                sequence: 3,
+                payload: { node_id: 'resumed-node', step_id: 'resumed' },
               },
             });
           } else if (answer?.kind === 'host_action') {
@@ -738,8 +765,8 @@ suite('gert extension smoke tests', () => {
               event: {
                 kind: 'step/completed',
                 run_id: 'run-ui',
-                sequence: 2,
-                payload: { step_id: 'end', duration_ms: 12 },
+                sequence: 4,
+                payload: { node_id: 'parent-container', step_id: 'parent', duration_ms: 12 },
               },
             });
             writeFrame({ type: 'run.finished', runID: 'run-ui', status: 'completed' });
@@ -774,21 +801,7 @@ suite('gert extension smoke tests', () => {
                 kind: 'step/started',
                 run_id: 'run-ui',
                 sequence: 1,
-                payload: { step_id: 'end' },
-              },
-            });
-            writeFrame({
-              type: 'interaction.pending',
-              runID: 'run-ui',
-              turnID: 'turn-choice',
-              interaction: {
-                type: 'pending',
-                runID: 'run-ui',
-                turnID: 'turn-choice',
-                stepID: 'end',
-                kind: 'choice',
-                prompt: 'Continue?',
-                options: [{ value: 'o:0', label: 'Continue' }],
+                payload: { node_id: 'canonical-started', step_id: 'started' },
               },
             });
           });
@@ -808,6 +821,12 @@ suite('gert extension smoke tests', () => {
       resetButtonCount: number;
       cancelButtonCount: number;
       nodeStatuses: Record<string, string>;
+      executionNodeID?: string;
+      executionPositionLabel?: string;
+      executionPositionTitle?: string;
+      currentExecutionMarkerCount: number;
+      lastExecutionMarkerCount: number;
+      visibleButtons: string[];
     };
     const waitForUI = (predicate: (state: UIState) => boolean, failure: string) =>
       new Promise<UIState>((resolve, reject) => {
@@ -845,14 +864,43 @@ suite('gert extension smoke tests', () => {
       await panel.webview.postMessage({ type: 'test.action', action: 'set-input', name: 'access_token', value: 'SENTINEL-private' });
       await secretReady;
 
+      const started = waitForUI(
+        (state) => state.runStatus === 'running' && state.executionNodeID === 'canonical-started',
+        'direct webview did not identify the canonical started node',
+      );
+      await panel.webview.postMessage({ type: 'test.action', action: 'run' });
+      const startedState = await started;
+      assert.strictEqual(startedState.executionPositionTitle, 'Canonical start');
+      assert.strictEqual(startedState.currentExecutionMarkerCount, 1);
+
       const waiting = waitForUI(
         (state) => state.runStatus === 'waiting' && state.pendingKind === 'choice',
         'direct webview did not reach the choice interaction',
       );
-      await panel.webview.postMessage({ type: 'test.action', action: 'run' });
+      writeFrame({
+        type: 'interaction.pending',
+        runID: 'run-ui',
+        turnID: 'turn-choice',
+        interaction: {
+          type: 'pending',
+          runID: 'run-ui',
+          turnID: 'turn-choice',
+          stepID: 'choice',
+          nodeID: 'choice-node',
+          kind: 'choice',
+          prompt: 'Continue?',
+          options: [{ value: 'o:0', label: 'Continue' }],
+        },
+      });
       const waitingState = await waiting;
       assert.strictEqual(waitingState.cancelButtonCount, 1);
-      assert.strictEqual(waitingState.nodeStatuses.end, 'running');
+      assert.strictEqual(waitingState.nodeStatuses['canonical-started'], 'running');
+      assert.strictEqual(waitingState.executionNodeID, 'choice-node');
+      assert.strictEqual(waitingState.executionPositionTitle, 'Choose next action');
+      assert.strictEqual(waitingState.executionPositionLabel, 'Current step');
+      assert.strictEqual(waitingState.currentExecutionMarkerCount, 1);
+      assert.strictEqual(waitingState.lastExecutionMarkerCount, 0);
+      assert.ok(waitingState.visibleButtons.includes('Locate'));
       const activeDocument = await vscode.workspace.openTextDocument(runbookUri);
       const activeEdit = new vscode.WorkspaceEdit();
       activeEdit.insert(runbookUri, activeDocument.lineAt(activeDocument.lineCount - 1).range.end, '\n# saved during run\n');
@@ -864,14 +912,37 @@ suite('gert extension smoke tests', () => {
       assert.ok(spawnArgs.includes('env_name=prod'));
       assert.ok(!spawnArgs.some((arg) => arg.includes('SENTINEL-private')));
 
-      const completed = waitForUI(
-        (state) => state.runStatus === 'completed' && state.nodeStatuses.end === 'completed',
-        'direct webview did not complete after the choice answer',
+      const resumed = waitForUI(
+        (state) => state.runStatus === 'running' && state.executionNodeID === 'resumed-node',
+        'direct webview did not identify the resumed node after parent completion',
       );
       await panel.webview.postMessage({
         type: 'test.action',
         action: 'answer',
         answer: { kind: 'choice', selected: ['o:0'] },
+      });
+      const resumedState = await resumed;
+      assert.strictEqual(resumedState.nodeStatuses['parent-container'], 'completed');
+      assert.strictEqual(resumedState.executionPositionTitle, 'Resume workflow');
+
+      const completed = waitForUI(
+        (state) => state.runStatus === 'completed' && state.nodeStatuses['parent-container'] === 'completed',
+        'direct webview did not complete after the host interaction',
+      );
+      writeFrame({
+        type: 'interaction.pending',
+        runID: 'run-ui',
+        turnID: 'turn-host',
+        interaction: {
+          type: 'pending',
+          runID: 'run-ui',
+          turnID: 'turn-host',
+          stepID: 'host',
+          nodeID: 'host-node',
+          kind: 'host_action',
+          correlationID: 'corr-host',
+          host_action: { capability: 'test.echo', request: { echo: 'hello' } },
+        },
       });
       const completedState = await completed;
       await Promise.race([
@@ -882,6 +953,12 @@ suite('gert extension smoke tests', () => {
       assert.strictEqual(completedState.runButtonCount, 1);
       assert.strictEqual(completedState.resetButtonCount, 1);
       assert.strictEqual(completedState.cancelButtonCount, 0);
+      assert.strictEqual(completedState.executionNodeID, 'host-node');
+      assert.strictEqual(completedState.executionPositionTitle, 'Open supporting tool');
+      assert.strictEqual(completedState.executionPositionLabel, 'Last reached');
+      assert.strictEqual(completedState.lastExecutionMarkerCount, 1);
+      assert.strictEqual(completedState.currentExecutionMarkerCount, 0);
+      assert.ok(completedState.visibleButtons.includes('Locate'));
       assert.strictEqual(commands.length, 3);
       assert.deepStrictEqual(commands[0], {
         type: 'run.configure',
@@ -906,6 +983,26 @@ suite('gert extension smoke tests', () => {
       assert.strictEqual(hostCommand.answer.status, 'completed');
       assert.deepStrictEqual(hostCommand.answer.result, { echo: 'hello' });
 
+      const startingAgain = waitForUI(
+        (state) => state.runStatus === 'starting' && state.executionNodeID === undefined,
+        'a new run did not clear the retained execution position',
+      );
+      await panel.webview.postMessage({ type: 'run.starting' });
+      const startingAgainState = await startingAgain;
+      assert.strictEqual(startingAgainState.executionPositionLabel, undefined);
+      assert.strictEqual(startingAgainState.currentExecutionMarkerCount, 0);
+      assert.strictEqual(startingAgainState.lastExecutionMarkerCount, 0);
+
+      const cancelledAgain = waitForUI(
+        (state) => state.runStatus === 'cancelled',
+        'the synthetic second run did not reach a terminal state',
+      );
+      await panel.webview.postMessage({
+        type: 'run.frame',
+        frame: { type: 'run.finished', version: 'gert-stdio/v1', status: 'cancelled' },
+      });
+      await cancelledAgain;
+
       const reset = waitForUI(
         (state) => state.runStatus === 'idle' && state.runID === undefined && Object.keys(state.nodeStatuses).length === 0,
         'direct webview did not reset completed execution state',
@@ -915,6 +1012,10 @@ suite('gert extension smoke tests', () => {
       assert.strictEqual(resetState.runButtonCount, 1);
       assert.strictEqual(resetState.resetButtonCount, 0);
       assert.strictEqual(resetState.cancelButtonCount, 0);
+      assert.strictEqual(resetState.executionNodeID, undefined);
+      assert.strictEqual(resetState.executionPositionLabel, undefined);
+      assert.strictEqual(resetState.currentExecutionMarkerCount, 0);
+      assert.strictEqual(resetState.lastExecutionMarkerCount, 0);
       assert.strictEqual(resetState.inputValues.env_name, 'prod');
       assert.strictEqual(resetState.inputValues.access_token, '<redacted>');
     } finally {
