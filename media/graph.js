@@ -30,9 +30,9 @@
     mod
   ));
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/graph.js
+  // node_modules/@dagrejs/graphlib/lib/graph.js
   var require_graph = __commonJS({
-    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/graph.js"(exports, module) {
+    "node_modules/@dagrejs/graphlib/lib/graph.js"(exports, module) {
       "use strict";
       var DEFAULT_EDGE_NAME = "\0";
       var GRAPH_NODE = "\0";
@@ -623,16 +623,16 @@
     }
   });
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/version.js
+  // node_modules/@dagrejs/graphlib/lib/version.js
   var require_version = __commonJS({
-    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/version.js"(exports, module) {
+    "node_modules/@dagrejs/graphlib/lib/version.js"(exports, module) {
       module.exports = "2.2.4";
     }
   });
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/index.js
+  // node_modules/@dagrejs/graphlib/lib/index.js
   var require_lib = __commonJS({
-    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/index.js"(exports, module) {
+    "node_modules/@dagrejs/graphlib/lib/index.js"(exports, module) {
       module.exports = {
         Graph: require_graph(),
         version: require_version()
@@ -640,9 +640,9 @@
     }
   });
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/json.js
+  // node_modules/@dagrejs/graphlib/lib/json.js
   var require_json = __commonJS({
-    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/json.js"(exports, module) {
+    "node_modules/@dagrejs/graphlib/lib/json.js"(exports, module) {
       var Graph = require_graph();
       module.exports = {
         write,
@@ -706,9 +706,9 @@
     }
   });
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/alg/components.js
+  // node_modules/@dagrejs/graphlib/lib/alg/components.js
   var require_components = __commonJS({
-    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/alg/components.js"(exports, module) {
+    "node_modules/@dagrejs/graphlib/lib/alg/components.js"(exports, module) {
       module.exports = components;
       function components(g) {
         var visited = {};
@@ -733,9 +733,9 @@
     }
   });
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/data/priority-queue.js
+  // node_modules/@dagrejs/graphlib/lib/data/priority-queue.js
   var require_priority_queue = __commonJS({
-    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/data/priority-queue.js"(exports, module) {
+    "node_modules/@dagrejs/graphlib/lib/data/priority-queue.js"(exports, module) {
       var PriorityQueue = class {
         _arr = [];
         _keyIndices = {};
@@ -871,9 +871,9 @@
     }
   });
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/alg/dijkstra.js
+  // node_modules/@dagrejs/graphlib/lib/alg/dijkstra.js
   var require_dijkstra = __commonJS({
-    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/alg/dijkstra.js"(exports, module) {
+    "node_modules/@dagrejs/graphlib/lib/alg/dijkstra.js"(exports, module) {
       var PriorityQueue = require_priority_queue();
       module.exports = dijkstra;
       var DEFAULT_WEIGHT_FUNC = () => 1;
@@ -923,9 +923,9 @@
     }
   });
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/alg/dijkstra-all.js
+  // node_modules/@dagrejs/graphlib/lib/alg/dijkstra-all.js
   var require_dijkstra_all = __commonJS({
-    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/alg/dijkstra-all.js"(exports, module) {
+    "node_modules/@dagrejs/graphlib/lib/alg/dijkstra-all.js"(exports, module) {
       var dijkstra = require_dijkstra();
       module.exports = dijkstraAll;
       function dijkstraAll(g, weightFunc, edgeFunc) {
@@ -937,9 +937,9 @@
     }
   });
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/alg/tarjan.js
+  // node_modules/@dagrejs/graphlib/lib/alg/tarjan.js
   var require_tarjan = __commonJS({
-    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/alg/tarjan.js"(exports, module) {
+    "node_modules/@dagrejs/graphlib/lib/alg/tarjan.js"(exports, module) {
       module.exports = tarjan;
       function tarjan(g) {
         var index = 0;
@@ -982,9 +982,9 @@
     }
   });
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/alg/find-cycles.js
+  // node_modules/@dagrejs/graphlib/lib/alg/find-cycles.js
   var require_find_cycles = __commonJS({
-    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/alg/find-cycles.js"(exports, module) {
+    "node_modules/@dagrejs/graphlib/lib/alg/find-cycles.js"(exports, module) {
       var tarjan = require_tarjan();
       module.exports = findCycles;
       function findCycles(g) {
@@ -995,9 +995,9 @@
     }
   });
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/alg/floyd-warshall.js
+  // node_modules/@dagrejs/graphlib/lib/alg/floyd-warshall.js
   var require_floyd_warshall = __commonJS({
-    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/alg/floyd-warshall.js"(exports, module) {
+    "node_modules/@dagrejs/graphlib/lib/alg/floyd-warshall.js"(exports, module) {
       module.exports = floydWarshall;
       var DEFAULT_WEIGHT_FUNC = () => 1;
       function floydWarshall(g, weightFn, edgeFn) {
@@ -1047,9 +1047,9 @@
     }
   });
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/alg/topsort.js
+  // node_modules/@dagrejs/graphlib/lib/alg/topsort.js
   var require_topsort = __commonJS({
-    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/alg/topsort.js"(exports, module) {
+    "node_modules/@dagrejs/graphlib/lib/alg/topsort.js"(exports, module) {
       function topsort(g) {
         var visited = {};
         var stack = {};
@@ -1082,9 +1082,9 @@
     }
   });
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/alg/is-acyclic.js
+  // node_modules/@dagrejs/graphlib/lib/alg/is-acyclic.js
   var require_is_acyclic = __commonJS({
-    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/alg/is-acyclic.js"(exports, module) {
+    "node_modules/@dagrejs/graphlib/lib/alg/is-acyclic.js"(exports, module) {
       var topsort = require_topsort();
       module.exports = isAcyclic;
       function isAcyclic(g) {
@@ -1101,9 +1101,9 @@
     }
   });
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/alg/dfs.js
+  // node_modules/@dagrejs/graphlib/lib/alg/dfs.js
   var require_dfs = __commonJS({
-    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/alg/dfs.js"(exports, module) {
+    "node_modules/@dagrejs/graphlib/lib/alg/dfs.js"(exports, module) {
       module.exports = dfs;
       function dfs(g, vs, order) {
         if (!Array.isArray(vs)) {
@@ -1157,9 +1157,9 @@
     }
   });
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/alg/postorder.js
+  // node_modules/@dagrejs/graphlib/lib/alg/postorder.js
   var require_postorder = __commonJS({
-    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/alg/postorder.js"(exports, module) {
+    "node_modules/@dagrejs/graphlib/lib/alg/postorder.js"(exports, module) {
       var dfs = require_dfs();
       module.exports = postorder;
       function postorder(g, vs) {
@@ -1168,9 +1168,9 @@
     }
   });
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/alg/preorder.js
+  // node_modules/@dagrejs/graphlib/lib/alg/preorder.js
   var require_preorder = __commonJS({
-    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/alg/preorder.js"(exports, module) {
+    "node_modules/@dagrejs/graphlib/lib/alg/preorder.js"(exports, module) {
       var dfs = require_dfs();
       module.exports = preorder;
       function preorder(g, vs) {
@@ -1179,9 +1179,9 @@
     }
   });
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/alg/prim.js
+  // node_modules/@dagrejs/graphlib/lib/alg/prim.js
   var require_prim = __commonJS({
-    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/alg/prim.js"(exports, module) {
+    "node_modules/@dagrejs/graphlib/lib/alg/prim.js"(exports, module) {
       var Graph = require_graph();
       var PriorityQueue = require_priority_queue();
       module.exports = prim;
@@ -1226,9 +1226,9 @@
     }
   });
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/alg/index.js
+  // node_modules/@dagrejs/graphlib/lib/alg/index.js
   var require_alg = __commonJS({
-    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/alg/index.js"(exports, module) {
+    "node_modules/@dagrejs/graphlib/lib/alg/index.js"(exports, module) {
       module.exports = {
         components: require_components(),
         dijkstra: require_dijkstra(),
@@ -1245,9 +1245,9 @@
     }
   });
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/index.js
+  // node_modules/@dagrejs/graphlib/index.js
   var require_graphlib = __commonJS({
-    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/index.js"(exports, module) {
+    "node_modules/@dagrejs/graphlib/index.js"(exports, module) {
       var lib = require_lib();
       module.exports = {
         Graph: lib.Graph,
@@ -1258,9 +1258,9 @@
     }
   });
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/data/list.js
+  // node_modules/@dagrejs/dagre/lib/data/list.js
   var require_list = __commonJS({
-    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/data/list.js"(exports, module) {
+    "node_modules/@dagrejs/dagre/lib/data/list.js"(exports, module) {
       var List = class {
         constructor() {
           let sentinel = {};
@@ -1311,9 +1311,9 @@
     }
   });
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/greedy-fas.js
+  // node_modules/@dagrejs/dagre/lib/greedy-fas.js
   var require_greedy_fas = __commonJS({
-    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/greedy-fas.js"(exports, module) {
+    "node_modules/@dagrejs/dagre/lib/greedy-fas.js"(exports, module) {
       var Graph = require_graphlib().Graph;
       var List = require_list();
       module.exports = greedyFAS;
@@ -1412,9 +1412,9 @@
     }
   });
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/util.js
+  // node_modules/@dagrejs/dagre/lib/util.js
   var require_util = __commonJS({
-    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/util.js"(exports, module) {
+    "node_modules/@dagrejs/dagre/lib/util.js"(exports, module) {
       "use strict";
       var Graph = require_graphlib().Graph;
       module.exports = {
@@ -1676,9 +1676,9 @@
     }
   });
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/acyclic.js
+  // node_modules/@dagrejs/dagre/lib/acyclic.js
   var require_acyclic = __commonJS({
-    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/acyclic.js"(exports, module) {
+    "node_modules/@dagrejs/dagre/lib/acyclic.js"(exports, module) {
       "use strict";
       var greedyFAS = require_greedy_fas();
       var uniqueId = require_util().uniqueId;
@@ -1738,9 +1738,9 @@
     }
   });
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/normalize.js
+  // node_modules/@dagrejs/dagre/lib/normalize.js
   var require_normalize = __commonJS({
-    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/normalize.js"(exports, module) {
+    "node_modules/@dagrejs/dagre/lib/normalize.js"(exports, module) {
       "use strict";
       var util = require_util();
       module.exports = {
@@ -1810,9 +1810,9 @@
     }
   });
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/rank/util.js
+  // node_modules/@dagrejs/dagre/lib/rank/util.js
   var require_util2 = __commonJS({
-    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/rank/util.js"(exports, module) {
+    "node_modules/@dagrejs/dagre/lib/rank/util.js"(exports, module) {
       "use strict";
       var { applyWithChunking } = require_util();
       module.exports = {
@@ -1847,9 +1847,9 @@
     }
   });
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/rank/feasible-tree.js
+  // node_modules/@dagrejs/dagre/lib/rank/feasible-tree.js
   var require_feasible_tree = __commonJS({
-    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/rank/feasible-tree.js"(exports, module) {
+    "node_modules/@dagrejs/dagre/lib/rank/feasible-tree.js"(exports, module) {
       "use strict";
       var Graph = require_graphlib().Graph;
       var slack = require_util2().slack;
@@ -1900,9 +1900,9 @@
     }
   });
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/rank/network-simplex.js
+  // node_modules/@dagrejs/dagre/lib/rank/network-simplex.js
   var require_network_simplex = __commonJS({
-    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/rank/network-simplex.js"(exports, module) {
+    "node_modules/@dagrejs/dagre/lib/rank/network-simplex.js"(exports, module) {
       "use strict";
       var feasibleTree = require_feasible_tree();
       var slack = require_util2().slack;
@@ -2046,9 +2046,9 @@
     }
   });
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/rank/index.js
+  // node_modules/@dagrejs/dagre/lib/rank/index.js
   var require_rank = __commonJS({
-    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/rank/index.js"(exports, module) {
+    "node_modules/@dagrejs/dagre/lib/rank/index.js"(exports, module) {
       "use strict";
       var rankUtil = require_util2();
       var longestPath = rankUtil.longestPath;
@@ -2081,9 +2081,9 @@
     }
   });
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/parent-dummy-chains.js
+  // node_modules/@dagrejs/dagre/lib/parent-dummy-chains.js
   var require_parent_dummy_chains = __commonJS({
-    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/parent-dummy-chains.js"(exports, module) {
+    "node_modules/@dagrejs/dagre/lib/parent-dummy-chains.js"(exports, module) {
       module.exports = parentDummyChains;
       function parentDummyChains(g) {
         let postorderNums = postorder(g);
@@ -2150,9 +2150,9 @@
     }
   });
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/nesting-graph.js
+  // node_modules/@dagrejs/dagre/lib/nesting-graph.js
   var require_nesting_graph = __commonJS({
-    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/nesting-graph.js"(exports, module) {
+    "node_modules/@dagrejs/dagre/lib/nesting-graph.js"(exports, module) {
       var util = require_util();
       module.exports = {
         run,
@@ -2236,9 +2236,9 @@
     }
   });
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/add-border-segments.js
+  // node_modules/@dagrejs/dagre/lib/add-border-segments.js
   var require_add_border_segments = __commonJS({
-    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/add-border-segments.js"(exports, module) {
+    "node_modules/@dagrejs/dagre/lib/add-border-segments.js"(exports, module) {
       var util = require_util();
       module.exports = addBorderSegments;
       function addBorderSegments(g) {
@@ -2272,9 +2272,9 @@
     }
   });
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/coordinate-system.js
+  // node_modules/@dagrejs/dagre/lib/coordinate-system.js
   var require_coordinate_system = __commonJS({
-    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/coordinate-system.js"(exports, module) {
+    "node_modules/@dagrejs/dagre/lib/coordinate-system.js"(exports, module) {
       "use strict";
       module.exports = {
         adjust,
@@ -2336,9 +2336,9 @@
     }
   });
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/order/init-order.js
+  // node_modules/@dagrejs/dagre/lib/order/init-order.js
   var require_init_order = __commonJS({
-    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/order/init-order.js"(exports, module) {
+    "node_modules/@dagrejs/dagre/lib/order/init-order.js"(exports, module) {
       "use strict";
       var util = require_util();
       module.exports = initOrder;
@@ -2362,9 +2362,9 @@
     }
   });
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/order/cross-count.js
+  // node_modules/@dagrejs/dagre/lib/order/cross-count.js
   var require_cross_count = __commonJS({
-    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/order/cross-count.js"(exports, module) {
+    "node_modules/@dagrejs/dagre/lib/order/cross-count.js"(exports, module) {
       "use strict";
       var zipObject = require_util().zipObject;
       module.exports = crossCount;
@@ -2406,9 +2406,9 @@
     }
   });
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/order/barycenter.js
+  // node_modules/@dagrejs/dagre/lib/order/barycenter.js
   var require_barycenter = __commonJS({
-    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/order/barycenter.js"(exports, module) {
+    "node_modules/@dagrejs/dagre/lib/order/barycenter.js"(exports, module) {
       module.exports = barycenter;
       function barycenter(g, movable = []) {
         return movable.map((v) => {
@@ -2434,9 +2434,9 @@
     }
   });
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/order/resolve-conflicts.js
+  // node_modules/@dagrejs/dagre/lib/order/resolve-conflicts.js
   var require_resolve_conflicts = __commonJS({
-    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/order/resolve-conflicts.js"(exports, module) {
+    "node_modules/@dagrejs/dagre/lib/order/resolve-conflicts.js"(exports, module) {
       "use strict";
       var util = require_util();
       module.exports = resolveConflicts;
@@ -2516,9 +2516,9 @@
     }
   });
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/order/sort.js
+  // node_modules/@dagrejs/dagre/lib/order/sort.js
   var require_sort = __commonJS({
-    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/order/sort.js"(exports, module) {
+    "node_modules/@dagrejs/dagre/lib/order/sort.js"(exports, module) {
       var util = require_util();
       module.exports = sort;
       function sort(entries, biasRight) {
@@ -2564,9 +2564,9 @@
     }
   });
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/order/sort-subgraph.js
+  // node_modules/@dagrejs/dagre/lib/order/sort-subgraph.js
   var require_sort_subgraph = __commonJS({
-    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/order/sort-subgraph.js"(exports, module) {
+    "node_modules/@dagrejs/dagre/lib/order/sort-subgraph.js"(exports, module) {
       var barycenter = require_barycenter();
       var resolveConflicts = require_resolve_conflicts();
       var sort = require_sort();
@@ -2629,9 +2629,9 @@
     }
   });
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/order/build-layer-graph.js
+  // node_modules/@dagrejs/dagre/lib/order/build-layer-graph.js
   var require_build_layer_graph = __commonJS({
-    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/order/build-layer-graph.js"(exports, module) {
+    "node_modules/@dagrejs/dagre/lib/order/build-layer-graph.js"(exports, module) {
       var Graph = require_graphlib().Graph;
       var util = require_util();
       module.exports = buildLayerGraph;
@@ -2664,9 +2664,9 @@
     }
   });
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/order/add-subgraph-constraints.js
+  // node_modules/@dagrejs/dagre/lib/order/add-subgraph-constraints.js
   var require_add_subgraph_constraints = __commonJS({
-    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/order/add-subgraph-constraints.js"(exports, module) {
+    "node_modules/@dagrejs/dagre/lib/order/add-subgraph-constraints.js"(exports, module) {
       module.exports = addSubgraphConstraints;
       function addSubgraphConstraints(g, cg, vs) {
         let prev = {}, rootPrev;
@@ -2692,9 +2692,9 @@
     }
   });
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/order/index.js
+  // node_modules/@dagrejs/dagre/lib/order/index.js
   var require_order = __commonJS({
-    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/order/index.js"(exports, module) {
+    "node_modules/@dagrejs/dagre/lib/order/index.js"(exports, module) {
       "use strict";
       var initOrder = require_init_order();
       var crossCount = require_cross_count();
@@ -2748,9 +2748,9 @@
     }
   });
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/position/bk.js
+  // node_modules/@dagrejs/dagre/lib/position/bk.js
   var require_bk = __commonJS({
-    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/position/bk.js"(exports, module) {
+    "node_modules/@dagrejs/dagre/lib/position/bk.js"(exports, module) {
       "use strict";
       var Graph = require_graphlib().Graph;
       var util = require_util();
@@ -3056,9 +3056,9 @@
     }
   });
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/position/index.js
+  // node_modules/@dagrejs/dagre/lib/position/index.js
   var require_position = __commonJS({
-    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/position/index.js"(exports, module) {
+    "node_modules/@dagrejs/dagre/lib/position/index.js"(exports, module) {
       "use strict";
       var util = require_util();
       var positionX = require_bk().positionX;
@@ -3088,9 +3088,9 @@
     }
   });
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/layout.js
+  // node_modules/@dagrejs/dagre/lib/layout.js
   var require_layout = __commonJS({
-    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/layout.js"(exports, module) {
+    "node_modules/@dagrejs/dagre/lib/layout.js"(exports, module) {
       "use strict";
       var acyclic = require_acyclic();
       var normalize = require_normalize();
@@ -3448,9 +3448,9 @@
     }
   });
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/debug.js
+  // node_modules/@dagrejs/dagre/lib/debug.js
   var require_debug = __commonJS({
-    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/debug.js"(exports, module) {
+    "node_modules/@dagrejs/dagre/lib/debug.js"(exports, module) {
       var util = require_util();
       var Graph = require_graphlib().Graph;
       module.exports = {
@@ -3477,16 +3477,16 @@
     }
   });
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/version.js
+  // node_modules/@dagrejs/dagre/lib/version.js
   var require_version2 = __commonJS({
-    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/version.js"(exports, module) {
+    "node_modules/@dagrejs/dagre/lib/version.js"(exports, module) {
       module.exports = "1.1.4";
     }
   });
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/index.js
+  // node_modules/@dagrejs/dagre/index.js
   var require_dagre = __commonJS({
-    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/index.js"(exports, module) {
+    "node_modules/@dagrejs/dagre/index.js"(exports, module) {
       module.exports = {
         graphlib: require_graphlib(),
         layout: require_layout(),
@@ -3500,9 +3500,9 @@
     }
   });
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/react/cjs/react.development.js
+  // node_modules/react/cjs/react.development.js
   var require_react_development = __commonJS({
-    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/react/cjs/react.development.js"(exports, module) {
+    "node_modules/react/cjs/react.development.js"(exports, module) {
       "use strict";
       if (true) {
         (function() {
@@ -4559,7 +4559,7 @@
             }
             return dispatcher.useContext(Context);
           }
-          function useState9(initialState2) {
+          function useState8(initialState2) {
             var dispatcher = resolveDispatcher();
             return dispatcher.useState(initialState2);
           }
@@ -4571,7 +4571,7 @@
             var dispatcher = resolveDispatcher();
             return dispatcher.useRef(initialValue);
           }
-          function useEffect9(create2, deps) {
+          function useEffect8(create2, deps) {
             var dispatcher = resolveDispatcher();
             return dispatcher.useEffect(create2, deps);
           }
@@ -5354,7 +5354,7 @@
           exports.useContext = useContext4;
           exports.useDebugValue = useDebugValue2;
           exports.useDeferredValue = useDeferredValue;
-          exports.useEffect = useEffect9;
+          exports.useEffect = useEffect8;
           exports.useId = useId2;
           exports.useImperativeHandle = useImperativeHandle;
           exports.useInsertionEffect = useInsertionEffect;
@@ -5362,7 +5362,7 @@
           exports.useMemo = useMemo3;
           exports.useReducer = useReducer;
           exports.useRef = useRef6;
-          exports.useState = useState9;
+          exports.useState = useState8;
           exports.useSyncExternalStore = useSyncExternalStore;
           exports.useTransition = useTransition;
           exports.version = ReactVersion;
@@ -5374,9 +5374,9 @@
     }
   });
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/react/index.js
+  // node_modules/react/index.js
   var require_react = __commonJS({
-    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/react/index.js"(exports, module) {
+    "node_modules/react/index.js"(exports, module) {
       "use strict";
       if (false) {
         module.exports = null;
@@ -5386,9 +5386,9 @@
     }
   });
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/scheduler/cjs/scheduler.development.js
+  // node_modules/scheduler/cjs/scheduler.development.js
   var require_scheduler_development = __commonJS({
-    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/scheduler/cjs/scheduler.development.js"(exports) {
+    "node_modules/scheduler/cjs/scheduler.development.js"(exports) {
       "use strict";
       if (true) {
         (function() {
@@ -5836,9 +5836,9 @@
     }
   });
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/scheduler/index.js
+  // node_modules/scheduler/index.js
   var require_scheduler = __commonJS({
-    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/scheduler/index.js"(exports, module) {
+    "node_modules/scheduler/index.js"(exports, module) {
       "use strict";
       if (false) {
         module.exports = null;
@@ -5848,9 +5848,9 @@
     }
   });
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/react-dom/cjs/react-dom.development.js
+  // node_modules/react-dom/cjs/react-dom.development.js
   var require_react_dom_development = __commonJS({
-    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/react-dom/cjs/react-dom.development.js"(exports) {
+    "node_modules/react-dom/cjs/react-dom.development.js"(exports) {
       "use strict";
       if (true) {
         (function() {
@@ -5858,9 +5858,9 @@
           if (typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ !== "undefined" && typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart === "function") {
             __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(new Error());
           }
-          var React13 = require_react();
+          var React12 = require_react();
           var Scheduler = require_scheduler();
-          var ReactSharedInternals = React13.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
+          var ReactSharedInternals = React12.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
           var suppressWarning = false;
           function setSuppressWarning(newSuppressWarning) {
             {
@@ -7467,7 +7467,7 @@
             {
               if (props.value == null) {
                 if (typeof props.children === "object" && props.children !== null) {
-                  React13.Children.forEach(props.children, function(child) {
+                  React12.Children.forEach(props.children, function(child) {
                     if (child == null) {
                       return;
                     }
@@ -27012,9 +27012,9 @@
     }
   });
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/react-dom/index.js
+  // node_modules/react-dom/index.js
   var require_react_dom = __commonJS({
-    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/react-dom/index.js"(exports, module) {
+    "node_modules/react-dom/index.js"(exports, module) {
       "use strict";
       if (false) {
         checkDCE();
@@ -27025,9 +27025,9 @@
     }
   });
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/react-dom/client.js
+  // node_modules/react-dom/client.js
   var require_client = __commonJS({
-    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/react-dom/client.js"(exports) {
+    "node_modules/react-dom/client.js"(exports) {
       "use strict";
       var m = require_react_dom();
       if (false) {
@@ -27056,16 +27056,16 @@
     }
   });
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/use-sync-external-store/cjs/use-sync-external-store-shim.development.js
+  // node_modules/use-sync-external-store/cjs/use-sync-external-store-shim.development.js
   var require_use_sync_external_store_shim_development = __commonJS({
-    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/use-sync-external-store/cjs/use-sync-external-store-shim.development.js"(exports) {
+    "node_modules/use-sync-external-store/cjs/use-sync-external-store-shim.development.js"(exports) {
       "use strict";
       (function() {
         function is(x, y) {
           return x === y && (0 !== x || 1 / x === 1 / y) || x !== x && y !== y;
         }
         function useSyncExternalStore$2(subscribe, getSnapshot) {
-          didWarnOld18Alpha || void 0 === React13.startTransition || (didWarnOld18Alpha = true, console.error(
+          didWarnOld18Alpha || void 0 === React12.startTransition || (didWarnOld18Alpha = true, console.error(
             "You are using an outdated, pre-release alpha of React 18 that does not support useSyncExternalStore. The use-sync-external-store shim will not work correctly. Upgrade to a newer pre-release."
           ));
           var value = getSnapshot();
@@ -27075,7 +27075,7 @@
               "The result of getSnapshot should be cached to avoid an infinite loop"
             ), didWarnUncachedGetSnapshot = true);
           }
-          cachedValue = useState9({
+          cachedValue = useState8({
             inst: { value, getSnapshot }
           });
           var inst = cachedValue[0].inst, forceUpdate = cachedValue[1];
@@ -27087,7 +27087,7 @@
             },
             [subscribe, value, getSnapshot]
           );
-          useEffect9(
+          useEffect8(
             function() {
               checkIfSnapshotChanged(inst) && forceUpdate({ inst });
               return subscribe(function() {
@@ -27113,16 +27113,16 @@
           return getSnapshot();
         }
         "undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
-        var React13 = require_react(), objectIs = "function" === typeof Object.is ? Object.is : is, useState9 = React13.useState, useEffect9 = React13.useEffect, useLayoutEffect = React13.useLayoutEffect, useDebugValue2 = React13.useDebugValue, didWarnOld18Alpha = false, didWarnUncachedGetSnapshot = false, shim = "undefined" === typeof window || "undefined" === typeof window.document || "undefined" === typeof window.document.createElement ? useSyncExternalStore$1 : useSyncExternalStore$2;
-        exports.useSyncExternalStore = void 0 !== React13.useSyncExternalStore ? React13.useSyncExternalStore : shim;
+        var React12 = require_react(), objectIs = "function" === typeof Object.is ? Object.is : is, useState8 = React12.useState, useEffect8 = React12.useEffect, useLayoutEffect = React12.useLayoutEffect, useDebugValue2 = React12.useDebugValue, didWarnOld18Alpha = false, didWarnUncachedGetSnapshot = false, shim = "undefined" === typeof window || "undefined" === typeof window.document || "undefined" === typeof window.document.createElement ? useSyncExternalStore$1 : useSyncExternalStore$2;
+        exports.useSyncExternalStore = void 0 !== React12.useSyncExternalStore ? React12.useSyncExternalStore : shim;
         "undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop(Error());
       })();
     }
   });
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/use-sync-external-store/shim/index.js
+  // node_modules/use-sync-external-store/shim/index.js
   var require_shim = __commonJS({
-    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/use-sync-external-store/shim/index.js"(exports, module) {
+    "node_modules/use-sync-external-store/shim/index.js"(exports, module) {
       "use strict";
       if (false) {
         module.exports = null;
@@ -27132,16 +27132,16 @@
     }
   });
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/use-sync-external-store/cjs/use-sync-external-store-shim/with-selector.development.js
+  // node_modules/use-sync-external-store/cjs/use-sync-external-store-shim/with-selector.development.js
   var require_with_selector_development = __commonJS({
-    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/use-sync-external-store/cjs/use-sync-external-store-shim/with-selector.development.js"(exports) {
+    "node_modules/use-sync-external-store/cjs/use-sync-external-store-shim/with-selector.development.js"(exports) {
       "use strict";
       (function() {
         function is(x, y) {
           return x === y && (0 !== x || 1 / x === 1 / y) || x !== x && y !== y;
         }
         "undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
-        var React13 = require_react(), shim = require_shim(), objectIs = "function" === typeof Object.is ? Object.is : is, useSyncExternalStore = shim.useSyncExternalStore, useRef6 = React13.useRef, useEffect9 = React13.useEffect, useMemo3 = React13.useMemo, useDebugValue2 = React13.useDebugValue;
+        var React12 = require_react(), shim = require_shim(), objectIs = "function" === typeof Object.is ? Object.is : is, useSyncExternalStore = shim.useSyncExternalStore, useRef6 = React12.useRef, useEffect8 = React12.useEffect, useMemo3 = React12.useMemo, useDebugValue2 = React12.useDebugValue;
         exports.useSyncExternalStoreWithSelector = function(subscribe, getSnapshot, getServerSnapshot, selector5, isEqual) {
           var instRef = useRef6(null);
           if (null === instRef.current) {
@@ -27184,7 +27184,7 @@
             [getSnapshot, getServerSnapshot, selector5, isEqual]
           );
           var value = useSyncExternalStore(subscribe, instRef[0], instRef[1]);
-          useEffect9(
+          useEffect8(
             function() {
               inst.hasValue = true;
               inst.value = value;
@@ -27199,9 +27199,9 @@
     }
   });
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/use-sync-external-store/shim/with-selector.js
+  // node_modules/use-sync-external-store/shim/with-selector.js
   var require_with_selector = __commonJS({
-    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/use-sync-external-store/shim/with-selector.js"(exports, module) {
+    "node_modules/use-sync-external-store/shim/with-selector.js"(exports, module) {
       "use strict";
       if (false) {
         module.exports = null;
@@ -27214,19 +27214,19 @@
   // webview/graph.tsx
   var import_dagre = __toESM(require_dagre());
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/lucide-react/dist/esm/createLucideIcon.js
+  // node_modules/lucide-react/dist/esm/createLucideIcon.js
   var import_react2 = __toESM(require_react());
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/lucide-react/dist/esm/shared/src/utils.js
+  // node_modules/lucide-react/dist/esm/shared/src/utils.js
   var toKebabCase = (string) => string.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase();
   var mergeClasses = (...classes) => classes.filter((className, index, array3) => {
     return Boolean(className) && className.trim() !== "" && array3.indexOf(className) === index;
   }).join(" ").trim();
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/lucide-react/dist/esm/Icon.js
+  // node_modules/lucide-react/dist/esm/Icon.js
   var import_react = __toESM(require_react());
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/lucide-react/dist/esm/defaultAttributes.js
+  // node_modules/lucide-react/dist/esm/defaultAttributes.js
   var defaultAttributes = {
     xmlns: "http://www.w3.org/2000/svg",
     width: 24,
@@ -27239,7 +27239,7 @@
     strokeLinejoin: "round"
   };
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/lucide-react/dist/esm/Icon.js
+  // node_modules/lucide-react/dist/esm/Icon.js
   var Icon = (0, import_react.forwardRef)(
     ({
       color: color2 = "currentColor",
@@ -27271,7 +27271,7 @@
     }
   );
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/lucide-react/dist/esm/createLucideIcon.js
+  // node_modules/lucide-react/dist/esm/createLucideIcon.js
   var createLucideIcon = (iconName, iconNode) => {
     const Component = (0, import_react2.forwardRef)(
       ({ className, ...props }, ref) => (0, import_react2.createElement)(Icon, {
@@ -27285,7 +27285,7 @@
     return Component;
   };
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/lucide-react/dist/esm/icons/activity.js
+  // node_modules/lucide-react/dist/esm/icons/activity.js
   var Activity = createLucideIcon("Activity", [
     [
       "path",
@@ -27296,19 +27296,19 @@
     ]
   ]);
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/lucide-react/dist/esm/icons/arrow-left.js
+  // node_modules/lucide-react/dist/esm/icons/arrow-left.js
   var ArrowLeft = createLucideIcon("ArrowLeft", [
     ["path", { d: "m12 19-7-7 7-7", key: "1l729n" }],
     ["path", { d: "M19 12H5", key: "x3x0zl" }]
   ]);
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/lucide-react/dist/esm/icons/arrow-right.js
+  // node_modules/lucide-react/dist/esm/icons/arrow-right.js
   var ArrowRight = createLucideIcon("ArrowRight", [
     ["path", { d: "M5 12h14", key: "1ays0h" }],
     ["path", { d: "m12 5 7 7-7 7", key: "xquz4c" }]
   ]);
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/lucide-react/dist/esm/icons/bug.js
+  // node_modules/lucide-react/dist/esm/icons/bug.js
   var Bug = createLucideIcon("Bug", [
     ["path", { d: "m8 2 1.88 1.88", key: "fmnt4t" }],
     ["path", { d: "M14.12 3.88 16 2", key: "qol33r" }],
@@ -27329,25 +27329,25 @@
     ["path", { d: "M17.2 17c2.1.1 3.8 1.9 3.8 4", key: "k3fwyw" }]
   ]);
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/lucide-react/dist/esm/icons/circle-check.js
+  // node_modules/lucide-react/dist/esm/icons/circle-check.js
   var CircleCheck = createLucideIcon("CircleCheck", [
     ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
     ["path", { d: "m9 12 2 2 4-4", key: "dzmm74" }]
   ]);
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/lucide-react/dist/esm/icons/circle-dot.js
+  // node_modules/lucide-react/dist/esm/icons/circle-dot.js
   var CircleDot = createLucideIcon("CircleDot", [
     ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
     ["circle", { cx: "12", cy: "12", r: "1", key: "41hilf" }]
   ]);
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/lucide-react/dist/esm/icons/clock-3.js
+  // node_modules/lucide-react/dist/esm/icons/clock-3.js
   var Clock3 = createLucideIcon("Clock3", [
     ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
     ["polyline", { points: "12 6 12 12 16.5 12", key: "1aq6pp" }]
   ]);
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/lucide-react/dist/esm/icons/file-input.js
+  // node_modules/lucide-react/dist/esm/icons/file-input.js
   var FileInput = createLucideIcon("FileInput", [
     ["path", { d: "M4 22h14a2 2 0 0 0 2-2V7l-5-5H6a2 2 0 0 0-2 2v4", key: "1pf5j1" }],
     ["path", { d: "M14 2v4a2 2 0 0 0 2 2h4", key: "tnqrlb" }],
@@ -27355,13 +27355,13 @@
     ["path", { d: "m9 18 3-3-3-3", key: "112psh" }]
   ]);
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/lucide-react/dist/esm/icons/flag.js
+  // node_modules/lucide-react/dist/esm/icons/flag.js
   var Flag = createLucideIcon("Flag", [
     ["path", { d: "M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z", key: "i9b6wo" }],
     ["line", { x1: "4", x2: "4", y1: "22", y2: "15", key: "1cm3nv" }]
   ]);
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/lucide-react/dist/esm/icons/git-branch.js
+  // node_modules/lucide-react/dist/esm/icons/git-branch.js
   var GitBranch = createLucideIcon("GitBranch", [
     ["line", { x1: "6", x2: "6", y1: "3", y2: "15", key: "17qcm7" }],
     ["circle", { cx: "18", cy: "6", r: "3", key: "1h7g24" }],
@@ -27369,7 +27369,7 @@
     ["path", { d: "M18 9a9 9 0 0 1-9 9", key: "n2h4wq" }]
   ]);
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/lucide-react/dist/esm/icons/list-checks.js
+  // node_modules/lucide-react/dist/esm/icons/list-checks.js
   var ListChecks = createLucideIcon("ListChecks", [
     ["path", { d: "m3 17 2 2 4-4", key: "1jhpwq" }],
     ["path", { d: "m3 7 2 2 4-4", key: "1obspn" }],
@@ -27378,24 +27378,14 @@
     ["path", { d: "M13 18h8", key: "oe0vm4" }]
   ]);
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/lucide-react/dist/esm/icons/locate-fixed.js
-  var LocateFixed = createLucideIcon("LocateFixed", [
-    ["line", { x1: "2", x2: "5", y1: "12", y2: "12", key: "bvdh0s" }],
-    ["line", { x1: "19", x2: "22", y1: "12", y2: "12", key: "1tbv5k" }],
-    ["line", { x1: "12", x2: "12", y1: "2", y2: "5", key: "11lu5j" }],
-    ["line", { x1: "12", x2: "12", y1: "19", y2: "22", key: "x3vr5v" }],
-    ["circle", { cx: "12", cy: "12", r: "7", key: "fim9np" }],
-    ["circle", { cx: "12", cy: "12", r: "3", key: "1v7zrd" }]
-  ]);
-
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/lucide-react/dist/esm/icons/message-square-text.js
+  // node_modules/lucide-react/dist/esm/icons/message-square-text.js
   var MessageSquareText = createLucideIcon("MessageSquareText", [
     ["path", { d: "M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z", key: "1lielz" }],
     ["path", { d: "M13 8H7", key: "14i4kc" }],
     ["path", { d: "M17 12H7", key: "16if0g" }]
   ]);
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/lucide-react/dist/esm/icons/package-open.js
+  // node_modules/lucide-react/dist/esm/icons/package-open.js
   var PackageOpen = createLucideIcon("PackageOpen", [
     ["path", { d: "M12 22v-9", key: "x3hkom" }],
     [
@@ -27421,18 +27411,18 @@
     ]
   ]);
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/lucide-react/dist/esm/icons/panel-right.js
+  // node_modules/lucide-react/dist/esm/icons/panel-right.js
   var PanelRight = createLucideIcon("PanelRight", [
     ["rect", { width: "18", height: "18", x: "3", y: "3", rx: "2", key: "afitv7" }],
     ["path", { d: "M15 3v18", key: "14nvp0" }]
   ]);
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/lucide-react/dist/esm/icons/play.js
+  // node_modules/lucide-react/dist/esm/icons/play.js
   var Play = createLucideIcon("Play", [
     ["polygon", { points: "6 3 20 12 6 21 6 3", key: "1oa8hb" }]
   ]);
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/lucide-react/dist/esm/icons/puzzle.js
+  // node_modules/lucide-react/dist/esm/icons/puzzle.js
   var Puzzle = createLucideIcon("Puzzle", [
     [
       "path",
@@ -27443,7 +27433,7 @@
     ]
   ]);
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/lucide-react/dist/esm/icons/radio.js
+  // node_modules/lucide-react/dist/esm/icons/radio.js
   var Radio = createLucideIcon("Radio", [
     ["path", { d: "M4.9 19.1C1 15.2 1 8.8 4.9 4.9", key: "1vaf9d" }],
     ["path", { d: "M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5", key: "u1ii0m" }],
@@ -27452,7 +27442,7 @@
     ["path", { d: "M19.1 4.9C23 8.8 23 15.1 19.1 19", key: "10b0cb" }]
   ]);
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/lucide-react/dist/esm/icons/repeat-2.js
+  // node_modules/lucide-react/dist/esm/icons/repeat-2.js
   var Repeat2 = createLucideIcon("Repeat2", [
     ["path", { d: "m2 9 3-3 3 3", key: "1ltn5i" }],
     ["path", { d: "M13 18H7a2 2 0 0 1-2-2V6", key: "1r6tfw" }],
@@ -27460,13 +27450,13 @@
     ["path", { d: "M11 6h6a2 2 0 0 1 2 2v10", key: "2f72bc" }]
   ]);
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/lucide-react/dist/esm/icons/rotate-ccw.js
+  // node_modules/lucide-react/dist/esm/icons/rotate-ccw.js
   var RotateCcw = createLucideIcon("RotateCcw", [
     ["path", { d: "M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8", key: "1357e3" }],
     ["path", { d: "M3 3v5h5", key: "1xhq8a" }]
   ]);
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/lucide-react/dist/esm/icons/shield-check.js
+  // node_modules/lucide-react/dist/esm/icons/shield-check.js
   var ShieldCheck = createLucideIcon("ShieldCheck", [
     [
       "path",
@@ -27478,31 +27468,31 @@
     ["path", { d: "m9 12 2 2 4-4", key: "dzmm74" }]
   ]);
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/lucide-react/dist/esm/icons/square.js
+  // node_modules/lucide-react/dist/esm/icons/square.js
   var Square = createLucideIcon("Square", [
     ["rect", { width: "18", height: "18", x: "3", y: "3", rx: "2", key: "afitv7" }]
   ]);
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/lucide-react/dist/esm/icons/terminal.js
+  // node_modules/lucide-react/dist/esm/icons/terminal.js
   var Terminal = createLucideIcon("Terminal", [
     ["polyline", { points: "4 17 10 11 4 5", key: "akl6gq" }],
     ["line", { x1: "12", x2: "20", y1: "19", y2: "19", key: "q2wloq" }]
   ]);
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/lucide-react/dist/esm/icons/undo-2.js
+  // node_modules/lucide-react/dist/esm/icons/undo-2.js
   var Undo2 = createLucideIcon("Undo2", [
     ["path", { d: "M9 14 4 9l5-5", key: "102s5s" }],
     ["path", { d: "M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5a5.5 5.5 0 0 1-5.5 5.5H11", key: "f3b9sd" }]
   ]);
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/lucide-react/dist/esm/icons/workflow.js
+  // node_modules/lucide-react/dist/esm/icons/workflow.js
   var Workflow = createLucideIcon("Workflow", [
     ["rect", { width: "8", height: "8", x: "3", y: "3", rx: "2", key: "by2w9f" }],
     ["path", { d: "M7 11v4a2 2 0 0 0 2 2h4", key: "xkn7yn" }],
     ["rect", { width: "8", height: "8", x: "13", y: "13", rx: "2", key: "1cgmvn" }]
   ]);
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/lucide-react/dist/esm/icons/wrench.js
+  // node_modules/lucide-react/dist/esm/icons/wrench.js
   var Wrench = createLucideIcon("Wrench", [
     [
       "path",
@@ -27514,13 +27504,13 @@
   ]);
 
   // webview/graph.tsx
-  var import_react15 = __toESM(require_react());
+  var import_react14 = __toESM(require_react());
   var import_client = __toESM(require_client());
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@reactflow/core/dist/esm/index.mjs
+  // node_modules/@reactflow/core/dist/esm/index.mjs
   var import_react4 = __toESM(require_react(), 1);
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/classcat/index.js
+  // node_modules/classcat/index.js
   function cc(names) {
     if (typeof names === "string" || typeof names === "number") return "" + names;
     let out = "";
@@ -27538,11 +27528,11 @@
     return out;
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/zustand/esm/traditional.mjs
+  // node_modules/zustand/esm/traditional.mjs
   var import_react3 = __toESM(require_react(), 1);
   var import_with_selector = __toESM(require_with_selector(), 1);
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/zustand/esm/vanilla.mjs
+  // node_modules/zustand/esm/vanilla.mjs
   var import_meta = {};
   var createStoreImpl = (createState) => {
     let state;
@@ -27575,7 +27565,7 @@
   };
   var createStore = (createState) => createState ? createStoreImpl(createState) : createStoreImpl;
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/zustand/esm/traditional.mjs
+  // node_modules/zustand/esm/traditional.mjs
   var { useDebugValue } = import_react3.default;
   var { useSyncExternalStoreWithSelector } = import_with_selector.default;
   var identity = (arg) => arg;
@@ -27598,7 +27588,7 @@
   };
   var createWithEqualityFn = (createState, defaultEqualityFn) => createState ? createWithEqualityFnImpl(createState, defaultEqualityFn) : createWithEqualityFnImpl;
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/zustand/esm/shallow.mjs
+  // node_modules/zustand/esm/shallow.mjs
   function shallow$1(objA, objB) {
     if (Object.is(objA, objB)) {
       return true;
@@ -27636,7 +27626,7 @@
     return true;
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-dispatch/src/dispatch.js
+  // node_modules/d3-dispatch/src/dispatch.js
   var noop = { value: () => {
   } };
   function dispatch() {
@@ -27706,7 +27696,7 @@
   }
   var dispatch_default = dispatch;
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/namespaces.js
+  // node_modules/d3-selection/src/namespaces.js
   var xhtml = "http://www.w3.org/1999/xhtml";
   var namespaces_default = {
     svg: "http://www.w3.org/2000/svg",
@@ -27716,14 +27706,14 @@
     xmlns: "http://www.w3.org/2000/xmlns/"
   };
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/namespace.js
+  // node_modules/d3-selection/src/namespace.js
   function namespace_default(name) {
     var prefix = name += "", i = prefix.indexOf(":");
     if (i >= 0 && (prefix = name.slice(0, i)) !== "xmlns") name = name.slice(i + 1);
     return namespaces_default.hasOwnProperty(prefix) ? { space: namespaces_default[prefix], local: name } : name;
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/creator.js
+  // node_modules/d3-selection/src/creator.js
   function creatorInherit(name) {
     return function() {
       var document2 = this.ownerDocument, uri = this.namespaceURI;
@@ -27740,7 +27730,7 @@
     return (fullname.local ? creatorFixed : creatorInherit)(fullname);
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selector.js
+  // node_modules/d3-selection/src/selector.js
   function none() {
   }
   function selector_default(selector5) {
@@ -27749,7 +27739,7 @@
     };
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/select.js
+  // node_modules/d3-selection/src/selection/select.js
   function select_default(select) {
     if (typeof select !== "function") select = selector_default(select);
     for (var groups = this._groups, m = groups.length, subgroups = new Array(m), j = 0; j < m; ++j) {
@@ -27763,12 +27753,12 @@
     return new Selection(subgroups, this._parents);
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/array.js
+  // node_modules/d3-selection/src/array.js
   function array(x) {
     return x == null ? [] : Array.isArray(x) ? x : Array.from(x);
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selectorAll.js
+  // node_modules/d3-selection/src/selectorAll.js
   function empty() {
     return [];
   }
@@ -27778,7 +27768,7 @@
     };
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/selectAll.js
+  // node_modules/d3-selection/src/selection/selectAll.js
   function arrayAll(select) {
     return function() {
       return array(select.apply(this, arguments));
@@ -27798,7 +27788,7 @@
     return new Selection(subgroups, parents);
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/matcher.js
+  // node_modules/d3-selection/src/matcher.js
   function matcher_default(selector5) {
     return function() {
       return this.matches(selector5);
@@ -27810,7 +27800,7 @@
     };
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/selectChild.js
+  // node_modules/d3-selection/src/selection/selectChild.js
   var find = Array.prototype.find;
   function childFind(match) {
     return function() {
@@ -27824,7 +27814,7 @@
     return this.select(match == null ? childFirst : childFind(typeof match === "function" ? match : childMatcher(match)));
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/selectChildren.js
+  // node_modules/d3-selection/src/selection/selectChildren.js
   var filter = Array.prototype.filter;
   function children() {
     return Array.from(this.children);
@@ -27838,7 +27828,7 @@
     return this.selectAll(match == null ? children : childrenFilter(typeof match === "function" ? match : childMatcher(match)));
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/filter.js
+  // node_modules/d3-selection/src/selection/filter.js
   function filter_default(match) {
     if (typeof match !== "function") match = matcher_default(match);
     for (var groups = this._groups, m = groups.length, subgroups = new Array(m), j = 0; j < m; ++j) {
@@ -27851,12 +27841,12 @@
     return new Selection(subgroups, this._parents);
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/sparse.js
+  // node_modules/d3-selection/src/selection/sparse.js
   function sparse_default(update) {
     return new Array(update.length);
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/enter.js
+  // node_modules/d3-selection/src/selection/enter.js
   function enter_default() {
     return new Selection(this._enter || this._groups.map(sparse_default), this._parents);
   }
@@ -27883,14 +27873,14 @@
     }
   };
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/constant.js
+  // node_modules/d3-selection/src/constant.js
   function constant_default(x) {
     return function() {
       return x;
     };
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/data.js
+  // node_modules/d3-selection/src/selection/data.js
   function bindIndex(parent, group, enter, update, exit, data) {
     var i = 0, node, groupLength = group.length, dataLength = data.length;
     for (; i < dataLength; ++i) {
@@ -27962,12 +27952,12 @@
     return typeof data === "object" && "length" in data ? data : Array.from(data);
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/exit.js
+  // node_modules/d3-selection/src/selection/exit.js
   function exit_default() {
     return new Selection(this._exit || this._groups.map(sparse_default), this._parents);
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/join.js
+  // node_modules/d3-selection/src/selection/join.js
   function join_default(onenter, onupdate, onexit) {
     var enter = this.enter(), update = this, exit = this.exit();
     if (typeof onenter === "function") {
@@ -27985,7 +27975,7 @@
     return enter && update ? enter.merge(update).order() : update;
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/merge.js
+  // node_modules/d3-selection/src/selection/merge.js
   function merge_default(context) {
     var selection3 = context.selection ? context.selection() : context;
     for (var groups0 = this._groups, groups1 = selection3._groups, m0 = groups0.length, m1 = groups1.length, m = Math.min(m0, m1), merges = new Array(m0), j = 0; j < m; ++j) {
@@ -28001,7 +27991,7 @@
     return new Selection(merges, this._parents);
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/order.js
+  // node_modules/d3-selection/src/selection/order.js
   function order_default() {
     for (var groups = this._groups, j = -1, m = groups.length; ++j < m; ) {
       for (var group = groups[j], i = group.length - 1, next = group[i], node; --i >= 0; ) {
@@ -28014,7 +28004,7 @@
     return this;
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/sort.js
+  // node_modules/d3-selection/src/selection/sort.js
   function sort_default(compare) {
     if (!compare) compare = ascending;
     function compareNode(a, b) {
@@ -28034,7 +28024,7 @@
     return a < b ? -1 : a > b ? 1 : a >= b ? 0 : NaN;
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/call.js
+  // node_modules/d3-selection/src/selection/call.js
   function call_default() {
     var callback = arguments[0];
     arguments[0] = this;
@@ -28042,12 +28032,12 @@
     return this;
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/nodes.js
+  // node_modules/d3-selection/src/selection/nodes.js
   function nodes_default() {
     return Array.from(this);
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/node.js
+  // node_modules/d3-selection/src/selection/node.js
   function node_default() {
     for (var groups = this._groups, j = 0, m = groups.length; j < m; ++j) {
       for (var group = groups[j], i = 0, n = group.length; i < n; ++i) {
@@ -28058,19 +28048,19 @@
     return null;
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/size.js
+  // node_modules/d3-selection/src/selection/size.js
   function size_default() {
     let size = 0;
     for (const node of this) ++size;
     return size;
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/empty.js
+  // node_modules/d3-selection/src/selection/empty.js
   function empty_default() {
     return !this.node();
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/each.js
+  // node_modules/d3-selection/src/selection/each.js
   function each_default(callback) {
     for (var groups = this._groups, j = 0, m = groups.length; j < m; ++j) {
       for (var group = groups[j], i = 0, n = group.length, node; i < n; ++i) {
@@ -28080,7 +28070,7 @@
     return this;
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/attr.js
+  // node_modules/d3-selection/src/selection/attr.js
   function attrRemove(name) {
     return function() {
       this.removeAttribute(name);
@@ -28124,12 +28114,12 @@
     return this.each((value == null ? fullname.local ? attrRemoveNS : attrRemove : typeof value === "function" ? fullname.local ? attrFunctionNS : attrFunction : fullname.local ? attrConstantNS : attrConstant)(fullname, value));
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/window.js
+  // node_modules/d3-selection/src/window.js
   function window_default(node) {
     return node.ownerDocument && node.ownerDocument.defaultView || node.document && node || node.defaultView;
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/style.js
+  // node_modules/d3-selection/src/selection/style.js
   function styleRemove(name) {
     return function() {
       this.style.removeProperty(name);
@@ -28154,7 +28144,7 @@
     return node.style.getPropertyValue(name) || window_default(node).getComputedStyle(node, null).getPropertyValue(name);
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/property.js
+  // node_modules/d3-selection/src/selection/property.js
   function propertyRemove(name) {
     return function() {
       delete this[name];
@@ -28176,7 +28166,7 @@
     return arguments.length > 1 ? this.each((value == null ? propertyRemove : typeof value === "function" ? propertyFunction : propertyConstant)(name, value)) : this.node()[name];
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/classed.js
+  // node_modules/d3-selection/src/selection/classed.js
   function classArray(string) {
     return string.trim().split(/^|\s+/);
   }
@@ -28239,7 +28229,7 @@
     return this.each((typeof value === "function" ? classedFunction : value ? classedTrue : classedFalse)(names, value));
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/text.js
+  // node_modules/d3-selection/src/selection/text.js
   function textRemove() {
     this.textContent = "";
   }
@@ -28258,7 +28248,7 @@
     return arguments.length ? this.each(value == null ? textRemove : (typeof value === "function" ? textFunction : textConstant)(value)) : this.node().textContent;
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/html.js
+  // node_modules/d3-selection/src/selection/html.js
   function htmlRemove() {
     this.innerHTML = "";
   }
@@ -28277,7 +28267,7 @@
     return arguments.length ? this.each(value == null ? htmlRemove : (typeof value === "function" ? htmlFunction : htmlConstant)(value)) : this.node().innerHTML;
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/raise.js
+  // node_modules/d3-selection/src/selection/raise.js
   function raise() {
     if (this.nextSibling) this.parentNode.appendChild(this);
   }
@@ -28285,7 +28275,7 @@
     return this.each(raise);
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/lower.js
+  // node_modules/d3-selection/src/selection/lower.js
   function lower() {
     if (this.previousSibling) this.parentNode.insertBefore(this, this.parentNode.firstChild);
   }
@@ -28293,7 +28283,7 @@
     return this.each(lower);
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/append.js
+  // node_modules/d3-selection/src/selection/append.js
   function append_default(name) {
     var create2 = typeof name === "function" ? name : creator_default(name);
     return this.select(function() {
@@ -28301,7 +28291,7 @@
     });
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/insert.js
+  // node_modules/d3-selection/src/selection/insert.js
   function constantNull() {
     return null;
   }
@@ -28312,7 +28302,7 @@
     });
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/remove.js
+  // node_modules/d3-selection/src/selection/remove.js
   function remove() {
     var parent = this.parentNode;
     if (parent) parent.removeChild(this);
@@ -28321,7 +28311,7 @@
     return this.each(remove);
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/clone.js
+  // node_modules/d3-selection/src/selection/clone.js
   function selection_cloneShallow() {
     var clone = this.cloneNode(false), parent = this.parentNode;
     return parent ? parent.insertBefore(clone, this.nextSibling) : clone;
@@ -28334,12 +28324,12 @@
     return this.select(deep ? selection_cloneDeep : selection_cloneShallow);
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/datum.js
+  // node_modules/d3-selection/src/selection/datum.js
   function datum_default(value) {
     return arguments.length ? this.property("__data__", value) : this.node().__data__;
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/on.js
+  // node_modules/d3-selection/src/selection/on.js
   function contextListener(listener) {
     return function(event) {
       listener.call(this, event, this.__data__);
@@ -28402,7 +28392,7 @@
     return this;
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/dispatch.js
+  // node_modules/d3-selection/src/selection/dispatch.js
   function dispatchEvent(node, type, params) {
     var window2 = window_default(node), event = window2.CustomEvent;
     if (typeof event === "function") {
@@ -28428,7 +28418,7 @@
     return this.each((typeof params === "function" ? dispatchFunction : dispatchConstant)(type, params));
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/iterator.js
+  // node_modules/d3-selection/src/selection/iterator.js
   function* iterator_default() {
     for (var groups = this._groups, j = 0, m = groups.length; j < m; ++j) {
       for (var group = groups[j], i = 0, n = group.length, node; i < n; ++i) {
@@ -28437,7 +28427,7 @@
     }
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/index.js
+  // node_modules/d3-selection/src/selection/index.js
   var root = [null];
   function Selection(groups, parents) {
     this._groups = groups;
@@ -28489,19 +28479,19 @@
   };
   var selection_default = selection;
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/select.js
+  // node_modules/d3-selection/src/select.js
   function select_default2(selector5) {
     return typeof selector5 === "string" ? new Selection([[document.querySelector(selector5)]], [document.documentElement]) : new Selection([[selector5]], root);
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/sourceEvent.js
+  // node_modules/d3-selection/src/sourceEvent.js
   function sourceEvent_default(event) {
     let sourceEvent;
     while (sourceEvent = event.sourceEvent) event = sourceEvent;
     return event;
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/pointer.js
+  // node_modules/d3-selection/src/pointer.js
   function pointer_default(event, node) {
     event = sourceEvent_default(event);
     if (node === void 0) node = event.currentTarget;
@@ -28521,7 +28511,7 @@
     return [event.pageX, event.pageY];
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-drag/src/noevent.js
+  // node_modules/d3-drag/src/noevent.js
   var nonpassive = { passive: false };
   var nonpassivecapture = { capture: true, passive: false };
   function nopropagation(event) {
@@ -28532,7 +28522,7 @@
     event.stopImmediatePropagation();
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-drag/src/nodrag.js
+  // node_modules/d3-drag/src/nodrag.js
   function nodrag_default(view) {
     var root3 = view.document.documentElement, selection3 = select_default2(view).on("dragstart.drag", noevent_default, nonpassivecapture);
     if ("onselectstart" in root3) {
@@ -28558,10 +28548,10 @@
     }
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-drag/src/constant.js
+  // node_modules/d3-drag/src/constant.js
   var constant_default2 = (x) => () => x;
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-drag/src/event.js
+  // node_modules/d3-drag/src/event.js
   function DragEvent(type, {
     sourceEvent,
     subject,
@@ -28593,7 +28583,7 @@
     return value === this._ ? this : value;
   };
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-drag/src/drag.js
+  // node_modules/d3-drag/src/drag.js
   function defaultFilter(event) {
     return !event.ctrlKey && !event.button;
   }
@@ -28738,7 +28728,7 @@
     return drag;
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-color/src/define.js
+  // node_modules/d3-color/src/define.js
   function define_default(constructor, factory, prototype) {
     constructor.prototype = factory.prototype = prototype;
     prototype.constructor = constructor;
@@ -28749,7 +28739,7 @@
     return prototype;
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-color/src/color.js
+  // node_modules/d3-color/src/color.js
   function Color() {
   }
   var darker = 0.7;
@@ -29086,7 +29076,7 @@
     return (h < 60 ? m1 + (m2 - m1) * h / 60 : h < 180 ? m2 : h < 240 ? m1 + (m2 - m1) * (240 - h) / 60 : m1) * 255;
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-interpolate/src/basis.js
+  // node_modules/d3-interpolate/src/basis.js
   function basis(t1, v0, v1, v2, v3) {
     var t2 = t1 * t1, t3 = t2 * t1;
     return ((1 - 3 * t1 + 3 * t2 - t3) * v0 + (4 - 6 * t2 + 3 * t3) * v1 + (1 + 3 * t1 + 3 * t2 - 3 * t3) * v2 + t3 * v3) / 6;
@@ -29099,7 +29089,7 @@
     };
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-interpolate/src/basisClosed.js
+  // node_modules/d3-interpolate/src/basisClosed.js
   function basisClosed_default(values) {
     var n = values.length;
     return function(t) {
@@ -29108,10 +29098,10 @@
     };
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-interpolate/src/constant.js
+  // node_modules/d3-interpolate/src/constant.js
   var constant_default3 = (x) => () => x;
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-interpolate/src/color.js
+  // node_modules/d3-interpolate/src/color.js
   function linear(a, d) {
     return function(t) {
       return a + t * d;
@@ -29132,7 +29122,7 @@
     return d ? linear(a, d) : constant_default3(isNaN(a) ? b : a);
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-interpolate/src/rgb.js
+  // node_modules/d3-interpolate/src/rgb.js
   var rgb_default = (function rgbGamma(y) {
     var color2 = gamma(y);
     function rgb2(start2, end) {
@@ -29172,14 +29162,14 @@
   var rgbBasis = rgbSpline(basis_default);
   var rgbBasisClosed = rgbSpline(basisClosed_default);
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-interpolate/src/number.js
+  // node_modules/d3-interpolate/src/number.js
   function number_default(a, b) {
     return a = +a, b = +b, function(t) {
       return a * (1 - t) + b * t;
     };
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-interpolate/src/string.js
+  // node_modules/d3-interpolate/src/string.js
   var reA = /[-+]?(?:\d+\.?\d*|\.?\d+)(?:[eE][-+]?\d+)?/g;
   var reB = new RegExp(reA.source, "g");
   function zero(b) {
@@ -29221,7 +29211,7 @@
     });
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-interpolate/src/transform/decompose.js
+  // node_modules/d3-interpolate/src/transform/decompose.js
   var degrees = 180 / Math.PI;
   var identity2 = {
     translateX: 0,
@@ -29247,7 +29237,7 @@
     };
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-interpolate/src/transform/parse.js
+  // node_modules/d3-interpolate/src/transform/parse.js
   var svgNode;
   function parseCss(value) {
     const m = new (typeof DOMMatrix === "function" ? DOMMatrix : WebKitCSSMatrix)(value + "");
@@ -29262,7 +29252,7 @@
     return decompose_default(value.a, value.b, value.c, value.d, value.e, value.f);
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-interpolate/src/transform/index.js
+  // node_modules/d3-interpolate/src/transform/index.js
   function interpolateTransform(parse, pxComma, pxParen, degParen) {
     function pop(s) {
       return s.length ? s.pop() + " " : "";
@@ -29317,7 +29307,7 @@
   var interpolateTransformCss = interpolateTransform(parseCss, "px, ", "px)", "deg)");
   var interpolateTransformSvg = interpolateTransform(parseSvg, ", ", ")", ")");
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-interpolate/src/zoom.js
+  // node_modules/d3-interpolate/src/zoom.js
   var epsilon2 = 1e-12;
   function cosh(x) {
     return ((x = Math.exp(x)) + 1 / x) / 2;
@@ -29362,7 +29352,7 @@
     return zoom;
   })(Math.SQRT2, 2, 4);
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-timer/src/timer.js
+  // node_modules/d3-timer/src/timer.js
   var frame = 0;
   var timeout = 0;
   var interval = 0;
@@ -29464,7 +29454,7 @@
     }
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-timer/src/timeout.js
+  // node_modules/d3-timer/src/timeout.js
   function timeout_default(callback, delay, time) {
     var t = new Timer();
     delay = delay == null ? 0 : +delay;
@@ -29475,7 +29465,7 @@
     return t;
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-transition/src/transition/schedule.js
+  // node_modules/d3-transition/src/transition/schedule.js
   var emptyOn = dispatch_default("start", "end", "cancel", "interrupt");
   var emptyTween = [];
   var CREATED = 0;
@@ -29586,7 +29576,7 @@
     }
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-transition/src/interrupt.js
+  // node_modules/d3-transition/src/interrupt.js
   function interrupt_default(node, name) {
     var schedules = node.__transition, schedule, active, empty2 = true, i;
     if (!schedules) return;
@@ -29605,14 +29595,14 @@
     if (empty2) delete node.__transition;
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-transition/src/selection/interrupt.js
+  // node_modules/d3-transition/src/selection/interrupt.js
   function interrupt_default2(name) {
     return this.each(function() {
       interrupt_default(this, name);
     });
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-transition/src/transition/tween.js
+  // node_modules/d3-transition/src/transition/tween.js
   function tweenRemove(id2, name) {
     var tween0, tween1;
     return function() {
@@ -29673,13 +29663,13 @@
     };
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-transition/src/transition/interpolate.js
+  // node_modules/d3-transition/src/transition/interpolate.js
   function interpolate_default(a, b) {
     var c;
     return (typeof b === "number" ? number_default : b instanceof color ? rgb_default : (c = color(b)) ? (b = c, rgb_default) : string_default)(a, b);
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-transition/src/transition/attr.js
+  // node_modules/d3-transition/src/transition/attr.js
   function attrRemove2(name) {
     return function() {
       this.removeAttribute(name);
@@ -29729,7 +29719,7 @@
     return this.attrTween(name, typeof value === "function" ? (fullname.local ? attrFunctionNS2 : attrFunction2)(fullname, i, tweenValue(this, "attr." + name, value)) : value == null ? (fullname.local ? attrRemoveNS2 : attrRemove2)(fullname) : (fullname.local ? attrConstantNS2 : attrConstant2)(fullname, i, value));
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-transition/src/transition/attrTween.js
+  // node_modules/d3-transition/src/transition/attrTween.js
   function attrInterpolate(name, i) {
     return function(t) {
       this.setAttribute(name, i.call(this, t));
@@ -29769,7 +29759,7 @@
     return this.tween(key, (fullname.local ? attrTweenNS : attrTween)(fullname, value));
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-transition/src/transition/delay.js
+  // node_modules/d3-transition/src/transition/delay.js
   function delayFunction(id2, value) {
     return function() {
       init(this, id2).delay = +value.apply(this, arguments);
@@ -29785,7 +29775,7 @@
     return arguments.length ? this.each((typeof value === "function" ? delayFunction : delayConstant)(id2, value)) : get2(this.node(), id2).delay;
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-transition/src/transition/duration.js
+  // node_modules/d3-transition/src/transition/duration.js
   function durationFunction(id2, value) {
     return function() {
       set2(this, id2).duration = +value.apply(this, arguments);
@@ -29801,7 +29791,7 @@
     return arguments.length ? this.each((typeof value === "function" ? durationFunction : durationConstant)(id2, value)) : get2(this.node(), id2).duration;
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-transition/src/transition/ease.js
+  // node_modules/d3-transition/src/transition/ease.js
   function easeConstant(id2, value) {
     if (typeof value !== "function") throw new Error();
     return function() {
@@ -29813,7 +29803,7 @@
     return arguments.length ? this.each(easeConstant(id2, value)) : get2(this.node(), id2).ease;
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-transition/src/transition/easeVarying.js
+  // node_modules/d3-transition/src/transition/easeVarying.js
   function easeVarying(id2, value) {
     return function() {
       var v = value.apply(this, arguments);
@@ -29826,7 +29816,7 @@
     return this.each(easeVarying(this._id, value));
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-transition/src/transition/filter.js
+  // node_modules/d3-transition/src/transition/filter.js
   function filter_default2(match) {
     if (typeof match !== "function") match = matcher_default(match);
     for (var groups = this._groups, m = groups.length, subgroups = new Array(m), j = 0; j < m; ++j) {
@@ -29839,7 +29829,7 @@
     return new Transition(subgroups, this._parents, this._name, this._id);
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-transition/src/transition/merge.js
+  // node_modules/d3-transition/src/transition/merge.js
   function merge_default2(transition2) {
     if (transition2._id !== this._id) throw new Error();
     for (var groups0 = this._groups, groups1 = transition2._groups, m0 = groups0.length, m1 = groups1.length, m = Math.min(m0, m1), merges = new Array(m0), j = 0; j < m; ++j) {
@@ -29855,7 +29845,7 @@
     return new Transition(merges, this._parents, this._name, this._id);
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-transition/src/transition/on.js
+  // node_modules/d3-transition/src/transition/on.js
   function start(name) {
     return (name + "").trim().split(/^|\s+/).every(function(t) {
       var i = t.indexOf(".");
@@ -29876,7 +29866,7 @@
     return arguments.length < 2 ? get2(this.node(), id2).on.on(name) : this.each(onFunction(id2, name, listener));
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-transition/src/transition/remove.js
+  // node_modules/d3-transition/src/transition/remove.js
   function removeFunction(id2) {
     return function() {
       var parent = this.parentNode;
@@ -29888,7 +29878,7 @@
     return this.on("end.remove", removeFunction(this._id));
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-transition/src/transition/select.js
+  // node_modules/d3-transition/src/transition/select.js
   function select_default3(select) {
     var name = this._name, id2 = this._id;
     if (typeof select !== "function") select = selector_default(select);
@@ -29904,7 +29894,7 @@
     return new Transition(subgroups, this._parents, name, id2);
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-transition/src/transition/selectAll.js
+  // node_modules/d3-transition/src/transition/selectAll.js
   function selectAll_default2(select) {
     var name = this._name, id2 = this._id;
     if (typeof select !== "function") select = selectorAll_default(select);
@@ -29924,13 +29914,13 @@
     return new Transition(subgroups, parents, name, id2);
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-transition/src/transition/selection.js
+  // node_modules/d3-transition/src/transition/selection.js
   var Selection2 = selection_default.prototype.constructor;
   function selection_default2() {
     return new Selection2(this._groups, this._parents);
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-transition/src/transition/style.js
+  // node_modules/d3-transition/src/transition/style.js
   function styleNull(name, interpolate) {
     var string00, string10, interpolate0;
     return function() {
@@ -29971,7 +29961,7 @@
     return value == null ? this.styleTween(name, styleNull(name, i)).on("end.style." + name, styleRemove2(name)) : typeof value === "function" ? this.styleTween(name, styleFunction2(name, i, tweenValue(this, "style." + name, value))).each(styleMaybeRemove(this._id, name)) : this.styleTween(name, styleConstant2(name, i, value), priority).on("end.style." + name, null);
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-transition/src/transition/styleTween.js
+  // node_modules/d3-transition/src/transition/styleTween.js
   function styleInterpolate(name, i, priority) {
     return function(t) {
       this.style.setProperty(name, i.call(this, t), priority);
@@ -29995,7 +29985,7 @@
     return this.tween(key, styleTween(name, value, priority == null ? "" : priority));
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-transition/src/transition/text.js
+  // node_modules/d3-transition/src/transition/text.js
   function textConstant2(value) {
     return function() {
       this.textContent = value;
@@ -30011,7 +30001,7 @@
     return this.tween("text", typeof value === "function" ? textFunction2(tweenValue(this, "text", value)) : textConstant2(value == null ? "" : value + ""));
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-transition/src/transition/textTween.js
+  // node_modules/d3-transition/src/transition/textTween.js
   function textInterpolate(i) {
     return function(t) {
       this.textContent = i.call(this, t);
@@ -30035,7 +30025,7 @@
     return this.tween(key, textTween(value));
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-transition/src/transition/transition.js
+  // node_modules/d3-transition/src/transition/transition.js
   function transition_default() {
     var name = this._name, id0 = this._id, id1 = newId();
     for (var groups = this._groups, m = groups.length, j = 0; j < m; ++j) {
@@ -30054,7 +30044,7 @@
     return new Transition(groups, this._parents, name, id1);
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-transition/src/transition/end.js
+  // node_modules/d3-transition/src/transition/end.js
   function end_default() {
     var on0, on1, that = this, id2 = that._id, size = that.size();
     return new Promise(function(resolve, reject) {
@@ -30075,7 +30065,7 @@
     });
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-transition/src/transition/index.js
+  // node_modules/d3-transition/src/transition/index.js
   var id = 0;
   function Transition(groups, parents, name, id2) {
     this._groups = groups;
@@ -30123,12 +30113,12 @@
     [Symbol.iterator]: selection_prototype[Symbol.iterator]
   };
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-ease/src/cubic.js
+  // node_modules/d3-ease/src/cubic.js
   function cubicInOut(t) {
     return ((t *= 2) <= 1 ? t * t * t : (t -= 2) * t * t + 2) / 2;
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-transition/src/selection/transition.js
+  // node_modules/d3-transition/src/selection/transition.js
   var defaultTiming = {
     time: null,
     // Set on use.
@@ -30162,14 +30152,14 @@
     return new Transition(groups, this._parents, name, id2);
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-transition/src/selection/index.js
+  // node_modules/d3-transition/src/selection/index.js
   selection_default.prototype.interrupt = interrupt_default2;
   selection_default.prototype.transition = transition_default2;
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-zoom/src/constant.js
+  // node_modules/d3-zoom/src/constant.js
   var constant_default4 = (x) => () => x;
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-zoom/src/event.js
+  // node_modules/d3-zoom/src/event.js
   function ZoomEvent(type, {
     sourceEvent,
     target,
@@ -30185,7 +30175,7 @@
     });
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-zoom/src/transform.js
+  // node_modules/d3-zoom/src/transform.js
   function Transform(k, x, y) {
     this.k = k;
     this.x = x;
@@ -30234,7 +30224,7 @@
     return node.__zoom;
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-zoom/src/noevent.js
+  // node_modules/d3-zoom/src/noevent.js
   function nopropagation2(event) {
     event.stopImmediatePropagation();
   }
@@ -30243,7 +30233,7 @@
     event.stopImmediatePropagation();
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-zoom/src/zoom.js
+  // node_modules/d3-zoom/src/zoom.js
   function defaultFilter2(event) {
     return (!event.ctrlKey || event.type === "wheel") && !event.button;
   }
@@ -30558,7 +30548,7 @@
     return zoom;
   }
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@reactflow/core/dist/esm/index.mjs
+  // node_modules/@reactflow/core/dist/esm/index.mjs
   var import_react_dom = __toESM(require_react_dom(), 1);
   var StoreContext = (0, import_react4.createContext)(null);
   var Provider$1 = StoreContext.Provider;
@@ -34356,7 +34346,7 @@
   var useNodesState = createUseItemsState(applyNodeChanges);
   var useEdgesState = createUseItemsState(applyEdgeChanges);
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@reactflow/minimap/dist/esm/index.mjs
+  // node_modules/@reactflow/minimap/dist/esm/index.mjs
   var import_react5 = __toESM(require_react(), 1);
   var MiniMapNode = ({ id: id2, x, y, width, height, style: style2, color: color2, strokeColor, strokeWidth, className, borderRadius, shapeRendering, onClick, selected }) => {
     const { background, backgroundColor } = style2 || {};
@@ -34511,7 +34501,7 @@
   MiniMap.displayName = "MiniMap";
   var MiniMap$1 = (0, import_react5.memo)(MiniMap);
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@reactflow/controls/dist/esm/index.mjs
+  // node_modules/@reactflow/controls/dist/esm/index.mjs
   var import_react6 = __toESM(require_react(), 1);
   function PlusIcon() {
     return import_react6.default.createElement(
@@ -34615,7 +34605,7 @@
   Controls.displayName = "Controls";
   var Controls$1 = (0, import_react6.memo)(Controls);
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@reactflow/background/dist/esm/index.mjs
+  // node_modules/@reactflow/background/dist/esm/index.mjs
   var import_react7 = __toESM(require_react(), 1);
   var BackgroundVariant;
   (function(BackgroundVariant2) {
@@ -34681,7 +34671,7 @@
   Background.displayName = "Background";
   var Background$1 = (0, import_react7.memo)(Background);
 
-  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@reactflow/node-toolbar/dist/esm/index.mjs
+  // node_modules/@reactflow/node-toolbar/dist/esm/index.mjs
   var import_react8 = __toESM(require_react(), 1);
   var import_react_dom2 = __toESM(require_react_dom(), 1);
   var selector4 = (state) => state.domNode?.querySelector(".react-flow__renderer");
@@ -35721,26 +35711,6 @@
     }).sort((left, right) => Number(left.container) - Number(right.container) || (right.startedEventSequence ?? 0) - (left.startedEventSequence ?? 0) || (right.occurrenceSequence ?? 0) - (left.occurrenceSequence ?? 0) || left.path.localeCompare(right.path));
   }
 
-  // webview/CurrentActivity.tsx
-  var import_react9 = __toESM(require_react());
-  function CurrentActivity({ activities, runStatus, remaining, onLocate, locationNotice }) {
-    const [now2, setNow] = (0, import_react9.useState)(Date.now);
-    (0, import_react9.useEffect)(() => {
-      if (!activities.some((value) => value.lastActivityAt || value.startedAt)) return;
-      const timer2 = setInterval(() => setNow(Date.now()), 1e3);
-      return () => clearInterval(timer2);
-    }, [activities]);
-    const terminal = isExecutionEnded(runStatus);
-    const leafCount = activities.filter((value) => !value.container).length;
-    const containerCount = activities.length - leafCount;
-    const message = terminal ? remaining > 0 ? "Run ended, some steps lack final status." : `Run ${runStatus}.` : runStatus === "idle" ? "Not started." : ["paused", "paused_at_boundary", "handoff_pending"].includes(runStatus) ? "Paused \u2014 waiting for a resume command." : runStatus === "starting" ? "Starting \u2014 waiting for the first step event." : "Waiting for runtime activity \u2014 no active step reported.";
-    return /* @__PURE__ */ import_react9.default.createElement("section", { className: "execution-position-strip current-activity", "aria-label": "Current activity" }, /* @__PURE__ */ import_react9.default.createElement("div", null, /* @__PURE__ */ import_react9.default.createElement("span", null, "Current activity"), /* @__PURE__ */ import_react9.default.createElement("strong", { role: "status" }, activities.length ? `${leafCount} active runtime ${leafCount === 1 ? "step" : "steps"}${containerCount ? ` \xB7 ${containerCount} active ${containerCount === 1 ? "container" : "containers"}` : ""}` : message), activities.slice(0, 4).map((activity) => {
-      const timestamp = activity.lastActivityAt || activity.startedAt;
-      const time = timestamp ? Date.parse(timestamp) : NaN;
-      return /* @__PURE__ */ import_react9.default.createElement("div", { className: "current-activity-item", key: `${activity.nodeID}:${activity.occurrenceID ?? ""}` }, /* @__PURE__ */ import_react9.default.createElement("div", null, /* @__PURE__ */ import_react9.default.createElement("strong", null, activity.label, ": ", activity.title), /* @__PURE__ */ import_react9.default.createElement("code", { title: activity.path }, activity.path), activity.runID ? /* @__PURE__ */ import_react9.default.createElement("small", null, "Run ", activity.runID, activity.invocation !== void 0 ? ` \xB7 invocation ${activity.invocation}` : "", activity.retryAttempt !== void 0 ? ` \xB7 retry ${activity.retryAttempt}` : "", activity.executionLane ? ` \xB7 lane ${activity.executionLane}` : "") : null, Number.isFinite(time) ? /* @__PURE__ */ import_react9.default.createElement("small", { title: timestamp }, "Last update ", Math.max(0, Math.floor((now2 - time) / 1e3)), "s ago") : null, !activity.inGraph ? /* @__PURE__ */ import_react9.default.createElement("small", null, "Executing outside the loaded graph \u2014 exact runtime path shown.") : null), /* @__PURE__ */ import_react9.default.createElement("button", { type: "button", onClick: () => onLocate(activity), title: `Locate ${activity.path}` }, /* @__PURE__ */ import_react9.default.createElement(LocateFixed, { "aria-hidden": "true" }), /* @__PURE__ */ import_react9.default.createElement("span", null, "Locate")));
-    }), activities.length > 4 ? /* @__PURE__ */ import_react9.default.createElement("small", null, "+", activities.length - 4, " other active runtime locations") : null, locationNotice ? /* @__PURE__ */ import_react9.default.createElement("p", { role: "status" }, locationNotice) : null));
-  }
-
   // src/workflowView.ts
   function decodeWorkflowPreference(value) {
     const item = value;
@@ -35754,7 +35724,7 @@
   }
 
   // webview/ResultsViewer.tsx
-  var import_react10 = __toESM(require_react());
+  var import_react9 = __toESM(require_react());
 
   // src/typedResultsCanonical.ts
   var MAX_RESULTS_BYTES = 256 * 1024 * 1024;
@@ -35809,19 +35779,19 @@
   // webview/ResultsViewer.tsx
   function ResultsViewer({ results, nodeID }) {
     if (!results || results.state === "unavailable") {
-      return /* @__PURE__ */ import_react10.default.createElement("section", { className: "typed-results", "aria-label": "Results", "data-results-state": "unavailable" }, /* @__PURE__ */ import_react10.default.createElement("h2", null, "Results"), /* @__PURE__ */ import_react10.default.createElement("p", { role: "status" }, "Full structured result unavailable", results?.state === "unavailable" ? ` \u2014 ${results.reason}` : " \u2014 not published", "."), /* @__PURE__ */ import_react10.default.createElement("p", null, "Execution status is unchanged. A preview is not a complete result."));
+      return /* @__PURE__ */ import_react9.default.createElement("section", { className: "typed-results", "aria-label": "Results", "data-results-state": "unavailable" }, /* @__PURE__ */ import_react9.default.createElement("h2", null, "Results"), /* @__PURE__ */ import_react9.default.createElement("p", { role: "status" }, "Full structured result unavailable", results?.state === "unavailable" ? ` \u2014 ${results.reason}` : " \u2014 not published", "."), /* @__PURE__ */ import_react9.default.createElement("p", null, "Execution status is unchanged. A preview is not a complete result."));
     }
     const publication = results.canonicalJSON ? JSON.parse(results.canonicalJSON) : results.publication;
     if (publication.origin.node_id !== nodeID) {
-      return /* @__PURE__ */ import_react10.default.createElement("section", { className: "typed-results", "data-results-state": "unavailable" }, /* @__PURE__ */ import_react10.default.createElement("h2", null, "Results"), /* @__PURE__ */ import_react10.default.createElement("p", null, "This scope has no retrieved public publication. Select the root Results operation for its named outputs."));
+      return /* @__PURE__ */ import_react9.default.createElement("section", { className: "typed-results", "data-results-state": "unavailable" }, /* @__PURE__ */ import_react9.default.createElement("h2", null, "Results"), /* @__PURE__ */ import_react9.default.createElement("p", null, "This scope has no retrieved public publication. Select the root Results operation for its named outputs."));
     }
     let rendered;
     try {
       rendered = Object.entries(publication.outputs).map(([name, output]) => ({ name, type: output.type, text: canonicalResultsJSON(output.value, true) }));
     } catch {
-      return /* @__PURE__ */ import_react10.default.createElement("section", { className: "typed-results", "data-results-state": "unavailable" }, /* @__PURE__ */ import_react10.default.createElement("h2", null, "Results"), /* @__PURE__ */ import_react10.default.createElement("p", null, "Full structured result unavailable \u2014 exceeds the viewer budget. Execution status is unchanged; no rerun was requested."));
+      return /* @__PURE__ */ import_react9.default.createElement("section", { className: "typed-results", "data-results-state": "unavailable" }, /* @__PURE__ */ import_react9.default.createElement("h2", null, "Results"), /* @__PURE__ */ import_react9.default.createElement("p", null, "Full structured result unavailable \u2014 exceeds the viewer budget. Execution status is unchanged; no rerun was requested."));
     }
-    return /* @__PURE__ */ import_react10.default.createElement("section", { className: "typed-results", "aria-label": "Results", "data-results-state": "available" }, /* @__PURE__ */ import_react10.default.createElement("h2", null, "Results"), /* @__PURE__ */ import_react10.default.createElement("p", null, "Full structured JSON \xB7 verified canonical publication"), /* @__PURE__ */ import_react10.default.createElement("dl", null, /* @__PURE__ */ import_react10.default.createElement("dt", null, "Publication"), /* @__PURE__ */ import_react10.default.createElement("dd", null, /* @__PURE__ */ import_react10.default.createElement("code", null, publication.publication_id)), /* @__PURE__ */ import_react10.default.createElement("dt", null, "Digest"), /* @__PURE__ */ import_react10.default.createElement("dd", null, /* @__PURE__ */ import_react10.default.createElement("code", null, publication.digest))), rendered.map(({ name, type, text: text2 }) => /* @__PURE__ */ import_react10.default.createElement("section", { key: name, "data-result-name": name }, /* @__PURE__ */ import_react10.default.createElement("h3", null, name, " ", /* @__PURE__ */ import_react10.default.createElement("small", null, "(", type, ")")), /* @__PURE__ */ import_react10.default.createElement("pre", { className: "json-block" }, text2))));
+    return /* @__PURE__ */ import_react9.default.createElement("section", { className: "typed-results", "aria-label": "Results", "data-results-state": "available" }, /* @__PURE__ */ import_react9.default.createElement("h2", null, "Results"), /* @__PURE__ */ import_react9.default.createElement("p", null, "Full structured JSON \xB7 verified canonical publication"), /* @__PURE__ */ import_react9.default.createElement("dl", null, /* @__PURE__ */ import_react9.default.createElement("dt", null, "Publication"), /* @__PURE__ */ import_react9.default.createElement("dd", null, /* @__PURE__ */ import_react9.default.createElement("code", null, publication.publication_id)), /* @__PURE__ */ import_react9.default.createElement("dt", null, "Digest"), /* @__PURE__ */ import_react9.default.createElement("dd", null, /* @__PURE__ */ import_react9.default.createElement("code", null, publication.digest))), rendered.map(({ name, type, text: text2 }) => /* @__PURE__ */ import_react9.default.createElement("section", { key: name, "data-result-name": name }, /* @__PURE__ */ import_react9.default.createElement("h3", null, name, " ", /* @__PURE__ */ import_react9.default.createElement("small", null, "(", type, ")")), /* @__PURE__ */ import_react9.default.createElement("pre", { className: "json-block" }, text2))));
   }
 
   // webview/highlighting/browserClient.ts
@@ -35946,13 +35916,13 @@
   }
 
   // webview/inspector.tsx
-  var import_react13 = __toESM(require_react());
-
-  // webview/highlighting/CodeValue.tsx
   var import_react12 = __toESM(require_react());
 
-  // webview/highlighting/AuthoredValue.tsx
+  // webview/highlighting/CodeValue.tsx
   var import_react11 = __toESM(require_react());
+
+  // webview/highlighting/AuthoredValue.tsx
+  var import_react10 = __toESM(require_react());
 
   // src/expressionPresentationProtocol.ts
   var EXPRESSION_GRAMMAR = "gert-expression/v2";
@@ -36115,26 +36085,26 @@
   }
 
   // webview/highlighting/AuthoredValue.tsx
-  var AuthoredContext = (0, import_react11.createContext)({ values: /* @__PURE__ */ new Map() });
+  var AuthoredContext = (0, import_react10.createContext)({ values: /* @__PURE__ */ new Map() });
   function AuthoredValues({ details, children: children2 }) {
-    const [verified, setVerified] = (0, import_react11.useState)();
-    const [, setAppearance] = (0, import_react11.useState)(0);
-    (0, import_react11.useEffect)(() => {
+    const [verified, setVerified] = (0, import_react10.useState)();
+    const [, setAppearance] = (0, import_react10.useState)(0);
+    (0, import_react10.useEffect)(() => {
       const observer = new MutationObserver(() => setAppearance((value) => value + 1));
       observer.observe(document.body, { attributes: true, attributeFilter: ["class", "data-highlighting-enabled"] });
       return () => observer.disconnect();
     }, []);
-    (0, import_react11.useEffect)(() => {
+    (0, import_react10.useEffect)(() => {
       const controller = new AbortController();
       void verifiedExpressionValues(details, controller.signal).then((values) => {
         if (!controller.signal.aborted) setVerified({ details, values });
       });
       return () => controller.abort();
     }, [details]);
-    return /* @__PURE__ */ import_react11.default.createElement(AuthoredContext.Provider, { value: { details, values: verified && verified.details === details ? verified.values : /* @__PURE__ */ new Map() } }, children2);
+    return /* @__PURE__ */ import_react10.default.createElement(AuthoredContext.Provider, { value: { details, values: verified && verified.details === details ? verified.values : /* @__PURE__ */ new Map() } }, children2);
   }
   function useAuthoredExpression(path, text2) {
-    const context = (0, import_react11.useContext)(AuthoredContext);
+    const context = (0, import_react10.useContext)(AuthoredContext);
     if (!path || text2 === void 0 || typeof document === "undefined" || document.body.dataset.highlightingEnabled === "false" || safeExpressionText(context.details, path) !== text2) return void 0;
     const value = context.values.get(path);
     return value?.verifiedText === text2 ? value : void 0;
@@ -36144,37 +36114,37 @@
     let offset = 0;
     for (const span of spans) {
       parts.push(text2.slice(offset, span.start));
-      parts.push(/* @__PURE__ */ import_react11.default.createElement("span", { key: `${span.start}:${span.end}`, "data-expression-class": span.expressionClass, style: { color: span.color } }, text2.slice(span.start, span.end)));
+      parts.push(/* @__PURE__ */ import_react10.default.createElement("span", { key: `${span.start}:${span.end}`, "data-expression-class": span.expressionClass, style: { color: span.color } }, text2.slice(span.start, span.end)));
       offset = span.end;
     }
     parts.push(text2.slice(offset));
-    return /* @__PURE__ */ import_react11.default.createElement(import_react11.default.Fragment, null, parts);
+    return /* @__PURE__ */ import_react10.default.createElement(import_react10.default.Fragment, null, parts);
   }
   function AuthoredValue({ value, path, depth = 0 }) {
     const expression = useAuthoredExpression(path, typeof value === "string" ? value : void 0);
-    if (typeof value === "string") return /* @__PURE__ */ import_react11.default.createElement("span", { className: "authored-value", "data-expression-path": expression ? path : void 0 }, /* @__PURE__ */ import_react11.default.createElement(TokenText, { text: value, spans: currentExpressionSpans(expression) }));
-    if (depth >= 128) return /* @__PURE__ */ import_react11.default.createElement(import_react11.default.Fragment, null, "\u2026");
+    if (typeof value === "string") return /* @__PURE__ */ import_react10.default.createElement("span", { className: "authored-value", "data-expression-path": expression ? path : void 0 }, /* @__PURE__ */ import_react10.default.createElement(TokenText, { text: value, spans: currentExpressionSpans(expression) }));
+    if (depth >= 128) return /* @__PURE__ */ import_react10.default.createElement(import_react10.default.Fragment, null, "\u2026");
     if (value && typeof value === "object") {
       const entries = Object.entries(value);
-      return /* @__PURE__ */ import_react11.default.createElement(import_react11.default.Fragment, null, Array.isArray(value) ? "[" : "{", entries.map(([key, child], index) => /* @__PURE__ */ import_react11.default.createElement(import_react11.default.Fragment, { key }, index ? ", " : "", Array.isArray(value) ? "" : `${JSON.stringify(key)}: `, /* @__PURE__ */ import_react11.default.createElement(AuthoredValue, { value: child, path: `${path}/${key.replace(/~/g, "~0").replace(/\//g, "~1")}`, depth: depth + 1 }))), Array.isArray(value) ? "]" : "}");
+      return /* @__PURE__ */ import_react10.default.createElement(import_react10.default.Fragment, null, Array.isArray(value) ? "[" : "{", entries.map(([key, child], index) => /* @__PURE__ */ import_react10.default.createElement(import_react10.default.Fragment, { key }, index ? ", " : "", Array.isArray(value) ? "" : `${JSON.stringify(key)}: `, /* @__PURE__ */ import_react10.default.createElement(AuthoredValue, { value: child, path: `${path}/${key.replace(/~/g, "~0").replace(/\//g, "~1")}`, depth: depth + 1 }))), Array.isArray(value) ? "]" : "}");
     }
-    return /* @__PURE__ */ import_react11.default.createElement(import_react11.default.Fragment, null, value === void 0 ? "\u2014" : String(value));
+    return /* @__PURE__ */ import_react10.default.createElement(import_react10.default.Fragment, null, value === void 0 ? "\u2014" : String(value));
   }
 
   // webview/highlighting/CodeValue.tsx
   function CodeValue({ text: text2, descriptor, label, status = "available", expressionPath }) {
     const safe = status === "available" || status === "truncated" ? text2 : void 0;
     const expression = useAuthoredExpression(expressionPath, safe);
-    const [rendered, setRendered] = (0, import_react12.useState)();
-    const [reason, setReason] = (0, import_react12.useState)("");
-    const [appearance, setAppearance] = (0, import_react12.useState)(0);
-    (0, import_react12.useEffect)(() => {
+    const [rendered, setRendered] = (0, import_react11.useState)();
+    const [reason, setReason] = (0, import_react11.useState)("");
+    const [appearance, setAppearance] = (0, import_react11.useState)(0);
+    (0, import_react11.useEffect)(() => {
       const changed = () => setAppearance((value) => value + 1);
       const observer = new MutationObserver(changed);
       observer.observe(document.body, { attributes: true, attributeFilter: ["class", "data-highlighting-enabled"] });
       return () => observer.disconnect();
     }, []);
-    (0, import_react12.useEffect)(() => {
+    (0, import_react11.useEffect)(() => {
       const controller = new AbortController();
       setRendered(void 0);
       setReason("");
@@ -36190,19 +36160,19 @@
       }
       return () => controller.abort();
     }, [safe, descriptor?.language, descriptor?.version, status, appearance]);
-    if (safe === void 0) return /* @__PURE__ */ import_react12.default.createElement("div", { className: "gert-code" }, /* @__PURE__ */ import_react12.default.createElement("strong", null, label), /* @__PURE__ */ import_react12.default.createElement("p", null, status));
+    if (safe === void 0) return /* @__PURE__ */ import_react11.default.createElement("div", { className: "gert-code" }, /* @__PURE__ */ import_react11.default.createElement("strong", null, label), /* @__PURE__ */ import_react11.default.createElement("p", null, status));
     const spans = overlayExpressionSpans(rendered?.text === safe ? rendered.spans : [], currentExpressionSpans(expression));
     const parts = [];
     let offset = 0;
     for (const span of spans) {
       parts.push(safe.slice(offset, span.start));
-      parts.push(/* @__PURE__ */ import_react12.default.createElement("span", { key: `${span.start}:${span.end}`, "data-expression-class": span.expressionClass, style: { color: span.color } }, safe.slice(span.start, span.end)));
+      parts.push(/* @__PURE__ */ import_react11.default.createElement("span", { key: `${span.start}:${span.end}`, "data-expression-class": span.expressionClass, style: { color: span.color } }, safe.slice(span.start, span.end)));
       offset = span.end;
     }
     parts.push(safe.slice(offset));
-    return /* @__PURE__ */ import_react12.default.createElement("figure", { className: "gert-code" }, /* @__PURE__ */ import_react12.default.createElement("figcaption", null, label, status === "truncated" ? " \xB7 safe excerpt (truncated)" : "", safe.length > MAX_CODE_UNITS ? " \xB7 plaintext (highlighting limit)" : reason ? ` \xB7 plaintext (${reason})` : !descriptor ? " \xB7 plaintext" : "", /* @__PURE__ */ import_react12.default.createElement("button", { type: "button", onClick: () => {
+    return /* @__PURE__ */ import_react11.default.createElement("figure", { className: "gert-code" }, /* @__PURE__ */ import_react11.default.createElement("figcaption", null, label, status === "truncated" ? " \xB7 safe excerpt (truncated)" : "", safe.length > MAX_CODE_UNITS ? " \xB7 plaintext (highlighting limit)" : reason ? ` \xB7 plaintext (${reason})` : !descriptor ? " \xB7 plaintext" : "", /* @__PURE__ */ import_react11.default.createElement("button", { type: "button", onClick: () => {
       void navigator.clipboard.writeText(safe);
-    }, "aria-label": `Copy ${label}` }, "Copy")), /* @__PURE__ */ import_react12.default.createElement("pre", null, /* @__PURE__ */ import_react12.default.createElement("code", { "data-expression-path": expression ? expressionPath : void 0 }, parts)));
+    }, "aria-label": `Copy ${label}` }, "Copy")), /* @__PURE__ */ import_react11.default.createElement("pre", null, /* @__PURE__ */ import_react11.default.createElement("code", { "data-expression-path": expression ? expressionPath : void 0 }, parts)));
   }
 
   // webview/inspector.tsx
@@ -36231,49 +36201,49 @@
   function KindIcon({ kind }) {
     switch (kind) {
       case "cli":
-        return /* @__PURE__ */ import_react13.default.createElement(Terminal, { "aria-hidden": "true" });
+        return /* @__PURE__ */ import_react12.default.createElement(Terminal, { "aria-hidden": "true" });
       case "tool":
-        return /* @__PURE__ */ import_react13.default.createElement(Wrench, { "aria-hidden": "true" });
+        return /* @__PURE__ */ import_react12.default.createElement(Wrench, { "aria-hidden": "true" });
       case "include":
-        return /* @__PURE__ */ import_react13.default.createElement(PackageOpen, { "aria-hidden": "true" });
+        return /* @__PURE__ */ import_react12.default.createElement(PackageOpen, { "aria-hidden": "true" });
       case "branch":
-        return /* @__PURE__ */ import_react13.default.createElement(GitBranch, { "aria-hidden": "true" });
+        return /* @__PURE__ */ import_react12.default.createElement(GitBranch, { "aria-hidden": "true" });
       case "choice":
-        return /* @__PURE__ */ import_react13.default.createElement(ListChecks, { "aria-hidden": "true" });
+        return /* @__PURE__ */ import_react12.default.createElement(ListChecks, { "aria-hidden": "true" });
       case "decision":
-        return /* @__PURE__ */ import_react13.default.createElement(Workflow, { "aria-hidden": "true" });
+        return /* @__PURE__ */ import_react12.default.createElement(Workflow, { "aria-hidden": "true" });
       case "collector":
-        return /* @__PURE__ */ import_react13.default.createElement(FileInput, { "aria-hidden": "true" });
+        return /* @__PURE__ */ import_react12.default.createElement(FileInput, { "aria-hidden": "true" });
       case "iterate":
-        return /* @__PURE__ */ import_react13.default.createElement(Repeat2, { "aria-hidden": "true" });
+        return /* @__PURE__ */ import_react12.default.createElement(Repeat2, { "aria-hidden": "true" });
       case "parallel":
-        return /* @__PURE__ */ import_react13.default.createElement(Workflow, { "aria-hidden": "true" });
+        return /* @__PURE__ */ import_react12.default.createElement(Workflow, { "aria-hidden": "true" });
       case "approve":
-        return /* @__PURE__ */ import_react13.default.createElement(ShieldCheck, { "aria-hidden": "true" });
+        return /* @__PURE__ */ import_react12.default.createElement(ShieldCheck, { "aria-hidden": "true" });
       case "assert":
-        return /* @__PURE__ */ import_react13.default.createElement(CircleCheck, { "aria-hidden": "true" });
+        return /* @__PURE__ */ import_react12.default.createElement(CircleCheck, { "aria-hidden": "true" });
       case "wait_for_event":
-        return /* @__PURE__ */ import_react13.default.createElement(Radio, { "aria-hidden": "true" });
+        return /* @__PURE__ */ import_react12.default.createElement(Radio, { "aria-hidden": "true" });
       case "display":
-        return /* @__PURE__ */ import_react13.default.createElement(MessageSquareText, { "aria-hidden": "true" });
+        return /* @__PURE__ */ import_react12.default.createElement(MessageSquareText, { "aria-hidden": "true" });
       case "end":
-        return /* @__PURE__ */ import_react13.default.createElement(Flag, { "aria-hidden": "true" });
+        return /* @__PURE__ */ import_react12.default.createElement(Flag, { "aria-hidden": "true" });
       case "compensate":
-        return /* @__PURE__ */ import_react13.default.createElement(Undo2, { "aria-hidden": "true" });
+        return /* @__PURE__ */ import_react12.default.createElement(Undo2, { "aria-hidden": "true" });
       case "extension":
-        return /* @__PURE__ */ import_react13.default.createElement(Puzzle, { "aria-hidden": "true" });
+        return /* @__PURE__ */ import_react12.default.createElement(Puzzle, { "aria-hidden": "true" });
       case "noop":
-        return /* @__PURE__ */ import_react13.default.createElement(Clock3, { "aria-hidden": "true" });
+        return /* @__PURE__ */ import_react12.default.createElement(Clock3, { "aria-hidden": "true" });
       case "assign":
-        return /* @__PURE__ */ import_react13.default.createElement(FileInput, { "aria-hidden": "true" });
+        return /* @__PURE__ */ import_react12.default.createElement(FileInput, { "aria-hidden": "true" });
       case "results":
-        return /* @__PURE__ */ import_react13.default.createElement(CircleCheck, { "aria-hidden": "true" });
+        return /* @__PURE__ */ import_react12.default.createElement(CircleCheck, { "aria-hidden": "true" });
       default:
-        return /* @__PURE__ */ import_react13.default.createElement(Activity, { "aria-hidden": "true" });
+        return /* @__PURE__ */ import_react12.default.createElement(Activity, { "aria-hidden": "true" });
     }
   }
   function StatusBadge({ status }) {
-    return /* @__PURE__ */ import_react13.default.createElement("span", { className: `inspector-status status-${status}` }, status === "no-final-status" ? "No final status" : status);
+    return /* @__PURE__ */ import_react12.default.createElement("span", { className: `inspector-status status-${status}` }, status === "no-final-status" ? "No final status" : status);
   }
   function formatDuration(milliseconds) {
     if (milliseconds === void 0) return "\u2014";
@@ -36298,27 +36268,27 @@
     }
   }
   function Section({ title, count, children: children2, className = "" }) {
-    return /* @__PURE__ */ import_react13.default.createElement("section", { className: `inspector-section ${className}` }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "section-heading" }, /* @__PURE__ */ import_react13.default.createElement("h3", null, title), count !== void 0 ? /* @__PURE__ */ import_react13.default.createElement("span", null, count) : null), children2);
+    return /* @__PURE__ */ import_react12.default.createElement("section", { className: `inspector-section ${className}` }, /* @__PURE__ */ import_react12.default.createElement("div", { className: "section-heading" }, /* @__PURE__ */ import_react12.default.createElement("h3", null, title), count !== void 0 ? /* @__PURE__ */ import_react12.default.createElement("span", null, count) : null), children2);
   }
   function KeyValueRows({ rows }) {
     const visible = rows.filter((row) => row.value !== void 0 && row.value !== "" && row.value !== false);
-    if (visible.length === 0) return /* @__PURE__ */ import_react13.default.createElement("p", { className: "inspector-muted" }, "No additional configuration.");
-    return /* @__PURE__ */ import_react13.default.createElement("dl", { className: "detail-grid" }, visible.map((row) => /* @__PURE__ */ import_react13.default.createElement(import_react13.default.Fragment, { key: row.label }, /* @__PURE__ */ import_react13.default.createElement("dt", null, row.label), /* @__PURE__ */ import_react13.default.createElement("dd", { className: row.code ? "code-value" : "" }, row.path ? /* @__PURE__ */ import_react13.default.createElement(AuthoredValue, { path: row.path, value: row.value }) : scalarText(row.value)))));
+    if (visible.length === 0) return /* @__PURE__ */ import_react12.default.createElement("p", { className: "inspector-muted" }, "No additional configuration.");
+    return /* @__PURE__ */ import_react12.default.createElement("dl", { className: "detail-grid" }, visible.map((row) => /* @__PURE__ */ import_react12.default.createElement(import_react12.default.Fragment, { key: row.label }, /* @__PURE__ */ import_react12.default.createElement("dt", null, row.label), /* @__PURE__ */ import_react12.default.createElement("dd", { className: row.code ? "code-value" : "" }, row.path ? /* @__PURE__ */ import_react12.default.createElement(AuthoredValue, { path: row.path, value: row.value }) : scalarText(row.value)))));
   }
   function NamedValueRows({ values, empty: empty2 = "None", path, startIndex = 0 }) {
-    if (!values || values.length === 0) return /* @__PURE__ */ import_react13.default.createElement("p", { className: "inspector-muted" }, empty2);
-    return /* @__PURE__ */ import_react13.default.createElement("div", { className: "named-value-list" }, values.map((item, index) => /* @__PURE__ */ import_react13.default.createElement("div", { className: "named-value-row", key: item.name }, /* @__PURE__ */ import_react13.default.createElement("code", null, item.name), /* @__PURE__ */ import_react13.default.createElement("span", { className: item.redacted ? "redacted-value" : "" }, item.redacted ? "redacted" : path ? /* @__PURE__ */ import_react13.default.createElement(AuthoredValue, { path: `${path}/${index + startIndex}/value`, value: item.value }) : scalarText(item.value)))));
+    if (!values || values.length === 0) return /* @__PURE__ */ import_react12.default.createElement("p", { className: "inspector-muted" }, empty2);
+    return /* @__PURE__ */ import_react12.default.createElement("div", { className: "named-value-list" }, values.map((item, index) => /* @__PURE__ */ import_react12.default.createElement("div", { className: "named-value-row", key: item.name }, /* @__PURE__ */ import_react12.default.createElement("code", null, item.name), /* @__PURE__ */ import_react12.default.createElement("span", { className: item.redacted ? "redacted-value" : "" }, item.redacted ? "redacted" : path ? /* @__PURE__ */ import_react12.default.createElement(AuthoredValue, { path: `${path}/${index + startIndex}/value`, value: item.value }) : scalarText(item.value)))));
   }
   function DataObject({ value, empty: empty2 }) {
-    if (!value || Object.keys(value).length === 0) return /* @__PURE__ */ import_react13.default.createElement("p", { className: "inspector-muted" }, empty2);
+    if (!value || Object.keys(value).length === 0) return /* @__PURE__ */ import_react12.default.createElement("p", { className: "inspector-muted" }, empty2);
     const entries = Object.entries(value).sort(([left], [right]) => left.localeCompare(right));
-    return /* @__PURE__ */ import_react13.default.createElement("div", { className: "runtime-data" }, entries.map(([key, item]) => /* @__PURE__ */ import_react13.default.createElement("div", { className: "runtime-data-row", key }, /* @__PURE__ */ import_react13.default.createElement("code", null, key), typeof item === "object" && item !== null ? /* @__PURE__ */ import_react13.default.createElement("pre", null, JSON.stringify(item, null, 2)) : /* @__PURE__ */ import_react13.default.createElement("span", null, scalarText(item)))));
+    return /* @__PURE__ */ import_react12.default.createElement("div", { className: "runtime-data" }, entries.map(([key, item]) => /* @__PURE__ */ import_react12.default.createElement("div", { className: "runtime-data-row", key }, /* @__PURE__ */ import_react12.default.createElement("code", null, key), typeof item === "object" && item !== null ? /* @__PURE__ */ import_react12.default.createElement("pre", null, JSON.stringify(item, null, 2)) : /* @__PURE__ */ import_react12.default.createElement("span", null, scalarText(item)))));
   }
   function RuntimePane({ runtime, markdownDeclared = false, snapshotDigest }) {
     if (!runtime || runtime.status === "pending") {
-      return /* @__PURE__ */ import_react13.default.createElement("div", { className: "inspector-blank" }, /* @__PURE__ */ import_react13.default.createElement(Activity, { "aria-hidden": "true" }), /* @__PURE__ */ import_react13.default.createElement("strong", null, "Not run yet"), /* @__PURE__ */ import_react13.default.createElement("span", null, "Execution data will appear here."));
+      return /* @__PURE__ */ import_react12.default.createElement("div", { className: "inspector-blank" }, /* @__PURE__ */ import_react12.default.createElement(Activity, { "aria-hidden": "true" }), /* @__PURE__ */ import_react12.default.createElement("strong", null, "Not run yet"), /* @__PURE__ */ import_react12.default.createElement("span", null, "Execution data will appear here."));
     }
-    return /* @__PURE__ */ import_react13.default.createElement("div", { className: "inspector-pane" }, /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Execution" }, /* @__PURE__ */ import_react13.default.createElement(KeyValueRows, { rows: [
+    return /* @__PURE__ */ import_react12.default.createElement("div", { className: "inspector-pane" }, /* @__PURE__ */ import_react12.default.createElement(Section, { title: "Execution" }, /* @__PURE__ */ import_react12.default.createElement(KeyValueRows, { rows: [
       { label: "Status", value: runtime.status === "no-final-status" ? "No final status" : runtime.status },
       { label: "Duration", value: formatDuration(runtime.durationMs) },
       { label: "Attempt", value: runtime.attempt },
@@ -36326,10 +36296,10 @@
       { label: "Finished", value: formatTime(runtime.finishedAt) },
       { label: "Delay", value: runtime.delay },
       { label: "Skip reason", value: runtime.skipReason }
-    ] })), runtime.error ? /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Error", className: "error-section" }, /* @__PURE__ */ import_react13.default.createElement("pre", null, runtime.error)) : null, runtime.presentationDiagnostic ? /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Code presentation" }, /* @__PURE__ */ import_react13.default.createElement("p", { className: "inspector-muted" }, runtime.presentationDiagnostic)) : null, runtime.codePresentation || runtime.retainedPresentations?.length ? /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Execution-resolved inputs" }, /* @__PURE__ */ import_react13.default.createElement("p", { className: "inspector-muted" }, "Unavailable \u2014 not retained")) : null, runtime.retainedPresentations?.map((occurrence, index) => /* @__PURE__ */ import_react13.default.createElement(Section, { key: index, title: "Retained occurrence" }, /* @__PURE__ */ import_react13.default.createElement(KeyValueRows, { rows: Object.entries(occurrence.identity).map(([label, value]) => ({ label, value })) }), occurrence.details.code_presentation && safeOutputs(occurrence.details.code_presentation, occurrence.output, occurrence.output_value_status).map((value) => /* @__PURE__ */ import_react13.default.createElement(CodeValue, { key: value.name, label: value.name, text: value.text, descriptor: value.descriptor, status: value.status })))), runtime.codePresentation ? /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Declared code outputs" }, safeOutputs(runtime.codePresentation, runtime.output, runtime.outputValueStatus).map((value) => /* @__PURE__ */ import_react13.default.createElement(CodeValue, { key: value.name, label: value.name, text: value.text, descriptor: value.descriptor, status: value.status }))) : null, /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Output", count: runtime.output ? Object.keys(runtime.output).length : 0 }, /* @__PURE__ */ import_react13.default.createElement(DataObject, { value: runtime.output && Object.fromEntries(Object.entries(runtime.output).filter(([name]) => !runtime.codePresentation?.outputs.some((field2) => field2.name === name && field2.presentation))), empty: "No additional output was retained." })), /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Captures", count: runtime.captures ? Object.keys(runtime.captures).length : 0 }, /* @__PURE__ */ import_react13.default.createElement(DataObject, { value: runtime.captures, empty: "No variables were captured." })), runtime.logs && runtime.logs.length > 0 ? /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Process output", count: runtime.logs.length }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "runtime-log" }, runtime.logs.map((entry, index) => /* @__PURE__ */ import_react13.default.createElement("pre", { className: `stream-${entry.stream}`, key: `${index}:${entry.stream}` }, entry.line)))) : null, runtime.evidence ? /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Evidence" }, /* @__PURE__ */ import_react13.default.createElement("pre", { className: "json-block" }, JSON.stringify(runtime.evidence, null, 2))) : null);
+    ] })), runtime.error ? /* @__PURE__ */ import_react12.default.createElement(Section, { title: "Error", className: "error-section" }, /* @__PURE__ */ import_react12.default.createElement("pre", null, runtime.error)) : null, runtime.presentationDiagnostic ? /* @__PURE__ */ import_react12.default.createElement(Section, { title: "Code presentation" }, /* @__PURE__ */ import_react12.default.createElement("p", { className: "inspector-muted" }, runtime.presentationDiagnostic)) : null, runtime.codePresentation || runtime.retainedPresentations?.length ? /* @__PURE__ */ import_react12.default.createElement(Section, { title: "Execution-resolved inputs" }, /* @__PURE__ */ import_react12.default.createElement("p", { className: "inspector-muted" }, "Unavailable \u2014 not retained")) : null, runtime.retainedPresentations?.map((occurrence, index) => /* @__PURE__ */ import_react12.default.createElement(Section, { key: index, title: "Retained occurrence" }, /* @__PURE__ */ import_react12.default.createElement(KeyValueRows, { rows: Object.entries(occurrence.identity).map(([label, value]) => ({ label, value })) }), occurrence.details.code_presentation && safeOutputs(occurrence.details.code_presentation, occurrence.output, occurrence.output_value_status).map((value) => /* @__PURE__ */ import_react12.default.createElement(CodeValue, { key: value.name, label: value.name, text: value.text, descriptor: value.descriptor, status: value.status })))), runtime.codePresentation ? /* @__PURE__ */ import_react12.default.createElement(Section, { title: "Declared code outputs" }, safeOutputs(runtime.codePresentation, runtime.output, runtime.outputValueStatus).map((value) => /* @__PURE__ */ import_react12.default.createElement(CodeValue, { key: value.name, label: value.name, text: value.text, descriptor: value.descriptor, status: value.status }))) : null, /* @__PURE__ */ import_react12.default.createElement(Section, { title: "Output", count: runtime.output ? Object.keys(runtime.output).length : 0 }, /* @__PURE__ */ import_react12.default.createElement(DataObject, { value: runtime.output && Object.fromEntries(Object.entries(runtime.output).filter(([name]) => !runtime.codePresentation?.outputs.some((field2) => field2.name === name && field2.presentation))), empty: "No additional output was retained." })), /* @__PURE__ */ import_react12.default.createElement(Section, { title: "Captures", count: runtime.captures ? Object.keys(runtime.captures).length : 0 }, /* @__PURE__ */ import_react12.default.createElement(DataObject, { value: runtime.captures, empty: "No variables were captured." })), runtime.logs && runtime.logs.length > 0 ? /* @__PURE__ */ import_react12.default.createElement(Section, { title: "Process output", count: runtime.logs.length }, /* @__PURE__ */ import_react12.default.createElement("div", { className: "runtime-log" }, runtime.logs.map((entry, index) => /* @__PURE__ */ import_react12.default.createElement("pre", { className: `stream-${entry.stream}`, key: `${index}:${entry.stream}` }, entry.line)))) : null, runtime.evidence ? /* @__PURE__ */ import_react12.default.createElement(Section, { title: "Evidence" }, /* @__PURE__ */ import_react12.default.createElement("pre", { className: "json-block" }, JSON.stringify(runtime.evidence, null, 2))) : null);
   }
   function DebugPane({ controls, override }) {
-    return /* @__PURE__ */ import_react13.default.createElement("div", { className: "inspector-pane" }, override ? /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Applied override", className: "debug-audit" }, /* @__PURE__ */ import_react13.default.createElement("pre", { className: "json-block" }, JSON.stringify(override, null, 2))) : null, controls);
+    return /* @__PURE__ */ import_react12.default.createElement("div", { className: "inspector-pane" }, override ? /* @__PURE__ */ import_react12.default.createElement(Section, { title: "Applied override", className: "debug-audit" }, /* @__PURE__ */ import_react12.default.createElement("pre", { className: "json-block" }, JSON.stringify(override, null, 2))) : null, controls);
   }
   function RunOverview({
     document: document2,
@@ -36348,7 +36318,7 @@
     const settled = completed + issues + skipped;
     const terminal = isExecutionEnded(runStatus);
     const progress = total === 0 ? 0 : Math.round(settled / total * 100);
-    return /* @__PURE__ */ import_react13.default.createElement("div", { className: "run-overview" }, /* @__PURE__ */ import_react13.default.createElement("header", { className: "overview-header" }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "inspector-icon" }, /* @__PURE__ */ import_react13.default.createElement(Activity, { "aria-hidden": "true" })), /* @__PURE__ */ import_react13.default.createElement("div", null, /* @__PURE__ */ import_react13.default.createElement("span", null, "Run overview"), /* @__PURE__ */ import_react13.default.createElement("h2", null, document2.runbook.name ?? document2.runbook.id ?? "Runbook")), /* @__PURE__ */ import_react13.default.createElement(StatusBadge, { status: runStatus })), /* @__PURE__ */ import_react13.default.createElement(
+    return /* @__PURE__ */ import_react12.default.createElement("div", { className: "run-overview" }, /* @__PURE__ */ import_react12.default.createElement("header", { className: "overview-header" }, /* @__PURE__ */ import_react12.default.createElement("div", { className: "inspector-icon" }, /* @__PURE__ */ import_react12.default.createElement(Activity, { "aria-hidden": "true" })), /* @__PURE__ */ import_react12.default.createElement("div", null, /* @__PURE__ */ import_react12.default.createElement("span", null, "Run overview"), /* @__PURE__ */ import_react12.default.createElement("h2", null, document2.runbook.name ?? document2.runbook.id ?? "Runbook")), /* @__PURE__ */ import_react12.default.createElement(StatusBadge, { status: runStatus })), /* @__PURE__ */ import_react12.default.createElement(
       "div",
       {
         className: "overview-progress",
@@ -36359,14 +36329,14 @@
         "aria-valuenow": progress,
         "aria-valuetext": `${settled} of ${total} canonical steps have final status`
       },
-      /* @__PURE__ */ import_react13.default.createElement("span", { style: { width: `${progress}%` } })
-    ), /* @__PURE__ */ import_react13.default.createElement("div", { className: "overview-stats" }, /* @__PURE__ */ import_react13.default.createElement("div", null, /* @__PURE__ */ import_react13.default.createElement("strong", null, completed), /* @__PURE__ */ import_react13.default.createElement("span", null, "Done")), /* @__PURE__ */ import_react13.default.createElement("div", null, /* @__PURE__ */ import_react13.default.createElement("strong", null, issues), /* @__PURE__ */ import_react13.default.createElement("span", null, "Issues")), /* @__PURE__ */ import_react13.default.createElement("div", null, /* @__PURE__ */ import_react13.default.createElement("strong", null, skipped), /* @__PURE__ */ import_react13.default.createElement("span", null, "Skipped")), /* @__PURE__ */ import_react13.default.createElement("div", null, /* @__PURE__ */ import_react13.default.createElement("strong", null, running), /* @__PURE__ */ import_react13.default.createElement("span", null, "Running")), /* @__PURE__ */ import_react13.default.createElement("div", null, /* @__PURE__ */ import_react13.default.createElement("strong", null, remaining), /* @__PURE__ */ import_react13.default.createElement("span", null, terminal ? "No final status" : "Remaining"))), /* @__PURE__ */ import_react13.default.createElement("p", { className: "overview-hint" }, total, " canonical steps \xB7 latest observed status per step, including containers. Runtime child activity is listed separately."), terminal && remaining > 0 ? /* @__PURE__ */ import_react13.default.createElement("p", { role: "status" }, "Run ended, some steps lack final status.") : null, /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Run" }, /* @__PURE__ */ import_react13.default.createElement(KeyValueRows, { rows: [
+      /* @__PURE__ */ import_react12.default.createElement("span", { style: { width: `${progress}%` } })
+    ), /* @__PURE__ */ import_react12.default.createElement("div", { className: "overview-stats" }, /* @__PURE__ */ import_react12.default.createElement("div", null, /* @__PURE__ */ import_react12.default.createElement("strong", null, completed), /* @__PURE__ */ import_react12.default.createElement("span", null, "Done")), /* @__PURE__ */ import_react12.default.createElement("div", null, /* @__PURE__ */ import_react12.default.createElement("strong", null, issues), /* @__PURE__ */ import_react12.default.createElement("span", null, "Issues")), /* @__PURE__ */ import_react12.default.createElement("div", null, /* @__PURE__ */ import_react12.default.createElement("strong", null, skipped), /* @__PURE__ */ import_react12.default.createElement("span", null, "Skipped")), /* @__PURE__ */ import_react12.default.createElement("div", null, /* @__PURE__ */ import_react12.default.createElement("strong", null, running), /* @__PURE__ */ import_react12.default.createElement("span", null, "Running")), /* @__PURE__ */ import_react12.default.createElement("div", null, /* @__PURE__ */ import_react12.default.createElement("strong", null, remaining), /* @__PURE__ */ import_react12.default.createElement("span", null, terminal ? "No final status" : "Remaining"))), /* @__PURE__ */ import_react12.default.createElement("p", { className: "overview-hint" }, total, " canonical steps \xB7 latest observed status per step, including containers."), terminal && remaining > 0 ? /* @__PURE__ */ import_react12.default.createElement("p", { role: "status" }, "Run ended, some steps lack final status.") : null, /* @__PURE__ */ import_react12.default.createElement(Section, { title: "Run" }, /* @__PURE__ */ import_react12.default.createElement(KeyValueRows, { rows: [
       { label: terminal ? "Last reached" : "Current", value: executionNode?.data.title ?? executionNode?.id, code: true },
       { label: "Run ID", value: runID, code: true },
       { label: "Steps", value: document2.nodes.length },
       { label: "Breakpoints", value: breakpointCount },
       { label: "Source", value: document2.runbook.path, code: true }
-    ] })), /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Inputs", count: inputs.length }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "named-value-list" }, inputs.map((input) => /* @__PURE__ */ import_react13.default.createElement("div", { className: "named-value-row", key: input.name }, /* @__PURE__ */ import_react13.default.createElement("code", null, input.name), /* @__PURE__ */ import_react13.default.createElement("span", { className: input.secret ? "redacted-value" : "" }, input.secret && input.value ? "set" : input.value || "unset"))))), diagnostics ? /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Diagnostics" }, /* @__PURE__ */ import_react13.default.createElement("pre", { className: "runtime-log overview-diagnostics" }, diagnostics)) : null, /* @__PURE__ */ import_react13.default.createElement("p", { className: "overview-hint" }, "Select a step for definition and execution details."));
+    ] })), /* @__PURE__ */ import_react12.default.createElement(Section, { title: "Inputs", count: inputs.length }, /* @__PURE__ */ import_react12.default.createElement("div", { className: "named-value-list" }, inputs.map((input) => /* @__PURE__ */ import_react12.default.createElement("div", { className: "named-value-row", key: input.name }, /* @__PURE__ */ import_react12.default.createElement("code", null, input.name), /* @__PURE__ */ import_react12.default.createElement("span", { className: input.secret ? "redacted-value" : "" }, input.secret && input.value ? "set" : input.value || "unset"))))), diagnostics ? /* @__PURE__ */ import_react12.default.createElement(Section, { title: "Diagnostics" }, /* @__PURE__ */ import_react12.default.createElement("pre", { className: "runtime-log overview-diagnostics" }, diagnostics)) : null, /* @__PURE__ */ import_react12.default.createElement("p", { className: "overview-hint" }, "Select a step for definition and execution details."));
   }
   function StepInspector({
     node,
@@ -36380,10 +36350,10 @@
     debugControls
   }) {
     const tabOrder = ["definition", "run", "debug"];
-    const [tab, setTab] = (0, import_react13.useState)(runtime && runtime.status !== "pending" ? "run" : "definition");
-    const [selectedOccurrenceID, setSelectedOccurrenceID] = (0, import_react13.useState)();
-    const tabBaseID = (0, import_react13.useId)();
-    const tabRefs = (0, import_react13.useRef)({ definition: null, run: null, debug: null });
+    const [tab, setTab] = (0, import_react12.useState)(runtime && runtime.status !== "pending" ? "run" : "definition");
+    const [selectedOccurrenceID, setSelectedOccurrenceID] = (0, import_react12.useState)();
+    const tabBaseID = (0, import_react12.useId)();
+    const tabRefs = (0, import_react12.useRef)({ definition: null, run: null, debug: null });
     const occurrences = runtime?.occurrences?.length ? runtime.occurrences : (runtime?.retainedPresentations ?? []).map((occurrence) => ({
       occurrenceID: JSON.stringify(occurrence.identity),
       runID: runtime?.runID ?? "",
@@ -36403,14 +36373,14 @@
     }));
     const selectedOccurrence = occurrences.find((occurrence) => occurrence.occurrenceID === (selectedOccurrenceID ?? requestedOccurrenceID)) ?? occurrences.find((occurrence) => occurrence.occurrenceID === runtime?.occurrenceID) ?? occurrences[occurrences.length - 1];
     const displayedRuntime = selectedOccurrence ?? runtime;
-    (0, import_react13.useEffect)(() => {
+    (0, import_react12.useEffect)(() => {
       setSelectedOccurrenceID(requestedOccurrenceID);
     }, [requestedOccurrenceID]);
-    (0, import_react13.useEffect)(() => {
+    (0, import_react12.useEffect)(() => {
       setTab(displayedRuntime && displayedRuntime.status !== "pending" ? "run" : "definition");
       setSelectedOccurrenceID(void 0);
     }, [node.id]);
-    (0, import_react13.useEffect)(() => {
+    (0, import_react12.useEffect)(() => {
       if (displayedRuntime && displayedRuntime.status !== "pending" && tab === "definition") setTab("run");
     }, [displayedRuntime?.status]);
     const kind = String(node.data.kind ?? "step");
@@ -36434,15 +36404,15 @@
     };
     const tabID = (value) => `${tabBaseID}-${value}-tab`;
     const panelID = (value) => `${tabBaseID}-${value}-panel`;
-    return /* @__PURE__ */ import_react13.default.createElement("div", { className: "step-inspector" }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "inspector-sticky" }, /* @__PURE__ */ import_react13.default.createElement("header", { className: "step-inspector-header" }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "inspector-icon" }, /* @__PURE__ */ import_react13.default.createElement(KindIcon, { kind })), /* @__PURE__ */ import_react13.default.createElement("div", { className: "inspector-title" }, /* @__PURE__ */ import_react13.default.createElement("span", null, KIND_LABELS[kind] ?? kind, segmentOrdinal ? ` | Segment ${segmentOrdinal}` : ""), /* @__PURE__ */ import_react13.default.createElement("h2", null, title), /* @__PURE__ */ import_react13.default.createElement("code", { title: node.id }, displayNodeID)), /* @__PURE__ */ import_react13.default.createElement(StatusBadge, { status: displayedRuntime?.status ?? "pending" })), /* @__PURE__ */ import_react13.default.createElement("div", { className: "inspector-metrics" }, /* @__PURE__ */ import_react13.default.createElement("span", null, /* @__PURE__ */ import_react13.default.createElement(Clock3, { "aria-hidden": "true" }), formatDuration(displayedRuntime?.durationMs)), selectedOccurrence ? /* @__PURE__ */ import_react13.default.createElement("span", null, "Invocation ", selectedOccurrence.invocation) : null, selectedOccurrence?.retryAttempt && selectedOccurrence.retryAttempt > 1 ? /* @__PURE__ */ import_react13.default.createElement("span", null, "Retry ", selectedOccurrence.retryAttempt) : displayedRuntime?.attempt ? /* @__PURE__ */ import_react13.default.createElement("span", null, "Attempt ", displayedRuntime.attempt) : null, node.data.call_path && Array.isArray(node.data.call_path) && node.data.call_path.length > 0 ? /* @__PURE__ */ import_react13.default.createElement("span", null, node.data.call_path.length, " levels deep") : null, executionSource ? /* @__PURE__ */ import_react13.default.createElement("span", null, executionSource === "saved" ? "Saved result" : "Live execution") : null, segmentStatus ? /* @__PURE__ */ import_react13.default.createElement("span", null, "Segment ", segmentStatus.replaceAll("_", " ")) : null, sessionRunID ? /* @__PURE__ */ import_react13.default.createElement("span", { title: sessionRunID }, "Run ", sessionRunID.slice(0, 8)) : null), availableGraphRevisions.length > 1 && selectedGraphRevision !== void 0 ? /* @__PURE__ */ import_react13.default.createElement("label", { className: "revision-selector" }, /* @__PURE__ */ import_react13.default.createElement("span", null, "Graph revision"), /* @__PURE__ */ import_react13.default.createElement(
+    return /* @__PURE__ */ import_react12.default.createElement("div", { className: "step-inspector" }, /* @__PURE__ */ import_react12.default.createElement("div", { className: "inspector-sticky" }, /* @__PURE__ */ import_react12.default.createElement("header", { className: "step-inspector-header" }, /* @__PURE__ */ import_react12.default.createElement("div", { className: "inspector-icon" }, /* @__PURE__ */ import_react12.default.createElement(KindIcon, { kind })), /* @__PURE__ */ import_react12.default.createElement("div", { className: "inspector-title" }, /* @__PURE__ */ import_react12.default.createElement("span", null, KIND_LABELS[kind] ?? kind, segmentOrdinal ? ` | Segment ${segmentOrdinal}` : ""), /* @__PURE__ */ import_react12.default.createElement("h2", null, title), /* @__PURE__ */ import_react12.default.createElement("code", { title: node.id }, displayNodeID)), /* @__PURE__ */ import_react12.default.createElement(StatusBadge, { status: displayedRuntime?.status ?? "pending" })), /* @__PURE__ */ import_react12.default.createElement("div", { className: "inspector-metrics" }, /* @__PURE__ */ import_react12.default.createElement("span", null, /* @__PURE__ */ import_react12.default.createElement(Clock3, { "aria-hidden": "true" }), formatDuration(displayedRuntime?.durationMs)), selectedOccurrence ? /* @__PURE__ */ import_react12.default.createElement("span", null, "Invocation ", selectedOccurrence.invocation) : null, selectedOccurrence?.retryAttempt && selectedOccurrence.retryAttempt > 1 ? /* @__PURE__ */ import_react12.default.createElement("span", null, "Retry ", selectedOccurrence.retryAttempt) : displayedRuntime?.attempt ? /* @__PURE__ */ import_react12.default.createElement("span", null, "Attempt ", displayedRuntime.attempt) : null, node.data.call_path && Array.isArray(node.data.call_path) && node.data.call_path.length > 0 ? /* @__PURE__ */ import_react12.default.createElement("span", null, node.data.call_path.length, " levels deep") : null, executionSource ? /* @__PURE__ */ import_react12.default.createElement("span", null, executionSource === "saved" ? "Saved result" : "Live execution") : null, segmentStatus ? /* @__PURE__ */ import_react12.default.createElement("span", null, "Segment ", segmentStatus.replaceAll("_", " ")) : null, sessionRunID ? /* @__PURE__ */ import_react12.default.createElement("span", { title: sessionRunID }, "Run ", sessionRunID.slice(0, 8)) : null), availableGraphRevisions.length > 1 && selectedGraphRevision !== void 0 ? /* @__PURE__ */ import_react12.default.createElement("label", { className: "revision-selector" }, /* @__PURE__ */ import_react12.default.createElement("span", null, "Graph revision"), /* @__PURE__ */ import_react12.default.createElement(
       "select",
       {
         "aria-label": "Graph revision",
         value: selectedGraphRevision,
         onChange: (event) => onGraphRevisionChange?.(Number(event.target.value))
       },
-      [...availableGraphRevisions].reverse().map((revision, index) => /* @__PURE__ */ import_react13.default.createElement("option", { key: revision, value: revision }, "Revision ", revision, index === 0 ? " (latest)" : ""))
-    )) : null, occurrences.length > 1 ? /* @__PURE__ */ import_react13.default.createElement("label", { className: "occurrence-selector" }, /* @__PURE__ */ import_react13.default.createElement("span", null, "Execution occurrence"), /* @__PURE__ */ import_react13.default.createElement(
+      [...availableGraphRevisions].reverse().map((revision, index) => /* @__PURE__ */ import_react12.default.createElement("option", { key: revision, value: revision }, "Revision ", revision, index === 0 ? " (latest)" : ""))
+    )) : null, occurrences.length > 1 ? /* @__PURE__ */ import_react12.default.createElement("label", { className: "occurrence-selector" }, /* @__PURE__ */ import_react12.default.createElement("span", null, "Execution occurrence"), /* @__PURE__ */ import_react12.default.createElement(
       "select",
       {
         "aria-label": "Execution occurrence",
@@ -36453,21 +36423,21 @@
           if (occurrence) onOccurrenceChange?.(occurrence);
         }
       },
-      occurrences.map((occurrence) => /* @__PURE__ */ import_react13.default.createElement("option", { key: occurrence.occurrenceID, value: occurrence.occurrenceID }, occurrence.executionSource === "saved" ? "Saved" : "Live", " | run ", occurrence.runID.slice(0, 8), " | invocation ", occurrence.invocation))
-    )) : null, /* @__PURE__ */ import_react13.default.createElement("div", { className: "inspector-tabs", role: "tablist", "aria-label": "Step information" }, /* @__PURE__ */ import_react13.default.createElement("button", { ref: (element) => {
+      occurrences.map((occurrence) => /* @__PURE__ */ import_react12.default.createElement("option", { key: occurrence.occurrenceID, value: occurrence.occurrenceID }, occurrence.executionSource === "saved" ? "Saved" : "Live", " | run ", occurrence.runID.slice(0, 8), " | invocation ", occurrence.invocation))
+    )) : null, /* @__PURE__ */ import_react12.default.createElement("div", { className: "inspector-tabs", role: "tablist", "aria-label": "Step information" }, /* @__PURE__ */ import_react12.default.createElement("button", { ref: (element) => {
       tabRefs.current.definition = element;
-    }, id: tabID("definition"), type: "button", role: "tab", "aria-controls": panelID("definition"), "aria-selected": tab === "definition", tabIndex: tab === "definition" ? 0 : -1, className: tab === "definition" ? "active" : "", onKeyDown: onTabKeyDown, onClick: () => setTab("definition") }, "Definition"), /* @__PURE__ */ import_react13.default.createElement("button", { ref: (element) => {
+    }, id: tabID("definition"), type: "button", role: "tab", "aria-controls": panelID("definition"), "aria-selected": tab === "definition", tabIndex: tab === "definition" ? 0 : -1, className: tab === "definition" ? "active" : "", onKeyDown: onTabKeyDown, onClick: () => setTab("definition") }, "Definition"), /* @__PURE__ */ import_react12.default.createElement("button", { ref: (element) => {
       tabRefs.current.run = element;
-    }, id: tabID("run"), type: "button", role: "tab", "aria-controls": panelID("run"), "aria-selected": tab === "run", tabIndex: tab === "run" ? 0 : -1, className: tab === "run" ? "active" : "", onKeyDown: onTabKeyDown, onClick: () => setTab("run") }, "Run"), /* @__PURE__ */ import_react13.default.createElement("button", { ref: (element) => {
+    }, id: tabID("run"), type: "button", role: "tab", "aria-controls": panelID("run"), "aria-selected": tab === "run", tabIndex: tab === "run" ? 0 : -1, className: tab === "run" ? "active" : "", onKeyDown: onTabKeyDown, onClick: () => setTab("run") }, "Run"), /* @__PURE__ */ import_react12.default.createElement("button", { ref: (element) => {
       tabRefs.current.debug = element;
-    }, id: tabID("debug"), type: "button", role: "tab", "aria-controls": panelID("debug"), "aria-selected": tab === "debug", tabIndex: tab === "debug" ? 0 : -1, className: tab === "debug" ? "active" : "", onKeyDown: onTabKeyDown, onClick: () => setTab("debug") }, "Debug"))), tab === "definition" ? /* @__PURE__ */ import_react13.default.createElement("div", { id: panelID("definition"), role: "tabpanel", "aria-labelledby": tabID("definition"), tabIndex: 0 }, /* @__PURE__ */ import_react13.default.createElement(DefinitionPane, { details: node.data.details }), /* @__PURE__ */ import_react13.default.createElement(SessionProvenance, { node })) : null, tab === "run" ? /* @__PURE__ */ import_react13.default.createElement("div", { id: panelID("run"), role: "tabpanel", "aria-labelledby": tabID("run"), tabIndex: 0 }, /* @__PURE__ */ import_react13.default.createElement(
+    }, id: tabID("debug"), type: "button", role: "tab", "aria-controls": panelID("debug"), "aria-selected": tab === "debug", tabIndex: tab === "debug" ? 0 : -1, className: tab === "debug" ? "active" : "", onKeyDown: onTabKeyDown, onClick: () => setTab("debug") }, "Debug"))), tab === "definition" ? /* @__PURE__ */ import_react12.default.createElement("div", { id: panelID("definition"), role: "tabpanel", "aria-labelledby": tabID("definition"), tabIndex: 0 }, /* @__PURE__ */ import_react12.default.createElement(DefinitionPane, { details: node.data.details }), /* @__PURE__ */ import_react12.default.createElement(SessionProvenance, { node })) : null, tab === "run" ? /* @__PURE__ */ import_react12.default.createElement("div", { id: panelID("run"), role: "tabpanel", "aria-labelledby": tabID("run"), tabIndex: 0 }, /* @__PURE__ */ import_react12.default.createElement(
       RuntimePane,
       {
         runtime: displayedRuntime,
         markdownDeclared: (selectedOccurrence?.retainedDetails ?? node.data.details)?.kind === "display" && (selectedOccurrence?.retainedDetails ?? node.data.details)?.format === "markdown",
         snapshotDigest: displayedRuntime?.directDisplaySnapshot ?? snapshotDigest ?? "missing-binding"
       }
-    )) : null, tab === "debug" ? /* @__PURE__ */ import_react13.default.createElement("div", { id: panelID("debug"), role: "tabpanel", "aria-labelledby": tabID("debug"), tabIndex: 0 }, /* @__PURE__ */ import_react13.default.createElement(DebugPane, { controls: debugControls, override: displayedRuntime?.debugOverride })) : null);
+    )) : null, tab === "debug" ? /* @__PURE__ */ import_react12.default.createElement("div", { id: panelID("debug"), role: "tabpanel", "aria-labelledby": tabID("debug"), tabIndex: 0 }, /* @__PURE__ */ import_react12.default.createElement(DebugPane, { controls: debugControls, override: displayedRuntime?.debugOverride })) : null);
   }
   function SessionProvenance({ node }) {
     if (typeof node.data.session_id !== "string") return null;
@@ -36475,7 +36445,7 @@
       ...recordList(node.data.incoming_transitions).map((transition2) => ({ direction: "From", transition: transition2 })),
       ...recordList(node.data.outgoing_transitions).map((transition2) => ({ direction: "To", transition: transition2 }))
     ];
-    return /* @__PURE__ */ import_react13.default.createElement("div", { className: "inspector-pane session-provenance" }, /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Snapshot" }, /* @__PURE__ */ import_react13.default.createElement(KeyValueRows, { rows: [
+    return /* @__PURE__ */ import_react12.default.createElement("div", { className: "inspector-pane session-provenance" }, /* @__PURE__ */ import_react12.default.createElement(Section, { title: "Snapshot" }, /* @__PURE__ */ import_react12.default.createElement(KeyValueRows, { rows: [
       { label: "Runbook", value: node.data.runbook_name ?? node.data.runbook_id },
       { label: "Runbook ID", value: node.data.runbook_id, code: true },
       { label: "Graph revision", value: node.data.graph_revision },
@@ -36485,7 +36455,7 @@
       { label: "Catalog", value: node.data.catalog_digest, code: true },
       { label: "Package lock", value: node.data.package_lock_digest, code: true },
       { label: "Profile", value: node.data.profile_digest, code: true }
-    ] })), transitions.length > 0 ? /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Handoffs", count: transitions.length }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "compact-list" }, transitions.map(({ direction, transition: transition2 }) => /* @__PURE__ */ import_react13.default.createElement("div", { key: `${direction}:${String(transition2.transition_id)}` }, /* @__PURE__ */ import_react13.default.createElement("strong", null, direction, " ", String(direction === "From" ? transition2.source_segment_id : transition2.target_segment_id)), /* @__PURE__ */ import_react13.default.createElement("span", null, String(transition2.reason_summary ?? transition2.reason_code ?? transition2.status ?? "")))))) : null);
+    ] })), transitions.length > 0 ? /* @__PURE__ */ import_react12.default.createElement(Section, { title: "Handoffs", count: transitions.length }, /* @__PURE__ */ import_react12.default.createElement("div", { className: "compact-list" }, transitions.map(({ direction, transition: transition2 }) => /* @__PURE__ */ import_react12.default.createElement("div", { key: `${direction}:${String(transition2.transition_id)}` }, /* @__PURE__ */ import_react12.default.createElement("strong", null, direction, " ", String(direction === "From" ? transition2.source_segment_id : transition2.target_segment_id)), /* @__PURE__ */ import_react12.default.createElement("span", null, String(transition2.reason_summary ?? transition2.reason_code ?? transition2.status ?? "")))))) : null);
   }
   function recordList(value) {
     return Array.isArray(value) ? value.filter((item) => typeof item === "object" && item !== null && !Array.isArray(item)) : [];
@@ -36501,31 +36471,31 @@
       { label: "Retry", value: common.retry ? `${common.retry.max} max${common.retry.interval ? ` \xB7 ${common.retry.interval}` : ""}${common.retry.backoff ? ` \xB7 ${common.retry.backoff}` : ""}` : void 0 }
     ];
     const hasExecutionPolicy = executionRows.some((row) => row.value !== void 0 && row.value !== "");
-    return /* @__PURE__ */ import_react13.default.createElement(import_react13.default.Fragment, null, common.subtitle ? /* @__PURE__ */ import_react13.default.createElement("p", { className: "definition-summary" }, common.subtitle) : null, hasExecutionPolicy ? /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Execution" }, /* @__PURE__ */ import_react13.default.createElement(KeyValueRows, { rows: executionRows })) : null, common.captures && common.captures.length > 0 ? /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Captures", count: common.captures.length }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "named-value-list" }, common.captures.map((capture, index) => /* @__PURE__ */ import_react13.default.createElement("div", { className: "named-value-row", key: capture.name }, /* @__PURE__ */ import_react13.default.createElement("code", null, capture.name), /* @__PURE__ */ import_react13.default.createElement("span", null, /* @__PURE__ */ import_react13.default.createElement(AuthoredValue, { value: capture.source, path: `/common/captures/${index}/source` }), capture.has_default ? ` \xB7 default ${scalarText(capture.default)}` : ""))))) : null, common.exports && common.exports.length > 0 ? /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Exports" }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "tag-list" }, common.exports.map((item) => /* @__PURE__ */ import_react13.default.createElement("code", { key: item }, item)))) : null, common.contract ? /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Contract" }, /* @__PURE__ */ import_react13.default.createElement(KeyValueRows, { rows: [
+    return /* @__PURE__ */ import_react12.default.createElement(import_react12.default.Fragment, null, common.subtitle ? /* @__PURE__ */ import_react12.default.createElement("p", { className: "definition-summary" }, common.subtitle) : null, hasExecutionPolicy ? /* @__PURE__ */ import_react12.default.createElement(Section, { title: "Execution" }, /* @__PURE__ */ import_react12.default.createElement(KeyValueRows, { rows: executionRows })) : null, common.captures && common.captures.length > 0 ? /* @__PURE__ */ import_react12.default.createElement(Section, { title: "Captures", count: common.captures.length }, /* @__PURE__ */ import_react12.default.createElement("div", { className: "named-value-list" }, common.captures.map((capture, index) => /* @__PURE__ */ import_react12.default.createElement("div", { className: "named-value-row", key: capture.name }, /* @__PURE__ */ import_react12.default.createElement("code", null, capture.name), /* @__PURE__ */ import_react12.default.createElement("span", null, /* @__PURE__ */ import_react12.default.createElement(AuthoredValue, { value: capture.source, path: `/common/captures/${index}/source` }), capture.has_default ? ` \xB7 default ${scalarText(capture.default)}` : ""))))) : null, common.exports && common.exports.length > 0 ? /* @__PURE__ */ import_react12.default.createElement(Section, { title: "Exports" }, /* @__PURE__ */ import_react12.default.createElement("div", { className: "tag-list" }, common.exports.map((item) => /* @__PURE__ */ import_react12.default.createElement("code", { key: item }, item)))) : null, common.contract ? /* @__PURE__ */ import_react12.default.createElement(Section, { title: "Contract" }, /* @__PURE__ */ import_react12.default.createElement(KeyValueRows, { rows: [
       { label: "Effects", value: common.contract.effects?.join(", ") },
       { label: "Reads", value: common.contract.reads?.join(", ") },
       { label: "Writes", value: common.contract.writes?.join(", ") },
       { label: "Idempotent", value: common.contract.idempotent ? "yes" : void 0 },
       { label: "Deterministic", value: common.contract.deterministic ? "yes" : void 0 }
-    ] })) : null, common.evidence && common.evidence.length > 0 ? /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Required evidence", count: common.evidence.length }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "compact-list" }, common.evidence.map((item) => /* @__PURE__ */ import_react13.default.createElement("div", { key: `${item.kind}:${item.name}` }, /* @__PURE__ */ import_react13.default.createElement("strong", null, item.label || item.name), /* @__PURE__ */ import_react13.default.createElement("span", null, item.kind))))) : null);
+    ] })) : null, common.evidence && common.evidence.length > 0 ? /* @__PURE__ */ import_react12.default.createElement(Section, { title: "Required evidence", count: common.evidence.length }, /* @__PURE__ */ import_react12.default.createElement("div", { className: "compact-list" }, common.evidence.map((item) => /* @__PURE__ */ import_react12.default.createElement("div", { key: `${item.kind}:${item.name}` }, /* @__PURE__ */ import_react12.default.createElement("strong", null, item.label || item.name), /* @__PURE__ */ import_react12.default.createElement("span", null, item.kind))))) : null);
   }
   function DefinitionPane({ details }) {
-    if (!details) return /* @__PURE__ */ import_react13.default.createElement("div", { className: "inspector-blank" }, /* @__PURE__ */ import_react13.default.createElement(Activity, { "aria-hidden": "true" }), /* @__PURE__ */ import_react13.default.createElement("strong", null, "Definition unavailable"), /* @__PURE__ */ import_react13.default.createElement("span", null, "Rebuild the Gert CLI to load enriched step details."));
-    return /* @__PURE__ */ import_react13.default.createElement(AuthoredValues, { details }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "inspector-pane" }, /* @__PURE__ */ import_react13.default.createElement(KindDefinition, { details }), /* @__PURE__ */ import_react13.default.createElement(CommonDefinition, { common: details.common })));
+    if (!details) return /* @__PURE__ */ import_react12.default.createElement("div", { className: "inspector-blank" }, /* @__PURE__ */ import_react12.default.createElement(Activity, { "aria-hidden": "true" }), /* @__PURE__ */ import_react12.default.createElement("strong", null, "Definition unavailable"), /* @__PURE__ */ import_react12.default.createElement("span", null, "Rebuild the Gert CLI to load enriched step details."));
+    return /* @__PURE__ */ import_react12.default.createElement(AuthoredValues, { details }, /* @__PURE__ */ import_react12.default.createElement("div", { className: "inspector-pane" }, /* @__PURE__ */ import_react12.default.createElement(KindDefinition, { details }), /* @__PURE__ */ import_react12.default.createElement(CommonDefinition, { common: details.common })));
   }
   function KindDefinition({ details }) {
     switch (details.kind) {
       case "cli":
-        return /* @__PURE__ */ import_react13.default.createElement(import_react13.default.Fragment, null, /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Command" }, details.command || details.args?.length ? /* @__PURE__ */ import_react13.default.createElement("pre", { className: "command-block" }, details.command ? /* @__PURE__ */ import_react13.default.createElement(AuthoredValue, { value: details.command, path: "/command" }) : null, details.args?.map((arg, index) => /* @__PURE__ */ import_react13.default.createElement(import_react13.default.Fragment, { key: index }, details.command || index ? " " : "", /* @__PURE__ */ import_react13.default.createElement(AuthoredValue, { value: arg, path: `/args/${index}` })))) : /* @__PURE__ */ import_react13.default.createElement("p", { className: "inspector-muted" }, "No command declared."), details.script ? /* @__PURE__ */ import_react13.default.createElement("pre", { className: "command-block" }, /* @__PURE__ */ import_react13.default.createElement(AuthoredValue, { value: details.script, path: "/script" })) : null), /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Process" }, /* @__PURE__ */ import_react13.default.createElement(KeyValueRows, { rows: [
+        return /* @__PURE__ */ import_react12.default.createElement(import_react12.default.Fragment, null, /* @__PURE__ */ import_react12.default.createElement(Section, { title: "Command" }, details.command || details.args?.length ? /* @__PURE__ */ import_react12.default.createElement("pre", { className: "command-block" }, details.command ? /* @__PURE__ */ import_react12.default.createElement(AuthoredValue, { value: details.command, path: "/command" }) : null, details.args?.map((arg, index) => /* @__PURE__ */ import_react12.default.createElement(import_react12.default.Fragment, { key: index }, details.command || index ? " " : "", /* @__PURE__ */ import_react12.default.createElement(AuthoredValue, { value: arg, path: `/args/${index}` })))) : /* @__PURE__ */ import_react12.default.createElement("p", { className: "inspector-muted" }, "No command declared."), details.script ? /* @__PURE__ */ import_react12.default.createElement("pre", { className: "command-block" }, /* @__PURE__ */ import_react12.default.createElement(AuthoredValue, { value: details.script, path: "/script" })) : null), /* @__PURE__ */ import_react12.default.createElement(Section, { title: "Process" }, /* @__PURE__ */ import_react12.default.createElement(KeyValueRows, { rows: [
           { label: "Shell", value: details.shell, code: true, path: "/shell" },
           { label: "Working dir", value: details.workdir, code: true, path: "/workdir" },
           { label: "Environment", value: details.env_names?.length ? `${details.env_names.length} variables` : void 0 },
           { label: "Stdin", value: details.stdin ? "provided" : void 0 }
-        ] }), details.env_names && details.env_names.length > 0 ? /* @__PURE__ */ import_react13.default.createElement("div", { className: "tag-list" }, details.env_names.map((name) => /* @__PURE__ */ import_react13.default.createElement("code", { key: name }, name))) : null));
+        ] }), details.env_names && details.env_names.length > 0 ? /* @__PURE__ */ import_react12.default.createElement("div", { className: "tag-list" }, details.env_names.map((name) => /* @__PURE__ */ import_react12.default.createElement("code", { key: name }, name))) : null));
       case "tool":
-        return /* @__PURE__ */ import_react13.default.createElement(import_react13.default.Fragment, null, /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Tool action" }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "definition-call" }, /* @__PURE__ */ import_react13.default.createElement(Wrench, { "aria-hidden": "true" }), /* @__PURE__ */ import_react13.default.createElement("code", null, /* @__PURE__ */ import_react13.default.createElement(AuthoredValue, { value: details.tool || "unknown", path: "/tool" }), " / ", /* @__PURE__ */ import_react13.default.createElement(AuthoredValue, { value: details.action || "unknown", path: "/action" }))), details.version ? /* @__PURE__ */ import_react13.default.createElement(KeyValueRows, { rows: [{ label: "Version", value: details.version }] }) : null), /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Authored template", count: details.arguments?.length ?? 0 }, details.arguments?.map((item, index) => {
+        return /* @__PURE__ */ import_react12.default.createElement(import_react12.default.Fragment, null, /* @__PURE__ */ import_react12.default.createElement(Section, { title: "Tool action" }, /* @__PURE__ */ import_react12.default.createElement("div", { className: "definition-call" }, /* @__PURE__ */ import_react12.default.createElement(Wrench, { "aria-hidden": "true" }), /* @__PURE__ */ import_react12.default.createElement("code", null, /* @__PURE__ */ import_react12.default.createElement(AuthoredValue, { value: details.tool || "unknown", path: "/tool" }), " / ", /* @__PURE__ */ import_react12.default.createElement(AuthoredValue, { value: details.action || "unknown", path: "/action" }))), details.version ? /* @__PURE__ */ import_react12.default.createElement(KeyValueRows, { rows: [{ label: "Version", value: details.version }] }) : null), /* @__PURE__ */ import_react12.default.createElement(Section, { title: "Authored template", count: details.arguments?.length ?? 0 }, details.arguments?.map((item, index) => {
           const field2 = details.code_presentation?.arguments.find((f) => f.name === item.name);
-          return field2?.presentation && typeof item.value === "string" ? /* @__PURE__ */ import_react13.default.createElement(
+          return field2?.presentation && typeof item.value === "string" ? /* @__PURE__ */ import_react12.default.createElement(
             CodeValue,
             {
               key: item.name,
@@ -36535,73 +36505,73 @@
               descriptor: field2.status === "resolved" ? field2.presentation : void 0,
               status: item.redacted ? "redacted" : "available"
             }
-          ) : /* @__PURE__ */ import_react13.default.createElement(NamedValueRows, { key: item.name, values: [item], path: "/arguments", startIndex: index });
+          ) : /* @__PURE__ */ import_react12.default.createElement(NamedValueRows, { key: item.name, values: [item], path: "/arguments", startIndex: index });
         })));
       case "include":
-        return /* @__PURE__ */ import_react13.default.createElement(import_react13.default.Fragment, null, /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Target" }, /* @__PURE__ */ import_react13.default.createElement(KeyValueRows, { rows: [
+        return /* @__PURE__ */ import_react12.default.createElement(import_react12.default.Fragment, null, /* @__PURE__ */ import_react12.default.createElement(Section, { title: "Target" }, /* @__PURE__ */ import_react12.default.createElement(KeyValueRows, { rows: [
           { label: "Runbook", value: details.reference, code: true, path: "/reference" },
           { label: "Resolution", value: details.dynamic ? `dynamic \xB7 ${details.resolve_from || "catalog"}` : "static" },
           { label: "Expansion", value: details.expand || "inherited" },
           { label: "Not found", value: details.on_not_found || "fail" },
           { label: "Child steps", value: details.steps }
-        ] })), /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Bindings", count: details.bindings?.length ?? 0 }, /* @__PURE__ */ import_react13.default.createElement(NamedValueRows, { values: details.bindings, path: "/bindings" })), details.stop_if && details.stop_if.length > 0 ? /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Stop outcomes" }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "tag-list" }, details.stop_if.map((item) => /* @__PURE__ */ import_react13.default.createElement("code", { key: item }, item)))) : null);
+        ] })), /* @__PURE__ */ import_react12.default.createElement(Section, { title: "Bindings", count: details.bindings?.length ?? 0 }, /* @__PURE__ */ import_react12.default.createElement(NamedValueRows, { values: details.bindings, path: "/bindings" })), details.stop_if && details.stop_if.length > 0 ? /* @__PURE__ */ import_react12.default.createElement(Section, { title: "Stop outcomes" }, /* @__PURE__ */ import_react12.default.createElement("div", { className: "tag-list" }, details.stop_if.map((item) => /* @__PURE__ */ import_react12.default.createElement("code", { key: item }, item)))) : null);
       case "choice":
-        return /* @__PURE__ */ import_react13.default.createElement(import_react13.default.Fragment, null, /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Prompt" }, /* @__PURE__ */ import_react13.default.createElement("p", { className: "definition-copy" }, /* @__PURE__ */ import_react13.default.createElement(AuthoredValue, { value: details.prompt || "No prompt.", path: "/prompt" }))), /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Selection" }, /* @__PURE__ */ import_react13.default.createElement(KeyValueRows, { rows: [
+        return /* @__PURE__ */ import_react12.default.createElement(import_react12.default.Fragment, null, /* @__PURE__ */ import_react12.default.createElement(Section, { title: "Prompt" }, /* @__PURE__ */ import_react12.default.createElement("p", { className: "definition-copy" }, /* @__PURE__ */ import_react12.default.createElement(AuthoredValue, { value: details.prompt || "No prompt.", path: "/prompt" }))), /* @__PURE__ */ import_react12.default.createElement(Section, { title: "Selection" }, /* @__PURE__ */ import_react12.default.createElement(KeyValueRows, { rows: [
           { label: "Variable", value: details.variable, code: true },
           { label: "Mode", value: details.multiple ? "multiple" : "single" },
           { label: "Required", value: details.multiple ? `${details.min ?? 0}\u2013${details.max ?? "any"}` : void 0 },
           { label: "Default", value: details.default, code: true, path: "/default" }
-        ] })), /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Options", count: details.options?.length ?? 0 }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "compact-list" }, details.options?.map((option, index) => /* @__PURE__ */ import_react13.default.createElement("div", { key: option.value }, /* @__PURE__ */ import_react13.default.createElement("strong", null, /* @__PURE__ */ import_react13.default.createElement(AuthoredValue, { value: option.label, path: `/options/${index}/label` })), /* @__PURE__ */ import_react13.default.createElement("code", null, option.value), option.hint ? /* @__PURE__ */ import_react13.default.createElement("span", null, /* @__PURE__ */ import_react13.default.createElement(AuthoredValue, { value: option.hint, path: `/options/${index}/hint` })) : null)))));
+        ] })), /* @__PURE__ */ import_react12.default.createElement(Section, { title: "Options", count: details.options?.length ?? 0 }, /* @__PURE__ */ import_react12.default.createElement("div", { className: "compact-list" }, details.options?.map((option, index) => /* @__PURE__ */ import_react12.default.createElement("div", { key: option.value }, /* @__PURE__ */ import_react12.default.createElement("strong", null, /* @__PURE__ */ import_react12.default.createElement(AuthoredValue, { value: option.label, path: `/options/${index}/label` })), /* @__PURE__ */ import_react12.default.createElement("code", null, option.value), option.hint ? /* @__PURE__ */ import_react12.default.createElement("span", null, /* @__PURE__ */ import_react12.default.createElement(AuthoredValue, { value: option.hint, path: `/options/${index}/hint` })) : null)))));
       case "decision":
-        return /* @__PURE__ */ import_react13.default.createElement(import_react13.default.Fragment, null, /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Prompt" }, /* @__PURE__ */ import_react13.default.createElement("p", { className: "definition-copy" }, /* @__PURE__ */ import_react13.default.createElement(AuthoredValue, { value: details.prompt || "No prompt.", path: "/prompt" })), /* @__PURE__ */ import_react13.default.createElement(KeyValueRows, { rows: [{ label: "Variable", value: details.variable, code: true }] })), /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Routes", count: details.routes?.length ?? 0 }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "compact-list" }, details.routes?.map((route, index) => /* @__PURE__ */ import_react13.default.createElement("div", { key: `${index}:${route.label}` }, /* @__PURE__ */ import_react13.default.createElement("strong", null, /* @__PURE__ */ import_react13.default.createElement(AuthoredValue, { value: route.label, path: `/routes/${index}/label` })), /* @__PURE__ */ import_react13.default.createElement("code", null, route.goto || route.runbook || "inline"), route.hint ? /* @__PURE__ */ import_react13.default.createElement("span", null, /* @__PURE__ */ import_react13.default.createElement(AuthoredValue, { value: route.hint, path: `/routes/${index}/hint` })) : null)))));
+        return /* @__PURE__ */ import_react12.default.createElement(import_react12.default.Fragment, null, /* @__PURE__ */ import_react12.default.createElement(Section, { title: "Prompt" }, /* @__PURE__ */ import_react12.default.createElement("p", { className: "definition-copy" }, /* @__PURE__ */ import_react12.default.createElement(AuthoredValue, { value: details.prompt || "No prompt.", path: "/prompt" })), /* @__PURE__ */ import_react12.default.createElement(KeyValueRows, { rows: [{ label: "Variable", value: details.variable, code: true }] })), /* @__PURE__ */ import_react12.default.createElement(Section, { title: "Routes", count: details.routes?.length ?? 0 }, /* @__PURE__ */ import_react12.default.createElement("div", { className: "compact-list" }, details.routes?.map((route, index) => /* @__PURE__ */ import_react12.default.createElement("div", { key: `${index}:${route.label}` }, /* @__PURE__ */ import_react12.default.createElement("strong", null, /* @__PURE__ */ import_react12.default.createElement(AuthoredValue, { value: route.label, path: `/routes/${index}/label` })), /* @__PURE__ */ import_react12.default.createElement("code", null, route.goto || route.runbook || "inline"), route.hint ? /* @__PURE__ */ import_react12.default.createElement("span", null, /* @__PURE__ */ import_react12.default.createElement(AuthoredValue, { value: route.hint, path: `/routes/${index}/hint` })) : null)))));
       case "collector":
-        return /* @__PURE__ */ import_react13.default.createElement(import_react13.default.Fragment, null, /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Prompt" }, /* @__PURE__ */ import_react13.default.createElement("p", { className: "definition-copy" }, /* @__PURE__ */ import_react13.default.createElement(AuthoredValue, { value: details.prompt || "No prompt.", path: "/prompt" }))), /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Fields", count: details.fields?.length ?? 0 }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "field-list" }, details.fields?.map((field2, index) => {
+        return /* @__PURE__ */ import_react12.default.createElement(import_react12.default.Fragment, null, /* @__PURE__ */ import_react12.default.createElement(Section, { title: "Prompt" }, /* @__PURE__ */ import_react12.default.createElement("p", { className: "definition-copy" }, /* @__PURE__ */ import_react12.default.createElement(AuthoredValue, { value: details.prompt || "No prompt.", path: "/prompt" }))), /* @__PURE__ */ import_react12.default.createElement(Section, { title: "Fields", count: details.fields?.length ?? 0 }, /* @__PURE__ */ import_react12.default.createElement("div", { className: "field-list" }, details.fields?.map((field2, index) => {
           const name = typeof field2.name === "string" ? field2.name : `field-${index + 1}`;
           const type = typeof field2.type === "string" ? field2.type : "text";
           const label = typeof field2.label === "string" ? field2.label : name;
-          return /* @__PURE__ */ import_react13.default.createElement("div", { key: name }, /* @__PURE__ */ import_react13.default.createElement("div", null, /* @__PURE__ */ import_react13.default.createElement("strong", null, /* @__PURE__ */ import_react13.default.createElement(AuthoredValue, { value: label, path: `/fields/${index}/label` })), /* @__PURE__ */ import_react13.default.createElement("code", null, name)), /* @__PURE__ */ import_react13.default.createElement("span", null, type, field2.required === true ? " \xB7 required" : "", field2.multiple === true ? " \xB7 multiple" : "", field2.multiline === true ? " \xB7 multiline" : ""), typeof field2.hint === "string" ? /* @__PURE__ */ import_react13.default.createElement("p", null, /* @__PURE__ */ import_react13.default.createElement(AuthoredValue, { value: field2.hint, path: `/fields/${index}/hint` })) : null, /* @__PURE__ */ import_react13.default.createElement(KeyValueRows, { rows: [
+          return /* @__PURE__ */ import_react12.default.createElement("div", { key: name }, /* @__PURE__ */ import_react12.default.createElement("div", null, /* @__PURE__ */ import_react12.default.createElement("strong", null, /* @__PURE__ */ import_react12.default.createElement(AuthoredValue, { value: label, path: `/fields/${index}/label` })), /* @__PURE__ */ import_react12.default.createElement("code", null, name)), /* @__PURE__ */ import_react12.default.createElement("span", null, type, field2.required === true ? " \xB7 required" : "", field2.multiple === true ? " \xB7 multiple" : "", field2.multiline === true ? " \xB7 multiline" : ""), typeof field2.hint === "string" ? /* @__PURE__ */ import_react12.default.createElement("p", null, /* @__PURE__ */ import_react12.default.createElement(AuthoredValue, { value: field2.hint, path: `/fields/${index}/hint` })) : null, /* @__PURE__ */ import_react12.default.createElement(KeyValueRows, { rows: [
             { label: "When", value: field2.when, path: `/fields/${index}/when`, code: true },
             { label: "Default", value: field2.default, path: `/fields/${index}/default` }
-          ] }), Array.isArray(field2.options) ? /* @__PURE__ */ import_react13.default.createElement("div", { className: "compact-list" }, field2.options.map((option, optionIndex) => {
+          ] }), Array.isArray(field2.options) ? /* @__PURE__ */ import_react12.default.createElement("div", { className: "compact-list" }, field2.options.map((option, optionIndex) => {
             if (!option || typeof option !== "object") return null;
-            return /* @__PURE__ */ import_react13.default.createElement("div", { key: optionIndex }, /* @__PURE__ */ import_react13.default.createElement("strong", null, /* @__PURE__ */ import_react13.default.createElement(AuthoredValue, { value: option.label, path: `/fields/${index}/options/${optionIndex}/label` })), option.hint ? /* @__PURE__ */ import_react13.default.createElement("span", null, /* @__PURE__ */ import_react13.default.createElement(AuthoredValue, { value: option.hint, path: `/fields/${index}/options/${optionIndex}/hint` })) : null);
+            return /* @__PURE__ */ import_react12.default.createElement("div", { key: optionIndex }, /* @__PURE__ */ import_react12.default.createElement("strong", null, /* @__PURE__ */ import_react12.default.createElement(AuthoredValue, { value: option.label, path: `/fields/${index}/options/${optionIndex}/label` })), option.hint ? /* @__PURE__ */ import_react12.default.createElement("span", null, /* @__PURE__ */ import_react12.default.createElement(AuthoredValue, { value: option.hint, path: `/fields/${index}/options/${optionIndex}/hint` })) : null);
           })) : null);
         }))));
       case "host_action":
-        return /* @__PURE__ */ import_react13.default.createElement(import_react13.default.Fragment, null, /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Host capability" }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "definition-call" }, /* @__PURE__ */ import_react13.default.createElement(Puzzle, { "aria-hidden": "true" }), /* @__PURE__ */ import_react13.default.createElement("code", null, details.capability || "unknown"))), /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Request", count: details.request?.length ?? 0 }, /* @__PURE__ */ import_react13.default.createElement(NamedValueRows, { values: details.request, path: "/request" })));
+        return /* @__PURE__ */ import_react12.default.createElement(import_react12.default.Fragment, null, /* @__PURE__ */ import_react12.default.createElement(Section, { title: "Host capability" }, /* @__PURE__ */ import_react12.default.createElement("div", { className: "definition-call" }, /* @__PURE__ */ import_react12.default.createElement(Puzzle, { "aria-hidden": "true" }), /* @__PURE__ */ import_react12.default.createElement("code", null, details.capability || "unknown"))), /* @__PURE__ */ import_react12.default.createElement(Section, { title: "Request", count: details.request?.length ?? 0 }, /* @__PURE__ */ import_react12.default.createElement(NamedValueRows, { values: details.request, path: "/request" })));
       case "branch":
-        return /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Ordered arms", count: details.arms?.length ?? 0 }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "arm-list" }, details.arms?.map((arm, index) => /* @__PURE__ */ import_react13.default.createElement("div", { key: index }, /* @__PURE__ */ import_react13.default.createElement("span", null, index + 1), /* @__PURE__ */ import_react13.default.createElement("div", null, /* @__PURE__ */ import_react13.default.createElement("strong", null, arm.label || (arm.else ? "Otherwise" : `Arm ${index + 1}`)), /* @__PURE__ */ import_react13.default.createElement("code", null, arm.else ? "else" : /* @__PURE__ */ import_react13.default.createElement(AuthoredValue, { value: arm.condition || "always", path: `/arms/${index}/condition` }))), /* @__PURE__ */ import_react13.default.createElement("em", null, arm.steps, " steps")))));
+        return /* @__PURE__ */ import_react12.default.createElement(Section, { title: "Ordered arms", count: details.arms?.length ?? 0 }, /* @__PURE__ */ import_react12.default.createElement("div", { className: "arm-list" }, details.arms?.map((arm, index) => /* @__PURE__ */ import_react12.default.createElement("div", { key: index }, /* @__PURE__ */ import_react12.default.createElement("span", null, index + 1), /* @__PURE__ */ import_react12.default.createElement("div", null, /* @__PURE__ */ import_react12.default.createElement("strong", null, arm.label || (arm.else ? "Otherwise" : `Arm ${index + 1}`)), /* @__PURE__ */ import_react12.default.createElement("code", null, arm.else ? "else" : /* @__PURE__ */ import_react12.default.createElement(AuthoredValue, { value: arm.condition || "always", path: `/arms/${index}/condition` }))), /* @__PURE__ */ import_react12.default.createElement("em", null, arm.steps, " steps")))));
       case "iterate":
-        return /* @__PURE__ */ import_react13.default.createElement(import_react13.default.Fragment, null, /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Loop" }, /* @__PURE__ */ import_react13.default.createElement(KeyValueRows, { rows: [
+        return /* @__PURE__ */ import_react12.default.createElement(import_react12.default.Fragment, null, /* @__PURE__ */ import_react12.default.createElement(Section, { title: "Loop" }, /* @__PURE__ */ import_react12.default.createElement(KeyValueRows, { rows: [
           { label: "Over", value: details.over, code: true, path: "/over" },
           { label: "As", value: details.as, code: true },
           { label: "Until", value: details.until, code: true, path: "/until" },
           { label: "Maximum", value: details.max },
           { label: "Concurrency", value: details.concurrency || 1 },
           { label: "Body", value: details.steps !== void 0 ? `${details.steps} steps` : void 0 }
-        ] })), /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Collect" }, /* @__PURE__ */ import_react13.default.createElement(NamedValueRows, { values: details.collect, path: "/collect" })));
+        ] })), /* @__PURE__ */ import_react12.default.createElement(Section, { title: "Collect" }, /* @__PURE__ */ import_react12.default.createElement(NamedValueRows, { values: details.collect, path: "/collect" })));
       case "parallel":
-        return /* @__PURE__ */ import_react13.default.createElement(import_react13.default.Fragment, null, /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Branches" }, /* @__PURE__ */ import_react13.default.createElement(KeyValueRows, { rows: [{ label: "Count", value: details.branches }, { label: "Wait for", value: details.wait_for || "all" }, { label: "On failure", value: details.on_failure || "fail" }] })), details.branch_labels && details.branch_labels.length > 0 ? /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Branch labels" }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "tag-list" }, details.branch_labels.map((label, index) => /* @__PURE__ */ import_react13.default.createElement("span", { key: `${index}:${label}` }, label || `Branch ${index + 1}`)))) : null);
+        return /* @__PURE__ */ import_react12.default.createElement(import_react12.default.Fragment, null, /* @__PURE__ */ import_react12.default.createElement(Section, { title: "Branches" }, /* @__PURE__ */ import_react12.default.createElement(KeyValueRows, { rows: [{ label: "Count", value: details.branches }, { label: "Wait for", value: details.wait_for || "all" }, { label: "On failure", value: details.on_failure || "fail" }] })), details.branch_labels && details.branch_labels.length > 0 ? /* @__PURE__ */ import_react12.default.createElement(Section, { title: "Branch labels" }, /* @__PURE__ */ import_react12.default.createElement("div", { className: "tag-list" }, details.branch_labels.map((label, index) => /* @__PURE__ */ import_react12.default.createElement("span", { key: `${index}:${label}` }, label || `Branch ${index + 1}`)))) : null);
       case "approve":
-        return /* @__PURE__ */ import_react13.default.createElement(import_react13.default.Fragment, null, /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Approval policy" }, /* @__PURE__ */ import_react13.default.createElement(KeyValueRows, { rows: [{ label: "Required", value: details.required || 1 }, { label: "Timeout", value: details.timeout }, { label: "On timeout", value: details.on_timeout }, { label: "Timezone", value: details.timezone }, { label: "Calendar", value: details.business_calendar }] })), details.roles && details.roles.length > 0 ? /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Roles" }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "tag-list" }, details.roles.map((role) => /* @__PURE__ */ import_react13.default.createElement("span", { key: role }, role)))) : null, details.pool && details.pool.length > 0 ? /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Approver pool" }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "tag-list" }, details.pool.map((member) => /* @__PURE__ */ import_react13.default.createElement("span", { key: member }, member)))) : null, details.escalate_to && details.escalate_to.length > 0 ? /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Escalation" }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "tag-list" }, details.escalate_to.map((role) => /* @__PURE__ */ import_react13.default.createElement("span", { key: role }, role)))) : null);
+        return /* @__PURE__ */ import_react12.default.createElement(import_react12.default.Fragment, null, /* @__PURE__ */ import_react12.default.createElement(Section, { title: "Approval policy" }, /* @__PURE__ */ import_react12.default.createElement(KeyValueRows, { rows: [{ label: "Required", value: details.required || 1 }, { label: "Timeout", value: details.timeout }, { label: "On timeout", value: details.on_timeout }, { label: "Timezone", value: details.timezone }, { label: "Calendar", value: details.business_calendar }] })), details.roles && details.roles.length > 0 ? /* @__PURE__ */ import_react12.default.createElement(Section, { title: "Roles" }, /* @__PURE__ */ import_react12.default.createElement("div", { className: "tag-list" }, details.roles.map((role) => /* @__PURE__ */ import_react12.default.createElement("span", { key: role }, role)))) : null, details.pool && details.pool.length > 0 ? /* @__PURE__ */ import_react12.default.createElement(Section, { title: "Approver pool" }, /* @__PURE__ */ import_react12.default.createElement("div", { className: "tag-list" }, details.pool.map((member) => /* @__PURE__ */ import_react12.default.createElement("span", { key: member }, member)))) : null, details.escalate_to && details.escalate_to.length > 0 ? /* @__PURE__ */ import_react12.default.createElement(Section, { title: "Escalation" }, /* @__PURE__ */ import_react12.default.createElement("div", { className: "tag-list" }, details.escalate_to.map((role) => /* @__PURE__ */ import_react12.default.createElement("span", { key: role }, role)))) : null);
       case "assert":
-        return /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Assertions", count: details.assertions?.length ?? 0 }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "assertion-list" }, details.assertions?.map((assertion, index) => /* @__PURE__ */ import_react13.default.createElement("div", { key: index }, /* @__PURE__ */ import_react13.default.createElement(CircleCheck, { "aria-hidden": "true" }), /* @__PURE__ */ import_react13.default.createElement("div", null, /* @__PURE__ */ import_react13.default.createElement("strong", null, assertion.type), /* @__PURE__ */ import_react13.default.createElement("code", null, /* @__PURE__ */ import_react13.default.createElement(AuthoredValue, { value: assertion.subject, path: `/assertions/${index}/subject` })), assertion.expected ? /* @__PURE__ */ import_react13.default.createElement("span", null, "Expected: ", /* @__PURE__ */ import_react13.default.createElement(AuthoredValue, { value: assertion.expected, path: `/assertions/${index}/expected` })) : null, assertion.path ? /* @__PURE__ */ import_react13.default.createElement("span", null, "Path: ", assertion.path) : null)))));
+        return /* @__PURE__ */ import_react12.default.createElement(Section, { title: "Assertions", count: details.assertions?.length ?? 0 }, /* @__PURE__ */ import_react12.default.createElement("div", { className: "assertion-list" }, details.assertions?.map((assertion, index) => /* @__PURE__ */ import_react12.default.createElement("div", { key: index }, /* @__PURE__ */ import_react12.default.createElement(CircleCheck, { "aria-hidden": "true" }), /* @__PURE__ */ import_react12.default.createElement("div", null, /* @__PURE__ */ import_react12.default.createElement("strong", null, assertion.type), /* @__PURE__ */ import_react12.default.createElement("code", null, /* @__PURE__ */ import_react12.default.createElement(AuthoredValue, { value: assertion.subject, path: `/assertions/${index}/subject` })), assertion.expected ? /* @__PURE__ */ import_react12.default.createElement("span", null, "Expected: ", /* @__PURE__ */ import_react12.default.createElement(AuthoredValue, { value: assertion.expected, path: `/assertions/${index}/expected` })) : null, assertion.path ? /* @__PURE__ */ import_react12.default.createElement("span", null, "Path: ", assertion.path) : null)))));
       case "wait_for_event":
-        return /* @__PURE__ */ import_react13.default.createElement(import_react13.default.Fragment, null, /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Event" }, /* @__PURE__ */ import_react13.default.createElement(KeyValueRows, { rows: [{ label: "Source", value: details.source }, { label: "ID", value: details.event_id, code: true, path: "/event_id" }, { label: "Schema", value: details.payload_schema, code: true }, { label: "On timeout", value: details.on_timeout }] })), /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Filter", count: details.filter?.length ?? 0 }, /* @__PURE__ */ import_react13.default.createElement(NamedValueRows, { values: details.filter, path: "/filter" })));
+        return /* @__PURE__ */ import_react12.default.createElement(import_react12.default.Fragment, null, /* @__PURE__ */ import_react12.default.createElement(Section, { title: "Event" }, /* @__PURE__ */ import_react12.default.createElement(KeyValueRows, { rows: [{ label: "Source", value: details.source }, { label: "ID", value: details.event_id, code: true, path: "/event_id" }, { label: "Schema", value: details.payload_schema, code: true }, { label: "On timeout", value: details.on_timeout }] })), /* @__PURE__ */ import_react12.default.createElement(Section, { title: "Filter", count: details.filter?.length ?? 0 }, /* @__PURE__ */ import_react12.default.createElement(NamedValueRows, { values: details.filter, path: "/filter" })));
       case "display":
-        return /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Rendered content" }, /* @__PURE__ */ import_react13.default.createElement(KeyValueRows, { rows: [{ label: "Format", value: details.format || "text" }] }), /* @__PURE__ */ import_react13.default.createElement("pre", { className: "content-preview" }, /* @__PURE__ */ import_react13.default.createElement(AuthoredValue, { value: details.content || "No content.", path: "/content" })));
+        return /* @__PURE__ */ import_react12.default.createElement(Section, { title: "Rendered content" }, /* @__PURE__ */ import_react12.default.createElement(KeyValueRows, { rows: [{ label: "Format", value: details.format || "text" }] }), /* @__PURE__ */ import_react12.default.createElement("pre", { className: "content-preview" }, /* @__PURE__ */ import_react12.default.createElement(AuthoredValue, { value: details.content || "No content.", path: "/content" })));
       case "end":
-        return /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Terminal outcome" }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "outcome-display" }, /* @__PURE__ */ import_react13.default.createElement(Flag, { "aria-hidden": "true" }), /* @__PURE__ */ import_react13.default.createElement("div", null, /* @__PURE__ */ import_react13.default.createElement("strong", null, details.category || "unspecified"), /* @__PURE__ */ import_react13.default.createElement("code", null, details.code || "no code"))));
+        return /* @__PURE__ */ import_react12.default.createElement(Section, { title: "Terminal outcome" }, /* @__PURE__ */ import_react12.default.createElement("div", { className: "outcome-display" }, /* @__PURE__ */ import_react12.default.createElement(Flag, { "aria-hidden": "true" }), /* @__PURE__ */ import_react12.default.createElement("div", null, /* @__PURE__ */ import_react12.default.createElement("strong", null, details.category || "unspecified"), /* @__PURE__ */ import_react12.default.createElement("code", null, details.code || "no code"))));
       case "compensate":
-        return /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Compensation" }, /* @__PURE__ */ import_react13.default.createElement(KeyValueRows, { rows: [{ label: "Trigger", value: details.on || "failure" }, { label: "Body", value: details.steps !== void 0 ? `${details.steps} steps` : void 0 }] }));
+        return /* @__PURE__ */ import_react12.default.createElement(Section, { title: "Compensation" }, /* @__PURE__ */ import_react12.default.createElement(KeyValueRows, { rows: [{ label: "Trigger", value: details.on || "failure" }, { label: "Body", value: details.steps !== void 0 ? `${details.steps} steps` : void 0 }] }));
       case "noop":
-        return /* @__PURE__ */ import_react13.default.createElement(Section, { title: "No-op" }, /* @__PURE__ */ import_react13.default.createElement("p", { className: "definition-copy" }, "This step changes no external state. Execution policy, delay, and captures are shown below."));
+        return /* @__PURE__ */ import_react12.default.createElement(Section, { title: "No-op" }, /* @__PURE__ */ import_react12.default.createElement("p", { className: "definition-copy" }, "This step changes no external state. Execution policy, delay, and captures are shown below."));
       case "assign":
-        return /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Atomic binding assignments", count: details.assign?.length }, /* @__PURE__ */ import_react13.default.createElement("p", { className: "definition-copy" }, "Technical operation. All writes validate together; no external work is performed."), /* @__PURE__ */ import_react13.default.createElement(NamedValueRows, { values: details.assign, path: "/assign" }));
+        return /* @__PURE__ */ import_react12.default.createElement(Section, { title: "Atomic binding assignments", count: details.assign?.length }, /* @__PURE__ */ import_react12.default.createElement("p", { className: "definition-copy" }, "Technical operation. All writes validate together; no external work is performed."), /* @__PURE__ */ import_react12.default.createElement(NamedValueRows, { values: details.assign, path: "/assign" }));
       case "results":
-        return /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Results" }, /* @__PURE__ */ import_react13.default.createElement("p", { className: "definition-copy" }, "Publishes this runbook's declared named outputs atomically and finishes this scope. The full structured result is shown only after canonical transport validation."));
+        return /* @__PURE__ */ import_react12.default.createElement(Section, { title: "Results" }, /* @__PURE__ */ import_react12.default.createElement("p", { className: "definition-copy" }, "Publishes this runbook's declared named outputs atomically and finishes this scope. The full structured result is shown only after canonical transport validation."));
       case "extension":
-        return /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Extension" }, /* @__PURE__ */ import_react13.default.createElement("p", { className: "definition-copy" }, "Execution is delegated to a registered Gert extension."));
+        return /* @__PURE__ */ import_react12.default.createElement(Section, { title: "Extension" }, /* @__PURE__ */ import_react12.default.createElement("p", { className: "definition-copy" }, "Execution is delegated to a registered Gert extension."));
     }
   }
 
@@ -37405,7 +37375,7 @@
   }
 
   // webview/routeTestPane.tsx
-  var import_react14 = __toESM(require_react());
+  var import_react13 = __toESM(require_react());
   function routeTestMatchesTarget(artifact, node) {
     return selectorKey(artifact.target) === selectorKey(selectorForNode(node, "before"));
   }
@@ -37428,16 +37398,16 @@
     onClose
   }) {
     const targetName = nodeTitle(target);
-    const [id2] = (0, import_react14.useState)(initial?.id ?? `${slug(selectorForNode(target).step)}-route-${Date.now().toString(36)}`);
-    const [stage, setStage] = (0, import_react14.useState)("conditions");
-    const [name, setName] = (0, import_react14.useState)(initial?.name ?? `Reach ${targetName}`);
-    const [reviewer, setReviewer] = (0, import_react14.useState)(firstReviewer(initial) ?? "");
-    const [acknowledged, setAcknowledged] = (0, import_react14.useState)(false);
-    const [sensitivityReviewed, setSensitivityReviewed] = (0, import_react14.useState)(firstSensitivityReview(initial));
-    const [localError, setLocalError] = (0, import_react14.useState)();
-    const [executedArtifact, setExecutedArtifact] = (0, import_react14.useState)();
-    const [inputs, setInputs] = (0, import_react14.useState)(() => initial?.inputs ?? routeTestInputs(document2, inputValues));
-    const [conditions, setConditions] = (0, import_react14.useState)(() => candidates.map((node) => conditionForNode(node, initial)));
+    const [id2] = (0, import_react13.useState)(initial?.id ?? `${slug(selectorForNode(target).step)}-route-${Date.now().toString(36)}`);
+    const [stage, setStage] = (0, import_react13.useState)("conditions");
+    const [name, setName] = (0, import_react13.useState)(initial?.name ?? `Reach ${targetName}`);
+    const [reviewer, setReviewer] = (0, import_react13.useState)(firstReviewer(initial) ?? "");
+    const [acknowledged, setAcknowledged] = (0, import_react13.useState)(false);
+    const [sensitivityReviewed, setSensitivityReviewed] = (0, import_react13.useState)(firstSensitivityReview(initial));
+    const [localError, setLocalError] = (0, import_react13.useState)();
+    const [executedArtifact, setExecutedArtifact] = (0, import_react13.useState)();
+    const [inputs, setInputs] = (0, import_react13.useState)(() => initial?.inputs ?? routeTestInputs(document2, inputValues));
+    const [conditions, setConditions] = (0, import_react13.useState)(() => candidates.map((node) => conditionForNode(node, initial)));
     const updateCondition = (nodeID, patch) => {
       const materialEdit = ["status", "nestedStatus", "objectValue", "selected", "label", "values", "testApproval", "approvalGranted"].some((key) => Object.prototype.hasOwnProperty.call(patch, key));
       setConditions((current) => current.map((condition) => condition.node.id === nodeID ? { ...condition, ...patch, ...materialEdit ? { source: { kind: "manual" } } : {} } : condition));
@@ -37557,7 +37527,7 @@
       }
     };
     if (stage === "running" && outcome?.passed) {
-      return /* @__PURE__ */ import_react14.default.createElement("section", { className: "route-test-pane route-test-result", "aria-label": "Route test passed", "aria-live": "assertive" }, /* @__PURE__ */ import_react14.default.createElement("h2", null, "Step reached - command not run"), /* @__PURE__ */ import_react14.default.createElement("p", null, "Gert reached ", /* @__PURE__ */ import_react14.default.createElement("strong", null, targetName), " and stopped before running it."), /* @__PURE__ */ import_react14.default.createElement("dl", null, /* @__PURE__ */ import_react14.default.createElement("dt", null, "External actions"), /* @__PURE__ */ import_react14.default.createElement("dd", null, outcome.externalDispatches), /* @__PURE__ */ import_react14.default.createElement("dt", null, "Saved answers used"), /* @__PURE__ */ import_react14.default.createElement("dd", null, conditions.filter((condition) => condition.enabled).length)), localError || error ? /* @__PURE__ */ import_react14.default.createElement("div", { className: "interaction-error", role: "alert" }, localError ?? error) : null, /* @__PURE__ */ import_react14.default.createElement("button", { type: "button", className: "primary", onClick: () => {
+      return /* @__PURE__ */ import_react13.default.createElement("section", { className: "route-test-pane route-test-result", "aria-label": "Route test passed", "aria-live": "assertive" }, /* @__PURE__ */ import_react13.default.createElement("h2", null, "Step reached - command not run"), /* @__PURE__ */ import_react13.default.createElement("p", null, "Gert reached ", /* @__PURE__ */ import_react13.default.createElement("strong", null, targetName), " and stopped before running it."), /* @__PURE__ */ import_react13.default.createElement("dl", null, /* @__PURE__ */ import_react13.default.createElement("dt", null, "External actions"), /* @__PURE__ */ import_react13.default.createElement("dd", null, outcome.externalDispatches), /* @__PURE__ */ import_react13.default.createElement("dt", null, "Saved answers used"), /* @__PURE__ */ import_react13.default.createElement("dd", null, conditions.filter((condition) => condition.enabled).length)), localError || error ? /* @__PURE__ */ import_react13.default.createElement("div", { className: "interaction-error", role: "alert" }, localError ?? error) : null, /* @__PURE__ */ import_react13.default.createElement("button", { type: "button", className: "primary", onClick: () => {
         try {
           if (!executedArtifact) throw new Error("The executed route-test conditions are unavailable.");
           const artifact = { ...executedArtifact };
@@ -37575,34 +37545,34 @@
       } }, "Save route test"));
     }
     if (stage === "running" && !runStarting && (runStatus === "cancelled" || outcome?.status === "stopped")) {
-      return /* @__PURE__ */ import_react14.default.createElement("section", { className: "route-test-pane route-test-result", "aria-label": "Route test stopped", "aria-live": "assertive" }, /* @__PURE__ */ import_react14.default.createElement("h2", null, "Route test stopped"), /* @__PURE__ */ import_react14.default.createElement("p", null, "The operator stopped this route test before it reached the selected step."), /* @__PURE__ */ import_react14.default.createElement("button", { type: "button", className: "primary", onClick: () => setStage("conditions") }, "Review test conditions"));
+      return /* @__PURE__ */ import_react13.default.createElement("section", { className: "route-test-pane route-test-result", "aria-label": "Route test stopped", "aria-live": "assertive" }, /* @__PURE__ */ import_react13.default.createElement("h2", null, "Route test stopped"), /* @__PURE__ */ import_react13.default.createElement("p", null, "The operator stopped this route test before it reached the selected step."), /* @__PURE__ */ import_react13.default.createElement("button", { type: "button", className: "primary", onClick: () => setStage("conditions") }, "Review test conditions"));
     }
     if (stage === "running" && (error || outcome || !runStarting && runStatus === "failed")) {
       const status = outcome?.status ?? (error?.toLowerCase().includes("safety failure") ? "safety-failed" : "runtime-failed");
       const routeChanged = status === "route-changed";
       const safetyFailed = status === "safety-failed";
-      return /* @__PURE__ */ import_react14.default.createElement("section", { className: "route-test-pane route-test-result", "aria-label": routeChanged ? "Route test changed" : safetyFailed ? "Route test safety failure" : "Route test failed", "aria-live": "assertive" }, /* @__PURE__ */ import_react14.default.createElement("h2", null, routeChanged ? "The route went somewhere else" : safetyFailed ? "External action blocked" : "Route test failed"), /* @__PURE__ */ import_react14.default.createElement("p", null, outcome?.message || error || "Gert did not reach the selected step under these saved conditions."), /* @__PURE__ */ import_react14.default.createElement("button", { type: "button", className: "primary", onClick: () => setStage("conditions") }, "Fix test conditions"));
+      return /* @__PURE__ */ import_react13.default.createElement("section", { className: "route-test-pane route-test-result", "aria-label": routeChanged ? "Route test changed" : safetyFailed ? "Route test safety failure" : "Route test failed", "aria-live": "assertive" }, /* @__PURE__ */ import_react13.default.createElement("h2", null, routeChanged ? "The route went somewhere else" : safetyFailed ? "External action blocked" : "Route test failed"), /* @__PURE__ */ import_react13.default.createElement("p", null, outcome?.message || error || "Gert did not reach the selected step under these saved conditions."), /* @__PURE__ */ import_react13.default.createElement("button", { type: "button", className: "primary", onClick: () => setStage("conditions") }, "Fix test conditions"));
     }
     if (stage === "running") {
-      return /* @__PURE__ */ import_react14.default.createElement("section", { className: "route-test-pane", "aria-label": "Route test running" }, /* @__PURE__ */ import_react14.default.createElement("h2", null, targetName), /* @__PURE__ */ import_react14.default.createElement("p", null, runStarting ? "Starting route test..." : "Testing the saved route toward this step."), /* @__PURE__ */ import_react14.default.createElement("button", { type: "button", className: "danger", onClick: onStop }, "Stop test"));
+      return /* @__PURE__ */ import_react13.default.createElement("section", { className: "route-test-pane", "aria-label": "Route test running" }, /* @__PURE__ */ import_react13.default.createElement("h2", null, targetName), /* @__PURE__ */ import_react13.default.createElement("p", null, runStarting ? "Starting route test..." : "Testing the saved route toward this step."), /* @__PURE__ */ import_react13.default.createElement("button", { type: "button", className: "danger", onClick: onStop }, "Stop test"));
     }
     if (stage === "review") {
-      return /* @__PURE__ */ import_react14.default.createElement("section", { className: "route-test-pane", "aria-label": "Check route" }, /* @__PURE__ */ import_react14.default.createElement("strong", { className: "route-test-review-safety" }, "No external actions will run."), /* @__PURE__ */ import_react14.default.createElement("div", { className: "route-test-stepper" }, /* @__PURE__ */ import_react14.default.createElement("strong", null, "1 Set conditions"), /* @__PURE__ */ import_react14.default.createElement("strong", null, "2 Check route")), /* @__PURE__ */ import_react14.default.createElement("h2", null, targetName), /* @__PURE__ */ import_react14.default.createElement("p", null, "Gert will stop before this step. XTS, commands, tools, transfers, and connectors are blocked."), /* @__PURE__ */ import_react14.default.createElement("ol", { className: "route-test-review-list" }, conditions.filter((condition) => condition.enabled).map((condition) => /* @__PURE__ */ import_react14.default.createElement("li", { key: condition.node.id }, /* @__PURE__ */ import_react14.default.createElement("strong", null, nodeTitle(condition.node)), /* @__PURE__ */ import_react14.default.createElement("span", null, conditionSummary(condition), " \xB7 ", sourceSummary(condition.source)))), /* @__PURE__ */ import_react14.default.createElement("li", null, /* @__PURE__ */ import_react14.default.createElement("strong", null, targetName), /* @__PURE__ */ import_react14.default.createElement("span", null, "Stop before this step"))), /* @__PURE__ */ import_react14.default.createElement("label", { className: "route-test-field" }, /* @__PURE__ */ import_react14.default.createElement("span", null, "Reviewed by"), /* @__PURE__ */ import_react14.default.createElement("input", { value: reviewer, onChange: (event) => setReviewer(event.target.value) })), /* @__PURE__ */ import_react14.default.createElement("label", { className: "route-test-ack" }, /* @__PURE__ */ import_react14.default.createElement("input", { type: "checkbox", checked: acknowledged, onChange: (event) => setAcknowledged(event.target.checked) }), /* @__PURE__ */ import_react14.default.createElement("span", null, "This tests the runbook route, not Azure or the external service.")), /* @__PURE__ */ import_react14.default.createElement("label", { className: "route-test-ack" }, /* @__PURE__ */ import_react14.default.createElement("input", { type: "checkbox", checked: sensitivityReviewed, onChange: (event) => setSensitivityReviewed(event.target.checked) }), /* @__PURE__ */ import_react14.default.createElement("span", null, "I reviewed the saved values. They contain no credentials, tokens, customer data, or raw XTS output.")), localError || error ? /* @__PURE__ */ import_react14.default.createElement("div", { className: "interaction-error", role: "alert" }, localError ?? error) : null, /* @__PURE__ */ import_react14.default.createElement("div", { className: "route-test-actions" }, /* @__PURE__ */ import_react14.default.createElement("button", { type: "button", className: "primary", disabled: !acknowledged || !sensitivityReviewed || runStarting, onClick: run }, "Run route test"), /* @__PURE__ */ import_react14.default.createElement("button", { type: "button", onClick: () => setStage("conditions") }, "Edit conditions"), /* @__PURE__ */ import_react14.default.createElement("button", { type: "button", onClick: save }, "Save draft")));
+      return /* @__PURE__ */ import_react13.default.createElement("section", { className: "route-test-pane", "aria-label": "Check route" }, /* @__PURE__ */ import_react13.default.createElement("strong", { className: "route-test-review-safety" }, "No external actions will run."), /* @__PURE__ */ import_react13.default.createElement("div", { className: "route-test-stepper" }, /* @__PURE__ */ import_react13.default.createElement("strong", null, "1 Set conditions"), /* @__PURE__ */ import_react13.default.createElement("strong", null, "2 Check route")), /* @__PURE__ */ import_react13.default.createElement("h2", null, targetName), /* @__PURE__ */ import_react13.default.createElement("p", null, "Gert will stop before this step. XTS, commands, tools, transfers, and connectors are blocked."), /* @__PURE__ */ import_react13.default.createElement("ol", { className: "route-test-review-list" }, conditions.filter((condition) => condition.enabled).map((condition) => /* @__PURE__ */ import_react13.default.createElement("li", { key: condition.node.id }, /* @__PURE__ */ import_react13.default.createElement("strong", null, nodeTitle(condition.node)), /* @__PURE__ */ import_react13.default.createElement("span", null, conditionSummary(condition), " \xB7 ", sourceSummary(condition.source)))), /* @__PURE__ */ import_react13.default.createElement("li", null, /* @__PURE__ */ import_react13.default.createElement("strong", null, targetName), /* @__PURE__ */ import_react13.default.createElement("span", null, "Stop before this step"))), /* @__PURE__ */ import_react13.default.createElement("label", { className: "route-test-field" }, /* @__PURE__ */ import_react13.default.createElement("span", null, "Reviewed by"), /* @__PURE__ */ import_react13.default.createElement("input", { value: reviewer, onChange: (event) => setReviewer(event.target.value) })), /* @__PURE__ */ import_react13.default.createElement("label", { className: "route-test-ack" }, /* @__PURE__ */ import_react13.default.createElement("input", { type: "checkbox", checked: acknowledged, onChange: (event) => setAcknowledged(event.target.checked) }), /* @__PURE__ */ import_react13.default.createElement("span", null, "This tests the runbook route, not Azure or the external service.")), /* @__PURE__ */ import_react13.default.createElement("label", { className: "route-test-ack" }, /* @__PURE__ */ import_react13.default.createElement("input", { type: "checkbox", checked: sensitivityReviewed, onChange: (event) => setSensitivityReviewed(event.target.checked) }), /* @__PURE__ */ import_react13.default.createElement("span", null, "I reviewed the saved values. They contain no credentials, tokens, customer data, or raw XTS output.")), localError || error ? /* @__PURE__ */ import_react13.default.createElement("div", { className: "interaction-error", role: "alert" }, localError ?? error) : null, /* @__PURE__ */ import_react13.default.createElement("div", { className: "route-test-actions" }, /* @__PURE__ */ import_react13.default.createElement("button", { type: "button", className: "primary", disabled: !acknowledged || !sensitivityReviewed || runStarting, onClick: run }, "Run route test"), /* @__PURE__ */ import_react13.default.createElement("button", { type: "button", onClick: () => setStage("conditions") }, "Edit conditions"), /* @__PURE__ */ import_react13.default.createElement("button", { type: "button", onClick: save }, "Save draft")));
     }
-    return /* @__PURE__ */ import_react14.default.createElement("section", { className: "route-test-pane", "aria-label": "Set route-test conditions" }, /* @__PURE__ */ import_react14.default.createElement("div", { className: "route-test-stepper" }, /* @__PURE__ */ import_react14.default.createElement("strong", null, "1 Set conditions"), /* @__PURE__ */ import_react14.default.createElement("span", null, "2 Check route")), /* @__PURE__ */ import_react14.default.createElement("h2", null, "Test reaching ", targetName), needsReview ? /* @__PURE__ */ import_react14.default.createElement("p", { className: "route-test-warning" }, "The runbook changed. Review these conditions before running again.") : null, blockers.length > 0 ? /* @__PURE__ */ import_react14.default.createElement("p", { className: "route-test-warning" }, "This route cannot run yet: ", blockers.join("; "), ".") : null, /* @__PURE__ */ import_react14.default.createElement("label", { className: "route-test-field" }, /* @__PURE__ */ import_react14.default.createElement("span", null, "Route test name"), /* @__PURE__ */ import_react14.default.createElement("input", { value: name, onChange: (event) => setName(event.target.value) })), graphInputs(document2).length > 0 ? /* @__PURE__ */ import_react14.default.createElement("fieldset", { className: "route-test-group" }, /* @__PURE__ */ import_react14.default.createElement("legend", null, "Runbook inputs"), graphInputs(document2).filter((input) => input.type !== "secret").map((input) => /* @__PURE__ */ import_react14.default.createElement("label", { className: "route-test-field", key: input.name }, /* @__PURE__ */ import_react14.default.createElement("span", null, input.name), /* @__PURE__ */ import_react14.default.createElement("input", { value: inputs[input.name] ?? "", onChange: (event) => setInputs((current) => ({ ...current, [input.name]: event.target.value })) }))), graphInputs(document2).some((input) => input.type === "secret") ? /* @__PURE__ */ import_react14.default.createElement("p", null, "Secret inputs are not saved in route tests.") : null) : null, /* @__PURE__ */ import_react14.default.createElement("div", { className: "route-test-conditions" }, conditions.length === 0 ? /* @__PURE__ */ import_react14.default.createElement("p", null, "This route reaches the selected step using only Gert logic.") : null, conditions.map((condition) => /* @__PURE__ */ import_react14.default.createElement(ConditionEditor, { key: condition.node.id, condition, onChange: (patch) => updateCondition(condition.node.id, patch) }))), /* @__PURE__ */ import_react14.default.createElement("label", { className: "route-test-ack" }, /* @__PURE__ */ import_react14.default.createElement("input", { type: "checkbox", checked: sensitivityReviewed, onChange: (event) => setSensitivityReviewed(event.target.checked) }), /* @__PURE__ */ import_react14.default.createElement("span", null, "I reviewed the saved values. They contain no credentials, tokens, customer data, or raw external output.")), localError || error ? /* @__PURE__ */ import_react14.default.createElement("div", { className: "interaction-error", role: "alert" }, localError ?? error) : null, /* @__PURE__ */ import_react14.default.createElement("div", { className: "route-test-actions" }, /* @__PURE__ */ import_react14.default.createElement("button", { type: "button", className: "primary", disabled: !sensitivityReviewed || blockers.length > 0, onClick: check }, "Check this route"), /* @__PURE__ */ import_react14.default.createElement("button", { type: "button", disabled: !sensitivityReviewed, onClick: save }, "Save draft"), /* @__PURE__ */ import_react14.default.createElement("button", { type: "button", onClick: onClose }, "Close")));
+    return /* @__PURE__ */ import_react13.default.createElement("section", { className: "route-test-pane", "aria-label": "Set route-test conditions" }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "route-test-stepper" }, /* @__PURE__ */ import_react13.default.createElement("strong", null, "1 Set conditions"), /* @__PURE__ */ import_react13.default.createElement("span", null, "2 Check route")), /* @__PURE__ */ import_react13.default.createElement("h2", null, "Test reaching ", targetName), needsReview ? /* @__PURE__ */ import_react13.default.createElement("p", { className: "route-test-warning" }, "The runbook changed. Review these conditions before running again.") : null, blockers.length > 0 ? /* @__PURE__ */ import_react13.default.createElement("p", { className: "route-test-warning" }, "This route cannot run yet: ", blockers.join("; "), ".") : null, /* @__PURE__ */ import_react13.default.createElement("label", { className: "route-test-field" }, /* @__PURE__ */ import_react13.default.createElement("span", null, "Route test name"), /* @__PURE__ */ import_react13.default.createElement("input", { value: name, onChange: (event) => setName(event.target.value) })), graphInputs(document2).length > 0 ? /* @__PURE__ */ import_react13.default.createElement("fieldset", { className: "route-test-group" }, /* @__PURE__ */ import_react13.default.createElement("legend", null, "Runbook inputs"), graphInputs(document2).filter((input) => input.type !== "secret").map((input) => /* @__PURE__ */ import_react13.default.createElement("label", { className: "route-test-field", key: input.name }, /* @__PURE__ */ import_react13.default.createElement("span", null, input.name), /* @__PURE__ */ import_react13.default.createElement("input", { value: inputs[input.name] ?? "", onChange: (event) => setInputs((current) => ({ ...current, [input.name]: event.target.value })) }))), graphInputs(document2).some((input) => input.type === "secret") ? /* @__PURE__ */ import_react13.default.createElement("p", null, "Secret inputs are not saved in route tests.") : null) : null, /* @__PURE__ */ import_react13.default.createElement("div", { className: "route-test-conditions" }, conditions.length === 0 ? /* @__PURE__ */ import_react13.default.createElement("p", null, "This route reaches the selected step using only Gert logic.") : null, conditions.map((condition) => /* @__PURE__ */ import_react13.default.createElement(ConditionEditor, { key: condition.node.id, condition, onChange: (patch) => updateCondition(condition.node.id, patch) }))), /* @__PURE__ */ import_react13.default.createElement("label", { className: "route-test-ack" }, /* @__PURE__ */ import_react13.default.createElement("input", { type: "checkbox", checked: sensitivityReviewed, onChange: (event) => setSensitivityReviewed(event.target.checked) }), /* @__PURE__ */ import_react13.default.createElement("span", null, "I reviewed the saved values. They contain no credentials, tokens, customer data, or raw external output.")), localError || error ? /* @__PURE__ */ import_react13.default.createElement("div", { className: "interaction-error", role: "alert" }, localError ?? error) : null, /* @__PURE__ */ import_react13.default.createElement("div", { className: "route-test-actions" }, /* @__PURE__ */ import_react13.default.createElement("button", { type: "button", className: "primary", disabled: !sensitivityReviewed || blockers.length > 0, onClick: check }, "Check this route"), /* @__PURE__ */ import_react13.default.createElement("button", { type: "button", disabled: !sensitivityReviewed, onClick: save }, "Save draft"), /* @__PURE__ */ import_react13.default.createElement("button", { type: "button", onClick: onClose }, "Close")));
   }
   function ConditionEditor({ condition, onChange }) {
     const kind = nodeKind2(condition.node);
     const capability = hostCapability(condition.node);
     const details = condition.node.data.details;
-    return /* @__PURE__ */ import_react14.default.createElement("article", { className: `route-test-condition${condition.enabled ? " enabled" : ""}` }, /* @__PURE__ */ import_react14.default.createElement("label", { className: "route-test-enable" }, /* @__PURE__ */ import_react14.default.createElement("input", { type: "checkbox", checked: condition.enabled, onChange: (event) => onChange({ enabled: event.target.checked }) }), /* @__PURE__ */ import_react14.default.createElement("span", null, /* @__PURE__ */ import_react14.default.createElement("strong", null, nodeTitle(condition.node)), /* @__PURE__ */ import_react14.default.createElement("small", null, kindLabels[kind] ?? kind))), condition.enabled && kind === "host_action" ? /* @__PURE__ */ import_react14.default.createElement("div", { className: "route-test-condition-fields" }, /* @__PURE__ */ import_react14.default.createElement("p", null, "Source: ", sourceSummary(condition.source)), capability === "xts.open-view" ? /* @__PURE__ */ import_react14.default.createElement("p", null, "XTS will not open in this route test.") : null, /* @__PURE__ */ import_react14.default.createElement("label", { className: "route-test-field" }, /* @__PURE__ */ import_react14.default.createElement("span", null, "Assume host result"), /* @__PURE__ */ import_react14.default.createElement("select", { value: condition.status, onChange: (event) => onChange({ status: event.target.value }) }, ["completed", "failed", "timed-out", "execution-not-started", "unsupported"].map((status) => /* @__PURE__ */ import_react14.default.createElement("option", { key: status }, status)))), condition.status === "completed" && capability === "xts.open-view" ? /* @__PURE__ */ import_react14.default.createElement("label", { className: "route-test-field" }, /* @__PURE__ */ import_react14.default.createElement("span", null, "Assume XTS launch result"), /* @__PURE__ */ import_react14.default.createElement("select", { value: condition.nestedStatus, onChange: (event) => onChange({ nestedStatus: event.target.value }) }, ["opened", "view-not-found", "environment-not-found", "invalid-parameters", "execution-not-started"].map((status) => /* @__PURE__ */ import_react14.default.createElement("option", { key: status }, status)))) : condition.status === "completed" ? /* @__PURE__ */ import_react14.default.createElement(JSONField, { label: "Saved result", value: condition.objectValue, onChange: (objectValue) => onChange({ objectValue }) }) : null) : null, condition.enabled && (kind === "cli" || kind === "tool") ? /* @__PURE__ */ import_react14.default.createElement("div", { className: "route-test-condition-fields" }, /* @__PURE__ */ import_react14.default.createElement("p", null, "Source: ", sourceSummary(condition.source)), /* @__PURE__ */ import_react14.default.createElement("label", { className: "route-test-field" }, /* @__PURE__ */ import_react14.default.createElement("span", null, "Saved result status"), /* @__PURE__ */ import_react14.default.createElement("select", { value: condition.status, onChange: (event) => onChange({ status: event.target.value }) }, /* @__PURE__ */ import_react14.default.createElement("option", { value: "completed" }, "completed"), /* @__PURE__ */ import_react14.default.createElement("option", { value: "failed" }, "failed"), /* @__PURE__ */ import_react14.default.createElement("option", { value: "skipped" }, "skipped"))), /* @__PURE__ */ import_react14.default.createElement(JSONField, { label: "Saved result", value: condition.objectValue, onChange: (objectValue) => onChange({ objectValue }) })) : null, condition.enabled && kind === "collector" ? /* @__PURE__ */ import_react14.default.createElement("fieldset", { className: "route-test-condition-fields" }, /* @__PURE__ */ import_react14.default.createElement("legend", null, "Saved findings"), /* @__PURE__ */ import_react14.default.createElement("p", null, "Source: ", sourceSummary(condition.source)), collectorFields(condition.node).map((field2) => /* @__PURE__ */ import_react14.default.createElement("label", { className: "route-test-field", key: field2.name }, /* @__PURE__ */ import_react14.default.createElement("span", null, field2.label ?? field2.name, field2.required ? " *" : ""), field2.ephemeral ? /* @__PURE__ */ import_react14.default.createElement("small", null, "Ephemeral field cannot be saved in a route test.") : null, field2.type === "boolean" ? /* @__PURE__ */ import_react14.default.createElement(
+    return /* @__PURE__ */ import_react13.default.createElement("article", { className: `route-test-condition${condition.enabled ? " enabled" : ""}` }, /* @__PURE__ */ import_react13.default.createElement("label", { className: "route-test-enable" }, /* @__PURE__ */ import_react13.default.createElement("input", { type: "checkbox", checked: condition.enabled, onChange: (event) => onChange({ enabled: event.target.checked }) }), /* @__PURE__ */ import_react13.default.createElement("span", null, /* @__PURE__ */ import_react13.default.createElement("strong", null, nodeTitle(condition.node)), /* @__PURE__ */ import_react13.default.createElement("small", null, kindLabels[kind] ?? kind))), condition.enabled && kind === "host_action" ? /* @__PURE__ */ import_react13.default.createElement("div", { className: "route-test-condition-fields" }, /* @__PURE__ */ import_react13.default.createElement("p", null, "Source: ", sourceSummary(condition.source)), capability === "xts.open-view" ? /* @__PURE__ */ import_react13.default.createElement("p", null, "XTS will not open in this route test.") : null, /* @__PURE__ */ import_react13.default.createElement("label", { className: "route-test-field" }, /* @__PURE__ */ import_react13.default.createElement("span", null, "Assume host result"), /* @__PURE__ */ import_react13.default.createElement("select", { value: condition.status, onChange: (event) => onChange({ status: event.target.value }) }, ["completed", "failed", "timed-out", "execution-not-started", "unsupported"].map((status) => /* @__PURE__ */ import_react13.default.createElement("option", { key: status }, status)))), condition.status === "completed" && capability === "xts.open-view" ? /* @__PURE__ */ import_react13.default.createElement("label", { className: "route-test-field" }, /* @__PURE__ */ import_react13.default.createElement("span", null, "Assume XTS launch result"), /* @__PURE__ */ import_react13.default.createElement("select", { value: condition.nestedStatus, onChange: (event) => onChange({ nestedStatus: event.target.value }) }, ["opened", "view-not-found", "environment-not-found", "invalid-parameters", "execution-not-started"].map((status) => /* @__PURE__ */ import_react13.default.createElement("option", { key: status }, status)))) : condition.status === "completed" ? /* @__PURE__ */ import_react13.default.createElement(JSONField, { label: "Saved result", value: condition.objectValue, onChange: (objectValue) => onChange({ objectValue }) }) : null) : null, condition.enabled && (kind === "cli" || kind === "tool") ? /* @__PURE__ */ import_react13.default.createElement("div", { className: "route-test-condition-fields" }, /* @__PURE__ */ import_react13.default.createElement("p", null, "Source: ", sourceSummary(condition.source)), /* @__PURE__ */ import_react13.default.createElement("label", { className: "route-test-field" }, /* @__PURE__ */ import_react13.default.createElement("span", null, "Saved result status"), /* @__PURE__ */ import_react13.default.createElement("select", { value: condition.status, onChange: (event) => onChange({ status: event.target.value }) }, /* @__PURE__ */ import_react13.default.createElement("option", { value: "completed" }, "completed"), /* @__PURE__ */ import_react13.default.createElement("option", { value: "failed" }, "failed"), /* @__PURE__ */ import_react13.default.createElement("option", { value: "skipped" }, "skipped"))), /* @__PURE__ */ import_react13.default.createElement(JSONField, { label: "Saved result", value: condition.objectValue, onChange: (objectValue) => onChange({ objectValue }) })) : null, condition.enabled && kind === "collector" ? /* @__PURE__ */ import_react13.default.createElement("fieldset", { className: "route-test-condition-fields" }, /* @__PURE__ */ import_react13.default.createElement("legend", null, "Saved findings"), /* @__PURE__ */ import_react13.default.createElement("p", null, "Source: ", sourceSummary(condition.source)), collectorFields(condition.node).map((field2) => /* @__PURE__ */ import_react13.default.createElement("label", { className: "route-test-field", key: field2.name }, /* @__PURE__ */ import_react13.default.createElement("span", null, field2.label ?? field2.name, field2.required ? " *" : ""), field2.ephemeral ? /* @__PURE__ */ import_react13.default.createElement("small", null, "Ephemeral field cannot be saved in a route test.") : null, field2.type === "boolean" ? /* @__PURE__ */ import_react13.default.createElement(
       "input",
       {
         type: "checkbox",
         checked: condition.values[field2.name] === true,
         onChange: (event) => onChange({ values: { ...condition.values, [field2.name]: event.target.checked } })
       }
-    ) : field2.options.length > 0 ? /* @__PURE__ */ import_react14.default.createElement(
+    ) : field2.options.length > 0 ? /* @__PURE__ */ import_react13.default.createElement(
       "select",
       {
         multiple: field2.multiple,
@@ -37612,9 +37582,9 @@
           [field2.name]: field2.multiple ? Array.from(event.target.selectedOptions).map((option) => option.value) : event.target.value
         } })
       },
-      !field2.multiple ? /* @__PURE__ */ import_react14.default.createElement("option", { value: "" }, "Select...") : null,
-      field2.options.map((option) => /* @__PURE__ */ import_react14.default.createElement("option", { value: option.value, key: option.value }, option.label))
-    ) : field2.multiple ? /* @__PURE__ */ import_react14.default.createElement(
+      !field2.multiple ? /* @__PURE__ */ import_react13.default.createElement("option", { value: "" }, "Select...") : null,
+      field2.options.map((option) => /* @__PURE__ */ import_react13.default.createElement("option", { value: option.value, key: option.value }, option.label))
+    ) : field2.multiple ? /* @__PURE__ */ import_react13.default.createElement(
       "textarea",
       {
         rows: 3,
@@ -37625,7 +37595,7 @@
           [field2.name]: parseMultipleCollectorText(event.target.value)
         } })
       }
-    ) : /* @__PURE__ */ import_react14.default.createElement(
+    ) : /* @__PURE__ */ import_react13.default.createElement(
       "input",
       {
         type: collectorInputType(field2.type),
@@ -37633,19 +37603,19 @@
         value: String(condition.values[field2.name] ?? ""),
         onChange: (event) => onChange({ values: { ...condition.values, [field2.name]: event.target.value } })
       }
-    )))) : null, condition.enabled && kind === "choice" ? /* @__PURE__ */ import_react14.default.createElement("label", { className: "route-test-field" }, /* @__PURE__ */ import_react14.default.createElement("span", null, "Saved choice"), /* @__PURE__ */ import_react14.default.createElement(
+    )))) : null, condition.enabled && kind === "choice" ? /* @__PURE__ */ import_react13.default.createElement("label", { className: "route-test-field" }, /* @__PURE__ */ import_react13.default.createElement("span", null, "Saved choice"), /* @__PURE__ */ import_react13.default.createElement(
       "select",
       {
         multiple: details?.multiple === true,
         value: details?.multiple === true ? condition.selected : condition.selected[0] ?? "",
         onChange: (event) => onChange({ selected: Array.from(event.target.selectedOptions).map((option) => option.value) })
       },
-      /* @__PURE__ */ import_react14.default.createElement("option", { value: "" }, "Select..."),
-      detailOptions(condition.node).map((option) => /* @__PURE__ */ import_react14.default.createElement("option", { key: option.value, value: option.value }, option.label))
-    )) : null, condition.enabled && kind === "decision" ? /* @__PURE__ */ import_react14.default.createElement("label", { className: "route-test-field" }, /* @__PURE__ */ import_react14.default.createElement("span", null, "Saved decision"), /* @__PURE__ */ import_react14.default.createElement("select", { value: condition.label, onChange: (event) => onChange({ label: event.target.value }) }, /* @__PURE__ */ import_react14.default.createElement("option", { value: "" }, "Select..."), detailRoutes(condition.node).map((route) => /* @__PURE__ */ import_react14.default.createElement("option", { key: route.label, value: route.label }, route.label)))) : null, condition.enabled && kind === "approve" ? /* @__PURE__ */ import_react14.default.createElement("label", { className: "route-test-field" }, /* @__PURE__ */ import_react14.default.createElement("span", null, "Test approval"), /* @__PURE__ */ import_react14.default.createElement("select", { value: condition.approvalGranted ? "approved" : "denied", onChange: (event) => onChange({ approvalGranted: event.target.value === "approved" }) }, /* @__PURE__ */ import_react14.default.createElement("option", { value: "approved" }, "Approve for this route test"), /* @__PURE__ */ import_react14.default.createElement("option", { value: "denied" }, "Deny for this route test"))) : null, condition.enabled && ["cli", "tool", "host_action"].includes(kind) ? /* @__PURE__ */ import_react14.default.createElement("label", { className: "route-test-ack" }, /* @__PURE__ */ import_react14.default.createElement("input", { type: "checkbox", checked: condition.testApproval, onChange: (event) => onChange({ testApproval: event.target.checked }) }), /* @__PURE__ */ import_react14.default.createElement("span", null, "Use a non-production test approval for this step.")) : null);
+      /* @__PURE__ */ import_react13.default.createElement("option", { value: "" }, "Select..."),
+      detailOptions(condition.node).map((option) => /* @__PURE__ */ import_react13.default.createElement("option", { key: option.value, value: option.value }, option.label))
+    )) : null, condition.enabled && kind === "decision" ? /* @__PURE__ */ import_react13.default.createElement("label", { className: "route-test-field" }, /* @__PURE__ */ import_react13.default.createElement("span", null, "Saved decision"), /* @__PURE__ */ import_react13.default.createElement("select", { value: condition.label, onChange: (event) => onChange({ label: event.target.value }) }, /* @__PURE__ */ import_react13.default.createElement("option", { value: "" }, "Select..."), detailRoutes(condition.node).map((route) => /* @__PURE__ */ import_react13.default.createElement("option", { key: route.label, value: route.label }, route.label)))) : null, condition.enabled && kind === "approve" ? /* @__PURE__ */ import_react13.default.createElement("label", { className: "route-test-field" }, /* @__PURE__ */ import_react13.default.createElement("span", null, "Test approval"), /* @__PURE__ */ import_react13.default.createElement("select", { value: condition.approvalGranted ? "approved" : "denied", onChange: (event) => onChange({ approvalGranted: event.target.value === "approved" }) }, /* @__PURE__ */ import_react13.default.createElement("option", { value: "approved" }, "Approve for this route test"), /* @__PURE__ */ import_react13.default.createElement("option", { value: "denied" }, "Deny for this route test"))) : null, condition.enabled && ["cli", "tool", "host_action"].includes(kind) ? /* @__PURE__ */ import_react13.default.createElement("label", { className: "route-test-ack" }, /* @__PURE__ */ import_react13.default.createElement("input", { type: "checkbox", checked: condition.testApproval, onChange: (event) => onChange({ testApproval: event.target.checked }) }), /* @__PURE__ */ import_react13.default.createElement("span", null, "Use a non-production test approval for this step.")) : null);
   }
   function JSONField({ label, value, onChange }) {
-    return /* @__PURE__ */ import_react14.default.createElement("label", { className: "route-test-field" }, /* @__PURE__ */ import_react14.default.createElement("span", null, label), /* @__PURE__ */ import_react14.default.createElement("textarea", { rows: 4, spellCheck: false, value, onChange: (event) => onChange(event.target.value) }));
+    return /* @__PURE__ */ import_react13.default.createElement("label", { className: "route-test-field" }, /* @__PURE__ */ import_react13.default.createElement("span", null, label), /* @__PURE__ */ import_react13.default.createElement("textarea", { rows: 4, spellCheck: false, value, onChange: (event) => onChange(event.target.value) }));
   }
   function conditionForNode(node, artifact) {
     const selector5 = selectorForNode(node);
@@ -37838,16 +37808,16 @@
     tool: "Tool",
     wait_for_event: "Wait event"
   };
-  var RuntimeNodesContext = (0, import_react15.createContext)({});
-  var DebugBreakpointsContext = (0, import_react15.createContext)(/* @__PURE__ */ new Set());
-  var ExecutionPositionContext = (0, import_react15.createContext)({ terminal: false });
+  var RuntimeNodesContext = (0, import_react14.createContext)({});
+  var DebugBreakpointsContext = (0, import_react14.createContext)(/* @__PURE__ */ new Set());
+  var ExecutionPositionContext = (0, import_react14.createContext)({ terminal: false });
   function breakpointKey(nodeID, phase) {
     return `${nodeID}:${phase}`;
   }
   function StepNode({ data, selected }) {
-    const runtimeNodes = (0, import_react15.useContext)(RuntimeNodesContext);
-    const debugBreakpoints = (0, import_react15.useContext)(DebugBreakpointsContext);
-    const executionPosition = (0, import_react15.useContext)(ExecutionPositionContext);
+    const runtimeNodes = (0, import_react14.useContext)(RuntimeNodesContext);
+    const debugBreakpoints = (0, import_react14.useContext)(DebugBreakpointsContext);
+    const executionPosition = (0, import_react14.useContext)(ExecutionPositionContext);
     const kind = typeof data.kind === "string" ? data.kind : "step";
     const id2 = typeof data.id === "string" ? data.id : "";
     const title = typeof data.title === "string" ? data.title : "";
@@ -37864,20 +37834,20 @@
     const currentLabel = `Current step: ${locatorText}`;
     const executionLabel = executionPosition.terminal ? "Last reached" : "Current";
     const executionAriaLabel = executionPosition.terminal ? `Last reached step: ${locatorText}` : currentLabel;
-    return /* @__PURE__ */ import_react15.default.createElement(import_react15.default.Fragment, null, /* @__PURE__ */ import_react15.default.createElement(NodeToolbar, { isVisible: selected, position: Position.Left, align: "center", offset: 12 }, /* @__PURE__ */ import_react15.default.createElement("div", { className: "node-locator focused", role: "status", "aria-label": focusedLabel, title: focusedLabel }, /* @__PURE__ */ import_react15.default.createElement("span", null, "Focused"), /* @__PURE__ */ import_react15.default.createElement("code", { title: id2 }, locatorText), /* @__PURE__ */ import_react15.default.createElement(ArrowRight, { "aria-hidden": "true" }))), /* @__PURE__ */ import_react15.default.createElement(NodeToolbar, { isVisible: isCurrent, position: Position.Right, align: "center", offset: 12 }, /* @__PURE__ */ import_react15.default.createElement("div", { className: `node-locator ${executionPosition.terminal ? "last-reached" : "current"}`, role: "status", "aria-label": executionAriaLabel, title: executionAriaLabel }, /* @__PURE__ */ import_react15.default.createElement(ArrowLeft, { "aria-hidden": "true" }), /* @__PURE__ */ import_react15.default.createElement("span", null, executionLabel), /* @__PURE__ */ import_react15.default.createElement("code", { title: id2 }, locatorText))), /* @__PURE__ */ import_react15.default.createElement("div", { className: `step-node kind-${kind} status-${status}${selected ? " selected" : ""}${isCurrent ? executionPosition.terminal ? " execution-last" : " execution-current" : ""}` }, /* @__PURE__ */ import_react15.default.createElement(Handle$1, { type: "target", position: Position.Top }), /* @__PURE__ */ import_react15.default.createElement("div", { className: "step-heading" }, /* @__PURE__ */ import_react15.default.createElement("span", { className: "kind-mark", "aria-hidden": "true" }, kind.slice(0, 2).toUpperCase()), /* @__PURE__ */ import_react15.default.createElement("span", null, kindLabels2[kind] ?? kind)), /* @__PURE__ */ import_react15.default.createElement("div", { className: "debug-node-markers" }, hasBeforeBreakpoint ? /* @__PURE__ */ import_react15.default.createElement("span", { "aria-label": "Before breakpoint", title: "Pause before execution" }, /* @__PURE__ */ import_react15.default.createElement(CircleDot, { className: "debug-before-marker", "aria-hidden": "true" })) : null, hasAfterBreakpoint ? /* @__PURE__ */ import_react15.default.createElement("span", { "aria-label": "After breakpoint", title: "Pause after execution" }, /* @__PURE__ */ import_react15.default.createElement(CircleDot, { className: "debug-after-marker", "aria-hidden": "true" })) : null, runtime?.debugOverride ? /* @__PURE__ */ import_react15.default.createElement("span", { "aria-label": "Debug override applied", title: "Debug override applied" }, /* @__PURE__ */ import_react15.default.createElement(Bug, { className: "debug-override-marker", "aria-hidden": "true" })) : null), /* @__PURE__ */ import_react15.default.createElement("div", { className: "step-id" }, id2), title && title !== id2 ? /* @__PURE__ */ import_react15.default.createElement("div", { className: "step-title" }, title) : null, status !== "pending" ? /* @__PURE__ */ import_react15.default.createElement("div", { className: "step-status" }, status === "no-final-status" ? "No final status" : status, error ? `: ${error}` : "") : null, !isTerminal ? /* @__PURE__ */ import_react15.default.createElement(Handle$1, { type: "source", position: Position.Bottom }) : null));
+    return /* @__PURE__ */ import_react14.default.createElement(import_react14.default.Fragment, null, /* @__PURE__ */ import_react14.default.createElement(NodeToolbar, { isVisible: selected, position: Position.Left, align: "center", offset: 12 }, /* @__PURE__ */ import_react14.default.createElement("div", { className: "node-locator focused", role: "status", "aria-label": focusedLabel, title: focusedLabel }, /* @__PURE__ */ import_react14.default.createElement("span", null, "Focused"), /* @__PURE__ */ import_react14.default.createElement("code", { title: id2 }, locatorText), /* @__PURE__ */ import_react14.default.createElement(ArrowRight, { "aria-hidden": "true" }))), /* @__PURE__ */ import_react14.default.createElement(NodeToolbar, { isVisible: isCurrent, position: Position.Right, align: "center", offset: 12 }, /* @__PURE__ */ import_react14.default.createElement("div", { className: `node-locator ${executionPosition.terminal ? "last-reached" : "current"}`, role: "status", "aria-label": executionAriaLabel, title: executionAriaLabel }, /* @__PURE__ */ import_react14.default.createElement(ArrowLeft, { "aria-hidden": "true" }), /* @__PURE__ */ import_react14.default.createElement("span", null, executionLabel), /* @__PURE__ */ import_react14.default.createElement("code", { title: id2 }, locatorText))), /* @__PURE__ */ import_react14.default.createElement("div", { className: `step-node kind-${kind} status-${status}${selected ? " selected" : ""}${isCurrent ? executionPosition.terminal ? " execution-last" : " execution-current" : ""}` }, /* @__PURE__ */ import_react14.default.createElement(Handle$1, { type: "target", position: Position.Top }), /* @__PURE__ */ import_react14.default.createElement("div", { className: "step-heading" }, /* @__PURE__ */ import_react14.default.createElement("span", { className: "kind-mark", "aria-hidden": "true" }, kind.slice(0, 2).toUpperCase()), /* @__PURE__ */ import_react14.default.createElement("span", null, kindLabels2[kind] ?? kind)), /* @__PURE__ */ import_react14.default.createElement("div", { className: "debug-node-markers" }, hasBeforeBreakpoint ? /* @__PURE__ */ import_react14.default.createElement("span", { "aria-label": "Before breakpoint", title: "Pause before execution" }, /* @__PURE__ */ import_react14.default.createElement(CircleDot, { className: "debug-before-marker", "aria-hidden": "true" })) : null, hasAfterBreakpoint ? /* @__PURE__ */ import_react14.default.createElement("span", { "aria-label": "After breakpoint", title: "Pause after execution" }, /* @__PURE__ */ import_react14.default.createElement(CircleDot, { className: "debug-after-marker", "aria-hidden": "true" })) : null, runtime?.debugOverride ? /* @__PURE__ */ import_react14.default.createElement("span", { "aria-label": "Debug override applied", title: "Debug override applied" }, /* @__PURE__ */ import_react14.default.createElement(Bug, { className: "debug-override-marker", "aria-hidden": "true" })) : null), /* @__PURE__ */ import_react14.default.createElement("div", { className: "step-id" }, id2), title && title !== id2 ? /* @__PURE__ */ import_react14.default.createElement("div", { className: "step-title" }, title) : null, status !== "pending" ? /* @__PURE__ */ import_react14.default.createElement("div", { className: "step-status" }, status === "no-final-status" ? "No final status" : status, error ? `: ${error}` : "") : null, !isTerminal ? /* @__PURE__ */ import_react14.default.createElement(Handle$1, { type: "source", position: Position.Bottom }) : null));
   }
   function FrameNode({ data }) {
     const segmentStatus = typeof data.segment_status === "string" ? data.segment_status : "";
-    return /* @__PURE__ */ import_react15.default.createElement("div", { className: "frame-content" }, /* @__PURE__ */ import_react15.default.createElement("span", null, String(data.label ?? data.kind ?? "")), segmentStatus ? /* @__PURE__ */ import_react15.default.createElement("em", { className: `segment-status status-${segmentStatus}` }, segmentStatus.replaceAll("_", " ")) : null, data.graph_loaded === false ? /* @__PURE__ */ import_react15.default.createElement("em", null, "Load on demand") : null, data.empty ? /* @__PURE__ */ import_react15.default.createElement("em", null, "Empty route") : null);
+    return /* @__PURE__ */ import_react14.default.createElement("div", { className: "frame-content" }, /* @__PURE__ */ import_react14.default.createElement("span", null, String(data.label ?? data.kind ?? "")), segmentStatus ? /* @__PURE__ */ import_react14.default.createElement("em", { className: `segment-status status-${segmentStatus}` }, segmentStatus.replaceAll("_", " ")) : null, data.graph_loaded === false ? /* @__PURE__ */ import_react14.default.createElement("em", null, "Load on demand") : null, data.empty ? /* @__PURE__ */ import_react14.default.createElement("em", null, "Empty route") : null);
   }
   function BranchMergeNode() {
-    return /* @__PURE__ */ import_react15.default.createElement("div", { className: "branch-merge-node", title: "Branch merge" }, /* @__PURE__ */ import_react15.default.createElement(Handle$1, { type: "target", position: Position.Top }), /* @__PURE__ */ import_react15.default.createElement("span", { "aria-hidden": "true" }), /* @__PURE__ */ import_react15.default.createElement(Handle$1, { type: "source", position: Position.Bottom }));
+    return /* @__PURE__ */ import_react14.default.createElement("div", { className: "branch-merge-node", title: "Branch merge" }, /* @__PURE__ */ import_react14.default.createElement(Handle$1, { type: "target", position: Position.Top }), /* @__PURE__ */ import_react14.default.createElement("span", { "aria-hidden": "true" }), /* @__PURE__ */ import_react14.default.createElement(Handle$1, { type: "source", position: Position.Bottom }));
   }
   function SessionEntryNode() {
-    return /* @__PURE__ */ import_react15.default.createElement("div", { className: "session-entry-node", title: "Segment entry" }, /* @__PURE__ */ import_react15.default.createElement(Handle$1, { type: "target", position: Position.Top }), /* @__PURE__ */ import_react15.default.createElement("span", { "aria-hidden": "true" }), /* @__PURE__ */ import_react15.default.createElement(Handle$1, { type: "source", position: Position.Bottom }));
+    return /* @__PURE__ */ import_react14.default.createElement("div", { className: "session-entry-node", title: "Segment entry" }, /* @__PURE__ */ import_react14.default.createElement(Handle$1, { type: "target", position: Position.Top }), /* @__PURE__ */ import_react14.default.createElement("span", { "aria-hidden": "true" }), /* @__PURE__ */ import_react14.default.createElement(Handle$1, { type: "source", position: Position.Bottom }));
   }
   function TechnicalSegmentNode({ data }) {
-    return /* @__PURE__ */ import_react15.default.createElement("div", { className: "technical-segment", title: "Visual grouping only, not execution evidence. Click to expand without rerunning." }, /* @__PURE__ */ import_react15.default.createElement(Handle$1, { type: "target", position: Position.Top }), /* @__PURE__ */ import_react15.default.createElement("button", { type: "button", className: "nodrag", onClick: () => data.expand?.() }, String(data.title)), /* @__PURE__ */ import_react15.default.createElement("small", null, String(data.memberSummary ?? "Visual grouping \u2014 not skipped")), /* @__PURE__ */ import_react15.default.createElement(Handle$1, { type: "source", position: Position.Bottom }));
+    return /* @__PURE__ */ import_react14.default.createElement("div", { className: "technical-segment", title: "Visual grouping only, not execution evidence. Click to expand without rerunning." }, /* @__PURE__ */ import_react14.default.createElement(Handle$1, { type: "target", position: Position.Top }), /* @__PURE__ */ import_react14.default.createElement("button", { type: "button", className: "nodrag", onClick: () => data.expand?.() }, String(data.title)), /* @__PURE__ */ import_react14.default.createElement("small", null, String(data.memberSummary ?? "Visual grouping \u2014 not skipped")), /* @__PURE__ */ import_react14.default.createElement(Handle$1, { type: "source", position: Position.Bottom }));
   }
   var nodeTypes = { technicalSegment: TechnicalSegmentNode, gertStep: StepNode, branchMerge: BranchMergeNode, sessionEntry: SessionEntryNode, frameBox: FrameNode };
   function InputsForm({
@@ -37887,10 +37857,10 @@
     onChange
   }) {
     if (declarations.length === 0) return null;
-    return /* @__PURE__ */ import_react15.default.createElement("section", { className: "run-inputs", "aria-label": "Runbook inputs" }, declarations.map((declaration) => {
+    return /* @__PURE__ */ import_react14.default.createElement("section", { className: "run-inputs", "aria-label": "Runbook inputs" }, declarations.map((declaration) => {
       const value = values[declaration.name] ?? "";
       const label = `${declaration.name}${declaration.required ? " *" : ""}`;
-      return /* @__PURE__ */ import_react15.default.createElement("label", { key: declaration.name, title: declaration.description }, /* @__PURE__ */ import_react15.default.createElement("span", null, label), declaration.enum && !declaration.enumRedacted ? /* @__PURE__ */ import_react15.default.createElement(
+      return /* @__PURE__ */ import_react14.default.createElement("label", { key: declaration.name, title: declaration.description }, /* @__PURE__ */ import_react14.default.createElement("span", null, label), declaration.enum && !declaration.enumRedacted ? /* @__PURE__ */ import_react14.default.createElement(
         "select",
         {
           value,
@@ -37898,9 +37868,9 @@
           required: declaration.required,
           onChange: (event) => onChange(declaration.name, event.target.value)
         },
-        /* @__PURE__ */ import_react15.default.createElement("option", { value: "" }, declaration.required ? "Select..." : "Unset"),
-        declaration.enum.map((member) => /* @__PURE__ */ import_react15.default.createElement("option", { key: member, value: member }, member))
-      ) : /* @__PURE__ */ import_react15.default.createElement(
+        /* @__PURE__ */ import_react14.default.createElement("option", { value: "" }, declaration.required ? "Select..." : "Unset"),
+        declaration.enum.map((member) => /* @__PURE__ */ import_react14.default.createElement("option", { key: member, value: member }, member))
+      ) : /* @__PURE__ */ import_react14.default.createElement(
         "input",
         {
           type: declaration.type === "secret" ? "password" : "text",
@@ -37975,17 +37945,17 @@
     onSubmit
   }) {
     const debug = interaction.debug;
-    const [variablePatch, setVariablePatch] = (0, import_react15.useState)("{}");
-    const [outputPatch, setOutputPatch] = (0, import_react15.useState)("{}");
-    const [effectiveStatus, setEffectiveStatus] = (0, import_react15.useState)(debug?.actual?.status ?? "completed");
-    const [effectiveError, setEffectiveError] = (0, import_react15.useState)("");
-    const [submitting, setSubmitting] = (0, import_react15.useState)(false);
-    const [validationError, setValidationError] = (0, import_react15.useState)();
-    const pauseHeadingRef = (0, import_react15.useRef)(null);
-    (0, import_react15.useEffect)(() => {
+    const [variablePatch, setVariablePatch] = (0, import_react14.useState)("{}");
+    const [outputPatch, setOutputPatch] = (0, import_react14.useState)("{}");
+    const [effectiveStatus, setEffectiveStatus] = (0, import_react14.useState)(debug?.actual?.status ?? "completed");
+    const [effectiveError, setEffectiveError] = (0, import_react14.useState)("");
+    const [submitting, setSubmitting] = (0, import_react14.useState)(false);
+    const [validationError, setValidationError] = (0, import_react14.useState)();
+    const pauseHeadingRef = (0, import_react14.useRef)(null);
+    (0, import_react14.useEffect)(() => {
       pauseHeadingRef.current?.focus();
     }, [interaction.turnID]);
-    if (!debug) return /* @__PURE__ */ import_react15.default.createElement("div", { className: "interaction-error" }, "Debug pause payload is missing.");
+    if (!debug) return /* @__PURE__ */ import_react14.default.createElement("div", { className: "interaction-error" }, "Debug pause payload is missing.");
     const submit = (action, apply) => {
       try {
         let set3;
@@ -38014,7 +37984,7 @@
       }
     };
     const callPath = [...(debug.callPath ?? []).map((frame2) => frame2.step_id), interaction.stepID].join(" / ");
-    return /* @__PURE__ */ import_react15.default.createElement("section", { className: "interaction-pane debug-break", "aria-label": "Debug pause" }, /* @__PURE__ */ import_react15.default.createElement("span", { className: "interaction-kind" }, "Debug pause \xB7 ", debug.phase), /* @__PURE__ */ import_react15.default.createElement("h2", { ref: pauseHeadingRef, tabIndex: -1 }, interaction.stepID), /* @__PURE__ */ import_react15.default.createElement("div", { className: "debug-breadcrumb" }, callPath), /* @__PURE__ */ import_react15.default.createElement("dl", { className: "debug-metadata" }, /* @__PURE__ */ import_react15.default.createElement("dt", null, "Invocation"), /* @__PURE__ */ import_react15.default.createElement("dd", null, debug.invocation), /* @__PURE__ */ import_react15.default.createElement("dt", null, "Attempt"), /* @__PURE__ */ import_react15.default.createElement("dd", null, debug.attempt)), debug.watches && debug.watches.length > 0 ? /* @__PURE__ */ import_react15.default.createElement("section", { className: "debug-values", "aria-label": "Watch expressions" }, /* @__PURE__ */ import_react15.default.createElement("h3", null, "Watches"), debug.watches.map((watch) => /* @__PURE__ */ import_react15.default.createElement("div", { key: watch.expression, className: "debug-watch" }, /* @__PURE__ */ import_react15.default.createElement("code", null, watch.expression), /* @__PURE__ */ import_react15.default.createElement("span", null, watch.error ?? JSON.stringify(watch.value))))) : null, /* @__PURE__ */ import_react15.default.createElement("details", { className: "debug-values" }, /* @__PURE__ */ import_react15.default.createElement("summary", null, "Runtime variables"), /* @__PURE__ */ import_react15.default.createElement("pre", null, JSON.stringify(debug.variables ?? {}, null, 2))), debug.actual ? /* @__PURE__ */ import_react15.default.createElement("details", { className: "debug-values", open: true }, /* @__PURE__ */ import_react15.default.createElement("summary", null, "Actual result \xB7 ", debug.actual.status), /* @__PURE__ */ import_react15.default.createElement("pre", null, JSON.stringify(debug.actual.output ?? {}, null, 2)), debug.actual.error ? /* @__PURE__ */ import_react15.default.createElement("p", null, debug.actual.error) : null) : null, /* @__PURE__ */ import_react15.default.createElement("label", { className: "debug-field" }, /* @__PURE__ */ import_react15.default.createElement("span", null, "Variable patch"), /* @__PURE__ */ import_react15.default.createElement(
+    return /* @__PURE__ */ import_react14.default.createElement("section", { className: "interaction-pane debug-break", "aria-label": "Debug pause" }, /* @__PURE__ */ import_react14.default.createElement("span", { className: "interaction-kind" }, "Debug pause \xB7 ", debug.phase), /* @__PURE__ */ import_react14.default.createElement("h2", { ref: pauseHeadingRef, tabIndex: -1 }, interaction.stepID), /* @__PURE__ */ import_react14.default.createElement("div", { className: "debug-breadcrumb" }, callPath), /* @__PURE__ */ import_react14.default.createElement("dl", { className: "debug-metadata" }, /* @__PURE__ */ import_react14.default.createElement("dt", null, "Invocation"), /* @__PURE__ */ import_react14.default.createElement("dd", null, debug.invocation), /* @__PURE__ */ import_react14.default.createElement("dt", null, "Attempt"), /* @__PURE__ */ import_react14.default.createElement("dd", null, debug.attempt)), debug.watches && debug.watches.length > 0 ? /* @__PURE__ */ import_react14.default.createElement("section", { className: "debug-values", "aria-label": "Watch expressions" }, /* @__PURE__ */ import_react14.default.createElement("h3", null, "Watches"), debug.watches.map((watch) => /* @__PURE__ */ import_react14.default.createElement("div", { key: watch.expression, className: "debug-watch" }, /* @__PURE__ */ import_react14.default.createElement("code", null, watch.expression), /* @__PURE__ */ import_react14.default.createElement("span", null, watch.error ?? JSON.stringify(watch.value))))) : null, /* @__PURE__ */ import_react14.default.createElement("details", { className: "debug-values" }, /* @__PURE__ */ import_react14.default.createElement("summary", null, "Runtime variables"), /* @__PURE__ */ import_react14.default.createElement("pre", null, JSON.stringify(debug.variables ?? {}, null, 2))), debug.actual ? /* @__PURE__ */ import_react14.default.createElement("details", { className: "debug-values", open: true }, /* @__PURE__ */ import_react14.default.createElement("summary", null, "Actual result \xB7 ", debug.actual.status), /* @__PURE__ */ import_react14.default.createElement("pre", null, JSON.stringify(debug.actual.output ?? {}, null, 2)), debug.actual.error ? /* @__PURE__ */ import_react14.default.createElement("p", null, debug.actual.error) : null) : null, /* @__PURE__ */ import_react14.default.createElement("label", { className: "debug-field" }, /* @__PURE__ */ import_react14.default.createElement("span", null, "Variable patch"), /* @__PURE__ */ import_react14.default.createElement(
       "textarea",
       {
         value: variablePatch,
@@ -38022,7 +37992,7 @@
         spellCheck: false,
         onChange: (event) => setVariablePatch(event.target.value)
       }
-    )), debug.phase === "after" ? /* @__PURE__ */ import_react15.default.createElement(import_react15.default.Fragment, null, /* @__PURE__ */ import_react15.default.createElement("label", { className: "debug-field" }, /* @__PURE__ */ import_react15.default.createElement("span", null, "Output patch"), /* @__PURE__ */ import_react15.default.createElement(
+    )), debug.phase === "after" ? /* @__PURE__ */ import_react14.default.createElement(import_react14.default.Fragment, null, /* @__PURE__ */ import_react14.default.createElement("label", { className: "debug-field" }, /* @__PURE__ */ import_react14.default.createElement("span", null, "Output patch"), /* @__PURE__ */ import_react14.default.createElement(
       "textarea",
       {
         value: outputPatch,
@@ -38030,7 +38000,7 @@
         spellCheck: false,
         onChange: (event) => setOutputPatch(event.target.value)
       }
-    )), debug.outputProtected ? /* @__PURE__ */ import_react15.default.createElement("p", { className: "debug-protected" }, "Output is protected and cannot be overridden.") : null, /* @__PURE__ */ import_react15.default.createElement("label", { className: "debug-field compact" }, /* @__PURE__ */ import_react15.default.createElement("span", null, "Effective status"), /* @__PURE__ */ import_react15.default.createElement(
+    )), debug.outputProtected ? /* @__PURE__ */ import_react14.default.createElement("p", { className: "debug-protected" }, "Output is protected and cannot be overridden.") : null, /* @__PURE__ */ import_react14.default.createElement("label", { className: "debug-field compact" }, /* @__PURE__ */ import_react14.default.createElement("span", null, "Effective status"), /* @__PURE__ */ import_react14.default.createElement(
       "select",
       {
         value: effectiveStatus,
@@ -38040,18 +38010,18 @@
           if (event.target.value !== "failed") setEffectiveError("");
         }
       },
-      /* @__PURE__ */ import_react15.default.createElement("option", { value: "completed" }, "Completed"),
-      /* @__PURE__ */ import_react15.default.createElement("option", { value: "failed" }, "Failed"),
-      /* @__PURE__ */ import_react15.default.createElement("option", { value: "skipped" }, "Skipped")
-    )), effectiveStatus === "failed" ? /* @__PURE__ */ import_react15.default.createElement("label", { className: "debug-field compact" }, /* @__PURE__ */ import_react15.default.createElement("span", null, "Effective error"), /* @__PURE__ */ import_react15.default.createElement("input", { value: effectiveError, disabled: submitting, onChange: (event) => setEffectiveError(event.target.value) })) : null) : null, debug.protectedVariables && debug.protectedVariables.length > 0 ? /* @__PURE__ */ import_react15.default.createElement("p", { className: "debug-protected" }, "Protected: ", debug.protectedVariables.join(", ")) : null, validationError ? /* @__PURE__ */ import_react15.default.createElement("div", { className: "interaction-error", role: "alert" }, validationError) : null, /* @__PURE__ */ import_react15.default.createElement("div", { className: "debug-actions" }, /* @__PURE__ */ import_react15.default.createElement("button", { type: "button", disabled: submitting, onClick: () => submit("continue", false) }, "Continue unchanged"), /* @__PURE__ */ import_react15.default.createElement("button", { type: "button", className: "primary", disabled: submitting, onClick: () => submit("continue", true) }, "Apply and continue"), /* @__PURE__ */ import_react15.default.createElement("button", { type: "button", disabled: submitting || !debug.canStepInto, onClick: () => submit("step_into", true) }, "Step into"), /* @__PURE__ */ import_react15.default.createElement("button", { type: "button", disabled: submitting, onClick: () => submit("step_over", true) }, "Step over"), /* @__PURE__ */ import_react15.default.createElement("button", { type: "button", disabled: submitting, onClick: () => submit("step_out", true) }, "Step out"), /* @__PURE__ */ import_react15.default.createElement("button", { type: "button", className: "danger", disabled: submitting, onClick: () => submit("stop", false) }, "Stop")));
+      /* @__PURE__ */ import_react14.default.createElement("option", { value: "completed" }, "Completed"),
+      /* @__PURE__ */ import_react14.default.createElement("option", { value: "failed" }, "Failed"),
+      /* @__PURE__ */ import_react14.default.createElement("option", { value: "skipped" }, "Skipped")
+    )), effectiveStatus === "failed" ? /* @__PURE__ */ import_react14.default.createElement("label", { className: "debug-field compact" }, /* @__PURE__ */ import_react14.default.createElement("span", null, "Effective error"), /* @__PURE__ */ import_react14.default.createElement("input", { value: effectiveError, disabled: submitting, onChange: (event) => setEffectiveError(event.target.value) })) : null) : null, debug.protectedVariables && debug.protectedVariables.length > 0 ? /* @__PURE__ */ import_react14.default.createElement("p", { className: "debug-protected" }, "Protected: ", debug.protectedVariables.join(", ")) : null, validationError ? /* @__PURE__ */ import_react14.default.createElement("div", { className: "interaction-error", role: "alert" }, validationError) : null, /* @__PURE__ */ import_react14.default.createElement("div", { className: "debug-actions" }, /* @__PURE__ */ import_react14.default.createElement("button", { type: "button", disabled: submitting, onClick: () => submit("continue", false) }, "Continue unchanged"), /* @__PURE__ */ import_react14.default.createElement("button", { type: "button", className: "primary", disabled: submitting, onClick: () => submit("continue", true) }, "Apply and continue"), /* @__PURE__ */ import_react14.default.createElement("button", { type: "button", disabled: submitting || !debug.canStepInto, onClick: () => submit("step_into", true) }, "Step into"), /* @__PURE__ */ import_react14.default.createElement("button", { type: "button", disabled: submitting, onClick: () => submit("step_over", true) }, "Step over"), /* @__PURE__ */ import_react14.default.createElement("button", { type: "button", disabled: submitting, onClick: () => submit("step_out", true) }, "Step out"), /* @__PURE__ */ import_react14.default.createElement("button", { type: "button", className: "danger", disabled: submitting, onClick: () => submit("stop", false) }, "Stop")));
   }
   function ApprovalInteractionPane({
     interaction,
     onSubmit
   }) {
-    const [approver, setApprover] = (0, import_react15.useState)("");
-    const [submitting, setSubmitting] = (0, import_react15.useState)(false);
-    return /* @__PURE__ */ import_react15.default.createElement("section", { className: "interaction-pane approval-pane", "aria-label": "Governance approval" }, /* @__PURE__ */ import_react15.default.createElement("span", { className: "interaction-kind" }, "Approval"), /* @__PURE__ */ import_react15.default.createElement("h2", null, interaction.title ?? interaction.stepID), interaction.prompt ? /* @__PURE__ */ import_react15.default.createElement("p", null, interaction.prompt) : null, /* @__PURE__ */ import_react15.default.createElement("label", { className: "debug-field compact" }, /* @__PURE__ */ import_react15.default.createElement("span", null, "Approver identity"), /* @__PURE__ */ import_react15.default.createElement(
+    const [approver, setApprover] = (0, import_react14.useState)("");
+    const [submitting, setSubmitting] = (0, import_react14.useState)(false);
+    return /* @__PURE__ */ import_react14.default.createElement("section", { className: "interaction-pane approval-pane", "aria-label": "Governance approval" }, /* @__PURE__ */ import_react14.default.createElement("span", { className: "interaction-kind" }, "Approval"), /* @__PURE__ */ import_react14.default.createElement("h2", null, interaction.title ?? interaction.stepID), interaction.prompt ? /* @__PURE__ */ import_react14.default.createElement("p", null, interaction.prompt) : null, /* @__PURE__ */ import_react14.default.createElement("label", { className: "debug-field compact" }, /* @__PURE__ */ import_react14.default.createElement("span", null, "Approver identity"), /* @__PURE__ */ import_react14.default.createElement(
       "input",
       {
         value: approver,
@@ -38061,7 +38031,7 @@
         placeholder: "name or email",
         onChange: (event) => setApprover(event.target.value)
       }
-    )), /* @__PURE__ */ import_react15.default.createElement("div", { className: "debug-actions" }, /* @__PURE__ */ import_react15.default.createElement(
+    )), /* @__PURE__ */ import_react14.default.createElement("div", { className: "debug-actions" }, /* @__PURE__ */ import_react14.default.createElement(
       "button",
       {
         type: "button",
@@ -38073,7 +38043,7 @@
         }
       },
       "Approve"
-    ), /* @__PURE__ */ import_react15.default.createElement(
+    ), /* @__PURE__ */ import_react14.default.createElement(
       "button",
       {
         type: "button",
@@ -38093,17 +38063,17 @@
     onConfirmHostAction,
     xtsOpened
   }) {
-    const [selected, setSelected] = (0, import_react15.useState)([]);
-    const [values, setValues] = (0, import_react15.useState)(() => {
+    const [selected, setSelected] = (0, import_react14.useState)([]);
+    const [values, setValues] = (0, import_react14.useState)(() => {
       const initial = {};
       for (const field2 of interaction.fields ?? []) {
         if (field2.default !== void 0) initial[field2.name] = field2.default;
       }
       return initial;
     });
-    const [submitting, setSubmitting] = (0, import_react15.useState)(false);
-    const [validationError, setValidationError] = (0, import_react15.useState)();
-    const [collectorReview, setCollectorReview] = (0, import_react15.useState)();
+    const [submitting, setSubmitting] = (0, import_react14.useState)(false);
+    const [validationError, setValidationError] = (0, import_react14.useState)();
+    const [collectorReview, setCollectorReview] = (0, import_react14.useState)();
     const choiceMax = interaction.kind === "choice" && interaction.multiple && typeof interaction.max === "number" && Number.isInteger(interaction.max) && interaction.max >= 0 ? interaction.max : void 0;
     const choiceLimitID = `choice-limit-${interaction.turnID}`;
     const submit = (answer) => {
@@ -38112,8 +38082,8 @@
     };
     if (interaction.kind === "host_action") {
       const isXts = interaction.host_action?.capability === "xts.open-view";
-      if (!isXts) return /* @__PURE__ */ import_react15.default.createElement("div", { className: "interaction-wait", role: "status" }, "Opening host view...");
-      return /* @__PURE__ */ import_react15.default.createElement("section", { className: "interaction-pane host-action-pane", "aria-label": isXts ? "Open XTS view" : "Open host view" }, /* @__PURE__ */ import_react15.default.createElement("div", { className: "actual-run-stepper", "aria-label": "Actual run progress" }, /* @__PURE__ */ import_react15.default.createElement("strong", null, "1 Open XTS"), /* @__PURE__ */ import_react15.default.createElement("span", null, "2 Answer questions"), /* @__PURE__ */ import_react15.default.createElement("span", null, "3 Review")), /* @__PURE__ */ import_react15.default.createElement("span", { className: "interaction-kind" }, isXts ? "Actual run \xB7 XTS" : "Host action"), /* @__PURE__ */ import_react15.default.createElement("h2", null, interaction.title ?? interaction.stepID), interaction.prompt ? /* @__PURE__ */ import_react15.default.createElement("p", null, interaction.prompt) : null, isXts ? /* @__PURE__ */ import_react15.default.createElement("p", null, "VS Code will switch to XTS. Review the view, then return here to record your findings.") : null, /* @__PURE__ */ import_react15.default.createElement(
+      if (!isXts) return /* @__PURE__ */ import_react14.default.createElement("div", { className: "interaction-wait", role: "status" }, "Opening host view...");
+      return /* @__PURE__ */ import_react14.default.createElement("section", { className: "interaction-pane host-action-pane", "aria-label": isXts ? "Open XTS view" : "Open host view" }, /* @__PURE__ */ import_react14.default.createElement("div", { className: "actual-run-stepper", "aria-label": "Actual run progress" }, /* @__PURE__ */ import_react14.default.createElement("strong", null, "1 Open XTS"), /* @__PURE__ */ import_react14.default.createElement("span", null, "2 Answer questions"), /* @__PURE__ */ import_react14.default.createElement("span", null, "3 Review")), /* @__PURE__ */ import_react14.default.createElement("span", { className: "interaction-kind" }, isXts ? "Actual run \xB7 XTS" : "Host action"), /* @__PURE__ */ import_react14.default.createElement("h2", null, interaction.title ?? interaction.stepID), interaction.prompt ? /* @__PURE__ */ import_react14.default.createElement("p", null, interaction.prompt) : null, isXts ? /* @__PURE__ */ import_react14.default.createElement("p", null, "VS Code will switch to XTS. Review the view, then return here to record your findings.") : null, /* @__PURE__ */ import_react14.default.createElement(
         "button",
         {
           type: "button",
@@ -38124,27 +38094,27 @@
             onConfirmHostAction(interaction);
           }
         },
-        submitting ? "Opening XTS..." : /* @__PURE__ */ import_react15.default.createElement("span", null, "Open XTS")
+        submitting ? "Opening XTS..." : /* @__PURE__ */ import_react14.default.createElement("span", null, "Open XTS")
       ));
     }
     if (interaction.kind === "approval") {
-      return /* @__PURE__ */ import_react15.default.createElement(ApprovalInteractionPane, { interaction, onSubmit });
+      return /* @__PURE__ */ import_react14.default.createElement(ApprovalInteractionPane, { interaction, onSubmit });
     }
     if (interaction.kind === "debug_break") {
-      return /* @__PURE__ */ import_react15.default.createElement(DebugInteractionPane, { interaction, onSubmit });
+      return /* @__PURE__ */ import_react14.default.createElement(DebugInteractionPane, { interaction, onSubmit });
     }
-    return /* @__PURE__ */ import_react15.default.createElement("section", { className: "interaction-pane", "aria-label": "Runbook interaction" }, /* @__PURE__ */ import_react15.default.createElement("span", { className: "interaction-kind" }, interaction.kind), /* @__PURE__ */ import_react15.default.createElement("h2", null, interaction.title ?? interaction.stepID), interaction.prompt ? /* @__PURE__ */ import_react15.default.createElement("p", null, interaction.prompt) : null, interaction.kind === "choice" ? /* @__PURE__ */ import_react15.default.createElement("form", { onSubmit: (event) => {
+    return /* @__PURE__ */ import_react14.default.createElement("section", { className: "interaction-pane", "aria-label": "Runbook interaction" }, /* @__PURE__ */ import_react14.default.createElement("span", { className: "interaction-kind" }, interaction.kind), /* @__PURE__ */ import_react14.default.createElement("h2", null, interaction.title ?? interaction.stepID), interaction.prompt ? /* @__PURE__ */ import_react14.default.createElement("p", null, interaction.prompt) : null, interaction.kind === "choice" ? /* @__PURE__ */ import_react14.default.createElement("form", { onSubmit: (event) => {
       event.preventDefault();
       if (choiceMax !== void 0 && selected.length > choiceMax) {
         setValidationError(`Select no more than ${choiceMax} options.`);
         return;
       }
       submit({ kind: "choice", selected });
-    } }, /* @__PURE__ */ import_react15.default.createElement("fieldset", { disabled: submitting }, (interaction.options ?? []).map((option) => {
+    } }, /* @__PURE__ */ import_react14.default.createElement("fieldset", { disabled: submitting }, (interaction.options ?? []).map((option) => {
       const checked = selected.includes(option.value);
       const disabledByMax = choiceMax !== void 0 && !checked && selected.length >= choiceMax;
       const disabledTitle = disabledByMax ? `Maximum of ${choiceMax} options selected. Deselect one to choose another.` : void 0;
-      return /* @__PURE__ */ import_react15.default.createElement("label", { className: "interaction-option", key: option.value, "aria-disabled": disabledByMax, title: disabledTitle }, /* @__PURE__ */ import_react15.default.createElement(
+      return /* @__PURE__ */ import_react14.default.createElement("label", { className: "interaction-option", key: option.value, "aria-disabled": disabledByMax, title: disabledTitle }, /* @__PURE__ */ import_react14.default.createElement(
         "input",
         {
           type: interaction.multiple ? "checkbox" : "radio",
@@ -38162,15 +38132,15 @@
             });
           }
         }
-      ), /* @__PURE__ */ import_react15.default.createElement("span", null, /* @__PURE__ */ import_react15.default.createElement("strong", null, optionText(option)), option.hint ? /* @__PURE__ */ import_react15.default.createElement("small", null, option.hint) : null));
-    })), choiceMax !== void 0 ? /* @__PURE__ */ import_react15.default.createElement("p", { id: choiceLimitID, className: "choice-limit", role: "status" }, selected.length >= choiceMax ? `${selected.length} of ${choiceMax} selected. Deselect an option to choose another.` : `${selected.length} of ${choiceMax} selected. Select up to ${choiceMax} options.`) : null, validationError ? /* @__PURE__ */ import_react15.default.createElement("p", { className: "interaction-error", role: "alert" }, validationError) : null, /* @__PURE__ */ import_react15.default.createElement(
+      ), /* @__PURE__ */ import_react14.default.createElement("span", null, /* @__PURE__ */ import_react14.default.createElement("strong", null, optionText(option)), option.hint ? /* @__PURE__ */ import_react14.default.createElement("small", null, option.hint) : null));
+    })), choiceMax !== void 0 ? /* @__PURE__ */ import_react14.default.createElement("p", { id: choiceLimitID, className: "choice-limit", role: "status" }, selected.length >= choiceMax ? `${selected.length} of ${choiceMax} selected. Deselect an option to choose another.` : `${selected.length} of ${choiceMax} selected. Select up to ${choiceMax} options.`) : null, validationError ? /* @__PURE__ */ import_react14.default.createElement("p", { className: "interaction-error", role: "alert" }, validationError) : null, /* @__PURE__ */ import_react14.default.createElement(
       "button",
       {
         type: "submit",
         disabled: submitting || selected.length < (interaction.min ?? 1) || choiceMax !== void 0 && selected.length > choiceMax
       },
       "Continue"
-    )) : null, interaction.kind === "decision" ? /* @__PURE__ */ import_react15.default.createElement("div", { className: "decision-options" }, (interaction.routes ?? []).map((route) => /* @__PURE__ */ import_react15.default.createElement(
+    )) : null, interaction.kind === "decision" ? /* @__PURE__ */ import_react14.default.createElement("div", { className: "decision-options" }, (interaction.routes ?? []).map((route) => /* @__PURE__ */ import_react14.default.createElement(
       "button",
       {
         key: route.label,
@@ -38178,9 +38148,9 @@
         disabled: submitting,
         onClick: () => submit({ kind: "decision", label: route.label })
       },
-      /* @__PURE__ */ import_react15.default.createElement("strong", null, optionText(route)),
-      route.hint ? /* @__PURE__ */ import_react15.default.createElement("small", null, route.hint) : null
-    ))) : null, interaction.kind === "collector" && collectorReview ? /* @__PURE__ */ import_react15.default.createElement("section", { className: "collector-review review-before-submit", "aria-label": "Review collected answers" }, xtsOpened ? /* @__PURE__ */ import_react15.default.createElement("div", { className: "actual-run-stepper", "aria-label": "Actual run progress" }, /* @__PURE__ */ import_react15.default.createElement("span", null, "1 Open XTS"), /* @__PURE__ */ import_react15.default.createElement("span", null, "2 Answer questions"), /* @__PURE__ */ import_react15.default.createElement("strong", null, "3 Review")) : null, /* @__PURE__ */ import_react15.default.createElement("span", { className: "interaction-kind" }, "Collected in this actual run"), /* @__PURE__ */ import_react15.default.createElement("h3", null, "Review answers"), /* @__PURE__ */ import_react15.default.createElement("dl", null, (interaction.fields ?? []).map((field2) => /* @__PURE__ */ import_react15.default.createElement(import_react15.default.Fragment, { key: field2.name }, /* @__PURE__ */ import_react15.default.createElement("dt", null, field2.label ?? field2.display_name ?? field2.name), /* @__PURE__ */ import_react15.default.createElement("dd", null, formatCollectorReviewValue(field2, collectorReview[field2.name]))))), /* @__PURE__ */ import_react15.default.createElement("p", null, "Saving submits these answers and resumes the run. The next route may depend on them."), /* @__PURE__ */ import_react15.default.createElement("div", { className: "debug-actions" }, /* @__PURE__ */ import_react15.default.createElement("button", { type: "button", className: "primary", disabled: submitting, onClick: () => submit({ kind: "collector", values: collectorReview }) }, "Save answers and continue"), /* @__PURE__ */ import_react15.default.createElement("button", { type: "button", disabled: submitting, onClick: () => setCollectorReview(void 0) }, "Edit answers"))) : interaction.kind === "collector" ? /* @__PURE__ */ import_react15.default.createElement("form", { onSubmit: (event) => {
+      /* @__PURE__ */ import_react14.default.createElement("strong", null, optionText(route)),
+      route.hint ? /* @__PURE__ */ import_react14.default.createElement("small", null, route.hint) : null
+    ))) : null, interaction.kind === "collector" && collectorReview ? /* @__PURE__ */ import_react14.default.createElement("section", { className: "collector-review review-before-submit", "aria-label": "Review collected answers" }, xtsOpened ? /* @__PURE__ */ import_react14.default.createElement("div", { className: "actual-run-stepper", "aria-label": "Actual run progress" }, /* @__PURE__ */ import_react14.default.createElement("span", null, "1 Open XTS"), /* @__PURE__ */ import_react14.default.createElement("span", null, "2 Answer questions"), /* @__PURE__ */ import_react14.default.createElement("strong", null, "3 Review")) : null, /* @__PURE__ */ import_react14.default.createElement("span", { className: "interaction-kind" }, "Collected in this actual run"), /* @__PURE__ */ import_react14.default.createElement("h3", null, "Review answers"), /* @__PURE__ */ import_react14.default.createElement("dl", null, (interaction.fields ?? []).map((field2) => /* @__PURE__ */ import_react14.default.createElement(import_react14.default.Fragment, { key: field2.name }, /* @__PURE__ */ import_react14.default.createElement("dt", null, field2.label ?? field2.display_name ?? field2.name), /* @__PURE__ */ import_react14.default.createElement("dd", null, formatCollectorReviewValue(field2, collectorReview[field2.name]))))), /* @__PURE__ */ import_react14.default.createElement("p", null, "Saving submits these answers and resumes the run. The next route may depend on them."), /* @__PURE__ */ import_react14.default.createElement("div", { className: "debug-actions" }, /* @__PURE__ */ import_react14.default.createElement("button", { type: "button", className: "primary", disabled: submitting, onClick: () => submit({ kind: "collector", values: collectorReview }) }, "Save answers and continue"), /* @__PURE__ */ import_react14.default.createElement("button", { type: "button", disabled: submitting, onClick: () => setCollectorReview(void 0) }, "Edit answers"))) : interaction.kind === "collector" ? /* @__PURE__ */ import_react14.default.createElement("form", { onSubmit: (event) => {
       event.preventDefault();
       try {
         setValidationError(void 0);
@@ -38188,7 +38158,7 @@
       } catch (error) {
         setValidationError(error instanceof Error ? error.message : String(error));
       }
-    } }, xtsOpened ? /* @__PURE__ */ import_react15.default.createElement("div", { className: "actual-run-stepper", "aria-label": "Actual run progress" }, /* @__PURE__ */ import_react15.default.createElement("span", null, "1 Open XTS"), /* @__PURE__ */ import_react15.default.createElement("strong", null, "2 Answer questions"), /* @__PURE__ */ import_react15.default.createElement("span", null, "3 Review")) : null, (interaction.fields ?? []).map((field2) => /* @__PURE__ */ import_react15.default.createElement("label", { className: "collector-field", "data-field-name": field2.name, key: field2.name }, /* @__PURE__ */ import_react15.default.createElement("span", null, field2.label ?? field2.display_name ?? field2.name, field2.required ? " *" : ""), field2.type === "boolean" ? /* @__PURE__ */ import_react15.default.createElement(
+    } }, xtsOpened ? /* @__PURE__ */ import_react14.default.createElement("div", { className: "actual-run-stepper", "aria-label": "Actual run progress" }, /* @__PURE__ */ import_react14.default.createElement("span", null, "1 Open XTS"), /* @__PURE__ */ import_react14.default.createElement("strong", null, "2 Answer questions"), /* @__PURE__ */ import_react14.default.createElement("span", null, "3 Review")) : null, (interaction.fields ?? []).map((field2) => /* @__PURE__ */ import_react14.default.createElement("label", { className: "collector-field", "data-field-name": field2.name, key: field2.name }, /* @__PURE__ */ import_react14.default.createElement("span", null, field2.label ?? field2.display_name ?? field2.name, field2.required ? " *" : ""), field2.type === "boolean" ? /* @__PURE__ */ import_react14.default.createElement(
       "input",
       {
         type: "checkbox",
@@ -38196,7 +38166,7 @@
         checked: Boolean(values[field2.name]),
         onChange: (event) => setValues((current) => ({ ...current, [field2.name]: event.target.checked }))
       }
-    ) : field2.options && field2.options.length > 0 ? /* @__PURE__ */ import_react15.default.createElement(
+    ) : field2.options && field2.options.length > 0 ? /* @__PURE__ */ import_react14.default.createElement(
       "select",
       {
         required: field2.required,
@@ -38208,9 +38178,9 @@
           [field2.name]: field2.multiple ? Array.from(event.target.selectedOptions).map((option) => option.value) : event.target.value
         }))
       },
-      !field2.multiple ? /* @__PURE__ */ import_react15.default.createElement("option", { value: "" }, "Select...") : null,
-      field2.options.map((option) => /* @__PURE__ */ import_react15.default.createElement("option", { key: option.value, value: option.value }, optionText(option)))
-    ) : field2.type === "textarea" ? /* @__PURE__ */ import_react15.default.createElement(
+      !field2.multiple ? /* @__PURE__ */ import_react14.default.createElement("option", { value: "" }, "Select...") : null,
+      field2.options.map((option) => /* @__PURE__ */ import_react14.default.createElement("option", { key: option.value, value: option.value }, optionText(option)))
+    ) : field2.type === "textarea" ? /* @__PURE__ */ import_react14.default.createElement(
       "textarea",
       {
         required: field2.required,
@@ -38220,7 +38190,7 @@
         rows: 3,
         onChange: (event) => setValues((current) => ({ ...current, [field2.name]: event.target.value }))
       }
-    ) : /* @__PURE__ */ import_react15.default.createElement(
+    ) : /* @__PURE__ */ import_react14.default.createElement(
       "input",
       {
         type: collectorInputType(field2.type),
@@ -38231,7 +38201,7 @@
         placeholder: field2.hint,
         onChange: (event) => setValues((current) => ({ ...current, [field2.name]: event.target.value }))
       }
-    ))), validationError ? /* @__PURE__ */ import_react15.default.createElement("div", { className: "interaction-error", role: "alert" }, validationError) : null, /* @__PURE__ */ import_react15.default.createElement("button", { type: "submit", disabled: submitting }, "Review answers")) : null);
+    ))), validationError ? /* @__PURE__ */ import_react14.default.createElement("div", { className: "interaction-error", role: "alert" }, validationError) : null, /* @__PURE__ */ import_react14.default.createElement("button", { type: "submit", disabled: submitting }, "Review answers")) : null);
   }
   function nodeDimensions(kind, style2) {
     if (kind === "technical-segment") return { width: 200, height: 58 };
@@ -38751,7 +38721,7 @@
     const supported = debugTargetSupported(document2, node);
     const hasBefore = breakpoints.some((breakpoint) => breakpoint.nodeID === node.id && breakpoint.phase === "before");
     const hasAfter = breakpoints.some((breakpoint) => breakpoint.nodeID === node.id && breakpoint.phase === "after");
-    return /* @__PURE__ */ import_react15.default.createElement("section", { className: "debug-controls", "aria-label": "Debugger settings" }, /* @__PURE__ */ import_react15.default.createElement("h3", null, /* @__PURE__ */ import_react15.default.createElement(Bug, { "aria-hidden": "true" }), "Debugger"), supported ? /* @__PURE__ */ import_react15.default.createElement("div", { className: "breakpoint-options" }, /* @__PURE__ */ import_react15.default.createElement("label", null, /* @__PURE__ */ import_react15.default.createElement("input", { type: "checkbox", checked: hasBefore, disabled, onChange: () => onToggle(node.id, "before") }), /* @__PURE__ */ import_react15.default.createElement("span", null, "Pause before execution")), /* @__PURE__ */ import_react15.default.createElement("label", null, /* @__PURE__ */ import_react15.default.createElement("input", { type: "checkbox", checked: hasAfter, disabled, onChange: () => onToggle(node.id, "after") }), /* @__PURE__ */ import_react15.default.createElement("span", null, "Pause after execution"))) : /* @__PURE__ */ import_react15.default.createElement("p", { className: "debug-protected" }, "Breakpoints are unavailable for this concurrent or structural step."), /* @__PURE__ */ import_react15.default.createElement("label", { className: "debug-field" }, /* @__PURE__ */ import_react15.default.createElement("span", null, "Watch expressions"), /* @__PURE__ */ import_react15.default.createElement(
+    return /* @__PURE__ */ import_react14.default.createElement("section", { className: "debug-controls", "aria-label": "Debugger settings" }, /* @__PURE__ */ import_react14.default.createElement("h3", null, /* @__PURE__ */ import_react14.default.createElement(Bug, { "aria-hidden": "true" }), "Debugger"), supported ? /* @__PURE__ */ import_react14.default.createElement("div", { className: "breakpoint-options" }, /* @__PURE__ */ import_react14.default.createElement("label", null, /* @__PURE__ */ import_react14.default.createElement("input", { type: "checkbox", checked: hasBefore, disabled, onChange: () => onToggle(node.id, "before") }), /* @__PURE__ */ import_react14.default.createElement("span", null, "Pause before execution")), /* @__PURE__ */ import_react14.default.createElement("label", null, /* @__PURE__ */ import_react14.default.createElement("input", { type: "checkbox", checked: hasAfter, disabled, onChange: () => onToggle(node.id, "after") }), /* @__PURE__ */ import_react14.default.createElement("span", null, "Pause after execution"))) : /* @__PURE__ */ import_react14.default.createElement("p", { className: "debug-protected" }, "Breakpoints are unavailable for this concurrent or structural step."), /* @__PURE__ */ import_react14.default.createElement("label", { className: "debug-field" }, /* @__PURE__ */ import_react14.default.createElement("span", null, "Watch expressions"), /* @__PURE__ */ import_react14.default.createElement(
       "textarea",
       {
         value: watches,
@@ -38808,31 +38778,31 @@
     onRunRouteTest,
     xtsOpened
   }) {
-    const runtimeNodes = (0, import_react15.useMemo)(() => displayRuntimeStatuses(observedRuntimeNodes, runStatus, document2), [observedRuntimeNodes, runStatus, document2]);
-    const [selectedId, setSelectedId] = (0, import_react15.useState)();
-    (0, import_react15.useEffect)(() => {
+    const runtimeNodes = (0, import_react14.useMemo)(() => displayRuntimeStatuses(observedRuntimeNodes, runStatus, document2), [observedRuntimeNodes, runStatus, document2]);
+    const [selectedId, setSelectedId] = (0, import_react14.useState)();
+    (0, import_react14.useEffect)(() => {
       if (!testMode) return;
       const report = (event) => vscode.postMessage({ type: "test.error", message: event.message, stack: event.error?.stack });
       window.addEventListener("error", report);
       return () => window.removeEventListener("error", report);
     }, [testMode]);
-    const [viewPreference, setViewPreference] = (0, import_react15.useState)(() => decodeWorkflowPreference(recordValue(vscode.getState?.())?.workflowView));
-    const [expandedTechnicalIDs, setExpandedTechnicalIDs] = (0, import_react15.useState)(/* @__PURE__ */ new Set());
-    const [issueSelection, setIssueSelection] = (0, import_react15.useState)();
-    const [issueNotice, setIssueNotice] = (0, import_react15.useState)(false);
-    const issues = (0, import_react15.useMemo)(() => workflowIssueIndex(runtimeNodes), [runtimeNodes]);
+    const [viewPreference, setViewPreference] = (0, import_react14.useState)(() => decodeWorkflowPreference(recordValue(vscode.getState?.())?.workflowView));
+    const [expandedTechnicalIDs, setExpandedTechnicalIDs] = (0, import_react14.useState)(/* @__PURE__ */ new Set());
+    const [issueSelection, setIssueSelection] = (0, import_react14.useState)();
+    const [issueNotice, setIssueNotice] = (0, import_react14.useState)(false);
+    const issues = (0, import_react14.useMemo)(() => workflowIssueIndex(runtimeNodes), [runtimeNodes]);
     const changePreference = (patch) => {
       const preference = decodeWorkflowPreference({ ...viewPreference, ...patch });
       setViewPreference(preference);
       vscode.setState?.(mergeWorkflowPreference(vscode.getState?.(), preference));
     };
-    (0, import_react15.useEffect)(() => {
+    (0, import_react14.useEffect)(() => {
       const canonicalIDs = new Set(document2.nodes.map((node) => node.id));
       setExpandedTechnicalIDs((current) => new Set([...current].filter((id2) => canonicalIDs.has(id2))));
       setSelectedId((current) => current && canonicalIDs.has(current) ? current : void 0);
     }, [document2.hash, document2.runbook.path, sessionID]);
-    const [showPanel, setShowPanel] = (0, import_react15.useState)(true);
-    (0, import_react15.useEffect)(() => {
+    const [showPanel, setShowPanel] = (0, import_react14.useState)(true);
+    (0, import_react14.useEffect)(() => {
       if (results?.state === "available" && runStatus === "completed") {
         const origin = results.publication.origin.node_id;
         if (document2.nodes.some((node) => node.id === origin && node.data.kind === "results")) {
@@ -38841,63 +38811,62 @@
         }
       }
     }, [results, runStatus]);
-    const [inspectorRatio, setInspectorRatio] = (0, import_react15.useState)(restoredInspectorRatio);
-    const [routeTargetID, setRouteTargetID] = (0, import_react15.useState)();
-    const [routeScope, setRouteScope] = (0, import_react15.useState)("through");
-    const [routeTestEditor, setRouteTestEditor] = (0, import_react15.useState)();
-    const [locateNodeID, setLocateNodeID] = (0, import_react15.useState)();
-    const [activityLocationNotice, setActivityLocationNotice] = (0, import_react15.useState)();
-    const activities = (0, import_react15.useMemo)(
+    const [inspectorRatio, setInspectorRatio] = (0, import_react14.useState)(restoredInspectorRatio);
+    const [routeTargetID, setRouteTargetID] = (0, import_react14.useState)();
+    const [routeScope, setRouteScope] = (0, import_react14.useState)("through");
+    const [routeTestEditor, setRouteTestEditor] = (0, import_react14.useState)();
+    const [locateNodeID, setLocateNodeID] = (0, import_react14.useState)();
+    const activities = (0, import_react14.useMemo)(
       () => currentActivities(document2, observedRuntimeNodes, runStatus, runID, pending2),
       [document2, observedRuntimeNodes, runStatus, runID, pending2]
     );
-    const progressCounts = (0, import_react15.useMemo)(() => canonicalProgress(document2, observedRuntimeNodes, runStatus), [document2, observedRuntimeNodes, runStatus]);
-    const [closeStatus, setCloseStatus] = (0, import_react15.useState)("resolved");
-    const [inspectionRevision, setInspectionRevision] = (0, import_react15.useState)();
-    const flowRef = (0, import_react15.useRef)();
-    const canvasRef = (0, import_react15.useRef)(null);
-    const workspaceRef = (0, import_react15.useRef)(null);
-    const resizePointerIDRef = (0, import_react15.useRef)();
-    const restoreViewportRef = (0, import_react15.useRef)();
-    const declarations = (0, import_react15.useMemo)(() => graphInputDeclarations(document2), [document2]);
-    const structuralDocument = (0, import_react15.useMemo)(() => withBranchMerges(document2), [document2]);
-    const routeSourceDocument = (0, import_react15.useMemo)(
+    const progressCounts = (0, import_react14.useMemo)(() => canonicalProgress(document2, observedRuntimeNodes, runStatus), [document2, observedRuntimeNodes, runStatus]);
+    const [closeStatus, setCloseStatus] = (0, import_react14.useState)("resolved");
+    const [inspectionRevision, setInspectionRevision] = (0, import_react14.useState)();
+    const flowRef = (0, import_react14.useRef)();
+    const canvasRef = (0, import_react14.useRef)(null);
+    const workspaceRef = (0, import_react14.useRef)(null);
+    const resizePointerIDRef = (0, import_react14.useRef)();
+    const restoreViewportRef = (0, import_react14.useRef)();
+    const declarations = (0, import_react14.useMemo)(() => graphInputDeclarations(document2), [document2]);
+    const structuralDocument = (0, import_react14.useMemo)(() => withBranchMerges(document2), [document2]);
+    const routeSourceDocument = (0, import_react14.useMemo)(
       () => sessionID ? sessionRouteDocument(structuralDocument, runtimeNodes, routeTargetID) : structuralDocument,
       [routeTargetID, runtimeNodes, sessionID, structuralDocument]
     );
-    const routeIndex2 = (0, import_react15.useMemo)(() => buildRouteProjectionIndex(routeSourceDocument), [routeSourceDocument]);
-    const routeProjection = (0, import_react15.useMemo)(
+    const routeIndex2 = (0, import_react14.useMemo)(() => buildRouteProjectionIndex(routeSourceDocument), [routeSourceDocument]);
+    const routeProjection = (0, import_react14.useMemo)(
       () => routeTargetID ? sessionID ? computeSessionRouteProjection(routeSourceDocument, routeTargetID, routeScope, routeIndex2) : computeRouteProjection(routeSourceDocument, routeTargetID, routeScope, routeIndex2) : void 0,
       [routeIndex2, routeScope, routeSourceDocument, routeTargetID, sessionID]
     );
-    const prerequisiteProjection = (0, import_react15.useMemo)(
+    const prerequisiteProjection = (0, import_react14.useMemo)(
       () => routeTargetID ? sessionID ? computeSessionRouteProjection(routeSourceDocument, routeTargetID, "to", routeIndex2) : computeRouteProjection(routeSourceDocument, routeTargetID, "to", routeIndex2) : void 0,
       [routeIndex2, routeSourceDocument, routeTargetID, sessionID]
     );
-    const routeDisplayDocument = (0, import_react15.useMemo)(
+    const routeDisplayDocument = (0, import_react14.useMemo)(
       () => routeProjection ? projectRouteDocument(routeSourceDocument, routeProjection) : structuralDocument,
       [routeProjection, routeSourceDocument, structuralDocument]
     );
-    const pinnedNodeIDs = (0, import_react15.useMemo)(() => /* @__PURE__ */ new Set([
+    const pinnedNodeIDs = (0, import_react14.useMemo)(() => /* @__PURE__ */ new Set([
       ...selectedId ? [selectedId] : [],
       ...locateNodeID ? [locateNodeID] : [],
       ...activities.filter((value) => value.inGraph).map((value) => value.nodeID),
       ...pending2?.nodeID ? [pending2.nodeID] : [],
       ...breakpoints.map((value) => value.nodeID)
     ]), [selectedId, locateNodeID, pending2?.nodeID, breakpoints, activities]);
-    const issueContextDocument = (0, import_react15.useMemo)(() => {
+    const issueContextDocument = (0, import_react14.useMemo)(() => {
       const structuralIDs = new Set(structuralDocument.nodes.map((node) => node.id));
       const canonicalIDs = new Set(document2.nodes.map((node) => node.id));
       return issues.some((issue) => !structuralIDs.has(issue.nodeID) && canonicalIDs.has(issue.nodeID)) ? document2 : structuralDocument;
     }, [document2, structuralDocument, issues]);
-    const workflow = (0, import_react15.useMemo)(() => projectWorkflow(issueContextDocument, runtimeNodes, {
+    const workflow = (0, import_react14.useMemo)(() => projectWorkflow(issueContextDocument, runtimeNodes, {
       mode: viewPreference.workflowMode,
       expandedNodeIDs: expandedTechnicalIDs,
       pinnedNodeIDs,
       collapsedGroupIDs: /* @__PURE__ */ new Set()
     }, routeDisplayDocument), [issueContextDocument, runtimeNodes, viewPreference.workflowMode, expandedTechnicalIDs, pinnedNodeIDs, routeDisplayDocument]);
     const displayDocument = workflow.document;
-    (0, import_react15.useEffect)(() => {
+    (0, import_react14.useEffect)(() => {
       if (!routeTargetID) return;
       const visible = new Set(routeDisplayDocument.nodes.map((node) => node.id));
       if ([...workflow.forcedNodeIDs].some((id2) => !visible.has(id2))) {
@@ -38906,13 +38875,13 @@
         setIssueNotice(true);
       }
     }, [issues, routeTargetID, routeDisplayDocument, workflow]);
-    const layoutTopologyKey = (0, import_react15.useMemo)(() => sessionGraphTopologyKey(displayDocument), [displayDocument]);
-    const layoutGeometry = (0, import_react15.useMemo)(() => layoutDocument(displayDocument, style2), [layoutTopologyKey, style2]);
-    const layout = (0, import_react15.useMemo)(
+    const layoutTopologyKey = (0, import_react14.useMemo)(() => sessionGraphTopologyKey(displayDocument), [displayDocument]);
+    const layoutGeometry = (0, import_react14.useMemo)(() => layoutDocument(displayDocument, style2), [layoutTopologyKey, style2]);
+    const layout = (0, import_react14.useMemo)(
       () => refreshLayoutMetadata(layoutGeometry, displayDocument, style2),
       [displayDocument, layoutGeometry, style2]
     );
-    const runtimeEdges = (0, import_react15.useMemo)(() => layout.edges.map((edge) => ({
+    const runtimeEdges = (0, import_react14.useMemo)(() => layout.edges.map((edge) => ({
       ...edge,
       className: edge.data?.graphEdge ? [
         edge.data.graphEdge.type === "session-transition" ? "edge-session-transition" : "",
@@ -38920,7 +38889,7 @@
       ].filter(Boolean).join(" ") || void 0 : void 0
     })), [layout.edges, runtimeNodes]);
     const focusedNodeID = routeTargetID ?? selectedId;
-    const displayNodes = (0, import_react15.useMemo)(() => layout.nodes.map((node) => ({
+    const displayNodes = (0, import_react14.useMemo)(() => layout.nodes.map((node) => ({
       ...node,
       ...workflow.segments.has(node.id) ? { data: {
         ...node.data,
@@ -38936,20 +38905,20 @@
       } } : {},
       selected: node.id === focusedNodeID
     })), [focusedNodeID, layout.nodes, workflow, runtimeNodes]);
-    const [renderNodes, setRenderNodes] = (0, import_react15.useState)(displayNodes);
-    (0, import_react15.useEffect)(() => {
+    const [renderNodes, setRenderNodes] = (0, import_react14.useState)(displayNodes);
+    (0, import_react14.useEffect)(() => {
       setRenderNodes((current) => preserveLayoutMeasurements(displayNodes, current));
     }, [displayNodes]);
-    const activeNodeIDs = (0, import_react15.useMemo)(() => activeGraphNodeIDs(structuralDocument, runtimeNodes), [structuralDocument, runtimeNodes]);
+    const activeNodeIDs = (0, import_react14.useMemo)(() => activeGraphNodeIDs(structuralDocument, runtimeNodes), [structuralDocument, runtimeNodes]);
     const currentNodeID = isExecutionEnded(runStatus) ? executionNodeID : activities[0]?.nodeID;
     const executionNode = currentNodeID ? document2.nodes.find((node) => node.id === currentNodeID) : void 0;
     const resolvedExecutionNodeID = executionNode?.id;
     const executionTerminal = isExecutionEnded(runStatus);
-    const executionPosition = (0, import_react15.useMemo)(
+    const executionPosition = (0, import_react14.useMemo)(
       () => ({ nodeID: resolvedExecutionNodeID, terminal: executionTerminal }),
       [executionTerminal, resolvedExecutionNodeID]
     );
-    const breakpointKeys = (0, import_react15.useMemo)(
+    const breakpointKeys = (0, import_react14.useMemo)(
       () => new Set(breakpoints.map((breakpoint) => breakpointKey(breakpoint.nodeID, breakpoint.phase))),
       [breakpoints]
     );
@@ -38964,11 +38933,11 @@
     const inspectedNode = selectedGraphRevision === latestGraphRevision ? selected : revisionNodes[revisionRequestID];
     const routeTarget = document2.nodes.find((node) => node.id === routeTargetID);
     const routeTargetName = String(routeTarget?.data.title || routeTarget?.data.id || routeTarget?.id || "selected step");
-    const routeTestCandidates = (0, import_react15.useMemo)(() => {
+    const routeTestCandidates = (0, import_react14.useMemo)(() => {
       const kinds = /* @__PURE__ */ new Set(["cli", "tool", "host_action", "collector", "choice", "decision", "approve"]);
       return document2.nodes.filter((node) => node.id !== routeTargetID && prerequisiteProjection?.nodeIDs.has(node.id) && kinds.has(String(node.data.kind ?? "")));
     }, [document2, prerequisiteProjection, routeTargetID]);
-    const routeTestBlockers = (0, import_react15.useMemo)(() => document2.nodes.flatMap((node) => {
+    const routeTestBlockers = (0, import_react14.useMemo)(() => document2.nodes.flatMap((node) => {
       if (node.id === routeTargetID || !prerequisiteProjection?.nodeIDs.has(node.id)) return [];
       const kind = String(node.data.kind ?? "");
       const dynamicInclude = kind === "include" && node.data.dynamic === true;
@@ -39017,43 +38986,6 @@
       setRouteTargetID(void 0);
       setRouteTestEditor(void 0);
     };
-    const locateExecutionNode = (activity) => {
-      setActivityLocationNotice(void 0);
-      if (!activity.inGraph) {
-        if (sessionID && activity.segmentID && activity.graphRevision !== void 0) {
-          if (unloadedSegmentIDs.includes(activity.segmentID)) {
-            vscode.postMessage({ type: "session.load-segment", segmentID: activity.segmentID, revision: activity.graphRevision });
-          }
-          onRequestGraphRevision(
-            revisionNodeKey(activity.segmentID, activity.graphRevision, activity.path),
-            activity.segmentID,
-            activity.graphRevision,
-            activity.path
-          );
-          setInspectionRevision({ nodeID: activity.nodeID, revision: activity.graphRevision });
-          setIssueSelection({
-            nodeID: activity.nodeID,
-            qualifiedNodeID: activity.path,
-            segmentID: activity.segmentID,
-            graphRevision: activity.graphRevision,
-            occurrenceID: activity.occurrenceID,
-            status: activity.status,
-            blockedOutcome: false
-          });
-          setSelectedId(activity.nodeID);
-          setShowPanel(true);
-          setActivityLocationNotice(`Requested existing segment revision ${activity.graphRevision}: ${activity.path}. The viewport is unchanged until this exact node is available.`);
-        } else {
-          setActivityLocationNotice(`No graph location is available for ${activity.path}. This is the exact runtime child path; no substitute node was selected.`);
-        }
-        return;
-      }
-      setRouteTargetID(void 0);
-      setRouteTestEditor(void 0);
-      setSelectedId(activity.nodeID);
-      setShowPanel(true);
-      setLocateNodeID(activity.nodeID);
-    };
     const resizeInspectorFromClientX = (clientX) => {
       const bounds = workspaceRef.current?.getBoundingClientRect();
       if (!bounds || bounds.width <= 0) return;
@@ -39070,19 +39002,19 @@
       event.preventDefault();
       setInspectorRatio(clampInspectorRatio(next));
     };
-    (0, import_react15.useEffect)(() => persistInspectorRatio(inspectorRatio), [inspectorRatio]);
-    (0, import_react15.useEffect)(() => {
+    (0, import_react14.useEffect)(() => persistInspectorRatio(inspectorRatio), [inspectorRatio]);
+    (0, import_react14.useEffect)(() => {
       if (!sessionID || !selectedSegmentID || selected?.data.graph_loaded !== false || !unloadedSegmentIDs.includes(selectedSegmentID)) return;
       const revision = segmentGraphRevisions[selectedSegmentID]?.at(-1);
       if (revision) vscode.postMessage({ type: "session.load-segment", segmentID: selectedSegmentID, revision });
     }, [selected?.id, selected?.data.graph_loaded, selectedSegmentID, sessionID, segmentGraphRevisions, unloadedSegmentIDs]);
-    (0, import_react15.useEffect)(() => {
+    (0, import_react14.useEffect)(() => {
       if (issueSelection?.nodeID !== selected?.id) setInspectionRevision(void 0);
     }, [selected?.id]);
-    (0, import_react15.useEffect)(() => {
+    (0, import_react14.useEffect)(() => {
       if (pending2?.nodeID || pending2?.stepID) setSelectedId(pending2.nodeID ?? pending2.stepID);
     }, [pending2?.turnID, pending2?.nodeID, pending2?.stepID]);
-    (0, import_react15.useEffect)(() => {
+    (0, import_react14.useEffect)(() => {
       if (!testMode) return;
       const receiveTestAction = (event) => {
         const message = event.data;
@@ -39124,7 +39056,7 @@
       window.addEventListener("message", receiveTestAction);
       return () => window.removeEventListener("message", receiveTestAction);
     }, [document2.nodes, testMode, displayNodes, displayDocument, workflow, runtimeNodes, viewPreference, selectedId, issues]);
-    (0, import_react15.useEffect)(() => {
+    (0, import_react14.useEffect)(() => {
       if (!testMode || !selected) return;
       const frame2 = requestAnimationFrame(() => {
         vscode.postMessage({
@@ -39136,7 +39068,7 @@
       });
       return () => cancelAnimationFrame(frame2);
     }, [selected?.id, testMode]);
-    (0, import_react15.useEffect)(() => {
+    (0, import_react14.useEffect)(() => {
       if (!testMode) return;
       const receive = (event) => {
         const message = event.data;
@@ -39186,7 +39118,6 @@
           routeTargetID,
           runtimeStatuses: Object.fromEntries(Object.entries(runtimeNodes).map(([id2, value]) => [id2, value.status])),
           activity: {
-            text: window.document.querySelector(".current-activity")?.textContent,
             items: activities.map(({ nodeID, path, title, label, container, inGraph, occurrenceID }) => ({ nodeID, path, title, label, container, inGraph, occurrenceID })),
             counts: progressCounts,
             summary: window.document.querySelector(".workflow-summary")?.textContent,
@@ -39217,7 +39148,7 @@
       activities,
       progressCounts
     ]);
-    (0, import_react15.useEffect)(() => {
+    (0, import_react14.useEffect)(() => {
       if (!flowRef.current) return;
       const frame2 = requestAnimationFrame(() => {
         if (routeTargetID) {
@@ -39232,7 +39163,7 @@
       });
       return () => cancelAnimationFrame(frame2);
     }, [layout.edges.length, layout.nodes.length, routeScope, routeTargetID]);
-    (0, import_react15.useEffect)(() => {
+    (0, import_react14.useEffect)(() => {
       if (!locateNodeID || routeTargetID) return;
       let frame2 = 0;
       let attempts = 0;
@@ -39252,7 +39183,7 @@
       locate();
       return () => cancelAnimationFrame(frame2);
     }, [locateNodeID, routeTargetID]);
-    (0, import_react15.useEffect)(() => {
+    (0, import_react14.useEffect)(() => {
       if (!routeTargetID) return;
       let frame2 = 0;
       const refit = () => {
@@ -39270,7 +39201,7 @@
         cancelAnimationFrame(frame2);
       };
     }, [routeTargetID]);
-    (0, import_react15.useEffect)(() => {
+    (0, import_react14.useEffect)(() => {
       if (!testMode) return;
       let secondFrame = 0;
       const firstFrame = requestAnimationFrame(() => {
@@ -39293,7 +39224,7 @@
         if (secondFrame) cancelAnimationFrame(secondFrame);
       };
     }, [document2, layout.nodes.length, layout.edges.length, style2, testMode]);
-    return /* @__PURE__ */ import_react15.default.createElement(import_react15.default.Fragment, null, /* @__PURE__ */ import_react15.default.createElement("main", { className: `app style-${style2}${showPanel ? "" : " panel-hidden"} has-panel-content` }, /* @__PURE__ */ import_react15.default.createElement("header", { className: "toolbar" }, /* @__PURE__ */ import_react15.default.createElement("div", { className: "identity" }, /* @__PURE__ */ import_react15.default.createElement("strong", null, document2.runbook.name ?? document2.runbook.id ?? "Runbook"), /* @__PURE__ */ import_react15.default.createElement("span", null, sessionID ? `${sessionSegmentCount} segments | ${document2.nodes.length} steps` : `${document2.nodes.length} steps`)), /* @__PURE__ */ import_react15.default.createElement("div", { className: "run-actions" }, /* @__PURE__ */ import_react15.default.createElement("div", { className: "workflow-mode", role: "group", "aria-label": "Graph detail" }, ["workflow", "all"].map((mode) => /* @__PURE__ */ import_react15.default.createElement(
+    return /* @__PURE__ */ import_react14.default.createElement(import_react14.default.Fragment, null, /* @__PURE__ */ import_react14.default.createElement("main", { className: `app style-${style2}${showPanel ? "" : " panel-hidden"} has-panel-content` }, /* @__PURE__ */ import_react14.default.createElement("header", { className: "toolbar" }, /* @__PURE__ */ import_react14.default.createElement("div", { className: "identity" }, /* @__PURE__ */ import_react14.default.createElement("strong", null, document2.runbook.name ?? document2.runbook.id ?? "Runbook"), /* @__PURE__ */ import_react14.default.createElement("span", null, sessionID ? `${sessionSegmentCount} segments | ${document2.nodes.length} steps` : `${document2.nodes.length} steps`)), /* @__PURE__ */ import_react14.default.createElement("div", { className: "run-actions" }, /* @__PURE__ */ import_react14.default.createElement("div", { className: "workflow-mode", role: "group", "aria-label": "Graph detail" }, ["workflow", "all"].map((mode) => /* @__PURE__ */ import_react14.default.createElement(
       "button",
       {
         type: "button",
@@ -39302,7 +39233,7 @@
         onClick: () => changePreference({ workflowMode: mode })
       },
       mode === "workflow" ? "Workflow" : "All steps"
-    ))), /* @__PURE__ */ import_react15.default.createElement("span", { className: `run-status status-${runStatus}`, role: "status", "aria-live": "polite" }, runStarting ? "starting" : runStatus), !runActive && !sessionID ? /* @__PURE__ */ import_react15.default.createElement(
+    ))), /* @__PURE__ */ import_react14.default.createElement("span", { className: `run-status status-${runStatus}`, role: "status", "aria-live": "polite" }, runStarting ? "starting" : runStatus), !runActive && !sessionID ? /* @__PURE__ */ import_react14.default.createElement(
       "button",
       {
         className: "primary",
@@ -39311,9 +39242,9 @@
         title: reloading ? "Wait for the runbook graph to finish reloading" : void 0,
         onClick: onRun
       },
-      /* @__PURE__ */ import_react15.default.createElement(Play, { "aria-hidden": "true" }),
+      /* @__PURE__ */ import_react14.default.createElement(Play, { "aria-hidden": "true" }),
       "Run"
-    ) : null, !runActive && !sessionID ? /* @__PURE__ */ import_react15.default.createElement(
+    ) : null, !runActive && !sessionID ? /* @__PURE__ */ import_react14.default.createElement(
       "button",
       {
         className: "session-run",
@@ -39322,9 +39253,9 @@
         title: "Start a durable investigation session",
         onClick: onStartSession
       },
-      /* @__PURE__ */ import_react15.default.createElement(Workflow, { "aria-hidden": "true" }),
-      /* @__PURE__ */ import_react15.default.createElement("span", null, "Start session")
-    ) : null, !runActive && !sessionID ? /* @__PURE__ */ import_react15.default.createElement(
+      /* @__PURE__ */ import_react14.default.createElement(Workflow, { "aria-hidden": "true" }),
+      /* @__PURE__ */ import_react14.default.createElement("span", null, "Start session")
+    ) : null, !runActive && !sessionID ? /* @__PURE__ */ import_react14.default.createElement(
       "button",
       {
         className: "debug-run",
@@ -39333,33 +39264,33 @@
         title: reloading ? "Wait for the runbook graph to finish reloading" : routeTestReviewOpen ? "Close the route-test review before starting a debug run" : breakpoints.length === 0 ? "Add a breakpoint to start a debug run" : "Start with debugger enabled",
         onClick: onDebugRun
       },
-      /* @__PURE__ */ import_react15.default.createElement(Bug, { "aria-hidden": "true" }),
-      /* @__PURE__ */ import_react15.default.createElement("span", null, "Debug Run")
-    ) : null, !runActive && (sessionID ? sessionClosed || !sessionAttached && !runStarting : isTerminalRunStatus(runStatus)) ? /* @__PURE__ */ import_react15.default.createElement("button", { className: "reset-run", type: "button", onClick: () => {
+      /* @__PURE__ */ import_react14.default.createElement(Bug, { "aria-hidden": "true" }),
+      /* @__PURE__ */ import_react14.default.createElement("span", null, "Debug Run")
+    ) : null, !runActive && (sessionID ? sessionClosed || !sessionAttached && !runStarting : isTerminalRunStatus(runStatus)) ? /* @__PURE__ */ import_react14.default.createElement("button", { className: "reset-run", type: "button", onClick: () => {
       setRouteTestEditor(void 0);
       onReset();
-    } }, /* @__PURE__ */ import_react15.default.createElement(RotateCcw, { "aria-hidden": "true" }), "Reset") : null, sessionID && sessionPaused && sessionAttached ? /* @__PURE__ */ import_react15.default.createElement("button", { className: "primary", type: "button", onClick: onResumeSession }, /* @__PURE__ */ import_react15.default.createElement(Play, { "aria-hidden": "true" }), "Resume") : null, canCloseSession ? /* @__PURE__ */ import_react15.default.createElement("div", { className: "session-close-actions" }, /* @__PURE__ */ import_react15.default.createElement(
+    } }, /* @__PURE__ */ import_react14.default.createElement(RotateCcw, { "aria-hidden": "true" }), "Reset") : null, sessionID && sessionPaused && sessionAttached ? /* @__PURE__ */ import_react14.default.createElement("button", { className: "primary", type: "button", onClick: onResumeSession }, /* @__PURE__ */ import_react14.default.createElement(Play, { "aria-hidden": "true" }), "Resume") : null, canCloseSession ? /* @__PURE__ */ import_react14.default.createElement("div", { className: "session-close-actions" }, /* @__PURE__ */ import_react14.default.createElement(
       "select",
       {
         "aria-label": "Investigation outcome",
         value: closeStatus,
         onChange: (event) => setCloseStatus(event.target.value)
       },
-      /* @__PURE__ */ import_react15.default.createElement("option", { value: "resolved" }, "Resolved"),
-      /* @__PURE__ */ import_react15.default.createElement("option", { value: "escalated" }, "Escalated"),
-      /* @__PURE__ */ import_react15.default.createElement("option", { value: "cancelled" }, "Cancelled"),
-      /* @__PURE__ */ import_react15.default.createElement("option", { value: "abandoned" }, "Abandoned")
-    ), /* @__PURE__ */ import_react15.default.createElement("button", { className: "primary", type: "button", onClick: () => onCloseSession(closeStatus) }, /* @__PURE__ */ import_react15.default.createElement(CircleCheck, { "aria-hidden": "true" }), "Close")) : null, runActive && runID ? /* @__PURE__ */ import_react15.default.createElement("button", { className: "danger", type: "button", onClick: onCancel }, /* @__PURE__ */ import_react15.default.createElement(Square, { "aria-hidden": "true" }), "Cancel") : null, /* @__PURE__ */ import_react15.default.createElement(
+      /* @__PURE__ */ import_react14.default.createElement("option", { value: "resolved" }, "Resolved"),
+      /* @__PURE__ */ import_react14.default.createElement("option", { value: "escalated" }, "Escalated"),
+      /* @__PURE__ */ import_react14.default.createElement("option", { value: "cancelled" }, "Cancelled"),
+      /* @__PURE__ */ import_react14.default.createElement("option", { value: "abandoned" }, "Abandoned")
+    ), /* @__PURE__ */ import_react14.default.createElement("button", { className: "primary", type: "button", onClick: () => onCloseSession(closeStatus) }, /* @__PURE__ */ import_react14.default.createElement(CircleCheck, { "aria-hidden": "true" }), "Close")) : null, runActive && runID ? /* @__PURE__ */ import_react14.default.createElement("button", { className: "danger", type: "button", onClick: onCancel }, /* @__PURE__ */ import_react14.default.createElement(Square, { "aria-hidden": "true" }), "Cancel") : null, /* @__PURE__ */ import_react14.default.createElement(
       "select",
       {
         "aria-label": "Graph style",
         value: style2,
         onChange: (event) => onStyleChange(event.target.value)
       },
-      /* @__PURE__ */ import_react15.default.createElement("option", { value: "smooth-curves" }, "Smooth"),
-      /* @__PURE__ */ import_react15.default.createElement("option", { value: "minimalist" }, "Minimal"),
-      /* @__PURE__ */ import_react15.default.createElement("option", { value: "header-badges" }, "Headers")
-    ), /* @__PURE__ */ import_react15.default.createElement("button", { type: "button", className: showPanel ? "toggle active" : "toggle", onClick: () => setShowPanel((value) => !value) }, /* @__PURE__ */ import_react15.default.createElement(PanelRight, { "aria-hidden": "true" }), "Panel"))), /* @__PURE__ */ import_react15.default.createElement(
+      /* @__PURE__ */ import_react14.default.createElement("option", { value: "smooth-curves" }, "Smooth"),
+      /* @__PURE__ */ import_react14.default.createElement("option", { value: "minimalist" }, "Minimal"),
+      /* @__PURE__ */ import_react14.default.createElement("option", { value: "header-badges" }, "Headers")
+    ), /* @__PURE__ */ import_react14.default.createElement("button", { type: "button", className: showPanel ? "toggle active" : "toggle", onClick: () => setShowPanel((value) => !value) }, /* @__PURE__ */ import_react14.default.createElement(PanelRight, { "aria-hidden": "true" }), "Panel"))), /* @__PURE__ */ import_react14.default.createElement(
       InputsForm,
       {
         declarations,
@@ -39367,7 +39298,7 @@
         disabled: runActive,
         onChange: onInputChange
       }
-    ), runError ? /* @__PURE__ */ import_react15.default.createElement("div", { className: "run-error", role: "alert" }, runError) : null, issueNotice || issues.length ? /* @__PURE__ */ import_react15.default.createElement("section", { className: "workflow-issues", "aria-label": "Execution issues" }, /* @__PURE__ */ import_react15.default.createElement("strong", null, issues.length ? "Showing issue context" : "Showing selected step context"), /* @__PURE__ */ import_react15.default.createElement("span", null, "Structural context, not a claim those alternatives executed."), issues.map((issue, index) => /* @__PURE__ */ import_react15.default.createElement(
+    ), runError ? /* @__PURE__ */ import_react14.default.createElement("div", { className: "run-error", role: "alert" }, runError) : null, issueNotice || issues.length ? /* @__PURE__ */ import_react14.default.createElement("section", { className: "workflow-issues", "aria-label": "Execution issues" }, /* @__PURE__ */ import_react14.default.createElement("strong", null, issues.length ? "Showing issue context" : "Showing selected step context"), /* @__PURE__ */ import_react14.default.createElement("span", null, "Structural context, not a claim those alternatives executed."), issues.map((issue, index) => /* @__PURE__ */ import_react14.default.createElement(
       "button",
       {
         type: "button",
@@ -39380,23 +39311,14 @@
       ": ",
       issue.qualifiedNodeID || issue.nodeID,
       issue.occurrenceID ? ` \xB7 occurrence ${index + 1}` : ""
-    )), issueSelection && !selected ? /* @__PURE__ */ import_react15.default.createElement("span", { role: "status" }, "Historical graph unavailable \u2014 occurrence remains in the issue index.") : null) : null, /* @__PURE__ */ import_react15.default.createElement("div", { className: "workflow-summary", role: "status" }, progressCounts.total, " canonical steps \xB7 ", progressCounts.completed, " done \xB7 ", progressCounts.issues, " issues \xB7 ", progressCounts.skipped, " skipped \xB7 ", progressCounts.running, " running \xB7 ", progressCounts.remaining, " ", executionTerminal ? "without final status" : "remaining", " \xB7 ", workflow.segments.size, " visual technical groups \xB7 hidden is not skipped"), /* @__PURE__ */ import_react15.default.createElement(
-      CurrentActivity,
-      {
-        activities,
-        runStatus,
-        remaining: progressCounts.remaining,
-        onLocate: locateExecutionNode,
-        locationNotice: activityLocationNotice
-      }
-    ), routeTargetID && routeProjection ? /* @__PURE__ */ import_react15.default.createElement("section", { className: "route-view-strip", "aria-label": `Routes through ${routeTargetName}` }, /* @__PURE__ */ import_react15.default.createElement("div", { className: "route-view-copy" }, /* @__PURE__ */ import_react15.default.createElement("strong", null, "Showing routes through: ", routeTargetName), /* @__PURE__ */ import_react15.default.createElement("span", null, routeProjection.predecessorCount, " steps lead to it, ", routeProjection.successorCount, " follow it, ", routeProjection.boundaryEdges.length, " hidden dependencies")), /* @__PURE__ */ import_react15.default.createElement("div", { className: "route-view-actions" }, /* @__PURE__ */ import_react15.default.createElement("div", { className: "route-scope", role: "radiogroup", "aria-label": "Visible routes" }, /* @__PURE__ */ import_react15.default.createElement("button", { type: "button", role: "radio", "aria-checked": routeScope === "through", onClick: () => setRouteScope("through") }, "Through this step"), /* @__PURE__ */ import_react15.default.createElement("button", { type: "button", role: "radio", "aria-checked": routeScope === "to", onClick: () => setRouteScope("to") }, "To this step"), /* @__PURE__ */ import_react15.default.createElement("button", { type: "button", role: "radio", "aria-checked": routeScope === "from", onClick: () => setRouteScope("from") }, "From this step")), /* @__PURE__ */ import_react15.default.createElement("button", { type: "button", disabled: routeActionsDisabled, onClick: showFullGraph }, "Show full graph"))) : null, currentRouteTestEditor ? /* @__PURE__ */ import_react15.default.createElement("div", { className: "route-test-global-safety", role: "status" }, routeTestOutcome?.passed ? "Route test completed - external actions were blocked" : routeTestRunning ? "Testing route - XTS and external actions are blocked" : "Reviewing route test - protected execution starts only when you run this route test") : null, /* @__PURE__ */ import_react15.default.createElement(
+    )), issueSelection && !selected ? /* @__PURE__ */ import_react14.default.createElement("span", { role: "status" }, "Historical graph unavailable \u2014 occurrence remains in the issue index.") : null) : null, /* @__PURE__ */ import_react14.default.createElement("div", { className: "workflow-summary", role: "status" }, progressCounts.total, " canonical steps \xB7 ", progressCounts.completed, " done \xB7 ", progressCounts.issues, " issues \xB7 ", progressCounts.skipped, " skipped \xB7 ", progressCounts.running, " running \xB7 ", progressCounts.remaining, " ", executionTerminal ? "without final status" : "remaining", " \xB7 ", workflow.segments.size, " visual technical groups \xB7 hidden is not skipped"), routeTargetID && routeProjection ? /* @__PURE__ */ import_react14.default.createElement("section", { className: "route-view-strip", "aria-label": `Routes through ${routeTargetName}` }, /* @__PURE__ */ import_react14.default.createElement("div", { className: "route-view-copy" }, /* @__PURE__ */ import_react14.default.createElement("strong", null, "Showing routes through: ", routeTargetName), /* @__PURE__ */ import_react14.default.createElement("span", null, routeProjection.predecessorCount, " steps lead to it, ", routeProjection.successorCount, " follow it, ", routeProjection.boundaryEdges.length, " hidden dependencies")), /* @__PURE__ */ import_react14.default.createElement("div", { className: "route-view-actions" }, /* @__PURE__ */ import_react14.default.createElement("div", { className: "route-scope", role: "radiogroup", "aria-label": "Visible routes" }, /* @__PURE__ */ import_react14.default.createElement("button", { type: "button", role: "radio", "aria-checked": routeScope === "through", onClick: () => setRouteScope("through") }, "Through this step"), /* @__PURE__ */ import_react14.default.createElement("button", { type: "button", role: "radio", "aria-checked": routeScope === "to", onClick: () => setRouteScope("to") }, "To this step"), /* @__PURE__ */ import_react14.default.createElement("button", { type: "button", role: "radio", "aria-checked": routeScope === "from", onClick: () => setRouteScope("from") }, "From this step")), /* @__PURE__ */ import_react14.default.createElement("button", { type: "button", disabled: routeActionsDisabled, onClick: showFullGraph }, "Show full graph"))) : null, currentRouteTestEditor ? /* @__PURE__ */ import_react14.default.createElement("div", { className: "route-test-global-safety", role: "status" }, routeTestOutcome?.passed ? "Route test completed - external actions were blocked" : routeTestRunning ? "Testing route - XTS and external actions are blocked" : "Reviewing route test - protected execution starts only when you run this route test") : null, /* @__PURE__ */ import_react14.default.createElement(
       "div",
       {
         ref: workspaceRef,
         className: "workspace",
         style: { "--inspector-width": `${inspectorRatio * 100}%` }
       },
-      /* @__PURE__ */ import_react15.default.createElement("section", { ref: canvasRef, className: "canvas", "aria-label": "Runbook structure" }, /* @__PURE__ */ import_react15.default.createElement(RuntimeNodesContext.Provider, { value: runtimeNodes }, /* @__PURE__ */ import_react15.default.createElement(ExecutionPositionContext.Provider, { value: executionPosition }, /* @__PURE__ */ import_react15.default.createElement(DebugBreakpointsContext.Provider, { value: breakpointKeys }, /* @__PURE__ */ import_react15.default.createElement(ReactFlowProvider, null, /* @__PURE__ */ import_react15.default.createElement(
+      /* @__PURE__ */ import_react14.default.createElement("section", { ref: canvasRef, className: "canvas", "aria-label": "Runbook structure" }, /* @__PURE__ */ import_react14.default.createElement(RuntimeNodesContext.Provider, { value: runtimeNodes }, /* @__PURE__ */ import_react14.default.createElement(ExecutionPositionContext.Provider, { value: executionPosition }, /* @__PURE__ */ import_react14.default.createElement(DebugBreakpointsContext.Provider, { value: breakpointKeys }, /* @__PURE__ */ import_react14.default.createElement(ReactFlowProvider, null, /* @__PURE__ */ import_react14.default.createElement(
         ReactFlow,
         {
           nodes: renderNodes,
@@ -39424,9 +39346,9 @@
             setSelectedId(void 0);
           }
         },
-        /* @__PURE__ */ import_react15.default.createElement(Background$1, { variant: BackgroundVariant.Dots, gap: 20, size: 1 }),
-        /* @__PURE__ */ import_react15.default.createElement(Controls$1, { showInteractive: false }),
-        /* @__PURE__ */ import_react15.default.createElement(
+        /* @__PURE__ */ import_react14.default.createElement(Background$1, { variant: BackgroundVariant.Dots, gap: 20, size: 1 }),
+        /* @__PURE__ */ import_react14.default.createElement(Controls$1, { showInteractive: false }),
+        /* @__PURE__ */ import_react14.default.createElement(
           MiniMap$1,
           {
             pannable: true,
@@ -39438,7 +39360,7 @@
           }
         )
       )))))),
-      showPanel ? /* @__PURE__ */ import_react15.default.createElement(
+      showPanel ? /* @__PURE__ */ import_react14.default.createElement(
         "div",
         {
           className: "inspector-resizer",
@@ -39470,7 +39392,7 @@
           }
         }
       ) : null,
-      /* @__PURE__ */ import_react15.default.createElement("aside", { id: "step-details-panel", className: "inspector", "aria-label": "Step details" }, pending2 ? /* @__PURE__ */ import_react15.default.createElement(
+      /* @__PURE__ */ import_react14.default.createElement("aside", { id: "step-details-panel", className: "inspector", "aria-label": "Step details" }, pending2 ? /* @__PURE__ */ import_react14.default.createElement(
         InteractionPane,
         {
           key: `${pending2.turnID}:${runError ?? ""}`,
@@ -39479,7 +39401,7 @@
           onConfirmHostAction,
           xtsOpened
         }
-      ) : currentRouteTestEditor && routeTarget && routeTestContext ? /* @__PURE__ */ import_react15.default.createElement(
+      ) : currentRouteTestEditor && routeTarget && routeTestContext ? /* @__PURE__ */ import_react14.default.createElement(
         RouteTestPane,
         {
           key: currentRouteTestEditor.key,
@@ -39500,7 +39422,7 @@
           onStop: onCancel,
           onClose: () => setRouteTestEditor(void 0)
         }
-      ) : selected ? /* @__PURE__ */ import_react15.default.createElement("div", { className: "selected-step-panel" }, !routeTargetID || routeTargetID !== selected.id ? /* @__PURE__ */ import_react15.default.createElement("div", { className: "route-context-action" }, /* @__PURE__ */ import_react15.default.createElement("button", { type: "button", disabled: routeActionsDisabled, onClick: () => showRoutesThrough(selected.id) }, "Show routes through this step")) : null, routeTargetID === selected.id && routeTestContext ? /* @__PURE__ */ import_react15.default.createElement("section", { className: "route-test-launcher", "aria-label": "Route tests" }, /* @__PURE__ */ import_react15.default.createElement(
+      ) : selected ? /* @__PURE__ */ import_react14.default.createElement("div", { className: "selected-step-panel" }, !routeTargetID || routeTargetID !== selected.id ? /* @__PURE__ */ import_react14.default.createElement("div", { className: "route-context-action" }, /* @__PURE__ */ import_react14.default.createElement("button", { type: "button", disabled: routeActionsDisabled, onClick: () => showRoutesThrough(selected.id) }, "Show routes through this step")) : null, routeTargetID === selected.id && routeTestContext ? /* @__PURE__ */ import_react14.default.createElement("section", { className: "route-test-launcher", "aria-label": "Route tests" }, /* @__PURE__ */ import_react14.default.createElement(
         "button",
         {
           type: "button",
@@ -39509,7 +39431,7 @@
           onClick: () => setRouteTestEditor({ key: `new:${selected.id}:${Date.now()}`, contextKey: routeTestContextKey })
         },
         "Test reaching this step"
-      ), savedRouteTests.length > 0 ? /* @__PURE__ */ import_react15.default.createElement("div", { className: "saved-route-tests" }, /* @__PURE__ */ import_react15.default.createElement("h3", null, "Saved route tests"), savedRouteTests.map((saved) => /* @__PURE__ */ import_react15.default.createElement(
+      ), savedRouteTests.length > 0 ? /* @__PURE__ */ import_react14.default.createElement("div", { className: "saved-route-tests" }, /* @__PURE__ */ import_react14.default.createElement("h3", null, "Saved route tests"), savedRouteTests.map((saved) => /* @__PURE__ */ import_react14.default.createElement(
         "button",
         {
           type: "button",
@@ -39522,9 +39444,9 @@
             contextKey: routeTestContextKey
           })
         },
-        /* @__PURE__ */ import_react15.default.createElement("span", null, saved.artifact.name),
-        /* @__PURE__ */ import_react15.default.createElement("small", null, saved.needsReview ? "Needs review" : saved.artifact.last_result?.status ?? "Draft")
-      ))) : null) : null, inspectedNode?.data.kind === "results" ? /* @__PURE__ */ import_react15.default.createElement(ResultsViewer, { results, nodeID: inspectedNode.id }) : null, inspectedNode ? /* @__PURE__ */ import_react15.default.createElement(
+        /* @__PURE__ */ import_react14.default.createElement("span", null, saved.artifact.name),
+        /* @__PURE__ */ import_react14.default.createElement("small", null, saved.needsReview ? "Needs review" : saved.artifact.last_result?.status ?? "Draft")
+      ))) : null) : null, inspectedNode?.data.kind === "results" ? /* @__PURE__ */ import_react14.default.createElement(ResultsViewer, { results, nodeID: inspectedNode.id }) : null, inspectedNode ? /* @__PURE__ */ import_react14.default.createElement(
         StepInspector,
         {
           node: inspectedNode,
@@ -39556,7 +39478,7 @@
               );
             }
           },
-          debugControls: selectedGraphRevision === latestGraphRevision ? /* @__PURE__ */ import_react15.default.createElement(
+          debugControls: selectedGraphRevision === latestGraphRevision ? /* @__PURE__ */ import_react14.default.createElement(
             DebugSelectionControls,
             {
               document: document2,
@@ -39567,9 +39489,9 @@
               onToggle: onToggleBreakpoint,
               onWatchesChange
             }
-          ) : /* @__PURE__ */ import_react15.default.createElement("p", { className: "debug-protected" }, "Historical graph revisions are read-only.")
+          ) : /* @__PURE__ */ import_react14.default.createElement("p", { className: "debug-protected" }, "Historical graph revisions are read-only.")
         }
-      ) : /* @__PURE__ */ import_react15.default.createElement("div", { className: "inspector-blank", role: "status" }, "Historical graph unavailable or loading \u2014 no current-source substitution.")) : /* @__PURE__ */ import_react15.default.createElement(
+      ) : /* @__PURE__ */ import_react14.default.createElement("div", { className: "inspector-blank", role: "status" }, "Historical graph unavailable or loading \u2014 no current-source substitution.")) : /* @__PURE__ */ import_react14.default.createElement(
         RunOverview,
         {
           document: document2,
@@ -39590,62 +39512,62 @@
     )));
   }
   function App() {
-    const [document2, setDocument] = (0, import_react15.useState)();
-    const [results, setResults] = (0, import_react15.useState)();
-    const [testMode, setTestMode] = (0, import_react15.useState)(false);
-    const [style2, setStyle] = (0, import_react15.useState)("smooth-curves");
-    const [loading, setLoading] = (0, import_react15.useState)(true);
-    const [error, setError] = (0, import_react15.useState)();
-    const [runError, setRunError] = (0, import_react15.useState)();
-    const [runDiagnostics, setRunDiagnostics] = (0, import_react15.useState)("");
-    const [sessionID, setSessionID] = (0, import_react15.useState)();
-    const [sessionStatus, setSessionStatus] = (0, import_react15.useState)();
-    const [sessionAttached, setSessionAttached] = (0, import_react15.useState)(false);
-    const [segmentGraphRevisions, setSegmentGraphRevisions] = (0, import_react15.useState)({});
-    const [unloadedSegmentIDs, setUnloadedSegmentIDs] = (0, import_react15.useState)([]);
-    const [revisionNodes, setRevisionNodes] = (0, import_react15.useState)({});
-    const [runID, setRunID] = (0, import_react15.useState)();
-    const [runStatus, setRunStatus] = (0, import_react15.useState)("idle");
-    const [runStarting, setRunStarting] = (0, import_react15.useState)(false);
-    const [reloading, setReloading] = (0, import_react15.useState)(false);
-    const [runtimeNodes, setRuntimeNodes] = (0, import_react15.useState)({});
-    const [executionNodeID, setExecutionNodeID] = (0, import_react15.useState)();
-    const [breakpoints, setBreakpoints] = (0, import_react15.useState)([]);
-    const [watches, setWatches] = (0, import_react15.useState)("");
-    const [pending2, setPending] = (0, import_react15.useState)();
-    const [inputValues, setInputValues] = (0, import_react15.useState)({});
-    const [routeTestContext, setRouteTestContext] = (0, import_react15.useState)();
-    const [routeTests, setRouteTests] = (0, import_react15.useState)([]);
-    const [routeTestOutcome, setRouteTestOutcome] = (0, import_react15.useState)();
-    const [routeTestRunning, setRouteTestRunning] = (0, import_react15.useState)(false);
-    const [routeTestError, setRouteTestError] = (0, import_react15.useState)();
-    const [xtsOpened, setXtsOpened] = (0, import_react15.useState)(false);
-    const pendingRef = (0, import_react15.useRef)();
-    const resolvedTurnsRef = (0, import_react15.useRef)(/* @__PURE__ */ new Set());
-    const runIDRef = (0, import_react15.useRef)();
-    const sessionIDRef = (0, import_react15.useRef)();
-    const sessionStatusRef = (0, import_react15.useRef)();
-    const runFinishedRef = (0, import_react15.useRef)(false);
-    const directDocumentRef = (0, import_react15.useRef)();
-    const directRunScopeRef = (0, import_react15.useRef)();
-    const displayWithdrawalsRef = (0, import_react15.useRef)(
+    const [document2, setDocument] = (0, import_react14.useState)();
+    const [results, setResults] = (0, import_react14.useState)();
+    const [testMode, setTestMode] = (0, import_react14.useState)(false);
+    const [style2, setStyle] = (0, import_react14.useState)("smooth-curves");
+    const [loading, setLoading] = (0, import_react14.useState)(true);
+    const [error, setError] = (0, import_react14.useState)();
+    const [runError, setRunError] = (0, import_react14.useState)();
+    const [runDiagnostics, setRunDiagnostics] = (0, import_react14.useState)("");
+    const [sessionID, setSessionID] = (0, import_react14.useState)();
+    const [sessionStatus, setSessionStatus] = (0, import_react14.useState)();
+    const [sessionAttached, setSessionAttached] = (0, import_react14.useState)(false);
+    const [segmentGraphRevisions, setSegmentGraphRevisions] = (0, import_react14.useState)({});
+    const [unloadedSegmentIDs, setUnloadedSegmentIDs] = (0, import_react14.useState)([]);
+    const [revisionNodes, setRevisionNodes] = (0, import_react14.useState)({});
+    const [runID, setRunID] = (0, import_react14.useState)();
+    const [runStatus, setRunStatus] = (0, import_react14.useState)("idle");
+    const [runStarting, setRunStarting] = (0, import_react14.useState)(false);
+    const [reloading, setReloading] = (0, import_react14.useState)(false);
+    const [runtimeNodes, setRuntimeNodes] = (0, import_react14.useState)({});
+    const [executionNodeID, setExecutionNodeID] = (0, import_react14.useState)();
+    const [breakpoints, setBreakpoints] = (0, import_react14.useState)([]);
+    const [watches, setWatches] = (0, import_react14.useState)("");
+    const [pending2, setPending] = (0, import_react14.useState)();
+    const [inputValues, setInputValues] = (0, import_react14.useState)({});
+    const [routeTestContext, setRouteTestContext] = (0, import_react14.useState)();
+    const [routeTests, setRouteTests] = (0, import_react14.useState)([]);
+    const [routeTestOutcome, setRouteTestOutcome] = (0, import_react14.useState)();
+    const [routeTestRunning, setRouteTestRunning] = (0, import_react14.useState)(false);
+    const [routeTestError, setRouteTestError] = (0, import_react14.useState)();
+    const [xtsOpened, setXtsOpened] = (0, import_react14.useState)(false);
+    const pendingRef = (0, import_react14.useRef)();
+    const resolvedTurnsRef = (0, import_react14.useRef)(/* @__PURE__ */ new Set());
+    const runIDRef = (0, import_react14.useRef)();
+    const sessionIDRef = (0, import_react14.useRef)();
+    const sessionStatusRef = (0, import_react14.useRef)();
+    const runFinishedRef = (0, import_react14.useRef)(false);
+    const directDocumentRef = (0, import_react14.useRef)();
+    const directRunScopeRef = (0, import_react14.useRef)();
+    const displayWithdrawalsRef = (0, import_react14.useRef)(
       decodeDisplayWithdrawals(recordValue(vscode.getState?.())?.displayWithdrawals)
     );
-    const hostSessionRef = (0, import_react15.useRef)(globalThis.crypto.randomUUID());
-    const hostRequestRef = (0, import_react15.useRef)();
-    (0, import_react15.useEffect)(() => {
+    const hostSessionRef = (0, import_react14.useRef)(globalThis.crypto.randomUUID());
+    const hostRequestRef = (0, import_react14.useRef)();
+    (0, import_react14.useEffect)(() => {
       pendingRef.current = pending2;
     }, [pending2]);
-    (0, import_react15.useEffect)(() => {
+    (0, import_react14.useEffect)(() => {
       runIDRef.current = runID;
     }, [runID]);
-    (0, import_react15.useEffect)(() => {
+    (0, import_react14.useEffect)(() => {
       sessionIDRef.current = sessionID;
     }, [sessionID]);
-    (0, import_react15.useEffect)(() => {
+    (0, import_react14.useEffect)(() => {
       sessionStatusRef.current = sessionStatus;
     }, [sessionStatus]);
-    (0, import_react15.useEffect)(() => {
+    (0, import_react14.useEffect)(() => {
       displayWithdrawalsRef.current = retainDirectDisplayWithdrawals(displayWithdrawalsRef.current, runtimeNodes);
       vscode.setState?.({ ...recordValue(vscode.getState?.()), displayWithdrawals: displayWithdrawalsRef.current });
     }, [runtimeNodes]);
@@ -39657,7 +39579,7 @@
       setPending(void 0);
       setRunID(void 0);
     };
-    (0, import_react15.useEffect)(() => {
+    (0, import_react14.useEffect)(() => {
       const receive = (event) => {
         const message = event.data;
         if (!message || typeof message !== "object") return;
@@ -39922,7 +39844,7 @@
       vscode.postMessage({ type: "ready" });
       return () => window.removeEventListener("message", receive);
     }, []);
-    (0, import_react15.useEffect)(() => {
+    (0, import_react14.useEffect)(() => {
       if (!document2) return;
       const values = {};
       for (const declaration of graphInputDeclarations(document2)) {
@@ -39960,7 +39882,7 @@
         request: interaction.host_action.request
       });
     };
-    (0, import_react15.useEffect)(() => {
+    (0, import_react14.useEffect)(() => {
       if (!pending2 || pending2.kind !== "host_action" || !pending2.host_action || !runID || pending2.host_action.capability === "xts.open-view") return;
       dispatchHostAction(pending2, false);
     }, [pending2?.turnID, runID]);
@@ -40109,7 +40031,7 @@
         }
       });
     };
-    (0, import_react15.useEffect)(() => {
+    (0, import_react14.useEffect)(() => {
       if (!testMode) return;
       const receiveTestAction = (event) => {
         const message = event.data;
@@ -40195,7 +40117,7 @@
       window.addEventListener("message", receiveTestAction);
       return () => window.removeEventListener("message", receiveTestAction);
     }, [document2, inputValues, pending2, runID, runStatus, runStarting, breakpoints, watches, testMode]);
-    (0, import_react15.useEffect)(() => {
+    (0, import_react14.useEffect)(() => {
       if (!testMode) return;
       const frame2 = requestAnimationFrame(() => {
         vscode.postMessage({
@@ -40245,10 +40167,10 @@
       });
       return () => cancelAnimationFrame(frame2);
     }, [document2, inputValues, sessionID, sessionStatus, sessionAttached, runID, runStatus, runStarting, reloading, runError, pending2?.turnID, runtimeNodes, executionNodeID, breakpoints, routeTestContext?.planHash, routeTestOutcome, routeTestError, routeTests, testMode]);
-    if (loading) return /* @__PURE__ */ import_react15.default.createElement("div", { className: "state", role: "status" }, "Loading runbook...");
-    if (error) return /* @__PURE__ */ import_react15.default.createElement("div", { className: "state error", role: "alert" }, error);
-    if (!document2) return /* @__PURE__ */ import_react15.default.createElement("div", { className: "state", role: "status" }, "No graph loaded");
-    return /* @__PURE__ */ import_react15.default.createElement(
+    if (loading) return /* @__PURE__ */ import_react14.default.createElement("div", { className: "state", role: "status" }, "Loading runbook...");
+    if (error) return /* @__PURE__ */ import_react14.default.createElement("div", { className: "state error", role: "alert" }, error);
+    if (!document2) return /* @__PURE__ */ import_react14.default.createElement("div", { className: "state", role: "status" }, "No graph loaded");
+    return /* @__PURE__ */ import_react14.default.createElement(
       GraphView2,
       {
         document: document2,
@@ -40313,7 +40235,7 @@
   }
   var root2 = document.getElementById("root");
   if (!root2) throw new Error("Missing webview root element");
-  (0, import_client.createRoot)(root2).render(/* @__PURE__ */ import_react15.default.createElement(App, null));
+  (0, import_client.createRoot)(root2).render(/* @__PURE__ */ import_react14.default.createElement(App, null));
 })();
 /*! Bundled license information:
 
@@ -40400,7 +40322,6 @@ lucide-react/dist/esm/icons/file-input.js:
 lucide-react/dist/esm/icons/flag.js:
 lucide-react/dist/esm/icons/git-branch.js:
 lucide-react/dist/esm/icons/list-checks.js:
-lucide-react/dist/esm/icons/locate-fixed.js:
 lucide-react/dist/esm/icons/message-square-text.js:
 lucide-react/dist/esm/icons/package-open.js:
 lucide-react/dist/esm/icons/panel-right.js:

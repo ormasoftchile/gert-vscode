@@ -335,7 +335,7 @@ export function RunOverview({
         <div><strong>{running}</strong><span>Running</span></div>
         <div><strong>{remaining}</strong><span>{terminal ? 'No final status' : 'Remaining'}</span></div>
       </div>
-      <p className="overview-hint">{total} canonical steps · latest observed status per step, including containers. Runtime child activity is listed separately.</p>
+      <p className="overview-hint">{total} canonical steps · latest observed status per step, including containers.</p>
       {terminal && remaining > 0 ? <p role="status">Run ended, some steps lack final status.</p> : null}
       <Section title="Run">
         <KeyValueRows rows={[

@@ -299,10 +299,8 @@ test('webview identifies focused and current steps with distinct side arrows', (
   assert.match(source, /Current step:\s*\$\{locatorText\}/);
   assert.match(source, /<code title=\{id\}>\{locatorText\}<\/code>/);
   assert.match(source, /executionPosition\.terminal \? 'Last reached' : 'Current'/);
-  const activity = fs.readFileSync(path.join(root, 'webview', 'CurrentActivity.tsx'), 'utf8');
-  assert.match(source, /<CurrentActivityStrip activities=\{activities\}/);
-  assert.match(activity, /className="execution-position-strip current-activity"/);
-  assert.match(activity, />Locate<\/span>/);
+  assert.doesNotMatch(source, /CurrentActivityStrip|activityLocationNotice|locateExecutionNode|current-activity/i);
+  assert.equal(fs.existsSync(path.join(root, 'webview', 'CurrentActivity.tsx')), false);
   assert.match(source, /executionNodeID=\{executionNodeID\}/);
   assert.match(source, /setExecutionNodeID\(reachedNodeID\)/);
   assert.match(source, /className="node-locator focused"/);
@@ -321,7 +319,7 @@ test('webview identifies focused and current steps with distinct side arrows', (
   assert.match(styles, /\.node-locator\.last-reached[^}]*var\(--vscode-charts-blue\)/s);
   assert.match(styles, /\.step-node\.execution-current[^}]*outline:/s);
   assert.match(styles, /\.step-node\.execution-last[^}]*outline:/s);
-  assert.match(styles, /\.execution-position-strip\s*\{/s);
+  assert.doesNotMatch(styles, /execution-position-strip|current-activity/);
   assert.match(styles, /\.node-locator code\s*\{[^}]*background:\s*transparent/s);
   assert.match(styles, /\.node-locator code\s*\{[^}]*font-weight:\s*600/s);
   assert.doesNotMatch(source, /\.setCenter\s*\(/);

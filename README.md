@@ -13,6 +13,9 @@ Three commands:
 
 ## Inspector
 
+The graph has no always-visible **Current Activity** panel. Execution remains
+visible through node states, Run controls, actionable errors, and terminal **Results**.
+
 The right rail is an operator inspector rather than a generic metadata panel.
 With no selection it shows run progress, current step, outcome counts, inputs,
 breakpoints, source, and diagnostics. Selecting a step opens three compact tabs:
@@ -159,6 +162,31 @@ Manual build:
 npm ci
 npm run compile
 ```
+
+### Offline graph UI acceptance
+
+After compiling, run the focused source checks:
+
+```powershell
+node --test --test-timeout=5000 test\directGraphPreview.test.js test\executionProgress.test.js test\sessionExecutionProgress.test.js test\runStatus.test.js
+```
+
+For real webview DOM and screenshot checks, use an already-installed VS Code
+executable (no editor download) and two existing runbooks:
+
+```powershell
+$env:GERT_VSCODE_EXECUTABLE = 'C:\Program Files\Microsoft VS Code\Code.exe'
+node scripts\test-current-activity-native.cjs 'C:\runbooks\first.runbook.yaml' 'C:\runbooks\second.runbook.yaml'
+```
+
+This uses `@vscode/test-electron` and the native CDP screenshot helper, with isolated
+user-data/extensions directories under ignored `.vscode-test\current-activity-*`.
+The actual production graph loader previews both unchanged files without executing
+them. DOM assertions check that the activity panel/heading is absent and graph/Run
+controls remain visible. Separate synthetic UI events check running/failed/completed
+nodes, actionable failure navigation, and terminal Results without live providers.
+`launch.json`, `results.json`, and screenshots remain in the evidence directory.
+The existing graph summary and inspector are preserved, not replacement panels.
 
 ## Package (.vsix)
 

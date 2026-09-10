@@ -1,5 +1,5 @@
 import dagre from '@dagrejs/dagre';
-import { ArrowLeft, ArrowRight, Bug, CheckCircle2, CircleDot, LocateFixed, PanelRight, Play, RotateCcw, Square, Workflow } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Bug, CheckCircle2, CircleDot, PanelRight, Play, RotateCcw, Square, Workflow } from 'lucide-react';
 import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import ReactFlow, {
@@ -27,8 +27,7 @@ import { applyDirectRetainedDocument, applyDirectDisplaySummary, reconcileDirect
 import { decodeDisplayWithdrawals } from '../src/displayObservationStorage';
 import { projectWorkflow, workflowIssueIndex, type WorkflowIssue, type WorkflowMode } from '../src/workflowProjection';
 import { preserveLayoutMeasurements } from '../src/graphLayoutMeasurements';
-import { canonicalProgress, currentActivities, compareOccurrences, directOccurrenceID, validProgressIdentity, producerStepKind, displayRuntimeStatuses, isExecutionEnded, normalizeRuntimeStatuses, type CurrentActivity } from '../src/executionProgress';
-import { CurrentActivity as CurrentActivityStrip } from './CurrentActivity';
+import { canonicalProgress, currentActivities, compareOccurrences, directOccurrenceID, validProgressIdentity, producerStepKind, displayRuntimeStatuses, isExecutionEnded, normalizeRuntimeStatuses } from '../src/executionProgress';
 import { decodeWorkflowPreference, mergeWorkflowPreference } from '../src/workflowView';
 import type { ResultsAvailability } from '../src/typedResultsTypes';
 import { ResultsViewer } from './ResultsViewer';
@@ -1713,7 +1712,6 @@ function GraphView({
   const [routeScope, setRouteScope] = useState<RouteProjectionScope>('through');
   const [routeTestEditor, setRouteTestEditor] = useState<{ artifact?: RouteTestArtifact; needsReview?: boolean; key: string; contextKey: string }>();
   const [locateNodeID, setLocateNodeID] = useState<string>();
-  const [activityLocationNotice, setActivityLocationNotice] = useState<string>();
   const activities = useMemo(() => currentActivities(document, observedRuntimeNodes, runStatus, runID, pending),
     [document, observedRuntimeNodes, runStatus, runID, pending]);
   const progressCounts = useMemo(() => canonicalProgress(document, observedRuntimeNodes, runStatus), [document, observedRuntimeNodes, runStatus]);
@@ -1898,32 +1896,6 @@ function GraphView({
     setRouteTargetID(undefined);
     setRouteTestEditor(undefined);
   };
-  const locateExecutionNode = (activity: CurrentActivity) => {
-    setActivityLocationNotice(undefined);
-    if (!activity.inGraph) {
-      if (sessionID && activity.segmentID && activity.graphRevision !== undefined) {
-        if (unloadedSegmentIDs.includes(activity.segmentID)) {
-          vscode.postMessage({ type: 'session.load-segment', segmentID: activity.segmentID, revision: activity.graphRevision });
-        }
-        onRequestGraphRevision(revisionNodeKey(activity.segmentID, activity.graphRevision, activity.path),
-          activity.segmentID, activity.graphRevision, activity.path);
-        setInspectionRevision({ nodeID: activity.nodeID, revision: activity.graphRevision });
-        setIssueSelection({ nodeID: activity.nodeID, qualifiedNodeID: activity.path, segmentID: activity.segmentID,
-          graphRevision: activity.graphRevision, occurrenceID: activity.occurrenceID, status: activity.status, blockedOutcome: false });
-        setSelectedId(activity.nodeID); setShowPanel(true);
-        setActivityLocationNotice(`Requested existing segment revision ${activity.graphRevision}: ${activity.path}. The viewport is unchanged until this exact node is available.`);
-      } else {
-        setActivityLocationNotice(`No graph location is available for ${activity.path}. This is the exact runtime child path; no substitute node was selected.`);
-      }
-      return;
-    }
-    setRouteTargetID(undefined);
-    setRouteTestEditor(undefined);
-    setSelectedId(activity.nodeID);
-    setShowPanel(true);
-    setLocateNodeID(activity.nodeID);
-  };
-
   const resizeInspectorFromClientX = (clientX: number) => {
     const bounds = workspaceRef.current?.getBoundingClientRect();
     if (!bounds || bounds.width <= 0) return;
@@ -2037,8 +2009,7 @@ function GraphView({
         edgeClasses: Array.from(window.document.querySelectorAll('.react-flow__edge')).map(edge => edge.getAttribute('class')),
         mode: viewPreference.workflowMode, selectedID: selectedId, routeTargetID,
         runtimeStatuses: Object.fromEntries(Object.entries(runtimeNodes).map(([id, value]) => [id, value.status])),
-        activity: { text: window.document.querySelector('.current-activity')?.textContent,
-          items: activities.map(({ nodeID, path, title, label, container, inGraph, occurrenceID }) =>
+        activity: { items: activities.map(({ nodeID, path, title, label, container, inGraph, occurrenceID }) =>
             ({ nodeID, path, title, label, container, inGraph, occurrenceID })), counts: progressCounts,
           summary: window.document.querySelector('.workflow-summary')?.textContent,
           overview: window.document.querySelector('.overview-stats')?.textContent },
@@ -2246,8 +2217,6 @@ function GraphView({
         {progressCounts.total} canonical steps · {progressCounts.completed} done · {progressCounts.issues} issues · {progressCounts.skipped} skipped · {progressCounts.running} running · {progressCounts.remaining} {executionTerminal ? 'without final status' : 'remaining'}
         {' · '}{workflow.segments.size} visual technical groups · hidden is not skipped
       </div>
-      <CurrentActivityStrip activities={activities} runStatus={runStatus} remaining={progressCounts.remaining}
-        onLocate={locateExecutionNode} locationNotice={activityLocationNotice} />
       {routeTargetID && routeProjection ? (
         <section className="route-view-strip" aria-label={`Routes through ${routeTargetName}`}>
           <div className="route-view-copy">
