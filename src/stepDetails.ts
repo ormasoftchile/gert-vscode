@@ -1,3 +1,6 @@
+import { decodeEnvelope, type PresentationEnvelope } from './presentationProtocol';
+import { decodeExpressionPresentation, type ExpressionPresentation } from './expressionPresentationProtocol';
+
 export interface NamedDetailValue {
   [key: string]: unknown;
   name: string;
@@ -44,7 +47,10 @@ export interface CommonStepDetails {
 interface DetailsBase<K extends string> {
   [key: string]: unknown;
   kind: K;
+  role?: 'technical' | 'operator';
   common?: CommonStepDetails;
+  code_presentation?: PresentationEnvelope;
+  expression_presentation?: ExpressionPresentation;
 }
 
 export type StepDetails =
@@ -63,6 +69,8 @@ export type StepDetails =
   | (DetailsBase<'end'> & { category?: string; code?: string })
   | (DetailsBase<'compensate'> & { on?: string; steps?: number })
   | DetailsBase<'noop'>
+  | (DetailsBase<'assign'> & { assign?: NamedDetailValue[] })
+  | DetailsBase<'results'>
   | (DetailsBase<'iterate'> & { over?: string; as?: string; max?: number; until?: string; collect?: NamedDetailValue[]; concurrency?: number; steps?: number })
   | (DetailsBase<'parallel'> & { branches?: number; branch_labels?: string[]; wait_for?: string; on_failure?: string })
   | DetailsBase<'extension'>;
@@ -83,6 +91,8 @@ const FIELDS_BY_KIND: Record<string, readonly string[]> = {
   end: ['category', 'code'],
   compensate: ['on', 'steps'],
   noop: [],
+  assign: ['assign'],
+  results: [],
   iterate: ['over', 'as', 'max', 'until', 'collect', 'concurrency', 'steps'],
   parallel: ['branches', 'branch_labels', 'wait_for', 'on_failure'],
   extension: [],
@@ -99,7 +109,7 @@ const STRING_FIELDS = new Set([
 const NUMBER_FIELDS = new Set(['min', 'max', 'required', 'steps', 'concurrency', 'branches']);
 const BOOLEAN_FIELDS = new Set(['stdin', 'dynamic', 'multiple']);
 
-export function parseStepDetails(value: unknown, nodeKind: string, label: string): StepDetails {
+export function parseStepDetails(value: unknown, nodeKind: string, label: string, typed = false): StepDetails {
   const details = plainRecord(value, `${label}.details`);
   if (typeof details.kind !== 'string' || details.kind.length === 0) {
     throw new Error(`${label}.details.kind must be a non-empty string`);
@@ -107,6 +117,9 @@ export function parseStepDetails(value: unknown, nodeKind: string, label: string
   if (details.kind !== nodeKind) {
     throw new Error(`${label}.details kind must match node kind`);
   }
+  if (details.role !== undefined && details.role !== 'technical' && details.role !== 'operator') throw new Error('invalid detail role');
+  if (typed && (nodeKind === 'assign' || nodeKind === 'results') &&
+      details.role !== (nodeKind === 'assign' ? 'technical' : 'operator')) throw new Error('invalid typed operation role');
   const kindFields = FIELDS_BY_KIND[details.kind];
   if (!kindFields) throw new Error(`${label}.details kind is unsupported`);
   const allowed = new Set(kindFields);
@@ -123,7 +136,21 @@ export function parseStepDetails(value: unknown, nodeKind: string, label: string
     if (BOOLEAN_FIELDS.has(key)) validateOptionalBoolean(field, fieldLabel);
   }
   if (details.common !== undefined) validateCommon(details.common, label);
+  if (details.code_presentation !== undefined) details.code_presentation = decodeEnvelope(details.code_presentation);
   validateDetailObjects(details, label);
+  if (details.kind === 'assign' && details.assign !== undefined) {
+    validateRecordArray(details.assign, `${label}.details.assign`, (write, itemLabel) => {
+      validateRequiredString(write.name, `${itemLabel}.name`);
+      if (!Object.prototype.hasOwnProperty.call(write, 'value')) throw new Error(`${itemLabel}.value is required`);
+      if (typed && (Object.keys(write).some(key => !['name', 'value', 'value_present'].includes(key)) ||
+          typeof write.value_present !== 'boolean')) throw new Error('invalid assignment presence');
+    });
+  }
+  if (details.expression_presentation !== undefined) {
+    const expressions = decodeExpressionPresentation(details.expression_presentation);
+    if (expressions) details.expression_presentation = expressions;
+    else delete details.expression_presentation;
+  }
   return details as unknown as StepDetails;
 }
 
@@ -175,6 +202,7 @@ function validateDetailObjects(details: Record<string, unknown>, label: string):
     validateRecordArray(details[key], `${detailsLabel}.${key}`, (entry, itemLabel) => {
       validateRequiredString(entry.name, `${itemLabel}.name`);
       validateOptionalBoolean(entry.redacted, `${itemLabel}.redacted`);
+      if (entry.redacted === true) delete entry.value;
     });
   }
   if (details.options !== undefined) validateOptions(details.options, `${detailsLabel}.options`);

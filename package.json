@@ -2,7 +2,15 @@
   "name": "gert-preview",
   "displayName": "gert Runbook Preview",
   "description": "Preview gert runbooks (.runbook.yaml) as a structural graph in VS Code.",
-  "version": "0.2.5",
+  "version": "0.2.8",
+  "gertCandidate": {
+    "label": "p0-blocked-child-forwarding-review",
+    "promotion": "not-approved",
+    "runtimeBuild": "p0-typed-results-rc.2",
+    "runtimeSourceID": "sha256:139e545180c569644c4d744604426ebd6646576aa361b8bd3c71437e22421921",
+    "runtimeSHA256": "a640f1b4189f8cdb7d711fae475163ee1925fddcfc4f20406bb58aa3f6be84e2",
+    "markdown": "paused"
+  },
   "publisher": "ormasoftchile",
   "license": "MIT",
   "repository": {
@@ -22,6 +30,14 @@
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
+      {
+        "command": "gert.insertRequiredArguments",
+        "title": "Gert: Insert Missing Required Arguments"
+      },
+      {
+        "command": "gert.showHighlightingDiagnostics",
+        "title": "gert: Show Highlighting Diagnostics"
+      },
       {
         "command": "gert.preview",
         "title": "gert: Open Runbook Preview",
@@ -75,6 +91,22 @@
     "configuration": {
       "title": "gert Preview",
       "properties": {
+        "gert.autocomplete.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Complete offline tool references, actions, argument keys and core-selected expression functions. Independent of highlighting; YAML services remain active. Required arguments are inserted only by the explicit command."
+        },
+        "gert.highlighting.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Highlight tool-declared SQL, KQL and PowerShell and core-selected authored GXL/GIS expressions offline. YAML language services remain active."
+        },
+        "gert.highlighting.developmentHelperPath": {
+          "type": "string",
+          "default": "",
+          "scope": "machine",
+          "description": "Development only: absolute path to the shared offline authoring/presentation helper. Each feature verifies its independent capabilities; older helpers keep highlighting but may lack autocomplete. Empty uses the matching packaged helper, independently of gert.binaryPath."
+        },
         "gert.packageMap": {
           "type": "string",
           "default": "",
@@ -129,22 +161,28 @@
     }
   },
   "dependencies": {
-    "js-yaml": "^4.1.0"
+    "js-yaml": "^4.1.0",
+    "shiki": "3.12.2",
+    "yaml": "2.8.1"
   },
   "scripts": {
-    "compile": "npm run compile:extension && npm run compile:webview",
+    "compile": "npm run compile:extension && npm run compile:webview && npm run compile:highlighting",
+    "compile:highlighting": "node scripts/build-highlighting.mjs",
+    "package:helper": "node scripts/package-helper.mjs",
     "compile:extension": "tsc -p ./",
     "compile:webview": "tsc -p tsconfig.webview.json --noEmit && esbuild webview/graph.tsx --bundle --format=iife --platform=browser --target=es2022 --outfile=media/graph.js",
     "compile:test": "tsc -p tsconfig.test.json",
     "pretest": "npm run compile",
     "test": "node --test --test-timeout=5000 test/*.test.js",
     "test:cross-repo": "npm run compile:extension && node --test test/crossRepoHostActionWire.js",
+    "test:authoring:core": "npm run compile:extension && node --test --test-concurrency=1 test/authoring-production.cjs test/authoring-pairs-production.cjs test/authoring-include-production.cjs",
+    "test:authoring:native": "npm run compile:extension && node scripts/test-authoring-native.cjs",
     "test:e2e": "npm run compile && npm run compile:test && vscode-test --label source",
     "test:e2e:only": "vscode-test",
     "test:e2e:vsix": "vscode-test --label production-surface",
     "watch": "tsc -w -p ./",
-    "vscode:prepublish": "npm run compile",
-    "package": "vsce package -o gert-preview.vsix",
+    "vscode:prepublish": "npm run compile && node scripts/verify-packaged-helper.mjs",
+    "package": "vsce package --no-dependencies -o gert-preview.vsix",
     "package:clean": "rm -rf out && npm run compile && npm run package"
   },
   "devDependencies": {
@@ -158,8 +196,10 @@
     "@vscode/test-cli": "^0.0.15",
     "@vscode/test-electron": "^3.1.0",
     "@vscode/vsce": "^2.32.0",
+    "dompurify": "3.4.14",
     "esbuild": "0.28.2",
     "lucide-react": "0.468.0",
+    "marked": "12.0.2",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "reactflow": "11.11.4",

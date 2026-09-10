@@ -22,6 +22,13 @@ import React, { useEffect, useId, useRef, useState, type ReactNode } from 'react
 import type { GraphDocument, GraphNode } from '../src/directGraphPreview';
 import type { CommonStepDetails, NamedDetailValue, StepDetails } from '../src/stepDetails';
 import { isIssueStepStatus, isSettledStepStatus, isTerminalRunStatus } from '../src/runStatus';
+import { canonicalProgress, isExecutionEnded } from '../src/executionProgress';
+import { safeOutputs, type PresentationEnvelope } from '../src/presentationProtocol';
+import { CodeValue } from './highlighting/CodeValue';
+import { AuthoredValue, AuthoredValues } from './highlighting/AuthoredValue';
+import type { RetainedPresentation } from '../src/presentationHistory';
+import type { DisplayPresentationV1 } from '../src/displayPresentation';
+import { isWorkflowIssue } from '../src/workflowProjection';
 
 export interface RuntimeLogLine {
   stream: string;
@@ -29,12 +36,22 @@ export interface RuntimeLogLine {
 }
 
 export interface InspectorRuntimeValueState {
+  directDisplaySnapshot?: string;
+  retainedDisplayScope?: { runID: string; snapshotDigest: string };
+  displayPresentation?: DisplayPresentationV1;
+  displayPresentationDiagnostic?: string;
+  retainedPresentations?: RetainedPresentation[];
+  codePresentation?: PresentationEnvelope;
+  outputValueStatus?: Record<string, unknown>;
+  presentationDiagnostic?: string;
   status: string;
   error?: string;
   durationMs?: number;
   attempt?: number;
   startedAt?: string;
   finishedAt?: string;
+  lastActivityAt?: string;
+  stepKind?: string;
   delay?: string;
   skipReason?: string;
   output?: Record<string, unknown>;
@@ -45,18 +62,22 @@ export interface InspectorRuntimeValueState {
 }
 
 export interface InspectorRuntimeOccurrence extends InspectorRuntimeValueState {
+  graphRevision?: number;
+  retainedDetails?: StepDetails;
   occurrenceID: string;
   runID: string;
   segmentID: string;
   qualifiedNodeID: string;
-  phase: string;
-  invocation: number;
-  retryAttempt: number;
-  occurrenceSequence: number;
+  phase?: string;
+  invocation?: number;
+  retryAttempt?: number;
+  occurrenceSequence?: number;
+  startedEventSequence?: number;
   executionSource: 'saved' | 'live';
 }
 
 export interface InspectorRuntimeState extends InspectorRuntimeValueState {
+  displayObservations?: import('../src/displayObservations').DisplayObservations;
   occurrenceID?: string;
   runID?: string;
   invocation?: number;
@@ -74,6 +95,7 @@ export interface InspectorInputValue {
 const KIND_LABELS: Record<string, string> = {
   approve: 'Approval',
   assert: 'Assertion',
+  assign: 'Assign bindings',
   branch: 'Branch',
   choice: 'Choice',
   cli: 'Command',
@@ -88,6 +110,7 @@ const KIND_LABELS: Record<string, string> = {
   iterate: 'Iteration',
   noop: 'No-op',
   parallel: 'Parallel',
+  results: 'Results',
   tool: 'Tool call',
   wait_for_event: 'Event wait',
 };
@@ -111,12 +134,14 @@ function KindIcon({ kind }: { kind: string }) {
     case 'compensate': return <Undo2 aria-hidden="true" />;
     case 'extension': return <Puzzle aria-hidden="true" />;
     case 'noop': return <Clock3 aria-hidden="true" />;
+    case 'assign': return <FileInput aria-hidden="true" />;
+    case 'results': return <CheckCircle2 aria-hidden="true" />;
     default: return <Activity aria-hidden="true" />;
   }
 }
 
 function StatusBadge({ status }: { status: string }) {
-  return <span className={`inspector-status status-${status}`}>{status}</span>;
+  return <span className={`inspector-status status-${status}`}>{status === 'no-final-status' ? 'No final status' : status}</span>;
 }
 
 function formatDuration(milliseconds: number | undefined): string {
@@ -149,7 +174,7 @@ function Section({ title, count, children, className = '' }: { title: string; co
   );
 }
 
-function KeyValueRows({ rows }: { rows: Array<{ label: string; value: unknown; code?: boolean }> }) {
+function KeyValueRows({ rows }: { rows: Array<{ label: string; value: unknown; code?: boolean; path?: string }> }) {
   const visible = rows.filter((row) => row.value !== undefined && row.value !== '' && row.value !== false);
   if (visible.length === 0) return <p className="inspector-muted">No additional configuration.</p>;
   return (
@@ -157,21 +182,22 @@ function KeyValueRows({ rows }: { rows: Array<{ label: string; value: unknown; c
       {visible.map((row) => (
         <React.Fragment key={row.label}>
           <dt>{row.label}</dt>
-          <dd className={row.code ? 'code-value' : ''}>{scalarText(row.value)}</dd>
+          <dd className={row.code ? 'code-value' : ''}>{row.path ? <AuthoredValue path={row.path} value={row.value} /> : scalarText(row.value)}</dd>
         </React.Fragment>
       ))}
     </dl>
   );
 }
 
-export function NamedValueRows({ values, empty = 'None' }: { values: NamedDetailValue[] | undefined; empty?: string }) {
+export function NamedValueRows({ values, empty = 'None', path, startIndex = 0 }: { values: NamedDetailValue[] | undefined; empty?: string; path?: string; startIndex?: number }) {
   if (!values || values.length === 0) return <p className="inspector-muted">{empty}</p>;
   return (
     <div className="named-value-list">
-      {values.map((item) => (
+      {values.map((item, index) => (
         <div className="named-value-row" key={item.name}>
           <code>{item.name}</code>
-          <span className={item.redacted ? 'redacted-value' : ''}>{item.redacted ? 'redacted' : scalarText(item.value)}</span>
+          <span className={item.redacted ? 'redacted-value' : ''}>{item.redacted ? 'redacted' : path
+            ? <AuthoredValue path={`${path}/${index + startIndex}/value`} value={item.value} /> : scalarText(item.value)}</span>
         </div>
       ))}
     </div>
@@ -195,7 +221,9 @@ function DataObject({ value, empty }: { value: Record<string, unknown> | undefin
   );
 }
 
-export function RuntimePane({ runtime }: { runtime: InspectorRuntimeState | undefined }) {
+export function RuntimePane({ runtime, markdownDeclared = false, snapshotDigest }: {
+  runtime: InspectorRuntimeState | undefined; markdownDeclared?: boolean; snapshotDigest?: string;
+}) {
   if (!runtime || runtime.status === 'pending') {
     return <div className="inspector-blank"><Activity aria-hidden="true" /><strong>Not run yet</strong><span>Execution data will appear here.</span></div>;
   }
@@ -203,7 +231,7 @@ export function RuntimePane({ runtime }: { runtime: InspectorRuntimeState | unde
     <div className="inspector-pane">
       <Section title="Execution">
         <KeyValueRows rows={[
-          { label: 'Status', value: runtime.status },
+          { label: 'Status', value: runtime.status === 'no-final-status' ? 'No final status' : runtime.status },
           { label: 'Duration', value: formatDuration(runtime.durationMs) },
           { label: 'Attempt', value: runtime.attempt },
           { label: 'Started', value: formatTime(runtime.startedAt) },
@@ -213,8 +241,21 @@ export function RuntimePane({ runtime }: { runtime: InspectorRuntimeState | unde
         ]} />
       </Section>
       {runtime.error ? <Section title="Error" className="error-section"><pre>{runtime.error}</pre></Section> : null}
+      {runtime.presentationDiagnostic ? <Section title="Code presentation"><p className="inspector-muted">{runtime.presentationDiagnostic}</p></Section> : null}
+      {runtime.codePresentation || runtime.retainedPresentations?.length
+        ? <Section title="Execution-resolved inputs"><p className="inspector-muted">Unavailable — not retained</p></Section> : null}
+      {runtime.retainedPresentations?.map((occurrence, index) => <Section key={index} title="Retained occurrence">
+        <KeyValueRows rows={Object.entries(occurrence.identity).map(([label, value]) => ({ label, value }))} />
+        {occurrence.details.code_presentation && safeOutputs(occurrence.details.code_presentation, occurrence.output, occurrence.output_value_status).map(value =>
+          <CodeValue key={value.name} label={value.name} text={value.text} descriptor={value.descriptor} status={value.status} />)}
+      </Section>)}
+      {runtime.codePresentation ? <Section title="Declared code outputs">
+        {safeOutputs(runtime.codePresentation, runtime.output, runtime.outputValueStatus).map(value =>
+          <CodeValue key={value.name} label={value.name} text={value.text} descriptor={value.descriptor} status={value.status} />)}
+      </Section> : null}
       <Section title="Output" count={runtime.output ? Object.keys(runtime.output).length : 0}>
-        <DataObject value={runtime.output} empty="No output was retained." />
+        <DataObject value={runtime.output && Object.fromEntries(Object.entries(runtime.output).filter(([name]) =>
+          !runtime.codePresentation?.outputs.some(field => field.name === name && field.presentation)))} empty="No additional output was retained." />
       </Section>
       <Section title="Captures" count={runtime.captures ? Object.keys(runtime.captures).length : 0}>
         <DataObject value={runtime.captures} empty="No variables were captured." />
@@ -263,15 +304,12 @@ export function RunOverview({
   diagnostics: string;
   activeNodeIDs: ReadonlySet<string>;
 }) {
-  const activeNodes = document.nodes.filter((node) => activeNodeIDs.has(node.id));
-  const states = activeNodes.map((node) => runtimeNodes[node.id]?.status ?? 'pending');
-  const completed = states.filter((status) => status === 'completed').length;
-  const issues = states.filter(isIssueStepStatus).length;
-  const skipped = states.filter((status) => status === 'skipped').length;
+  const counts = canonicalProgress(document, runtimeNodes, runStatus);
+  const { completed, issues, running, skipped, remaining, total } = counts;
   const executionNode = document.nodes.find((node) => node.id === executionNodeID);
-  const settled = states.filter(isSettledStepStatus).length;
-  const terminal = isTerminalRunStatus(runStatus);
-  const progress = terminal ? 100 : activeNodes.length === 0 ? 0 : Math.round((settled / activeNodes.length) * 100);
+  const settled = completed + issues + skipped;
+  const terminal = isExecutionEnded(runStatus);
+  const progress = total === 0 ? 0 : Math.round((settled / total) * 100);
   return (
     <div className="run-overview">
       <header className="overview-header">
@@ -282,11 +320,11 @@ export function RunOverview({
       <div
         className="overview-progress"
         role="progressbar"
-        aria-label="Run progress"
+        aria-label="Canonical step statuses"
         aria-valuemin={0}
         aria-valuemax={100}
         aria-valuenow={progress}
-        aria-valuetext={`${progress}% complete`}
+        aria-valuetext={`${settled} of ${total} canonical steps have final status`}
       >
         <span style={{ width: `${progress}%` }} />
       </div>
@@ -294,8 +332,11 @@ export function RunOverview({
         <div><strong>{completed}</strong><span>Done</span></div>
         <div><strong>{issues}</strong><span>Issues</span></div>
         <div><strong>{skipped}</strong><span>Skipped</span></div>
-        <div><strong>{activeNodes.length - settled}</strong><span>{terminal ? 'Unvisited' : 'Remaining'}</span></div>
+        <div><strong>{running}</strong><span>Running</span></div>
+        <div><strong>{remaining}</strong><span>{terminal ? 'No final status' : 'Remaining'}</span></div>
       </div>
+      <p className="overview-hint">{total} canonical steps · latest observed status per step, including containers. Runtime child activity is listed separately.</p>
+      {terminal && remaining > 0 ? <p role="status">Run ended, some steps lack final status.</p> : null}
       <Section title="Run">
         <KeyValueRows rows={[
           { label: terminal ? 'Last reached' : 'Current', value: executionNode?.data.title ?? executionNode?.id, code: true },
@@ -322,6 +363,9 @@ export function StepInspector({
   availableGraphRevisions = [],
   selectedGraphRevision,
   onGraphRevisionChange,
+  requestedOccurrenceID,
+  onOccurrenceChange,
+  snapshotDigest,
   debugControls,
 }: {
   node: GraphNode;
@@ -329,6 +373,9 @@ export function StepInspector({
   availableGraphRevisions?: readonly number[];
   selectedGraphRevision?: number;
   onGraphRevisionChange?(revision: number): void;
+  requestedOccurrenceID?: string;
+  onOccurrenceChange?(occurrence: InspectorRuntimeOccurrence): void;
+  snapshotDigest?: string;
   debugControls: ReactNode;
 }) {
   type InspectorTab = 'definition' | 'run' | 'debug';
@@ -337,11 +384,21 @@ export function StepInspector({
   const [selectedOccurrenceID, setSelectedOccurrenceID] = useState<string>();
   const tabBaseID = useId();
   const tabRefs = useRef<Record<InspectorTab, HTMLButtonElement | null>>({ definition: null, run: null, debug: null });
-  const occurrences = runtime?.occurrences ?? [];
-  const selectedOccurrence = occurrences.find((occurrence) => occurrence.occurrenceID === selectedOccurrenceID)
+  const occurrences: InspectorRuntimeOccurrence[] = runtime?.occurrences?.length ? runtime.occurrences :
+    (runtime?.retainedPresentations ?? []).map(occurrence => ({
+      occurrenceID: JSON.stringify(occurrence.identity), runID: runtime?.runID ?? '', segmentID: '',
+      qualifiedNodeID: occurrence.identity.qualified_node_id, phase: 'execute',
+      invocation: occurrence.identity.invocation ?? 1, retryAttempt: occurrence.identity.retry_attempt ?? 1,
+      occurrenceSequence: occurrence.identity.occurrence_sequence ?? 0, executionSource: 'saved', status: 'retained',
+      output: occurrence.output, codePresentation: occurrence.details.code_presentation,
+      outputValueStatus: occurrence.output_value_status, displayPresentation: occurrence.display_presentation,
+      retainedDetails: occurrence.details,
+    }));
+  const selectedOccurrence = occurrences.find((occurrence) => occurrence.occurrenceID === (selectedOccurrenceID ?? requestedOccurrenceID))
     ?? occurrences.find((occurrence) => occurrence.occurrenceID === runtime?.occurrenceID)
     ?? occurrences[occurrences.length - 1];
   const displayedRuntime = selectedOccurrence ?? runtime;
+  useEffect(() => { setSelectedOccurrenceID(requestedOccurrenceID); }, [requestedOccurrenceID]);
   useEffect(() => {
     setTab(displayedRuntime && displayedRuntime.status !== 'pending' ? 'run' : 'definition');
     setSelectedOccurrenceID(undefined);
@@ -413,7 +470,11 @@ export function StepInspector({
             <select
               aria-label="Execution occurrence"
               value={selectedOccurrence?.occurrenceID ?? ''}
-              onChange={(event) => setSelectedOccurrenceID(event.target.value)}
+              onChange={(event) => {
+                setSelectedOccurrenceID(event.target.value);
+                const occurrence = occurrences.find(value => value.occurrenceID === event.target.value);
+                if (occurrence) onOccurrenceChange?.(occurrence);
+              }}
             >
               {occurrences.map((occurrence) => (
                 <option key={occurrence.occurrenceID} value={occurrence.occurrenceID}>
@@ -430,7 +491,10 @@ export function StepInspector({
         </div>
       </div>
       {tab === 'definition' ? <div id={panelID('definition')} role="tabpanel" aria-labelledby={tabID('definition')} tabIndex={0}><DefinitionPane details={node.data.details} /><SessionProvenance node={node} /></div> : null}
-      {tab === 'run' ? <div id={panelID('run')} role="tabpanel" aria-labelledby={tabID('run')} tabIndex={0}><RuntimePane runtime={displayedRuntime} /></div> : null}
+      {tab === 'run' ? <div id={panelID('run')} role="tabpanel" aria-labelledby={tabID('run')} tabIndex={0}><RuntimePane runtime={displayedRuntime}
+        markdownDeclared={(selectedOccurrence?.retainedDetails ?? node.data.details)?.kind === 'display' &&
+          (selectedOccurrence?.retainedDetails ?? node.data.details)?.format === 'markdown'}
+        snapshotDigest={displayedRuntime?.directDisplaySnapshot ?? snapshotDigest ?? 'missing-binding'} /></div> : null}
       {tab === 'debug' ? <div id={panelID('debug')} role="tabpanel" aria-labelledby={tabID('debug')} tabIndex={0}><DebugPane controls={debugControls} override={displayedRuntime?.debugOverride} /></div> : null}
     </div>
   );
@@ -482,7 +546,7 @@ function recordList(value: unknown): Array<Record<string, unknown>> {
 export function CommonDefinition({ common }: { common: CommonStepDetails | undefined }) {
   if (!common) return null;
   const executionRows = [
-    { label: 'When', value: common.when, code: true },
+    { label: 'When', value: common.when, code: true, path: '/common/when' },
     { label: 'Timeout', value: common.timeout },
     { label: 'Delay', value: common.delay },
     { label: 'On error', value: common.on_error || (common.continue_on_fail ? 'continue' : undefined) },
@@ -494,7 +558,9 @@ export function CommonDefinition({ common }: { common: CommonStepDetails | undef
     <>
       {common.subtitle ? <p className="definition-summary">{common.subtitle}</p> : null}
       {hasExecutionPolicy ? <Section title="Execution"><KeyValueRows rows={executionRows} /></Section> : null}
-      {common.captures && common.captures.length > 0 ? <Section title="Captures" count={common.captures.length}><NamedValueRows values={common.captures.map((capture) => ({ name: capture.name, value: capture.has_default ? `${capture.source} · default ${scalarText(capture.default)}` : capture.source }))} /></Section> : null}
+      {common.captures && common.captures.length > 0 ? <Section title="Captures" count={common.captures.length}><div className="named-value-list">{common.captures.map((capture, index) =>
+        <div className="named-value-row" key={capture.name}><code>{capture.name}</code><span><AuthoredValue value={capture.source} path={`/common/captures/${index}/source`} />
+          {capture.has_default ? ` · default ${scalarText(capture.default)}` : ''}</span></div>)}</div></Section> : null}
       {common.exports && common.exports.length > 0 ? <Section title="Exports"><div className="tag-list">{common.exports.map((item) => <code key={item}>{item}</code>)}</div></Section> : null}
       {common.contract ? <Section title="Contract"><KeyValueRows rows={[
         { label: 'Effects', value: common.contract.effects?.join(', ') },
@@ -510,7 +576,7 @@ export function CommonDefinition({ common }: { common: CommonStepDetails | undef
 
 export function DefinitionPane({ details }: { details: StepDetails | undefined }) {
   if (!details) return <div className="inspector-blank"><Activity aria-hidden="true" /><strong>Definition unavailable</strong><span>Rebuild the Gert CLI to load enriched step details.</span></div>;
-  return <div className="inspector-pane"><KindDefinition details={details} /><CommonDefinition common={details.common} /></div>;
+  return <AuthoredValues details={details}><div className="inspector-pane"><KindDefinition details={details} /><CommonDefinition common={details.common} /></div></AuthoredValues>;
 }
 
 function KindDefinition({ details }: { details: StepDetails }) {
@@ -519,13 +585,14 @@ function KindDefinition({ details }: { details: StepDetails }) {
       return (
         <>
           <Section title="Command">
-            {details.command || details.args?.length ? <pre className="command-block">{[details.command, ...(details.args ?? [])].filter(Boolean).join(' ')}</pre> : <p className="inspector-muted">No command declared.</p>}
-            {details.script ? <pre className="command-block">{scalarText(details.script)}</pre> : null}
+            {details.command || details.args?.length ? <pre className="command-block">{details.command ? <AuthoredValue value={details.command} path="/command" /> : null}
+              {details.args?.map((arg, index) => <React.Fragment key={index}>{details.command || index ? ' ' : ''}<AuthoredValue value={arg} path={`/args/${index}`} /></React.Fragment>)}</pre> : <p className="inspector-muted">No command declared.</p>}
+            {details.script ? <pre className="command-block"><AuthoredValue value={details.script} path="/script" /></pre> : null}
           </Section>
           <Section title="Process">
             <KeyValueRows rows={[
-              { label: 'Shell', value: details.shell, code: true },
-              { label: 'Working dir', value: details.workdir, code: true },
+              { label: 'Shell', value: details.shell, code: true, path: '/shell' },
+              { label: 'Working dir', value: details.workdir, code: true, path: '/workdir' },
               { label: 'Environment', value: details.env_names?.length ? `${details.env_names.length} variables` : undefined },
               { label: 'Stdin', value: details.stdin ? 'provided' : undefined },
             ]} />
@@ -537,10 +604,18 @@ function KindDefinition({ details }: { details: StepDetails }) {
       return (
         <>
           <Section title="Tool action">
-            <div className="definition-call"><Wrench aria-hidden="true" /><code>{details.tool || 'unknown'} / {details.action || 'unknown'}</code></div>
+            <div className="definition-call"><Wrench aria-hidden="true" /><code><AuthoredValue value={details.tool || 'unknown'} path="/tool" /> / <AuthoredValue value={details.action || 'unknown'} path="/action" /></code></div>
             {details.version ? <KeyValueRows rows={[{ label: 'Version', value: details.version }]} /> : null}
           </Section>
-          <Section title="Arguments" count={details.arguments?.length ?? 0}><NamedValueRows values={details.arguments} /></Section>
+          <Section title="Authored template" count={details.arguments?.length ?? 0}>
+            {details.arguments?.map((item, index) => {
+              const field = details.code_presentation?.arguments.find(f => f.name === item.name);
+              return field?.presentation && typeof item.value === 'string'
+                ? <CodeValue key={item.name} label={item.name} text={item.redacted ? undefined : item.value}
+                    expressionPath={`/arguments/${index}/value`} descriptor={field.status === 'resolved' ? field.presentation : undefined} status={item.redacted ? 'redacted' : 'available'} />
+                : <NamedValueRows key={item.name} values={[item]} path="/arguments" startIndex={index} />;
+            })}
+          </Section>
         </>
       );
     case 'include':
@@ -548,49 +623,57 @@ function KindDefinition({ details }: { details: StepDetails }) {
         <>
           <Section title="Target">
             <KeyValueRows rows={[
-              { label: 'Runbook', value: details.reference, code: true },
+              { label: 'Runbook', value: details.reference, code: true, path: '/reference' },
               { label: 'Resolution', value: details.dynamic ? `dynamic · ${details.resolve_from || 'catalog'}` : 'static' },
               { label: 'Expansion', value: details.expand || 'inherited' },
               { label: 'Not found', value: details.on_not_found || 'fail' },
               { label: 'Child steps', value: details.steps },
             ]} />
           </Section>
-          <Section title="Bindings" count={details.bindings?.length ?? 0}><NamedValueRows values={details.bindings} /></Section>
+          <Section title="Bindings" count={details.bindings?.length ?? 0}><NamedValueRows values={details.bindings} path="/bindings" /></Section>
           {details.stop_if && details.stop_if.length > 0 ? <Section title="Stop outcomes"><div className="tag-list">{details.stop_if.map((item) => <code key={item}>{item}</code>)}</div></Section> : null}
         </>
       );
     case 'choice':
       return (
         <>
-          <Section title="Prompt"><p className="definition-copy">{details.prompt || 'No prompt.'}</p></Section>
+          <Section title="Prompt"><p className="definition-copy"><AuthoredValue value={details.prompt || 'No prompt.'} path="/prompt" /></p></Section>
           <Section title="Selection">
             <KeyValueRows rows={[
               { label: 'Variable', value: details.variable, code: true },
               { label: 'Mode', value: details.multiple ? 'multiple' : 'single' },
               { label: 'Required', value: details.multiple ? `${details.min ?? 0}–${details.max ?? 'any'}` : undefined },
-              { label: 'Default', value: details.default, code: true },
+              { label: 'Default', value: details.default, code: true, path: '/default' },
             ]} />
           </Section>
-          <Section title="Options" count={details.options?.length ?? 0}><div className="compact-list">{details.options?.map((option) => <div key={option.value}><strong>{option.label}</strong><code>{option.value}</code>{option.hint ? <span>{option.hint}</span> : null}</div>)}</div></Section>
+          <Section title="Options" count={details.options?.length ?? 0}><div className="compact-list">{details.options?.map((option, index) => <div key={option.value}><strong><AuthoredValue value={option.label} path={`/options/${index}/label`} /></strong><code>{option.value}</code>{option.hint ? <span><AuthoredValue value={option.hint} path={`/options/${index}/hint`} /></span> : null}</div>)}</div></Section>
         </>
       );
     case 'decision':
       return (
         <>
-          <Section title="Prompt"><p className="definition-copy">{details.prompt || 'No prompt.'}</p><KeyValueRows rows={[{ label: 'Variable', value: details.variable, code: true }]} /></Section>
-          <Section title="Routes" count={details.routes?.length ?? 0}><div className="compact-list">{details.routes?.map((route, index) => <div key={`${index}:${route.label}`}><strong>{route.label}</strong><code>{route.goto || route.runbook || 'inline'}</code>{route.hint ? <span>{route.hint}</span> : null}</div>)}</div></Section>
+          <Section title="Prompt"><p className="definition-copy"><AuthoredValue value={details.prompt || 'No prompt.'} path="/prompt" /></p><KeyValueRows rows={[{ label: 'Variable', value: details.variable, code: true }]} /></Section>
+          <Section title="Routes" count={details.routes?.length ?? 0}><div className="compact-list">{details.routes?.map((route, index) => <div key={`${index}:${route.label}`}><strong><AuthoredValue value={route.label} path={`/routes/${index}/label`} /></strong><code>{route.goto || route.runbook || 'inline'}</code>{route.hint ? <span><AuthoredValue value={route.hint} path={`/routes/${index}/hint`} /></span> : null}</div>)}</div></Section>
         </>
       );
     case 'collector':
       return (
         <>
-          <Section title="Prompt"><p className="definition-copy">{details.prompt || 'No prompt.'}</p></Section>
+          <Section title="Prompt"><p className="definition-copy"><AuthoredValue value={details.prompt || 'No prompt.'} path="/prompt" /></p></Section>
           <Section title="Fields" count={details.fields?.length ?? 0}>
             <div className="field-list">{details.fields?.map((field, index) => {
               const name = typeof field.name === 'string' ? field.name : `field-${index + 1}`;
               const type = typeof field.type === 'string' ? field.type : 'text';
               const label = typeof field.label === 'string' ? field.label : name;
-              return <div key={name}><div><strong>{label}</strong><code>{name}</code></div><span>{type}{field.required === true ? ' · required' : ''}{field.multiple === true ? ' · multiple' : ''}{field.multiline === true ? ' · multiline' : ''}</span>{typeof field.hint === 'string' ? <p>{field.hint}</p> : null}</div>;
+              return <div key={name}><div><strong><AuthoredValue value={label} path={`/fields/${index}/label`} /></strong><code>{name}</code></div><span>{type}{field.required === true ? ' · required' : ''}{field.multiple === true ? ' · multiple' : ''}{field.multiline === true ? ' · multiline' : ''}</span>
+                {typeof field.hint === 'string' ? <p><AuthoredValue value={field.hint} path={`/fields/${index}/hint`} /></p> : null}
+                <KeyValueRows rows={[{ label: 'When', value: field.when, path: `/fields/${index}/when`, code: true },
+                  { label: 'Default', value: field.default, path: `/fields/${index}/default` }]} />
+                {Array.isArray(field.options) ? <div className="compact-list">{field.options.map((option, optionIndex) => {
+                  if (!option || typeof option !== 'object') return null;
+                  return <div key={optionIndex}><strong><AuthoredValue value={option.label} path={`/fields/${index}/options/${optionIndex}/label`} /></strong>
+                    {option.hint ? <span><AuthoredValue value={option.hint} path={`/fields/${index}/options/${optionIndex}/hint`} /></span> : null}</div>;
+                })}</div> : null}</div>;
             })}</div>
           </Section>
         </>
@@ -599,25 +682,25 @@ function KindDefinition({ details }: { details: StepDetails }) {
       return (
         <>
           <Section title="Host capability"><div className="definition-call"><Puzzle aria-hidden="true" /><code>{details.capability || 'unknown'}</code></div></Section>
-          <Section title="Request" count={details.request?.length ?? 0}><NamedValueRows values={details.request} /></Section>
+          <Section title="Request" count={details.request?.length ?? 0}><NamedValueRows values={details.request} path="/request" /></Section>
         </>
       );
     case 'branch':
-      return <Section title="Ordered arms" count={details.arms?.length ?? 0}><div className="arm-list">{details.arms?.map((arm, index) => <div key={index}><span>{index + 1}</span><div><strong>{arm.label || (arm.else ? 'Otherwise' : `Arm ${index + 1}`)}</strong><code>{arm.else ? 'else' : arm.condition || 'always'}</code></div><em>{arm.steps} steps</em></div>)}</div></Section>;
+      return <Section title="Ordered arms" count={details.arms?.length ?? 0}><div className="arm-list">{details.arms?.map((arm, index) => <div key={index}><span>{index + 1}</span><div><strong>{arm.label || (arm.else ? 'Otherwise' : `Arm ${index + 1}`)}</strong><code>{arm.else ? 'else' : <AuthoredValue value={arm.condition || 'always'} path={`/arms/${index}/condition`} />}</code></div><em>{arm.steps} steps</em></div>)}</div></Section>;
     case 'iterate':
       return (
         <>
           <Section title="Loop">
             <KeyValueRows rows={[
-              { label: 'Over', value: details.over, code: true },
+              { label: 'Over', value: details.over, code: true, path: '/over' },
               { label: 'As', value: details.as, code: true },
-              { label: 'Until', value: details.until, code: true },
+              { label: 'Until', value: details.until, code: true, path: '/until' },
               { label: 'Maximum', value: details.max },
               { label: 'Concurrency', value: details.concurrency || 1 },
               { label: 'Body', value: details.steps !== undefined ? `${details.steps} steps` : undefined },
             ]} />
           </Section>
-          <Section title="Collect"><NamedValueRows values={details.collect} /></Section>
+          <Section title="Collect"><NamedValueRows values={details.collect} path="/collect" /></Section>
         </>
       );
     case 'parallel':
@@ -637,22 +720,32 @@ function KindDefinition({ details }: { details: StepDetails }) {
         </>
       );
     case 'assert':
-      return <Section title="Assertions" count={details.assertions?.length ?? 0}><div className="assertion-list">{details.assertions?.map((assertion, index) => <div key={index}><CheckCircle2 aria-hidden="true" /><div><strong>{assertion.type}</strong><code>{assertion.subject}</code>{assertion.expected ? <span>Expected: {assertion.expected}</span> : null}{assertion.path ? <span>Path: {assertion.path}</span> : null}</div></div>)}</div></Section>;
+      return <Section title="Assertions" count={details.assertions?.length ?? 0}><div className="assertion-list">{details.assertions?.map((assertion, index) => <div key={index}><CheckCircle2 aria-hidden="true" /><div><strong>{assertion.type}</strong><code><AuthoredValue value={assertion.subject} path={`/assertions/${index}/subject`} /></code>{assertion.expected ? <span>Expected: <AuthoredValue value={assertion.expected} path={`/assertions/${index}/expected`} /></span> : null}{assertion.path ? <span>Path: {assertion.path}</span> : null}</div></div>)}</div></Section>;
     case 'wait_for_event':
       return (
         <>
-          <Section title="Event"><KeyValueRows rows={[{ label: 'Source', value: details.source }, { label: 'ID', value: details.event_id, code: true }, { label: 'Schema', value: details.payload_schema, code: true }, { label: 'On timeout', value: details.on_timeout }]} /></Section>
-          <Section title="Filter" count={details.filter?.length ?? 0}><NamedValueRows values={details.filter} /></Section>
+          <Section title="Event"><KeyValueRows rows={[{ label: 'Source', value: details.source }, { label: 'ID', value: details.event_id, code: true, path: '/event_id' }, { label: 'Schema', value: details.payload_schema, code: true }, { label: 'On timeout', value: details.on_timeout }]} /></Section>
+          <Section title="Filter" count={details.filter?.length ?? 0}><NamedValueRows values={details.filter} path="/filter" /></Section>
         </>
       );
     case 'display':
-      return <Section title="Rendered content"><KeyValueRows rows={[{ label: 'Format', value: details.format || 'text' }]} /><pre className="content-preview">{details.content || 'No content.'}</pre></Section>;
+      return <Section title="Rendered content"><KeyValueRows rows={[{ label: 'Format', value: details.format || 'text' }]} /><pre className="content-preview"><AuthoredValue value={details.content || 'No content.'} path="/content" /></pre></Section>;
     case 'end':
       return <Section title="Terminal outcome"><div className="outcome-display"><Flag aria-hidden="true" /><div><strong>{details.category || 'unspecified'}</strong><code>{details.code || 'no code'}</code></div></div></Section>;
     case 'compensate':
       return <Section title="Compensation"><KeyValueRows rows={[{ label: 'Trigger', value: details.on || 'failure' }, { label: 'Body', value: details.steps !== undefined ? `${details.steps} steps` : undefined }]} /></Section>;
     case 'noop':
       return <Section title="No-op"><p className="definition-copy">This step changes no external state. Execution policy, delay, and captures are shown below.</p></Section>;
+    case 'assign':
+      return <Section title="Atomic binding assignments" count={details.assign?.length}>
+        <p className="definition-copy">Technical operation. All writes validate together; no external work is performed.</p>
+        <NamedValueRows values={details.assign} path="/assign" />
+      </Section>;
+    case 'results':
+      return <Section title="Results"><p className="definition-copy">
+        Publishes this runbook's declared named outputs atomically and finishes this scope.
+        The full structured result is shown only after canonical transport validation.
+      </p></Section>;
     case 'extension':
       return <Section title="Extension"><p className="definition-copy">Execution is delegated to a registered Gert extension.</p></Section>;
   }

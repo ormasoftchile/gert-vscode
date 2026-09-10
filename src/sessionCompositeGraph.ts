@@ -1,3 +1,8 @@
+import { sanitizePresentationPayload, terminalPresentation, type RuntimePresentation } from './presentationProjection';
+import { compareOccurrences, directOccurrenceID, validProgressIdentity, producerStepKind, normalizeRuntimeStatuses, isExecutionEnded } from './executionProgress';
+import { sanitizeDisplayPayload, hasDisplayPayload } from './displayPresentation';
+import { retainDisplayObservation, reconcileRuntimeDisplayState, type DisplayObservations } from './displayObservations';
+import { validateSessionPresentationBinding } from './directGraphPreview';
 import type {
   GraphDocument,
   GraphEdge,
@@ -80,13 +85,17 @@ export interface ComposeSessionGraphRequest {
   segmentGraphRevisions?: ReadonlyMap<string, readonly number[]>;
 }
 
-export interface SessionRuntimeValueState {
+export interface SessionRuntimeValueState extends RuntimePresentation {
+  directDisplaySnapshot?: string;
+  displayObservations?: DisplayObservations;
   status: string;
   error?: string;
   durationMs?: number;
   attempt?: number;
   startedAt?: string;
   finishedAt?: string;
+  lastActivityAt?: string;
+  stepKind?: string;
   output?: Record<string, unknown>;
   captures?: Record<string, unknown>;
   evidence?: unknown;
@@ -98,19 +107,24 @@ export interface SessionRuntimeOccurrence extends SessionRuntimeValueState {
   runID: string;
   segmentID: string;
   qualifiedNodeID: string;
-  phase: string;
-  invocation: number;
-  retryAttempt: number;
-  occurrenceSequence: number;
+  phase?: string;
+  invocation?: number;
+  retryAttempt?: number;
+  progressIdentity?: string;
+  occurrenceSequence?: number;
   executionSource: 'saved' | 'live';
   startedEventSequence?: number;
   finishedEventSequence?: number;
   predecessorNodeID?: string;
   executionLane?: string;
   graphRevision?: number;
+  frameID?: string;
+  frameStepIndex?: number;
+  dispatchOccurrenceID?: string;
 }
 
 export interface SessionRuntimeNodeState extends SessionRuntimeValueState {
+  occurrenceID?: string;
   occurrences?: SessionRuntimeOccurrence[];
 }
 
@@ -209,6 +223,7 @@ function namespaceNode(
   outgoingTransitions: readonly Record<string, unknown>[],
   graphRevision = segment.graph_revision,
   graphHash = segment.graph_hash,
+  displaySnapshotDigest?: string,
 ): GraphNode {
   const id = sessionGraphNodeID(sessionID, segment.segment_id, node.id);
   const sourceGroupID = typeof node.data.group_id === 'string' ? node.data.group_id : '';
@@ -239,6 +254,7 @@ function namespaceNode(
       executable_revision: segment.executable_revision,
       plan_hash: segment.plan_hash,
       executable_snapshot_hash: segment.executable_snapshot_hash,
+      ...(displaySnapshotDigest ? { display_plan_snapshot_digest: displaySnapshotDigest } : {}),
       catalog_digest: segment.catalog_digest,
       package_lock_digest: segment.package_lock_digest,
       profile_digest: segment.profile_digest,
@@ -383,6 +399,9 @@ export function composeSessionGraph(request: ComposeSessionGraphRequest): GraphD
         graphRevisions,
         incomingTransitions,
         outgoingTransitions,
+        segment.graph_revision,
+        segment.graph_hash,
+        graph.display_plan_snapshot_digest,
       )));
       edges.push(...graph.edges.map((edge) => namespaceEdge(sessionID, segment.segment_id, edge)));
       frames.push(...graph.frames.map((frame) => namespaceFrame(sessionID, segment.segment_id, frame)));
@@ -548,6 +567,7 @@ export class SessionGraphModel {
         throw new Error('session graph cache contains an invalid segment revision');
       }
       validateSessionSegmentGraphBinding(segmentSnapshot, cached.revision, cached.wholeBlobHash);
+      validateSessionPresentationBinding(cached.document, segmentSnapshot.executable_snapshot_hash);
       this.segmentGraphs.set(segmentID, cached.document);
       this.graphRevisions.set(segmentID, cached.revision);
       this.graphHistory.set(segmentID, new Map([[
@@ -576,6 +596,7 @@ export class SessionGraphModel {
           throw new Error('session graph history contains an invalid revision');
         }
         validateSessionSegmentGraphBinding(segmentSnapshot, cached.revision, cached.wholeBlobHash);
+        validateSessionPresentationBinding(cached.document, segmentSnapshot.executable_snapshot_hash);
         restored.set(cached.revision, {
           wholeBlobHash: cached.wholeBlobHash,
           document: cached.document,
@@ -614,7 +635,7 @@ export class SessionGraphModel {
       validatePreparedTransitionTarget(transition, segment, attempt);
       this.preparedTransitionTargets.set(transitionID, { segment, attempt });
     }
-    this.runtimeNodes = JSON.parse(JSON.stringify(runtimeNodes)) as Record<string, SessionRuntimeNodeState>;
+    this.runtimeNodes = normalizeRuntimeStatuses(JSON.parse(JSON.stringify(runtimeNodes)) as Record<string, SessionRuntimeNodeState>);
     this.lastStartedNodeByLane.clear();
     for (const [nodeID, state] of Object.entries(this.runtimeNodes)) {
       for (const occurrence of state.occurrences ?? []) {
@@ -675,6 +696,7 @@ export class SessionGraphModel {
       throw new Error('lazy graph revision does not match the session manifest');
     }
     validateSessionSegmentGraphBinding(segmentSnapshot, revision, wholeBlobHash);
+    validateSessionPresentationBinding(document, segmentSnapshot.executable_snapshot_hash);
     validateSegmentRecord(segmentSnapshot, current);
     const advertised = this.graphAvailability.get(segmentSnapshot.segment_id)?.get(revision);
     if (advertised && advertised.graph_hash !== wholeBlobHash) {
@@ -722,6 +744,7 @@ export class SessionGraphModel {
       transitionProvenance(manifest, segmentID, 'outgoing'),
       revision,
       archived.wholeBlobHash,
+      archived.document.display_plan_snapshot_digest,
     );
   }
 
@@ -729,6 +752,9 @@ export class SessionGraphModel {
     const manifest = this.manifest;
     const activeRunID = manifest?.session.active_run_id;
     const activeAttempt = activeRunID ? manifest?.attempts[activeRunID] : undefined;
+    const pending = this.currentPending && (!activeRunID || this.currentPending.runID === activeRunID) &&
+      !isExecutionEnded(activeAttempt?.status ?? '') && !isExecutionEnded(manifest?.session.status ?? '')
+      ? this.currentPending : undefined;
     const segmentGraphRevisions = Object.fromEntries(Object.values(manifest?.segments ?? {}).map((segment) => {
       const revisions = new Set(this.graphAvailability.get(segment.segment_id)?.keys() ?? []);
       for (const revision of this.graphHistory.get(segment.segment_id)?.keys() ?? []) revisions.add(revision);
@@ -748,7 +774,7 @@ export class SessionGraphModel {
       sessionID: this.sessionID,
       sequence: this.currentSequence,
       sessionStatus: manifest?.session.status ?? 'loading',
-      runStatus: this.currentPending ? 'waiting' : activeAttempt?.status ?? manifest?.session.status ?? 'loading',
+      runStatus: pending ? 'waiting' : activeAttempt?.status ?? manifest?.session.status ?? 'loading',
       ...(manifest?.session.active_segment_id ? { activeSegmentID: manifest.session.active_segment_id } : {}),
       ...(activeRunID ? { activeRunID } : {}),
       ...(this.composedDocument ? { document: this.composedDocument } : {}),
@@ -769,7 +795,7 @@ export class SessionGraphModel {
         ])),
       ])),
       ...(this.currentExecutionNodeID ? { executionNodeID: this.currentExecutionNodeID } : {}),
-      ...(this.currentPending ? { pending: { ...this.currentPending } } : {}),
+      ...(pending ? { pending: { ...pending } } : {}),
       ...(manifest ? { manifest: cloneManifest(manifest) } : {}),
     };
   }
@@ -826,6 +852,7 @@ export class SessionGraphModel {
     const segment = this.requireManifest().segments[update.segmentID];
     if (!segment) throw new Error('session graph update belongs to an unknown segment');
     validateSessionSegmentGraphBinding(segment, update.revision, update.wholeBlobHash);
+    validateSessionPresentationBinding(update.document, segment.executable_snapshot_hash);
     const previousRevision = this.graphRevisions.get(update.segmentID) ?? 0;
     const knownRevision = this.highestKnownGraphRevision(update.segmentID);
     const history = this.graphHistory.get(update.segmentID) ?? new Map();
@@ -1105,44 +1132,74 @@ export class SessionGraphModel {
     const segmentID = frame.segmentID || this.requireManifest().attempts[runID]?.segment_id;
     if (!segmentID) throw new Error('run event has no owning segment');
     const nodeID = sessionGraphNodeID(this.sessionID, segmentID, localNodeID);
-    const previous = this.runtimeNodes[nodeID] ?? { status: 'pending' };
+    let previous = this.runtimeNodes[nodeID] ?? { status: 'pending' };
     const kind = stringValue(event.kind, 'run event kind');
-    const phase = typeof payload.phase === 'string' && payload.phase ? payload.phase : 'execute';
-    const invocation = positiveInteger(payload.invocation) ? payload.invocation : 1;
+    const phase = typeof payload.phase === 'string' && payload.phase ? payload.phase : undefined;
+    const invocation = positiveInteger(payload.invocation) ? payload.invocation : undefined;
     const retryAttempt = positiveInteger(payload.retry_attempt)
       ? payload.retry_attempt
-      : positiveInteger(payload.attempt) ? payload.attempt : 1;
+      : payload.retry_attempt === undefined && positiveInteger(payload.attempt) ? payload.attempt : undefined;
     const suppliedOccurrenceSequence = positiveInteger(payload.occurrence_sequence)
       ? payload.occurrence_sequence
       : undefined;
+    const frameID = typeof payload.frame_id === 'string' ? payload.frame_id : undefined;
+    const frameStepIndex = typeof payload.frame_step_index === 'number' && Number.isSafeInteger(payload.frame_step_index) && payload.frame_step_index >= 0
+      ? payload.frame_step_index : undefined;
+    const dispatchOccurrenceID = typeof payload.dispatch_occurrence_id === 'string' ? payload.dispatch_occurrence_id : undefined;
+    const graphRevision = this.requireManifest().segments[segmentID]?.graph_revision;
+    const executionLane = typeof payload.execution_lane === 'string' ? payload.execution_lane
+      : this.executionLane(segmentID, localNodeID, graphRevision);
     const occurrences = [...(previous.occurrences ?? [])];
+    const progressIdentity = directOccurrenceID(runID, localNodeID, payload);
     const occurrenceIndex = occurrences.findIndex((occurrence) => (
-      occurrence.runID === runID && occurrence.qualifiedNodeID === localNodeID &&
-      occurrence.phase === phase && occurrence.invocation === invocation &&
-      occurrence.retryAttempt === retryAttempt &&
-      (suppliedOccurrenceSequence === undefined || occurrence.occurrenceSequence === suppliedOccurrenceSequence)
+      validProgressIdentity(payload) && occurrence.progressIdentity === progressIdentity
     ));
     const existingOccurrence = occurrenceIndex >= 0 ? occurrences[occurrenceIndex] : undefined;
-    if (existingOccurrence && TERMINAL_OCCURRENCE_STATUSES.has(existingOccurrence.status)) {
+    const displayRevision = existingOccurrence?.graphRevision ?? graphRevision;
+    const displayGraph = displayRevision === undefined ? undefined : this.graphRevision(segmentID, displayRevision);
+    const expectedDisplaySnapshot = displayGraph?.display_plan_snapshot_digest ?? 'missing-binding';
+    if ((kind === 'step/completed' || kind === 'step/failed') &&
+        (hasDisplayPayload(payload) || previous.displayObservations)) {
+      previous = { ...previous, displayObservations: retainDisplayObservation(previous.displayObservations ?? {},
+        localNodeID, runID, { ...payload, execution_lane: executionLane }, expectedDisplaySnapshot) };
+    }
+    if (kind === 'step/output' && !existingOccurrence) {
+      if (typeof payload.line !== 'string' || !payload.line) return;
+      this.runtimeNodes = { ...this.runtimeNodes, [nodeID]: { ...previous,
+        ...(typeof event.timestamp === 'string' ? { lastActivityAt: event.timestamp } : {}),
+        logs: [...(previous.logs ?? []), {
+          stream: typeof payload.stream === 'string' ? payload.stream : 'stdout', line: payload.line,
+        }].slice(-50),
+      } };
+      return;
+    }
+    if (existingOccurrence && TERMINAL_OCCURRENCE_STATUSES.has(existingOccurrence.status) && kind !== 'step/output') {
+      if (['step/started', 'step/resumed', 'step/delaying'].includes(kind)) return;
+      if ((kind === 'step/completed' || kind === 'step/failed') &&
+          (existingOccurrence.displayPresentation || existingOccurrence.displayPresentationDiagnostic ||
+            'display_presentation' in payload || 'display_presentation_diagnostic' in payload)) {
+        const display = terminalPresentation(payload, existingOccurrence, expectedDisplaySnapshot);
+        const update = { output: plainRecord(payload.output),
+          displayPresentation: display.displayPresentation,
+          displayPresentationDiagnostic: display.displayPresentationDiagnostic };
+        occurrences[occurrenceIndex] = { ...existingOccurrence, ...update };
+        this.runtimeNodes = { ...this.runtimeNodes, [nodeID]: reconcileRuntimeDisplayState({
+          ...previous, ...(previous.occurrenceID === existingOccurrence.occurrenceID ? update : {}), occurrences,
+        }) as SessionRuntimeNodeState };
+        return;
+      }
       throw new Error('session run event rewrites a terminal occurrence');
     }
     const eventSequence = positiveInteger(event.sequence) ? event.sequence : 1;
-    const graphRevision = this.requireManifest().segments[segmentID]?.graph_revision;
-    const executionLane = this.executionLane(segmentID, localNodeID, graphRevision);
     const laneKey = `${runID}\u0000${executionLane}`;
-    const occurrenceSequence = suppliedOccurrenceSequence ?? existingOccurrence?.occurrenceSequence ?? eventSequence;
+    const occurrenceSequence = suppliedOccurrenceSequence ?? existingOccurrence?.occurrenceSequence;
     const attempt = this.requireManifest().attempts[runID];
     const executionSource = attempt?.mode === 'replay' || attempt?.mode === 'route-test' ? 'saved' : 'live';
-    const occurrenceID = existingOccurrence?.occurrenceID ?? [
-      runID,
-      localNodeID,
-      phase,
-      invocation,
-      retryAttempt,
-      occurrenceSequence,
-    ].map(encodeURIComponent).join('/');
+    const occurrenceID = existingOccurrence?.occurrenceID ??
+      `${progressIdentity}${validProgressIdentity(payload) ? '' : `:uncertain:${eventSequence}`}`;
     let occurrence: SessionRuntimeOccurrence = existingOccurrence ?? {
       occurrenceID,
+      progressIdentity,
       runID,
       segmentID,
       qualifiedNodeID: localNodeID,
@@ -1153,12 +1210,17 @@ export class SessionGraphModel {
       executionSource,
       executionLane,
       graphRevision,
+      ...(frameID === undefined ? {} : { frameID }),
+      ...(frameStepIndex === undefined ? {} : { frameStepIndex }),
+      ...(dispatchOccurrenceID === undefined ? {} : { dispatchOccurrenceID }),
       status: 'pending',
     };
+    if (hasDisplayPayload(payload)) occurrence = { ...occurrence, directDisplaySnapshot: expectedDisplaySnapshot };
     if (kind === 'step/output') {
       if (typeof payload.line !== 'string' || !payload.line) return;
       occurrence = {
         ...occurrence,
+        ...(typeof event.timestamp === 'string' ? { lastActivityAt: event.timestamp } : {}),
         logs: [...(occurrence.logs ?? []), {
           stream: typeof payload.stream === 'string' ? payload.stream : 'stdout',
           line: payload.line,
@@ -1173,15 +1235,31 @@ export class SessionGraphModel {
         'step/failed': 'failed',
         'step/indeterminate': 'indeterminate',
         'step/skipped': 'skipped',
+        'step/cancelled': 'cancelled',
+        'step/denied': 'denied',
+        'step/blocked': 'blocked',
       };
       const status = statuses[kind];
       if (!status) return;
       const timestamp = typeof event.timestamp === 'string' ? event.timestamp : undefined;
+      if (kind === 'step/completed' || kind === 'step/failed') {
+        sanitizeDisplayPayload(payload, expectedDisplaySnapshot);
+        sanitizePresentationPayload(payload);
+      }
+      const presentation = kind === 'step/completed' || kind === 'step/failed'
+        ? terminalPresentation(payload, existingOccurrence, expectedDisplaySnapshot) : undefined;
       const output = plainRecord(payload.output);
       const captures = plainRecord(payload.captures);
       occurrence = {
         ...occurrence,
         status,
+        ...(timestamp ? { lastActivityAt: timestamp } : {}),
+        ...(producerStepKind(payload) ? { stepKind: producerStepKind(payload) } : {}),
+        ...((kind === 'step/completed' || kind === 'step/failed') ? {
+          codePresentation: undefined, outputValueStatus: undefined, presentationDiagnostic: undefined,
+          displayPresentation: undefined, displayPresentationDiagnostic: undefined,
+          output, ...presentation,
+        } : {}),
         ...(typeof payload.error === 'string' ? { error: payload.error } : {}),
         ...(typeof payload.duration_ms === 'number' ? { durationMs: payload.duration_ms } : {}),
         ...(typeof payload.attempt === 'number' ? { attempt: payload.attempt } : {}),
@@ -1207,17 +1285,18 @@ export class SessionGraphModel {
     occurrences.sort((left, right) => {
       const leftAttempt = this.requireManifest().attempts[left.runID]?.ordinal ?? 0;
       const rightAttempt = this.requireManifest().attempts[right.runID]?.ordinal ?? 0;
-      return leftAttempt - rightAttempt || left.occurrenceSequence - right.occurrenceSequence ||
-        left.occurrenceID.localeCompare(right.occurrenceID);
+      return leftAttempt - rightAttempt || compareOccurrences(left, right);
     });
     const activeRunID = this.requireManifest().session.active_run_id;
     const selected = [...occurrences].reverse().find((candidate) => candidate.runID === activeRunID)
       ?? occurrences[occurrences.length - 1];
     this.runtimeNodes = {
       ...this.runtimeNodes,
-      [nodeID]: { ...selected, occurrences },
+      [nodeID]: reconcileRuntimeDisplayState({ ...selected, occurrences,
+        displayObservations: previous.displayObservations }) as SessionRuntimeNodeState,
     };
-    if (kind === 'step/started' || kind === 'step/resumed') {
+    if ((kind === 'step/started' || kind === 'step/resumed') && selected.occurrenceID === occurrence.occurrenceID &&
+        (!activeRunID || activeRunID === runID)) {
       this.currentExecutionNodeID = nodeID;
       this.lastStartedNodeByLane.set(laneKey, { nodeID, eventSequence });
     }
@@ -1282,9 +1361,7 @@ export class SessionGraphModel {
       ))
     )).sort((left, right) => (
       (left.occurrence.startedEventSequence ?? Number.MAX_SAFE_INTEGER) -
-        (right.occurrence.startedEventSequence ?? Number.MAX_SAFE_INTEGER) ||
-      left.occurrence.occurrenceSequence - right.occurrence.occurrenceSequence ||
-      left.occurrence.occurrenceID.localeCompare(right.occurrence.occurrenceID)
+        (right.occurrence.startedEventSequence ?? Number.MAX_SAFE_INTEGER)
     ));
     const runIDs = new Set(occurrences.map(({ occurrence }) => occurrence.runID));
     for (const key of [...this.lastStartedNodeByLane.keys()]) {
@@ -1495,7 +1572,7 @@ const ATTEMPT_MUTABLE_FIELDS = new Set([
   'checkpoint_sequence', 'committed_trace_sequence', 'journaled_trace_sequence',
 ]);
 const TRANSITION_MUTABLE_FIELDS = new Set(['status', 'committed_at', 'aborted_at']);
-const TERMINAL_OCCURRENCE_STATUSES = new Set(['completed', 'failed', 'skipped', 'indeterminate', 'cancelled']);
+const TERMINAL_OCCURRENCE_STATUSES = new Set(['completed', 'failed', 'skipped', 'indeterminate', 'cancelled', 'denied', 'blocked']);
 
 function validateSegmentRecord(existing: SessionSegment, update: SessionSegment): void {
   if (!jsonEqual(
@@ -1631,6 +1708,7 @@ function parseRecord<T>(
 }
 
 function runtimeEventNodeID(payload: Record<string, unknown>): string | undefined {
+  if (typeof payload.qualified_node_id === 'string' && payload.qualified_node_id) return payload.qualified_node_id;
   if (typeof payload.node_id === 'string' && payload.node_id) return payload.node_id;
   if (typeof payload.step_id !== 'string' || !payload.step_id) return undefined;
   const callPath = Array.isArray(payload.call_path)

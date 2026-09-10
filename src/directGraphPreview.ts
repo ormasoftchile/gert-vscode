@@ -1,4 +1,6 @@
 import { parseStepDetails, type StepDetails } from './stepDetails';
+import { parseDisplayJSON } from './displayPresentationJSON';
+import { decodePresentationState, type PresentationState } from './presentationHistory';
 
 export interface GraphRunbookRef {
   id?: string;
@@ -46,6 +48,52 @@ export interface GraphFrame {
   runbook_path: string;
   parent_include_node_id?: string;
   depth: number;
+  invocation?: GraphInvocation;
+}
+
+export interface GraphInvocation {
+  bindings?: Array<{ name: string; type: string; mutable?: boolean; value: unknown; value_present: boolean; enum?: unknown }>;
+  outputs?: Record<string, { type: string; description?: string; value?: string; value_expr?: string;
+    value_tree?: unknown; value_tree_present?: boolean; optional?: boolean; enum?: unknown }>;
+  results?: boolean;
+}
+
+function parseInvocation(value: unknown): GraphInvocation {
+  const object = plainObject(value, 'frame invocation');
+  const closed = (v: Record<string, unknown>, keys: string[]) => {
+    if (Object.keys(v).some(key => !keys.includes(key))) throw new Error('unknown invocation field');
+  };
+  closed(object, ['bindings', 'outputs', 'results']);
+  if (object.results !== undefined && typeof object.results !== 'boolean') throw new Error('invalid invocation results');
+  if (object.bindings !== undefined) {
+    if (!Array.isArray(object.bindings)) throw new Error('invalid invocation bindings');
+    const names = new Set<string>();
+    for (const raw of object.bindings) {
+      const binding = plainObject(raw, 'invocation binding');
+      closed(binding, ['name', 'type', 'mutable', 'value', 'value_present', 'enum']);
+      const name = requiredString(binding, 'name', 'binding name');
+      requiredString(binding, 'type', 'binding type');
+      if (names.has(name) || !Object.hasOwn(binding, 'value') || typeof binding.value_present !== 'boolean' ||
+          binding.mutable !== undefined && typeof binding.mutable !== 'boolean') throw new Error('invalid invocation binding');
+      names.add(name);
+    }
+  }
+  if (object.outputs !== undefined) {
+    for (const [name, raw] of Object.entries(plainObject(object.outputs, 'invocation outputs'))) {
+      if (!name) throw new Error('invalid invocation output name');
+      const output = plainObject(raw, 'invocation output');
+      closed(output, ['type', 'description', 'value', 'value_expr', 'value_tree', 'value_tree_present', 'optional', 'enum']);
+      requiredString(output, 'type', 'output type');
+      for (const key of ['description', 'value', 'value_expr']) optionalString(output, key, `output ${key}`);
+      for (const key of ['value_tree_present', 'optional']) {
+        if (output[key] !== undefined && typeof output[key] !== 'boolean') throw new Error('invalid output presence');
+      }
+      if (Object.hasOwn(output, 'value_tree') && output.value_tree_present !== true) throw new Error('invalid output tree presence');
+      // Go omits a nil value_tree; its presence bit still denotes authored null.
+      if (output.value_tree_present === true && !Object.hasOwn(output, 'value_tree')) output.value_tree = null;
+    }
+  }
+  return object as GraphInvocation;
 }
 
 export interface GraphGroup {
@@ -63,7 +111,7 @@ export interface GraphGroup {
 }
 
 export interface GraphDocument {
-  schema_version: '1';
+  schema_version: '1' | '3';
   hash?: string;
   runbook: GraphRunbookRef;
   nodes: GraphNode[];
@@ -72,10 +120,31 @@ export interface GraphDocument {
   groups: GraphGroup[];
   regions?: unknown;
   inputs?: unknown[];
+  presentation_state?: PresentationState;
+  execution_plan_hash?: string;
+  display_plan_snapshot_digest?: string;
+  bound_content_hash?: string;
 }
 
-export function graphPreviewArgs(runbookPath: string): string[] {
-  return ['preview', '--format', 'graphjson', '--recurse', runbookPath];
+export function validateSessionPresentationBinding(document: GraphDocument, snapshotDigest: string | undefined): void {
+  const envelopes = document.nodes.flatMap(node => node.data.details?.code_presentation ? [node.data.details.code_presentation] : []);
+  if (document.display_plan_snapshot_digest !== undefined &&
+      (typeof document.display_plan_snapshot_digest !== 'string' || document.display_plan_snapshot_digest.length !== 71 ||
+       !/^sha256:[a-f0-9]{64}$/.test(document.display_plan_snapshot_digest))) {
+    throw new Error('session graph display snapshot binding is invalid');
+  }
+  if (!envelopes.length && !document.presentation_state && document.display_plan_snapshot_digest === undefined) return;
+  if (!snapshotDigest || !/^sha256:[a-f0-9]{64}$/.test(snapshotDigest) ||
+      document.execution_plan_hash !== snapshotDigest ||
+      envelopes.some(envelope => envelope.origin !== 'frozen' || envelope.plan_snapshot_digest !== snapshotDigest) ||
+      (document.presentation_state !== undefined && document.presentation_state.plan_snapshot_digest !== snapshotDigest)) {
+    throw new Error('session graph presentation does not match its frozen execution-plan binding');
+  }
+}
+
+export function graphPreviewArgs(runbookPath: string, packageMapPath?: string): string[] {
+  return ['preview', '--format', 'graphjson', '--recurse',
+    ...(packageMapPath ? ['--package-map', packageMapPath] : []), runbookPath];
 }
 
 export type GraphPreviewExecutor = (
@@ -87,20 +156,22 @@ export async function loadGraphDocument(
   binary: string,
   runbookPath: string,
   execute: GraphPreviewExecutor,
+  packageMapPath?: string,
 ): Promise<GraphDocument> {
-  const { stdout } = await execute(binary, graphPreviewArgs(runbookPath));
+  const { stdout } = await execute(binary, graphPreviewArgs(runbookPath, packageMapPath));
   return parseGraphDocument(stdout);
 }
 
 export function parseGraphDocument(stdout: string): GraphDocument {
   let value: unknown;
   try {
-    value = JSON.parse(stdout);
+    value = parseDisplayJSON(stdout);
   } catch {
     throw new Error('gert preview did not return valid JSON');
   }
   const document = plainObject(value, 'gert preview graph document');
-  if (document.schema_version !== '1') {
+  if (document.presentation_state !== undefined) document.presentation_state = decodePresentationState(document.presentation_state);
+  if (document.schema_version !== '1' && document.schema_version !== '3') {
     throw new Error(`unsupported graph schema_version ${JSON.stringify(document.schema_version)}`);
   }
   if (!Array.isArray(document.nodes)) {
@@ -133,6 +204,10 @@ export function parseGraphDocument(stdout: string): GraphDocument {
     if (!Number.isInteger(frame.depth) || (frame.depth as number) < 0) {
       throw new Error(`frame ${id} depth must be a non-negative integer`);
     }
+    if (frame.invocation !== undefined) {
+      if (document.schema_version !== '3') throw new Error('invocation requires graph v3');
+      frame.invocation = parseInvocation(frame.invocation);
+    }
     return frame;
   });
 
@@ -152,7 +227,7 @@ export function parseGraphDocument(stdout: string): GraphDocument {
     optionalString(data, 'tool_name', `node ${id} data.tool_name`);
     optionalString(data, 'tool_action', `node ${id} data.tool_action`);
     if (data.details !== undefined) {
-      data.details = parseStepDetails(data.details, kind, `node ${id} data`);
+      data.details = parseStepDetails(data.details, kind, `node ${id} data`, document.schema_version === '3');
     }
     optionalString(data, 'group_id', `node ${id} data.group_id`);
     optionalString(data, 'frame_id', `node ${id} data.frame_id`);
@@ -254,6 +329,9 @@ export function parseGraphDocument(stdout: string): GraphDocument {
     if (!nodeIDs.has(target)) throw new Error(`edge ${id} references unknown target ${JSON.stringify(target)}`);
   }
 
+  if (document.execution_plan_hash !== undefined) {
+    validateSessionPresentationBinding(value as GraphDocument, document.execution_plan_hash as string);
+  }
   return value as GraphDocument;
 }
 
@@ -311,17 +389,19 @@ export function createDirectGraphWebviewHtml(
   styleUri: string,
   cspSource: string,
   nonce: string,
+  highlightingWorkerUri = '',
+  highlightingEnabled = true,
 ): string {
   return `<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src ${cspSource} data:; style-src ${cspSource}; style-src-attr 'unsafe-inline'; script-src 'nonce-${nonce}';">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src ${cspSource} data:; style-src ${cspSource}; style-src-attr 'unsafe-inline'; script-src 'nonce-${nonce}'; connect-src ${cspSource}; worker-src blob:;">
   <link rel="stylesheet" href="${styleUri}">
   <title>gert runbook graph</title>
 </head>
-<body>
+<body data-highlighting-worker="${highlightingWorkerUri}" data-highlighting-enabled="${highlightingEnabled}">
   <div id="root" role="application" aria-label="Runbook graph"></div>
   <script nonce="${nonce}" src="${scriptUri}"></script>
 </body>

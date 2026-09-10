@@ -2,6 +2,10 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { binarySearchRoots, relativeBinaryCandidates } from './binaryPaths';
+import { bundledPresentationHelper, verifyPresentationHelper } from './presentationClient';
+
+let bundledRoot: string | undefined;
+export function configureBundledRuntime(extensionPath: string): void { bundledRoot = extensionPath; }
 
 // resolveBinary tries deterministic local locations rather than relying on the
 // Extension Host's stripped PATH. The active project is always searched first.
@@ -13,6 +17,21 @@ export async function resolveBinary(
 ): Promise<string> {
   const candidates: string[] = [];
   const useDefaultDiscovery = !configured || configured === 'gert';
+  if (useDefaultDiscovery && bundledRoot) {
+    const helper = bundledPresentationHelper(bundledRoot);
+    let present = false;
+    try {
+      await fs.promises.access(helper, fs.constants.X_OK);
+      present = true;
+    } catch {
+      // An unpackaged development build may still use local discovery.
+    }
+    if (present) {
+      await verifyPresentationHelper(helper);
+      output.appendLine('[gert] using matching packaged runtime');
+      return helper;
+    }
+  }
 
   if (path.isAbsolute(configured)) {
     candidates.push(configured);

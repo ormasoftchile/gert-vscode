@@ -1,3 +1,7 @@
+import { sanitizeEventFrame } from './presentationProjection';
+import { parseDisplayJSON } from './displayPresentationJSON';
+import { ResultsAssembly } from './typedResults';
+import { visitJSONWire } from './authoringProtocol';
 export const STDIO_PROTOCOL_VERSION = 'gert-stdio/v1' as const;
 const MAX_PROTOCOL_LINE_BYTES = 1024 * 1024;
 
@@ -37,8 +41,10 @@ export function buildStdioRunArgs(
   debug = false,
   privateInputNames: ReadonlySet<string> = new Set(),
   routeTestPath?: string,
+  typedResults = false,
 ): string[] {
   const args = ['run', '--stdio'];
+  if (typedResults) args.push('--require-capabilities', 'typed-results/v1,run-results-chunks/v1');
   if (routeTestPath) {
     // The reviewed artifact is authoritative; never mix live input or debug
     // configuration into a zero-dispatch route test.
@@ -68,6 +74,7 @@ export class DirectRunSession {
   private terminal = false;
   private disposed = false;
   private finalized = false;
+  private results?: ResultsAssembly;
 
   constructor(
     private readonly child: RunChildProcess,
@@ -139,25 +146,43 @@ export class DirectRunSession {
   private receive(chunk: string): void {
     if (this.disposed || this.terminal) return;
     this.buffer += chunk;
-    if (Buffer.byteLength(this.buffer, 'utf8') > MAX_PROTOCOL_LINE_BYTES) {
-      this.buffer = '';
-      this.protocolFailure(`stdio protocol line exceeds ${MAX_PROTOCOL_LINE_BYTES} bytes`);
-      return;
-    }
     let newline = this.buffer.indexOf('\n');
     while (newline >= 0) {
       const line = this.buffer.slice(0, newline).trimEnd();
       this.buffer = this.buffer.slice(newline + 1);
+      if (Buffer.byteLength(line, 'utf8') + 1 > MAX_PROTOCOL_LINE_BYTES) {
+        this.protocolFailure(`stdio protocol line exceeds ${MAX_PROTOCOL_LINE_BYTES} bytes`);
+        return;
+      }
       if (line) this.parseLine(line);
       if (this.disposed || this.terminal) return;
       newline = this.buffer.indexOf('\n');
+    }
+    if (Buffer.byteLength(this.buffer, 'utf8') > MAX_PROTOCOL_LINE_BYTES) {
+      this.buffer = '';
+      this.protocolFailure(`stdio protocol line exceeds ${MAX_PROTOCOL_LINE_BYTES} bytes`);
     }
   }
 
   private parseLine(line: string): void {
     let value: unknown;
+    const decorations = new Set(['results', 'results_ref', 'results_unavailable']);
+    let typedWire = false, invalidDecoration = false, invalidIdentity = false, wireError = false;
     try {
-      value = JSON.parse(line);
+      visitJSONWire(line, {
+        // The terminal envelope adds one level to a canonical Results record.
+        maxDepth: 129,
+        onRootValue: (key, value) => {
+          if (decorations.has(key) || (key === 'type' && value === 'run.results.chunk')) typedWire = true;
+        },
+        onDuplicate: (key, rootKey) => {
+          if (decorations.has(rootKey ?? key)) invalidDecoration = true;
+          else if (rootKey === undefined) invalidIdentity = true;
+        },
+      });
+    } catch { wireError = true; }
+    try {
+      value = parseDisplayJSON(line);
     } catch {
       this.protocolFailure('stdio protocol emitted invalid JSON');
       return;
@@ -167,6 +192,12 @@ export class DirectRunSession {
       return;
     }
     const frame = value as Record<string, unknown>;
+    typedWire ||= frame.type === 'run.results.chunk' ||
+      [...decorations].some(key => Object.hasOwn(frame, key));
+    if (typedWire && (invalidIdentity || wireError)) {
+      this.protocolFailure('invalid typed Results wire identity or JSON');
+      return;
+    }
     if (frame.version !== STDIO_PROTOCOL_VERSION) {
       this.protocolFailure(`unsupported protocol version ${JSON.stringify(frame.version)}`);
       return;
@@ -186,15 +217,28 @@ export class DirectRunSession {
           return;
         }
         this.runID = frame.runID;
+        this.results ??= new ResultsAssembly(frame.runID);
       } else if (!this.runID || frame.runID !== this.runID) {
         this.protocolFailure(`runID ${JSON.stringify(frame.runID)} does not match active run ${JSON.stringify(this.runID)}`);
         return;
       }
     }
+    if (frame.type === 'run.results.chunk') {
+      if (invalidDecoration) this.results?.rejectWire();
+      this.results?.acceptChunk(frame);
+      return;
+    }
     if (frame.type === 'run.finished') {
+      if (invalidDecoration) this.results?.rejectWire();
+      frame.resultsAvailability = this.results?.complete(frame) ?? { state: 'unavailable', reason: 'no-active-run' };
+      // Only the validated canonical document crosses into the webview.
+      delete frame.results;
+      delete frame.results_ref;
       this.terminal = true;
       this.buffer = '';
     }
+    try { sanitizeEventFrame(frame); }
+    catch { this.protocolFailure('invalid run event payload'); return; }
     this.callbacks.onFrame(frame as StdioProtocolFrame);
   }
 

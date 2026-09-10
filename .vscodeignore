@@ -4,6 +4,8 @@
 .github/**
 src/**
 test/**
+**/test/**
+**/tests/**
 webview/**
 out/test/**
 out/previewWebview.js
@@ -22,3 +24,13 @@ traces/**
 **/node_modules/.cache/**
 **/.DS_Store
 *.vsix
+scripts/**
+node_modules/shiki/**
+node_modules/@shikijs/**
+node_modules/@types/**
+node_modules/@vscode/**
+node_modules/oniguruma-to-es/**
+node_modules/oniguruma-parser/**
+node_modules/regex/**
+node_modules/regex-recursion/**
+node_modules/regex-utilities/**

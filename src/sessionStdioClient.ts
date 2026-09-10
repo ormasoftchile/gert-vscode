@@ -1,3 +1,5 @@
+import { sanitizeEventFrame } from './presentationProjection';
+import { parseDisplayJSON } from './displayPresentationJSON';
 import { createHash } from 'crypto';
 import type { RunChildProcess } from './directRunSession';
 import { parseGraphDocument, type GraphDocument } from './directGraphPreview';
@@ -289,7 +291,7 @@ export class SessionStdioClient {
   private parseLine(line: string): void {
     let value: unknown;
     try {
-      value = JSON.parse(line);
+      value = parseDisplayJSON(line);
     } catch {
       this.protocolFailure('session stdio emitted invalid JSON');
       return;
@@ -463,6 +465,7 @@ function parseFrame(value: unknown, sessionID: string): SessionProtocolFrame {
   if (frame.runID !== undefined && (typeof frame.runID !== 'string' || !frame.runID)) {
     throw new Error('session frame runID must be a non-empty string');
   }
+  sanitizeEventFrame(frame);
   return frame as unknown as SessionProtocolFrame;
 }
 

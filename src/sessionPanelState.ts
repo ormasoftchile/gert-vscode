@@ -1,11 +1,15 @@
 import { mkdir, readFile, rename, rm, stat, writeFile } from 'fs/promises';
+import { parseDisplayJSON } from './displayPresentationJSON';
 import * as path from 'path';
 import { createHash, randomUUID } from 'crypto';
-import { parseGraphDocument, type GraphDocument } from './directGraphPreview';
+import { sanitizeDisplayPayload, decodeDisplayPresentation } from './displayPresentation';
+import { reconcileRuntimeDisplayState } from './displayObservations';
+import { parseGraphDocument, validateSessionPresentationBinding, type GraphDocument } from './directGraphPreview';
 import {
   parseSessionManifest,
   parseSessionAttempt,
   parseSessionSegment,
+  sessionGraphNodeID,
   validateSessionSegmentGraphBinding,
   type SessionManifest,
   type SessionPendingInteraction,
@@ -140,7 +144,7 @@ export class SessionGraphCacheStore {
     if (!info.isFile() || info.size < 2 || info.size > MAX_SESSION_GRAPH_CACHE_BYTES) return undefined;
     try {
       const encoded = await readFile(this.pathFor(sessionID), 'utf8');
-      return parseSessionGraphCache(JSON.parse(encoded), sessionID, true);
+      return parseSessionGraphCache(parseDisplayJSON(encoded), sessionID, true);
     } catch {
       return undefined;
     }
@@ -247,7 +251,14 @@ function parseSessionGraphCache(
     segmentGraphHistory,
     segmentGraphAvailability,
     preparedTransitionTargets,
-    runtimeNodes: parseRuntimeNodes(source.runtimeNodes ?? {}),
+    runtimeNodes: parseRuntimeNodes(source.runtimeNodes ?? {}, (nodeID, occurrence) => {
+      const segmentID = occurrence.segmentID, localID = occurrence.qualifiedNodeID, revision = occurrence.graphRevision;
+      if (typeof segmentID !== 'string' || typeof localID !== 'string' || typeof revision !== 'number' ||
+        nodeID !== sessionGraphNodeID(expectedSessionID, segmentID, localID)) return undefined;
+      const graph = segmentGraphHistory[segmentID]?.[String(revision)] ??
+        (segmentGraphs[segmentID]?.revision === revision ? segmentGraphs[segmentID] : undefined);
+      return graph?.document.display_plan_snapshot_digest;
+    }),
     ...(typeof source.executionNodeID === 'string' && source.executionNodeID
       ? { executionNodeID: source.executionNodeID }
       : {}),
@@ -266,15 +277,31 @@ function cacheIntegrityDigest(cache: StoredSessionGraphCache): string {
   return `sha256:${createHash('sha256').update(JSON.stringify(cache), 'utf8').digest('hex')}`;
 }
 
-function parseRuntimeNodes(value: unknown): Record<string, SessionRuntimeNodeState> {
+function parseRuntimeNodes(value: unknown, snapshotFor: (nodeID: string, value: Record<string, unknown>) => string | undefined): Record<string, SessionRuntimeNodeState> {
   const source = objectValue(value, 'cached runtime nodes');
   const result: Record<string, SessionRuntimeNodeState> = {};
   for (const [nodeID, raw] of Object.entries(source)) {
     const state = objectValue(raw, 'cached runtime node');
-    result[nodeID] = {
-      ...(state as unknown as SessionRuntimeNodeState),
-      status: stringValue(state.status, 'cached runtime status'),
+    const displayScope = state.displayPresentation !== undefined || state.displayPresentationDiagnostic !== undefined ||
+      state.displayObservations !== undefined || (Array.isArray(state.occurrences) && state.occurrences.some(value =>
+        value && typeof value === 'object' && ('displayPresentation' in value || 'displayPresentationDiagnostic' in value)));
+    const sanitize = (value: Record<string, unknown>) => {
+      const directDisplaySnapshot = snapshotFor(nodeID, value) ?? 'missing-binding';
+      if (value.displayPresentation === undefined && value.displayPresentationDiagnostic === undefined)
+        return { ...value, ...(displayScope ? { directDisplaySnapshot } : {}) };
+      const payload = { display_presentation: value.displayPresentation, output: value.output,
+        display_presentation_diagnostic: value.displayPresentationDiagnostic };
+      sanitizeDisplayPayload(payload, snapshotFor(nodeID, value) ?? 'missing-binding');
+      return { ...value, directDisplaySnapshot, output: payload.output, displayPresentation: decodeDisplayPresentation(payload.display_presentation),
+        displayPresentationDiagnostic: payload.display_presentation_diagnostic as string | undefined };
     };
+    result[nodeID] = reconcileRuntimeDisplayState({
+      ...(sanitize(state) as unknown as SessionRuntimeNodeState),
+      ...(Array.isArray(state.occurrences) ? {
+        occurrences: state.occurrences.map(value => sanitize(objectValue(value, 'cached occurrence'))) as unknown as SessionRuntimeNodeState['occurrences'],
+      } : {}),
+      status: stringValue(state.status, 'cached runtime status'),
+    }) as SessionRuntimeNodeState;
   }
   return result;
 }
@@ -331,6 +358,7 @@ function parseCachedSegmentGraph(value: unknown): CachedSegmentGraph {
   }
   const segmentSnapshot = parseSessionSegment(graph.segmentSnapshot);
   validateSessionSegmentGraphBinding(segmentSnapshot, revision, wholeBlobHash);
+  validateSessionPresentationBinding(document, segmentSnapshot.executable_snapshot_hash);
   return { revision, wholeBlobHash, encodedDocument, document, segmentSnapshot };
 }
 
@@ -343,7 +371,7 @@ export function parseSessionGraphRevisionResponse(
   if (Buffer.byteLength(encoded, 'utf8') > MAX_SESSION_GRAPH_CACHE_BYTES * 2) {
     throw new Error('session graph response exceeds limits');
   }
-  const source = objectValue(JSON.parse(encoded), 'session graph response');
+  const source = objectValue(parseDisplayJSON(encoded), 'session graph response');
   if (source.schema_version !== 'session-graph-revision/v1' || source.session_id !== expectedSessionID ||
       source.graph_revision !== expectedRevision || typeof source.data !== 'string' ||
       !/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(source.data)) {
@@ -363,11 +391,13 @@ export function parseSessionGraphRevisionResponse(
   const encodedDocument = graphBytes.toString('utf8');
   const actualDigest = `sha256:${createHash('sha256').update(graphBytes).digest('hex')}`;
   if (actualDigest !== wholeBlobHash) throw new Error('session graph response digest mismatch');
+  const document = parseGraphDocument(encodedDocument);
+  validateSessionPresentationBinding(document, segmentSnapshot.executable_snapshot_hash);
   return {
     revision: expectedRevision,
     wholeBlobHash,
     encodedDocument,
-    document: parseGraphDocument(encodedDocument),
+    document,
     segmentSnapshot,
   };
 }

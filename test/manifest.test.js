@@ -3,6 +3,21 @@ const test = require('node:test');
 
 const manifest = require('../package.json');
 
+test('autocomplete has an independent toggle and only explicit required argument scaffolding', () => {
+  const properties = manifest.contributes.configuration.properties;
+  assert.equal(properties['gert.autocomplete.enabled'].type, 'boolean');
+  assert.equal(properties['gert.autocomplete.enabled'].default, true);
+  assert.equal(properties['gert.highlighting.enabled'].default, true);
+  assert.equal(properties['gert.highlighting.developmentHelperPath'].scope, 'machine');
+  assert.equal(properties['gert.autocomplete.developmentHelperPath'], undefined, 'Shared helper override, not competing binaries');
+  assert.ok(manifest.contributes.commands.some(command => command.command === 'gert.insertRequiredArguments' &&
+    command.title === 'Gert: Insert Missing Required Arguments'));
+  assert.ok(manifest.scripts['test:authoring:core'] && manifest.scripts['test:authoring:native']);
+});
+test('safe highlighting diagnostics are available as one Command Palette action', () => {
+  assert.ok(manifest.contributes.commands.some(command => command.command === 'gert.showHighlightingDiagnostics'));
+});
+
 test('React Flow preview is a visible editor title action for runbooks', () => {
   const command = manifest.contributes.commands.find(
     (candidate) => candidate.command === 'gert.previewGraph',
@@ -72,20 +87,21 @@ test('gert.validateInputs is contributed as a Command Palette entry', () => {
 
 // CE-C-02 (barbara-client-enum-compatibility-ruling.md, AR-CE-8): this
 // extension has no `runbook/v1` JSON Schema, no `jsonValidation`/
-// `yamlValidation` contribution, and no YAML parser dependency for runbook
-// files. It forwards files to the real `gert` CLI/server and never
+// `yamlValidation` contribution. It forwards files to the real `gert` CLI/server and never
 // re-implements structural or enum-membership validation of its own.
 // Exception: js-yaml is allowed because it is used to parse *.tool.yaml
 // *tool definition* files for the MCP bridge registry — never to validate
-// runbook YAML or to substitute for the gert engine.
-test('CE-C-02: no bundled schema, no editor schema-validation contribution, no YAML parser dependency', () => {
+// runbook YAML or to substitute for the gert engine. Approved code presentation
+// additionally uses yaml CST only to map exact core-selected scalar ranges.
+test('CE-C-02: no bundled schema or editor schema-validation; CST mapping is not a binding resolver', () => {
   assert.equal(manifest.contributes.jsonValidation, undefined, 'no jsonValidation contribution point expected');
   assert.equal(manifest.contributes.yamlValidation, undefined, 'no yamlValidation contribution point expected');
 
   const deps = { ...(manifest.dependencies ?? {}), ...(manifest.devDependencies ?? {}) };
   // js-yaml is intentionally allowed: used for parsing .tool.yaml definitions
   // in the MCP bridge registry, not for runbook validation.
-  const yamlParserAllowlist = new Set(['js-yaml', '@types/js-yaml']);
+  const yamlParserAllowlist = new Set(['js-yaml', '@types/js-yaml', 'yaml']);
+  assert.equal(deps.yaml, '2.8.1', 'CST mapper uses the vetted pinned YAML package');
   for (const name of Object.keys(deps)) {
     if (yamlParserAllowlist.has(name)) continue;
     assert.doesNotMatch(

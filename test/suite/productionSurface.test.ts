@@ -4,6 +4,11 @@ import * as vscode from 'vscode';
 const EXTENSION_ID = 'ormasoftchile.gert-preview';
 
 suite('Installed VSIX production surface', () => {
+  test('Workflow Markdown installed production bundle', async function () {
+    this.timeout(120000);
+    if (!process.env.GERT_WORKFLOW_ARTIFACTS && !process.env.GERT_TEST_GREP?.includes('Workflow Markdown')) this.skip();
+    await require('../../../test/helpers/workflow-markdown-native.cjs').verify(vscode, true);
+  });
   test('exposes only the direct runbook view and no test or SSE commands', async () => {
     const extension = vscode.extensions.getExtension(EXTENSION_ID);
     assert.ok(extension, `Extension ${EXTENSION_ID} must be installed from the VSIX`);

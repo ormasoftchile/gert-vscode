@@ -24,7 +24,11 @@ import { execFile, spawn } from 'child_process';
 import { promisify } from 'util';
 import * as path from 'path';
 import { randomBytes, randomUUID } from 'crypto';
-import { resolveBinary } from './binaryResolver';
+import { configureBundledRuntime, resolveBinary } from './binaryResolver';
+import { registerPresentationEditor, setPresentationEntrypoint } from './presentationEditor';
+import { registerAuthoringEditor } from './authoringEditor';
+import { presentationProjectRoot } from './presentationContext';
+import { bundledPresentationHelper, requireCompatibleExecution, resolvePresentation, verifyPresentationHelper, usesTypedResults } from './presentationClient';
 import { McpBridge } from './mcpBridge';
 import { buildRegistryForRun, buildRegistryFromDir } from './toolDefinitionRegistry';
 import { pickProjectRoot } from './projectRoot';
@@ -73,6 +77,7 @@ import {
   loadGraphDocument,
   sessionMayRequireMcpBridge,
 } from './directGraphPreview';
+import { graphSourceChanged } from './graphSourceChanged';
 import { WORKSPACE_RUNBOOK_KEY, resolveRunbookPath } from './panelRecovery';
 import { resolvePreviewPanelTarget } from './previewPlacement';
 import {
@@ -99,6 +104,23 @@ import {
 } from './enumInputs';
 
 const pexec = promisify(execFile);
+
+async function requireRunbookCompatibility(
+  binary: string, document: GraphDocument, runbookPath: string, projectRoot: string, packageMapPath?: string,
+): Promise<void> {
+  if (/^\.env(?:\.|$)/i.test(path.basename(runbookPath))) throw new Error('A runbook path is required for compatibility verification.');
+  const uri = vscode.Uri.file(runbookPath);
+  const stat = await vscode.workspace.fs.stat(uri);
+  if (stat.size > 8 * 1024 * 1024) throw new Error('Runbook metadata exceeds the local compatibility-check limit.');
+  const text = Buffer.from(await vscode.workspace.fs.readFile(uri)).toString('utf8');
+  const helper = bundledPresentationHelper(extensionContext!.extensionPath);
+  const metadata = await resolvePresentation(helper, {
+    schema_version: 'presentation-resolve/v1', request_id: `execution-preflight:${randomUUID()}`,
+    context: { project_root: projectRoot, generation: 0, ...(packageMapPath ? { package_map_path: packageMapPath } : {}) },
+    document: { uri: uri.toString(), path: runbookPath, version: 0, text }, overlays: [],
+  });
+  await requireCompatibleExecution(binary, document, metadata);
+}
 
 let output: vscode.OutputChannel | null = null;
 // ExtensionContext is stored at module scope so workspace state can be
@@ -205,7 +227,10 @@ function createMcpBridge(
 
 export function activate(context: vscode.ExtensionContext) {
   extensionContext = context;
+  configureBundledRuntime(context.extensionPath);
   output = vscode.window.createOutputChannel('gert');
+  context.subscriptions.push(registerPresentationEditor(context, output));
+  context.subscriptions.push(registerAuthoringEditor(context));
 
   // Chat participant — drives runbooks or captures token for MCP discovery.
   // /run   — runs a runbook in-handler, keeping the handler open until terminal.
@@ -276,25 +301,28 @@ export function activate(context: vscode.ExtensionContext) {
               runbookArg,
             );
 
+        const cfg = vscode.workspace.getConfiguration('gert', vscode.Uri.file(runbookPath));
+        const packageMapSetting = cfg.get<string>('packageMap', '');
+        const folders = (vscode.workspace.workspaceFolders ?? []).map(folder => folder.uri.fsPath);
+        const projectRoot = pickProjectRoot(runbookPath, folders, path.dirname(runbookPath));
+        let bin: string;
         try {
+          bin = await resolveBinary(cfg.get<string>('binaryPath', 'gert'), output!, projectRoot, folders);
+          const presentationBinary = bundledPresentationHelper(context.extensionPath);
+          await verifyPresentationHelper(presentationBinary);
+          const graph = await loadGraphDocument(presentationBinary, runbookPath, (command, args) => pexec(command, args, { cwd: projectRoot, maxBuffer: 16 * 1024 * 1024 }),
+            resolveRunPackageMapPath(projectRoot, packageMapSetting).path);
+          await requireRunbookCompatibility(bin, graph, runbookPath, projectRoot, resolveRunPackageMapPath(projectRoot, packageMapSetting).path);
           await ensureMcpBridge();
         } catch (error) {
-          reportEngineFailure('MCP bridge startup', error);
-          response.markdown('❌ **gert run could not start the MCP bridge.**');
+          reportEngineFailure('Runtime compatibility or MCP bridge startup', error);
+          response.markdown('❌ **gert run could not start: check runtime compatibility and bridge availability in the run log.**');
           return {};
         }
 
         // Refresh registry so the bridge dispatches against this runbook's tools.
         refreshBridgeRegistry(runbookPath);
 
-        const cfg = vscode.workspace.getConfiguration('gert', vscode.Uri.file(runbookPath));
-        const bin = cfg.get<string>('binaryPath', 'gert');
-        const packageMapSetting = cfg.get<string>('packageMap', '');
-        const projectRoot = pickProjectRoot(
-          runbookPath,
-          (vscode.workspace.workspaceFolders ?? []).map((folder) => folder.uri.fsPath),
-          path.dirname(runbookPath),
-        );
         const bridgeVars: Record<string, string> = mcpBridge
           ? {
               GERT_VSCODE_BRIDGE_URL: mcpBridge.bridgeUrl,
@@ -859,6 +887,8 @@ async function openDirectGraphPanelForRunbook(
     styleUri,
     panel.webview.cspSource,
     randomBytes(16).toString('hex'),
+    panel.webview.asWebviewUri(vscode.Uri.joinPath(mediaRoot, 'highlighting-worker.js')).toString(),
+    config.get<boolean>('highlighting.enabled', true),
   );
 
   let disposed = false;
@@ -1120,14 +1150,15 @@ async function openDirectGraphPanelForRunbook(
       ? buildRegistryForRun(descriptor.projectRoot, packageMap.path)
       : {};
     try {
-      bridge = currentDocument && sessionMayRequireMcpBridge(currentDocument, vscodeMcpActions)
-        ? await createMcpBridge(vscodeMcpActions, vscode.Uri.file(runbookPath))
-        : undefined;
-      if (!isCurrent()) return;
       const configuredBinary = scopedConfig.get<string>('binaryPath', 'gert');
       const binary = testHooks?.spawnSession
         ? configuredBinary
         : await resolveBinary(configuredBinary, output!, descriptor.projectRoot, workspaceFolders);
+      if (!testHooks?.spawnSession && currentDocument) await requireCompatibleExecution(binary, currentDocument);
+      bridge = currentDocument && sessionMayRequireMcpBridge(currentDocument, vscodeMcpActions)
+        ? await createMcpBridge(vscodeMcpActions, vscode.Uri.file(runbookPath))
+        : undefined;
+      if (!isCurrent()) return;
       if (!isCurrent()) return;
 	  const launchArgs = withSessionPackageMap(args, packageMap.path);
       const spawnOptions: Parameters<typeof spawn>[2] = {
@@ -1303,6 +1334,7 @@ async function openDirectGraphPanelForRunbook(
     const workspaceFolders = (vscode.workspace.workspaceFolders ?? []).map((folder) => folder.uri.fsPath);
     const projectRoot = pickProjectRoot(runbookPath, workspaceFolders, path.dirname(runbookPath));
     const isCurrentRevision = () => !disposed && revision === loadRevision;
+    const authoringRoot = presentationProjectRoot(runbookPath, workspaceFolders, path.dirname(runbookPath), scopedConfig.get<string>('packageMap', ''));
     try {
       let document: GraphDocument;
       if (testHooks?.documentLoader) {
@@ -1310,20 +1342,24 @@ async function openDirectGraphPanelForRunbook(
         if (!isCurrentRevision()) return;
       } else {
         const configuredBinary = scopedConfig.get<string>('binaryPath', 'gert');
-        const binary = await resolveBinary(configuredBinary, output!, projectRoot, workspaceFolders);
+        let binary = scopedConfig.get<string>('highlighting.developmentHelperPath', '') || bundledPresentationHelper(extensionContext!.extensionPath);
+        if (!path.isAbsolute(binary)) throw new Error('Presentation helper path must be absolute.');
+        try { await verifyPresentationHelper(binary, controller.signal); }
+        catch { binary = await resolveBinary(configuredBinary, output!, projectRoot, workspaceFolders); }
         if (!isCurrentRevision()) return;
         document = await loadGraphDocument(binary, runbookPath, async (command, args) => {
           const { stdout } = await pexec(command, args, {
-            cwd: projectRoot,
+            cwd: authoringRoot,
             signal: controller.signal,
             maxBuffer: 16 * 1024 * 1024,
           });
           if (!isCurrentRevision()) throw new Error('Graph reload was superseded.');
           return { stdout };
-        });
+        }, resolveRunPackageMapPath(authoringRoot, scopedConfig.get<string>('packageMap', '')).path);
         if (!isCurrentRevision()) return;
       }
       let planHash = document.hash;
+      setPresentationEntrypoint(authoringRoot, runbookPath, document.frames.map(frame => frame.runbook_path));
       let planWarning: string | undefined;
       if (!testHooks?.documentLoader) {
         try {
@@ -1476,6 +1512,11 @@ async function openDirectGraphPanelForRunbook(
         scopedConfig.get<string>('packageMap', ''),
       );
       if (packageMap.warning) output?.appendLine(`[gert run] WARNING: ${packageMap.warning}`);
+      const configuredBinary = scopedConfig.get<string>('binaryPath', 'gert');
+      const binary = testHooks?.spawnRun
+        ? configuredBinary
+        : await resolveBinary(configuredBinary, output!, projectRoot, workspaceFolders);
+      if (!testHooks?.spawnRun) await requireRunbookCompatibility(binary, currentDocument!, runbookPath, projectRoot, packageMap.path);
       const vscodeMcpActions = routeTestPath ? {} : buildRegistryForRun(projectRoot, packageMap.path);
       const bridge = !routeTestPath && graphMayRequireMcpBridge(currentDocument!, vscodeMcpActions)
         ? await createMcpBridge(vscodeMcpActions, vscode.Uri.file(runbookPath))
@@ -1486,13 +1527,10 @@ async function openDirectGraphPanelForRunbook(
         runBridge = undefined;
         return;
       }
-      const configuredBinary = scopedConfig.get<string>('binaryPath', 'gert');
-      const binary = testHooks?.spawnRun
-        ? configuredBinary
-        : await resolveBinary(configuredBinary, output!, projectRoot, workspaceFolders);
       if (!startupIsActive()) return;
       const privateInputNames = routeTestPath ? new Set<string>() : directSecretInputNames(currentDocument!);
-      const args = buildStdioRunArgs(runbookPath, inputs, packageMap.path, debug !== undefined, privateInputNames, routeTestPath);
+      const args = buildStdioRunArgs(runbookPath, inputs, packageMap.path, debug !== undefined, privateInputNames, routeTestPath,
+        currentDocument !== undefined && usesTypedResults(currentDocument));
       const spawnOptions: Parameters<typeof spawn>[2] = {
         cwd: projectRoot,
         env: {
@@ -1838,9 +1876,17 @@ async function openDirectGraphPanelForRunbook(
     }
   });
   const saveSub = vscode.workspace.onDidSaveTextDocument((document) => {
-    if (document.fileName === runbookPath) requestReload();
+    const folders = (vscode.workspace.workspaceFolders ?? []).map(folder => folder.uri.fsPath);
+    const config = vscode.workspace.getConfiguration('gert', vscode.Uri.file(runbookPath));
+    const projectRoot = presentationProjectRoot(runbookPath, folders, path.dirname(runbookPath), config.get<string>('packageMap', ''));
+    const packageMap = resolveRunPackageMapPath(projectRoot, config.get<string>('packageMap', ''));
+    if (graphSourceChanged(document.fileName, runbookPath, projectRoot, currentDocument, packageMap.path)) requestReload();
   });
   const configSub = vscode.workspace.onDidChangeConfiguration((event) => {
+    if (event.affectsConfiguration('gert.packageMap', vscode.Uri.file(runbookPath))) requestReload();
+    if (event.affectsConfiguration('gert.highlighting.enabled')) {
+      void panel.webview.postMessage({ type: 'highlighting', enabled: vscode.workspace.getConfiguration('gert', vscode.Uri.file(runbookPath)).get<boolean>('highlighting.enabled', true) });
+    }
     if (!event.affectsConfiguration('gert.preview.nodeStyle', vscode.Uri.file(runbookPath))) return;
     const updatedStyle = vscode.workspace
       .getConfiguration('gert', vscode.Uri.file(runbookPath))

@@ -43,6 +43,32 @@ test('graph preview invokes the CLI graphjson contract directly', () => {
   );
 });
 
+test('graph preview passes the resolved package map before the positional runbook', async () => {
+  const map = 'C:\\work\\packages\\local-onebox.serve-package-map.yaml';
+  const runbook = 'C:\\work\\incident.runbook.yaml';
+  const fixture = fs.readFileSync(path.join(__dirname, 'fixtures', 'enum-preview-graphjson.json'), 'utf8');
+  await loadGraphDocument('gert', runbook, async (binary, args) => {
+    assert.deepEqual(args, ['preview', '--format', 'graphjson', '--recurse', '--package-map', map, runbook]);
+    return { stdout: fixture };
+  }, map);
+});
+
+test('current graph invalidation includes authored tool saves and map, not unrelated files', () => {
+  const { graphSourceChanged } = require('../out/graphSourceChanged');
+  const project = path.resolve('project');
+  const runbook = path.join(project, 'main.runbook.yaml');
+  const map = path.join(project, 'packages', 'custom-map.yaml');
+  const included = path.resolve('external', 'included.runbook.yaml');
+  const doc = { frames: [{ runbook_path: included }] };
+  const changed = file => graphSourceChanged(file, runbook, project, doc, map);
+  for (const file of [runbook, map, included, path.join(project, 'packages', 'query.tool.yaml')]) assert.equal(changed(file), true, file);
+  for (const file of [path.join(project, 'notes.yaml'), path.resolve('project-other', 'query.tool.yaml'),
+    path.join(project, 'other.runbook.yaml')]) assert.equal(changed(file), false, file);
+  const source = fs.readFileSync(path.join(root, 'src', 'extension.ts'), 'utf8');
+  assert.match(source, /if \(graphSourceChanged\([\s\S]*?\)\) requestReload\(\)/);
+  assert.match(source, /const requestReload = \(\) => \{\s+if \(runStarting \|\| runSession \|\| investigationClient \|\| investigationDescriptor\)/);
+});
+
 test('loadGraphDocument executes graphjson and validates stdout', async () => {
   const calls = [];
   const fixture = fs.readFileSync(
@@ -273,8 +299,10 @@ test('webview identifies focused and current steps with distinct side arrows', (
   assert.match(source, /Current step:\s*\$\{locatorText\}/);
   assert.match(source, /<code title=\{id\}>\{locatorText\}<\/code>/);
   assert.match(source, /executionPosition\.terminal \? 'Last reached' : 'Current'/);
-  assert.match(source, /className=\{`execution-position-strip/);
-  assert.match(source, />Locate<\/span>/);
+  const activity = fs.readFileSync(path.join(root, 'webview', 'CurrentActivity.tsx'), 'utf8');
+  assert.match(source, /<CurrentActivityStrip activities=\{activities\}/);
+  assert.match(activity, /className="execution-position-strip current-activity"/);
+  assert.match(activity, />Locate<\/span>/);
   assert.match(source, /executionNodeID=\{executionNodeID\}/);
   assert.match(source, /setExecutionNodeID\(reachedNodeID\)/);
   assert.match(source, /className="node-locator focused"/);
@@ -397,7 +425,8 @@ test('route-test editor preserves skipped saved step outcomes', () => {
   test('webview retains bounded live step details for the inspector', () => {
     const source = fs.readFileSync(path.join(root, 'webview', 'graph.tsx'), 'utf8');
 
-    assert.match(source, /output:\s*recordValue\(payload\.output\)/);
+    assert.match(source, /output:\s*event\.kind === 'step\/completed' \|\| event\.kind === 'step\/failed'\s*\?\s*recordValue\(payload\.output\)\s*:\s*previous\.output/);
+    assert.match(source, /payload\.qualified_node_id/);
     assert.match(source, /captures:\s*recordValue\(payload\.captures\)/);
     assert.match(source, /evidence:\s*payload\.evidence/);
     assert.match(source, /logs:\s*appendRuntimeLog/);

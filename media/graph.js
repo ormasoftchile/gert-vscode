@@ -30,9 +30,9 @@
     mod
   ));
 
-  // node_modules/@dagrejs/graphlib/lib/graph.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/graph.js
   var require_graph = __commonJS({
-    "node_modules/@dagrejs/graphlib/lib/graph.js"(exports, module) {
+    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/graph.js"(exports, module) {
       "use strict";
       var DEFAULT_EDGE_NAME = "\0";
       var GRAPH_NODE = "\0";
@@ -623,16 +623,16 @@
     }
   });
 
-  // node_modules/@dagrejs/graphlib/lib/version.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/version.js
   var require_version = __commonJS({
-    "node_modules/@dagrejs/graphlib/lib/version.js"(exports, module) {
+    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/version.js"(exports, module) {
       module.exports = "2.2.4";
     }
   });
 
-  // node_modules/@dagrejs/graphlib/lib/index.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/index.js
   var require_lib = __commonJS({
-    "node_modules/@dagrejs/graphlib/lib/index.js"(exports, module) {
+    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/index.js"(exports, module) {
       module.exports = {
         Graph: require_graph(),
         version: require_version()
@@ -640,9 +640,9 @@
     }
   });
 
-  // node_modules/@dagrejs/graphlib/lib/json.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/json.js
   var require_json = __commonJS({
-    "node_modules/@dagrejs/graphlib/lib/json.js"(exports, module) {
+    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/json.js"(exports, module) {
       var Graph = require_graph();
       module.exports = {
         write,
@@ -706,9 +706,9 @@
     }
   });
 
-  // node_modules/@dagrejs/graphlib/lib/alg/components.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/alg/components.js
   var require_components = __commonJS({
-    "node_modules/@dagrejs/graphlib/lib/alg/components.js"(exports, module) {
+    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/alg/components.js"(exports, module) {
       module.exports = components;
       function components(g) {
         var visited = {};
@@ -733,9 +733,9 @@
     }
   });
 
-  // node_modules/@dagrejs/graphlib/lib/data/priority-queue.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/data/priority-queue.js
   var require_priority_queue = __commonJS({
-    "node_modules/@dagrejs/graphlib/lib/data/priority-queue.js"(exports, module) {
+    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/data/priority-queue.js"(exports, module) {
       var PriorityQueue = class {
         _arr = [];
         _keyIndices = {};
@@ -871,9 +871,9 @@
     }
   });
 
-  // node_modules/@dagrejs/graphlib/lib/alg/dijkstra.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/alg/dijkstra.js
   var require_dijkstra = __commonJS({
-    "node_modules/@dagrejs/graphlib/lib/alg/dijkstra.js"(exports, module) {
+    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/alg/dijkstra.js"(exports, module) {
       var PriorityQueue = require_priority_queue();
       module.exports = dijkstra;
       var DEFAULT_WEIGHT_FUNC = () => 1;
@@ -923,9 +923,9 @@
     }
   });
 
-  // node_modules/@dagrejs/graphlib/lib/alg/dijkstra-all.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/alg/dijkstra-all.js
   var require_dijkstra_all = __commonJS({
-    "node_modules/@dagrejs/graphlib/lib/alg/dijkstra-all.js"(exports, module) {
+    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/alg/dijkstra-all.js"(exports, module) {
       var dijkstra = require_dijkstra();
       module.exports = dijkstraAll;
       function dijkstraAll(g, weightFunc, edgeFunc) {
@@ -937,9 +937,9 @@
     }
   });
 
-  // node_modules/@dagrejs/graphlib/lib/alg/tarjan.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/alg/tarjan.js
   var require_tarjan = __commonJS({
-    "node_modules/@dagrejs/graphlib/lib/alg/tarjan.js"(exports, module) {
+    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/alg/tarjan.js"(exports, module) {
       module.exports = tarjan;
       function tarjan(g) {
         var index = 0;
@@ -982,9 +982,9 @@
     }
   });
 
-  // node_modules/@dagrejs/graphlib/lib/alg/find-cycles.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/alg/find-cycles.js
   var require_find_cycles = __commonJS({
-    "node_modules/@dagrejs/graphlib/lib/alg/find-cycles.js"(exports, module) {
+    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/alg/find-cycles.js"(exports, module) {
       var tarjan = require_tarjan();
       module.exports = findCycles;
       function findCycles(g) {
@@ -995,9 +995,9 @@
     }
   });
 
-  // node_modules/@dagrejs/graphlib/lib/alg/floyd-warshall.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/alg/floyd-warshall.js
   var require_floyd_warshall = __commonJS({
-    "node_modules/@dagrejs/graphlib/lib/alg/floyd-warshall.js"(exports, module) {
+    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/alg/floyd-warshall.js"(exports, module) {
       module.exports = floydWarshall;
       var DEFAULT_WEIGHT_FUNC = () => 1;
       function floydWarshall(g, weightFn, edgeFn) {
@@ -1047,9 +1047,9 @@
     }
   });
 
-  // node_modules/@dagrejs/graphlib/lib/alg/topsort.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/alg/topsort.js
   var require_topsort = __commonJS({
-    "node_modules/@dagrejs/graphlib/lib/alg/topsort.js"(exports, module) {
+    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/alg/topsort.js"(exports, module) {
       function topsort(g) {
         var visited = {};
         var stack = {};
@@ -1082,9 +1082,9 @@
     }
   });
 
-  // node_modules/@dagrejs/graphlib/lib/alg/is-acyclic.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/alg/is-acyclic.js
   var require_is_acyclic = __commonJS({
-    "node_modules/@dagrejs/graphlib/lib/alg/is-acyclic.js"(exports, module) {
+    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/alg/is-acyclic.js"(exports, module) {
       var topsort = require_topsort();
       module.exports = isAcyclic;
       function isAcyclic(g) {
@@ -1101,9 +1101,9 @@
     }
   });
 
-  // node_modules/@dagrejs/graphlib/lib/alg/dfs.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/alg/dfs.js
   var require_dfs = __commonJS({
-    "node_modules/@dagrejs/graphlib/lib/alg/dfs.js"(exports, module) {
+    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/alg/dfs.js"(exports, module) {
       module.exports = dfs;
       function dfs(g, vs, order) {
         if (!Array.isArray(vs)) {
@@ -1147,19 +1147,19 @@
           }
         }
       }
-      function forEachRight(array2, iteratee) {
-        var length = array2.length;
+      function forEachRight(array3, iteratee) {
+        var length = array3.length;
         while (length--) {
-          iteratee(array2[length], length, array2);
+          iteratee(array3[length], length, array3);
         }
-        return array2;
+        return array3;
       }
     }
   });
 
-  // node_modules/@dagrejs/graphlib/lib/alg/postorder.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/alg/postorder.js
   var require_postorder = __commonJS({
-    "node_modules/@dagrejs/graphlib/lib/alg/postorder.js"(exports, module) {
+    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/alg/postorder.js"(exports, module) {
       var dfs = require_dfs();
       module.exports = postorder;
       function postorder(g, vs) {
@@ -1168,9 +1168,9 @@
     }
   });
 
-  // node_modules/@dagrejs/graphlib/lib/alg/preorder.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/alg/preorder.js
   var require_preorder = __commonJS({
-    "node_modules/@dagrejs/graphlib/lib/alg/preorder.js"(exports, module) {
+    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/alg/preorder.js"(exports, module) {
       var dfs = require_dfs();
       module.exports = preorder;
       function preorder(g, vs) {
@@ -1179,9 +1179,9 @@
     }
   });
 
-  // node_modules/@dagrejs/graphlib/lib/alg/prim.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/alg/prim.js
   var require_prim = __commonJS({
-    "node_modules/@dagrejs/graphlib/lib/alg/prim.js"(exports, module) {
+    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/alg/prim.js"(exports, module) {
       var Graph = require_graph();
       var PriorityQueue = require_priority_queue();
       module.exports = prim;
@@ -1226,9 +1226,9 @@
     }
   });
 
-  // node_modules/@dagrejs/graphlib/lib/alg/index.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/alg/index.js
   var require_alg = __commonJS({
-    "node_modules/@dagrejs/graphlib/lib/alg/index.js"(exports, module) {
+    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/lib/alg/index.js"(exports, module) {
       module.exports = {
         components: require_components(),
         dijkstra: require_dijkstra(),
@@ -1245,9 +1245,9 @@
     }
   });
 
-  // node_modules/@dagrejs/graphlib/index.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/index.js
   var require_graphlib = __commonJS({
-    "node_modules/@dagrejs/graphlib/index.js"(exports, module) {
+    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/graphlib/index.js"(exports, module) {
       var lib = require_lib();
       module.exports = {
         Graph: lib.Graph,
@@ -1258,9 +1258,9 @@
     }
   });
 
-  // node_modules/@dagrejs/dagre/lib/data/list.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/data/list.js
   var require_list = __commonJS({
-    "node_modules/@dagrejs/dagre/lib/data/list.js"(exports, module) {
+    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/data/list.js"(exports, module) {
       var List = class {
         constructor() {
           let sentinel = {};
@@ -1311,9 +1311,9 @@
     }
   });
 
-  // node_modules/@dagrejs/dagre/lib/greedy-fas.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/greedy-fas.js
   var require_greedy_fas = __commonJS({
-    "node_modules/@dagrejs/dagre/lib/greedy-fas.js"(exports, module) {
+    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/greedy-fas.js"(exports, module) {
       var Graph = require_graphlib().Graph;
       var List = require_list();
       module.exports = greedyFAS;
@@ -1412,9 +1412,9 @@
     }
   });
 
-  // node_modules/@dagrejs/dagre/lib/util.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/util.js
   var require_util = __commonJS({
-    "node_modules/@dagrejs/dagre/lib/util.js"(exports, module) {
+    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/util.js"(exports, module) {
       "use strict";
       var Graph = require_graphlib().Graph;
       module.exports = {
@@ -1578,10 +1578,10 @@
         }
         return addDummyNode(g, "border", node, prefix);
       }
-      function splitToChunks(array2, chunkSize = CHUNKING_THRESHOLD) {
+      function splitToChunks(array3, chunkSize = CHUNKING_THRESHOLD) {
         const chunks = [];
-        for (let i = 0; i < array2.length; i += chunkSize) {
-          const chunk = array2.slice(i, i + chunkSize);
+        for (let i = 0; i < array3.length; i += chunkSize) {
+          const chunk = array3.slice(i, i + chunkSize);
           chunks.push(chunk);
         }
         return chunks;
@@ -1676,9 +1676,9 @@
     }
   });
 
-  // node_modules/@dagrejs/dagre/lib/acyclic.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/acyclic.js
   var require_acyclic = __commonJS({
-    "node_modules/@dagrejs/dagre/lib/acyclic.js"(exports, module) {
+    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/acyclic.js"(exports, module) {
       "use strict";
       var greedyFAS = require_greedy_fas();
       var uniqueId = require_util().uniqueId;
@@ -1738,9 +1738,9 @@
     }
   });
 
-  // node_modules/@dagrejs/dagre/lib/normalize.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/normalize.js
   var require_normalize = __commonJS({
-    "node_modules/@dagrejs/dagre/lib/normalize.js"(exports, module) {
+    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/normalize.js"(exports, module) {
       "use strict";
       var util = require_util();
       module.exports = {
@@ -1810,9 +1810,9 @@
     }
   });
 
-  // node_modules/@dagrejs/dagre/lib/rank/util.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/rank/util.js
   var require_util2 = __commonJS({
-    "node_modules/@dagrejs/dagre/lib/rank/util.js"(exports, module) {
+    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/rank/util.js"(exports, module) {
       "use strict";
       var { applyWithChunking } = require_util();
       module.exports = {
@@ -1847,9 +1847,9 @@
     }
   });
 
-  // node_modules/@dagrejs/dagre/lib/rank/feasible-tree.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/rank/feasible-tree.js
   var require_feasible_tree = __commonJS({
-    "node_modules/@dagrejs/dagre/lib/rank/feasible-tree.js"(exports, module) {
+    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/rank/feasible-tree.js"(exports, module) {
       "use strict";
       var Graph = require_graphlib().Graph;
       var slack = require_util2().slack;
@@ -1900,9 +1900,9 @@
     }
   });
 
-  // node_modules/@dagrejs/dagre/lib/rank/network-simplex.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/rank/network-simplex.js
   var require_network_simplex = __commonJS({
-    "node_modules/@dagrejs/dagre/lib/rank/network-simplex.js"(exports, module) {
+    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/rank/network-simplex.js"(exports, module) {
       "use strict";
       var feasibleTree = require_feasible_tree();
       var slack = require_util2().slack;
@@ -2046,9 +2046,9 @@
     }
   });
 
-  // node_modules/@dagrejs/dagre/lib/rank/index.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/rank/index.js
   var require_rank = __commonJS({
-    "node_modules/@dagrejs/dagre/lib/rank/index.js"(exports, module) {
+    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/rank/index.js"(exports, module) {
       "use strict";
       var rankUtil = require_util2();
       var longestPath = rankUtil.longestPath;
@@ -2081,9 +2081,9 @@
     }
   });
 
-  // node_modules/@dagrejs/dagre/lib/parent-dummy-chains.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/parent-dummy-chains.js
   var require_parent_dummy_chains = __commonJS({
-    "node_modules/@dagrejs/dagre/lib/parent-dummy-chains.js"(exports, module) {
+    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/parent-dummy-chains.js"(exports, module) {
       module.exports = parentDummyChains;
       function parentDummyChains(g) {
         let postorderNums = postorder(g);
@@ -2150,9 +2150,9 @@
     }
   });
 
-  // node_modules/@dagrejs/dagre/lib/nesting-graph.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/nesting-graph.js
   var require_nesting_graph = __commonJS({
-    "node_modules/@dagrejs/dagre/lib/nesting-graph.js"(exports, module) {
+    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/nesting-graph.js"(exports, module) {
       var util = require_util();
       module.exports = {
         run,
@@ -2236,9 +2236,9 @@
     }
   });
 
-  // node_modules/@dagrejs/dagre/lib/add-border-segments.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/add-border-segments.js
   var require_add_border_segments = __commonJS({
-    "node_modules/@dagrejs/dagre/lib/add-border-segments.js"(exports, module) {
+    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/add-border-segments.js"(exports, module) {
       var util = require_util();
       module.exports = addBorderSegments;
       function addBorderSegments(g) {
@@ -2272,9 +2272,9 @@
     }
   });
 
-  // node_modules/@dagrejs/dagre/lib/coordinate-system.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/coordinate-system.js
   var require_coordinate_system = __commonJS({
-    "node_modules/@dagrejs/dagre/lib/coordinate-system.js"(exports, module) {
+    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/coordinate-system.js"(exports, module) {
       "use strict";
       module.exports = {
         adjust,
@@ -2336,9 +2336,9 @@
     }
   });
 
-  // node_modules/@dagrejs/dagre/lib/order/init-order.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/order/init-order.js
   var require_init_order = __commonJS({
-    "node_modules/@dagrejs/dagre/lib/order/init-order.js"(exports, module) {
+    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/order/init-order.js"(exports, module) {
       "use strict";
       var util = require_util();
       module.exports = initOrder;
@@ -2362,9 +2362,9 @@
     }
   });
 
-  // node_modules/@dagrejs/dagre/lib/order/cross-count.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/order/cross-count.js
   var require_cross_count = __commonJS({
-    "node_modules/@dagrejs/dagre/lib/order/cross-count.js"(exports, module) {
+    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/order/cross-count.js"(exports, module) {
       "use strict";
       var zipObject = require_util().zipObject;
       module.exports = crossCount;
@@ -2406,9 +2406,9 @@
     }
   });
 
-  // node_modules/@dagrejs/dagre/lib/order/barycenter.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/order/barycenter.js
   var require_barycenter = __commonJS({
-    "node_modules/@dagrejs/dagre/lib/order/barycenter.js"(exports, module) {
+    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/order/barycenter.js"(exports, module) {
       module.exports = barycenter;
       function barycenter(g, movable = []) {
         return movable.map((v) => {
@@ -2434,9 +2434,9 @@
     }
   });
 
-  // node_modules/@dagrejs/dagre/lib/order/resolve-conflicts.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/order/resolve-conflicts.js
   var require_resolve_conflicts = __commonJS({
-    "node_modules/@dagrejs/dagre/lib/order/resolve-conflicts.js"(exports, module) {
+    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/order/resolve-conflicts.js"(exports, module) {
       "use strict";
       var util = require_util();
       module.exports = resolveConflicts;
@@ -2516,9 +2516,9 @@
     }
   });
 
-  // node_modules/@dagrejs/dagre/lib/order/sort.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/order/sort.js
   var require_sort = __commonJS({
-    "node_modules/@dagrejs/dagre/lib/order/sort.js"(exports, module) {
+    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/order/sort.js"(exports, module) {
       var util = require_util();
       module.exports = sort;
       function sort(entries, biasRight) {
@@ -2564,9 +2564,9 @@
     }
   });
 
-  // node_modules/@dagrejs/dagre/lib/order/sort-subgraph.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/order/sort-subgraph.js
   var require_sort_subgraph = __commonJS({
-    "node_modules/@dagrejs/dagre/lib/order/sort-subgraph.js"(exports, module) {
+    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/order/sort-subgraph.js"(exports, module) {
       var barycenter = require_barycenter();
       var resolveConflicts = require_resolve_conflicts();
       var sort = require_sort();
@@ -2629,9 +2629,9 @@
     }
   });
 
-  // node_modules/@dagrejs/dagre/lib/order/build-layer-graph.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/order/build-layer-graph.js
   var require_build_layer_graph = __commonJS({
-    "node_modules/@dagrejs/dagre/lib/order/build-layer-graph.js"(exports, module) {
+    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/order/build-layer-graph.js"(exports, module) {
       var Graph = require_graphlib().Graph;
       var util = require_util();
       module.exports = buildLayerGraph;
@@ -2664,9 +2664,9 @@
     }
   });
 
-  // node_modules/@dagrejs/dagre/lib/order/add-subgraph-constraints.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/order/add-subgraph-constraints.js
   var require_add_subgraph_constraints = __commonJS({
-    "node_modules/@dagrejs/dagre/lib/order/add-subgraph-constraints.js"(exports, module) {
+    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/order/add-subgraph-constraints.js"(exports, module) {
       module.exports = addSubgraphConstraints;
       function addSubgraphConstraints(g, cg, vs) {
         let prev = {}, rootPrev;
@@ -2692,9 +2692,9 @@
     }
   });
 
-  // node_modules/@dagrejs/dagre/lib/order/index.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/order/index.js
   var require_order = __commonJS({
-    "node_modules/@dagrejs/dagre/lib/order/index.js"(exports, module) {
+    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/order/index.js"(exports, module) {
       "use strict";
       var initOrder = require_init_order();
       var crossCount = require_cross_count();
@@ -2748,9 +2748,9 @@
     }
   });
 
-  // node_modules/@dagrejs/dagre/lib/position/bk.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/position/bk.js
   var require_bk = __commonJS({
-    "node_modules/@dagrejs/dagre/lib/position/bk.js"(exports, module) {
+    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/position/bk.js"(exports, module) {
       "use strict";
       var Graph = require_graphlib().Graph;
       var util = require_util();
@@ -3056,9 +3056,9 @@
     }
   });
 
-  // node_modules/@dagrejs/dagre/lib/position/index.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/position/index.js
   var require_position = __commonJS({
-    "node_modules/@dagrejs/dagre/lib/position/index.js"(exports, module) {
+    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/position/index.js"(exports, module) {
       "use strict";
       var util = require_util();
       var positionX = require_bk().positionX;
@@ -3088,9 +3088,9 @@
     }
   });
 
-  // node_modules/@dagrejs/dagre/lib/layout.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/layout.js
   var require_layout = __commonJS({
-    "node_modules/@dagrejs/dagre/lib/layout.js"(exports, module) {
+    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/layout.js"(exports, module) {
       "use strict";
       var acyclic = require_acyclic();
       var normalize = require_normalize();
@@ -3448,9 +3448,9 @@
     }
   });
 
-  // node_modules/@dagrejs/dagre/lib/debug.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/debug.js
   var require_debug = __commonJS({
-    "node_modules/@dagrejs/dagre/lib/debug.js"(exports, module) {
+    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/debug.js"(exports, module) {
       var util = require_util();
       var Graph = require_graphlib().Graph;
       module.exports = {
@@ -3477,16 +3477,16 @@
     }
   });
 
-  // node_modules/@dagrejs/dagre/lib/version.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/version.js
   var require_version2 = __commonJS({
-    "node_modules/@dagrejs/dagre/lib/version.js"(exports, module) {
+    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/lib/version.js"(exports, module) {
       module.exports = "1.1.4";
     }
   });
 
-  // node_modules/@dagrejs/dagre/index.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/index.js
   var require_dagre = __commonJS({
-    "node_modules/@dagrejs/dagre/index.js"(exports, module) {
+    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/@dagrejs/dagre/index.js"(exports, module) {
       module.exports = {
         graphlib: require_graphlib(),
         layout: require_layout(),
@@ -3500,9 +3500,9 @@
     }
   });
 
-  // node_modules/react/cjs/react.development.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/react/cjs/react.development.js
   var require_react_development = __commonJS({
-    "node_modules/react/cjs/react.development.js"(exports, module) {
+    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/react/cjs/react.development.js"(exports, module) {
       "use strict";
       if (true) {
         (function() {
@@ -4119,8 +4119,8 @@
           }
           var didWarnAboutMaps = false;
           var userProvidedKeyEscapeRegex = /\/+/g;
-          function escapeUserProvidedKey(text) {
-            return text.replace(userProvidedKeyEscapeRegex, "$&/");
+          function escapeUserProvidedKey(text2) {
+            return text2.replace(userProvidedKeyEscapeRegex, "$&/");
           }
           function getElementKey(element, index) {
             if (typeof element === "object" && element !== null && element.key != null) {
@@ -4131,7 +4131,7 @@
             }
             return index.toString(36);
           }
-          function mapIntoArray(children2, array2, escapedPrefix, nameSoFar, callback) {
+          function mapIntoArray(children2, array3, escapedPrefix, nameSoFar, callback) {
             var type = typeof children2;
             if (type === "undefined" || type === "boolean") {
               children2 = null;
@@ -4162,7 +4162,7 @@
                 if (childKey != null) {
                   escapedChildKey = escapeUserProvidedKey(childKey) + "/";
                 }
-                mapIntoArray(mappedChild, array2, escapedChildKey, "", function(c) {
+                mapIntoArray(mappedChild, array3, escapedChildKey, "", function(c) {
                   return c;
                 });
               } else if (mappedChild != null) {
@@ -4184,7 +4184,7 @@
                     ) : "") + childKey
                   );
                 }
-                array2.push(mappedChild);
+                array3.push(mappedChild);
               }
               return 1;
             }
@@ -4196,7 +4196,7 @@
               for (var i = 0; i < children2.length; i++) {
                 child = children2[i];
                 nextName = nextNamePrefix + getElementKey(child, i);
-                subtreeCount += mapIntoArray(child, array2, escapedPrefix, nextName, callback);
+                subtreeCount += mapIntoArray(child, array3, escapedPrefix, nextName, callback);
               }
             } else {
               var iteratorFn = getIteratorFn(children2);
@@ -4216,7 +4216,7 @@
                 while (!(step = iterator.next()).done) {
                   child = step.value;
                   nextName = nextNamePrefix + getElementKey(child, ii++);
-                  subtreeCount += mapIntoArray(child, array2, escapedPrefix, nextName, callback);
+                  subtreeCount += mapIntoArray(child, array3, escapedPrefix, nextName, callback);
                 }
               } else if (type === "object") {
                 var childrenString = String(children2);
@@ -4259,7 +4259,7 @@
             }
             return children2;
           }
-          function createContext3(defaultValue) {
+          function createContext4(defaultValue) {
             var context = {
               $$typeof: REACT_CONTEXT_TYPE,
               // As a workaround to support multiple concurrent renderers, we categorize
@@ -4379,9 +4379,9 @@
                 }
               });
               if (payload._status === Uninitialized) {
-                var pending = payload;
-                pending._status = Pending;
-                pending._result = thenable;
+                var pending2 = payload;
+                pending2._status = Pending;
+                pending2._result = thenable;
               }
             }
             if (payload._status === Resolved) {
@@ -4545,7 +4545,7 @@
             }
             return dispatcher;
           }
-          function useContext3(Context) {
+          function useContext4(Context) {
             var dispatcher = resolveDispatcher();
             {
               if (Context._context !== void 0) {
@@ -4559,7 +4559,7 @@
             }
             return dispatcher.useContext(Context);
           }
-          function useState6(initialState2) {
+          function useState9(initialState2) {
             var dispatcher = resolveDispatcher();
             return dispatcher.useState(initialState2);
           }
@@ -4571,7 +4571,7 @@
             var dispatcher = resolveDispatcher();
             return dispatcher.useRef(initialValue);
           }
-          function useEffect6(create2, deps) {
+          function useEffect9(create2, deps) {
             var dispatcher = resolveDispatcher();
             return dispatcher.useEffect(create2, deps);
           }
@@ -5340,7 +5340,7 @@
           exports.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED = ReactSharedInternals;
           exports.act = act;
           exports.cloneElement = cloneElement$1;
-          exports.createContext = createContext3;
+          exports.createContext = createContext4;
           exports.createElement = createElement$1;
           exports.createFactory = createFactory;
           exports.createRef = createRef;
@@ -5351,10 +5351,10 @@
           exports.startTransition = startTransition;
           exports.unstable_act = act;
           exports.useCallback = useCallback3;
-          exports.useContext = useContext3;
+          exports.useContext = useContext4;
           exports.useDebugValue = useDebugValue2;
           exports.useDeferredValue = useDeferredValue;
-          exports.useEffect = useEffect6;
+          exports.useEffect = useEffect9;
           exports.useId = useId2;
           exports.useImperativeHandle = useImperativeHandle;
           exports.useInsertionEffect = useInsertionEffect;
@@ -5362,7 +5362,7 @@
           exports.useMemo = useMemo3;
           exports.useReducer = useReducer;
           exports.useRef = useRef6;
-          exports.useState = useState6;
+          exports.useState = useState9;
           exports.useSyncExternalStore = useSyncExternalStore;
           exports.useTransition = useTransition;
           exports.version = ReactVersion;
@@ -5374,9 +5374,9 @@
     }
   });
 
-  // node_modules/react/index.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/react/index.js
   var require_react = __commonJS({
-    "node_modules/react/index.js"(exports, module) {
+    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/react/index.js"(exports, module) {
       "use strict";
       if (false) {
         module.exports = null;
@@ -5386,9 +5386,9 @@
     }
   });
 
-  // node_modules/scheduler/cjs/scheduler.development.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/scheduler/cjs/scheduler.development.js
   var require_scheduler_development = __commonJS({
-    "node_modules/scheduler/cjs/scheduler.development.js"(exports) {
+    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/scheduler/cjs/scheduler.development.js"(exports) {
       "use strict";
       if (true) {
         (function() {
@@ -5836,9 +5836,9 @@
     }
   });
 
-  // node_modules/scheduler/index.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/scheduler/index.js
   var require_scheduler = __commonJS({
-    "node_modules/scheduler/index.js"(exports, module) {
+    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/scheduler/index.js"(exports, module) {
       "use strict";
       if (false) {
         module.exports = null;
@@ -5848,9 +5848,9 @@
     }
   });
 
-  // node_modules/react-dom/cjs/react-dom.development.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/react-dom/cjs/react-dom.development.js
   var require_react_dom_development = __commonJS({
-    "node_modules/react-dom/cjs/react-dom.development.js"(exports) {
+    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/react-dom/cjs/react-dom.development.js"(exports) {
       "use strict";
       if (true) {
         (function() {
@@ -5858,9 +5858,9 @@
           if (typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ !== "undefined" && typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart === "function") {
             __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(new Error());
           }
-          var React9 = require_react();
+          var React13 = require_react();
           var Scheduler = require_scheduler();
-          var ReactSharedInternals = React9.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
+          var ReactSharedInternals = React13.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
           var suppressWarning = false;
           function setSuppressWarning(newSuppressWarning) {
             {
@@ -7467,7 +7467,7 @@
             {
               if (props.value == null) {
                 if (typeof props.children === "object" && props.children !== null) {
-                  React9.Children.forEach(props.children, function(child) {
+                  React13.Children.forEach(props.children, function(child) {
                     if (child == null) {
                       return;
                     }
@@ -7755,15 +7755,15 @@
           var COMMENT_NODE = 8;
           var DOCUMENT_NODE = 9;
           var DOCUMENT_FRAGMENT_NODE = 11;
-          var setTextContent = function(node, text) {
-            if (text) {
+          var setTextContent = function(node, text2) {
+            if (text2) {
               var firstChild = node.firstChild;
               if (firstChild && firstChild === node.lastChild && firstChild.nodeType === TEXT_NODE) {
-                firstChild.nodeValue = text;
+                firstChild.nodeValue = text2;
                 return;
               }
             }
-            node.textContent = text;
+            node.textContent = text2;
           };
           var shorthandToLonghand = {
             animation: ["animationDelay", "animationDirection", "animationDuration", "animationFillMode", "animationIterationCount", "animationName", "animationPlayState", "animationTimingFunction"],
@@ -11928,11 +11928,11 @@
           function getOffsets(outerNode) {
             var ownerDocument = outerNode.ownerDocument;
             var win = ownerDocument && ownerDocument.defaultView || window;
-            var selection2 = win.getSelection && win.getSelection();
-            if (!selection2 || selection2.rangeCount === 0) {
+            var selection3 = win.getSelection && win.getSelection();
+            if (!selection3 || selection3.rangeCount === 0) {
               return null;
             }
-            var anchorNode = selection2.anchorNode, anchorOffset = selection2.anchorOffset, focusNode = selection2.focusNode, focusOffset = selection2.focusOffset;
+            var anchorNode = selection3.anchorNode, anchorOffset = selection3.anchorOffset, focusNode = selection3.focusNode, focusOffset = selection3.focusOffset;
             try {
               anchorNode.nodeType;
               focusNode.nodeType;
@@ -11999,11 +11999,11 @@
             if (!win.getSelection) {
               return;
             }
-            var selection2 = win.getSelection();
+            var selection3 = win.getSelection();
             var length = node.textContent.length;
             var start2 = Math.min(offsets.start, length);
             var end = offsets.end === void 0 ? start2 : Math.min(offsets.end, length);
-            if (!selection2.extend && start2 > end) {
+            if (!selection3.extend && start2 > end) {
               var temp = end;
               end = start2;
               start2 = temp;
@@ -12011,18 +12011,18 @@
             var startMarker = getNodeForCharacterOffset(node, start2);
             var endMarker = getNodeForCharacterOffset(node, end);
             if (startMarker && endMarker) {
-              if (selection2.rangeCount === 1 && selection2.anchorNode === startMarker.node && selection2.anchorOffset === startMarker.offset && selection2.focusNode === endMarker.node && selection2.focusOffset === endMarker.offset) {
+              if (selection3.rangeCount === 1 && selection3.anchorNode === startMarker.node && selection3.anchorOffset === startMarker.offset && selection3.focusNode === endMarker.node && selection3.focusOffset === endMarker.offset) {
                 return;
               }
               var range = doc.createRange();
               range.setStart(startMarker.node, startMarker.offset);
-              selection2.removeAllRanges();
+              selection3.removeAllRanges();
               if (start2 > end) {
-                selection2.addRange(range);
-                selection2.extend(endMarker.node, endMarker.offset);
+                selection3.addRange(range);
+                selection3.extend(endMarker.node, endMarker.offset);
               } else {
                 range.setEnd(endMarker.node, endMarker.offset);
-                selection2.addRange(range);
+                selection3.addRange(range);
               }
             }
           }
@@ -12110,16 +12110,16 @@
             }
           }
           function getSelection(input) {
-            var selection2;
+            var selection3;
             if ("selectionStart" in input) {
-              selection2 = {
+              selection3 = {
                 start: input.selectionStart,
                 end: input.selectionEnd
               };
             } else {
-              selection2 = getOffsets(input);
+              selection3 = getOffsets(input);
             }
-            return selection2 || {
+            return selection3 || {
               start: 0,
               end: 0
             };
@@ -12153,12 +12153,12 @@
               };
             } else {
               var win = node.ownerDocument && node.ownerDocument.defaultView || window;
-              var selection2 = win.getSelection();
+              var selection3 = win.getSelection();
               return {
-                anchorNode: selection2.anchorNode,
-                anchorOffset: selection2.anchorOffset,
-                focusNode: selection2.focusNode,
-                focusOffset: selection2.focusOffset
+                anchorNode: selection3.anchorNode,
+                anchorOffset: selection3.anchorOffset,
+                focusNode: selection3.focusNode,
+                focusOffset: selection3.focusOffset
               };
             }
           }
@@ -12939,8 +12939,8 @@
             }
             return domElement;
           }
-          function createTextNode(text, rootContainerElement) {
-            return getOwnerDocumentFromRootContainer(rootContainerElement).createTextNode(text);
+          function createTextNode(text2, rootContainerElement) {
+            return getOwnerDocumentFromRootContainer(rootContainerElement).createTextNode(text2);
           }
           function setInitialProperties(domElement, tag, rawProps, rootContainerElement) {
             var isCustomComponentTag = isCustomComponent(tag, rawProps);
@@ -13384,8 +13384,8 @@
             }
             return updatePayload;
           }
-          function diffHydratedText(textNode, text, isConcurrentMode) {
-            var isDifferent = textNode.nodeValue !== text;
+          function diffHydratedText(textNode, text2, isConcurrentMode) {
+            var isDifferent = textNode.nodeValue !== text2;
             return isDifferent;
           }
           function warnForDeletedHydratableElement(parentNode, child) {
@@ -13415,16 +13415,16 @@
               error("Expected server HTML to contain a matching <%s> in <%s>.", tag, parentNode.nodeName.toLowerCase());
             }
           }
-          function warnForInsertedHydratedText(parentNode, text) {
+          function warnForInsertedHydratedText(parentNode, text2) {
             {
-              if (text === "") {
+              if (text2 === "") {
                 return;
               }
               if (didWarnInvalidHydration) {
                 return;
               }
               didWarnInvalidHydration = true;
-              error('Expected server HTML to contain a matching text node for "%s" in <%s>.', text, parentNode.nodeName.toLowerCase());
+              error('Expected server HTML to contain a matching text node for "%s" in <%s>.', text2, parentNode.nodeName.toLowerCase());
             }
           }
           function restoreControlledState$3(domElement, tag, props) {
@@ -13797,12 +13797,12 @@
           function shouldSetTextContent(type, props) {
             return type === "textarea" || type === "noscript" || typeof props.children === "string" || typeof props.children === "number" || typeof props.dangerouslySetInnerHTML === "object" && props.dangerouslySetInnerHTML !== null && props.dangerouslySetInnerHTML.__html != null;
           }
-          function createTextInstance(text, rootContainerInstance, hostContext, internalInstanceHandle) {
+          function createTextInstance(text2, rootContainerInstance, hostContext, internalInstanceHandle) {
             {
               var hostContextDev = hostContext;
-              validateDOMNesting(null, text, hostContextDev.ancestorInfo);
+              validateDOMNesting(null, text2, hostContextDev.ancestorInfo);
             }
-            var textNode = createTextNode(text, rootContainerInstance);
+            var textNode = createTextNode(text2, rootContainerInstance);
             precacheFiberNode(internalInstanceHandle, textNode);
             return textNode;
           }
@@ -13940,8 +13940,8 @@
             var display = styleProp !== void 0 && styleProp !== null && styleProp.hasOwnProperty("display") ? styleProp.display : null;
             instance.style.display = dangerousStyleValue("display", display);
           }
-          function unhideTextInstance(textInstance, text) {
-            textInstance.nodeValue = text;
+          function unhideTextInstance(textInstance, text2) {
+            textInstance.nodeValue = text2;
           }
           function clearContainer(container) {
             if (container.nodeType === ELEMENT_NODE) {
@@ -13958,8 +13958,8 @@
             }
             return instance;
           }
-          function canHydrateTextInstance(instance, text) {
-            if (text === "" || instance.nodeType !== TEXT_NODE) {
+          function canHydrateTextInstance(instance, text2) {
+            if (text2 === "" || instance.nodeType !== TEXT_NODE) {
               return null;
             }
             return instance;
@@ -14038,10 +14038,10 @@
             var isConcurrentMode = (internalInstanceHandle.mode & ConcurrentMode) !== NoMode;
             return diffHydratedProperties(instance, type, props, parentNamespace, rootContainerInstance, isConcurrentMode, shouldWarnDev);
           }
-          function hydrateTextInstance(textInstance, text, internalInstanceHandle, shouldWarnDev) {
+          function hydrateTextInstance(textInstance, text2, internalInstanceHandle, shouldWarnDev) {
             precacheFiberNode(internalInstanceHandle, textInstance);
             var isConcurrentMode = (internalInstanceHandle.mode & ConcurrentMode) !== NoMode;
-            return diffHydratedText(textInstance, text);
+            return diffHydratedText(textInstance, text2);
           }
           function hydrateSuspenseInstance(suspenseInstance, internalInstanceHandle) {
             precacheFiberNode(internalInstanceHandle, suspenseInstance);
@@ -14095,14 +14095,14 @@
           function shouldDeleteUnhydratedTailInstances(parentType) {
             return parentType !== "head" && parentType !== "body";
           }
-          function didNotMatchHydratedContainerTextInstance(parentContainer, textInstance, text, isConcurrentMode) {
+          function didNotMatchHydratedContainerTextInstance(parentContainer, textInstance, text2, isConcurrentMode) {
             var shouldWarnDev = true;
-            checkForUnmatchedText(textInstance.nodeValue, text, isConcurrentMode, shouldWarnDev);
+            checkForUnmatchedText(textInstance.nodeValue, text2, isConcurrentMode, shouldWarnDev);
           }
-          function didNotMatchHydratedTextInstance(parentType, parentProps, parentInstance, textInstance, text, isConcurrentMode) {
+          function didNotMatchHydratedTextInstance(parentType, parentProps, parentInstance, textInstance, text2, isConcurrentMode) {
             if (parentProps[SUPPRESS_HYDRATION_WARNING$1] !== true) {
               var shouldWarnDev = true;
-              checkForUnmatchedText(textInstance.nodeValue, text, isConcurrentMode, shouldWarnDev);
+              checkForUnmatchedText(textInstance.nodeValue, text2, isConcurrentMode, shouldWarnDev);
             }
           }
           function didNotHydrateInstanceWithinContainer(parentContainer, instance) {
@@ -14145,9 +14145,9 @@
               warnForInsertedHydratedElement(parentContainer, type);
             }
           }
-          function didNotFindHydratableTextInstanceWithinContainer(parentContainer, text) {
+          function didNotFindHydratableTextInstanceWithinContainer(parentContainer, text2) {
             {
-              warnForInsertedHydratedText(parentContainer, text);
+              warnForInsertedHydratedText(parentContainer, text2);
             }
           }
           function didNotFindHydratableInstanceWithinSuspenseInstance(parentInstance, type, props) {
@@ -14156,10 +14156,10 @@
               if (parentNode !== null) warnForInsertedHydratedElement(parentNode, type);
             }
           }
-          function didNotFindHydratableTextInstanceWithinSuspenseInstance(parentInstance, text) {
+          function didNotFindHydratableTextInstanceWithinSuspenseInstance(parentInstance, text2) {
             {
               var parentNode = parentInstance.parentNode;
-              if (parentNode !== null) warnForInsertedHydratedText(parentNode, text);
+              if (parentNode !== null) warnForInsertedHydratedText(parentNode, text2);
             }
           }
           function didNotFindHydratableInstance(parentType, parentProps, parentInstance, type, props, isConcurrentMode) {
@@ -14169,10 +14169,10 @@
               }
             }
           }
-          function didNotFindHydratableTextInstance(parentType, parentProps, parentInstance, text, isConcurrentMode) {
+          function didNotFindHydratableTextInstance(parentType, parentProps, parentInstance, text2, isConcurrentMode) {
             {
               if (isConcurrentMode || parentProps[SUPPRESS_HYDRATION_WARNING$1] !== true) {
-                warnForInsertedHydratedText(parentInstance, text);
+                warnForInsertedHydratedText(parentInstance, text2);
               }
             }
           }
@@ -14780,8 +14780,8 @@
                       didNotFindHydratableInstanceWithinContainer(parentContainer, type);
                       break;
                     case HostText:
-                      var text = fiber.pendingProps;
-                      didNotFindHydratableTextInstanceWithinContainer(parentContainer, text);
+                      var text2 = fiber.pendingProps;
+                      didNotFindHydratableTextInstanceWithinContainer(parentContainer, text2);
                       break;
                   }
                   break;
@@ -14862,8 +14862,8 @@
                 return false;
               }
               case HostText: {
-                var text = fiber.pendingProps;
-                var textInstance = canHydrateTextInstance(nextInstance, text);
+                var text2 = fiber.pendingProps;
+                var textInstance = canHydrateTextInstance(nextInstance, text2);
                 if (textInstance !== null) {
                   fiber.stateNode = textInstance;
                   hydrationParentFiber = fiber;
@@ -15099,11 +15099,11 @@
               return maybeStrictRoot;
             };
             var setToSortedString = function(set4) {
-              var array2 = [];
+              var array3 = [];
               set4.forEach(function(value) {
-                array2.push(value);
+                array3.push(value);
               });
-              return array2.sort().join(", ");
+              return array3.sort().join(", ");
             };
             var pendingComponentWillMountWarnings = [];
             var pendingUNSAFE_ComponentWillMountWarnings = [];
@@ -16113,10 +16113,10 @@
             }
             while (fiber !== null) {
               var nextFiber = void 0;
-              var list = fiber.dependencies;
-              if (list !== null) {
+              var list2 = fiber.dependencies;
+              if (list2 !== null) {
                 nextFiber = fiber.child;
-                var dependency = list.firstContext;
+                var dependency = list2.firstContext;
                 while (dependency !== null) {
                   if (dependency.context === context) {
                     if (fiber.tag === ClassComponent) {
@@ -16127,12 +16127,12 @@
                       if (updateQueue === null) ;
                       else {
                         var sharedQueue = updateQueue.shared;
-                        var pending = sharedQueue.pending;
-                        if (pending === null) {
+                        var pending2 = sharedQueue.pending;
+                        if (pending2 === null) {
                           update.next = update;
                         } else {
-                          update.next = pending.next;
-                          pending.next = update;
+                          update.next = pending2.next;
+                          pending2.next = update;
                         }
                         sharedQueue.pending = update;
                       }
@@ -16143,7 +16143,7 @@
                       alternate.lanes = mergeLanes(alternate.lanes, renderLanes2);
                     }
                     scheduleContextWorkOnParentPath(fiber.return, renderLanes2, workInProgress2);
-                    list.lanes = mergeLanes(list.lanes, renderLanes2);
+                    list2.lanes = mergeLanes(list2.lanes, renderLanes2);
                     break;
                   }
                   dependency = dependency.next;
@@ -16397,12 +16397,12 @@
               }
             }
             if (isUnsafeClassRenderPhaseUpdate()) {
-              var pending = sharedQueue.pending;
-              if (pending === null) {
+              var pending2 = sharedQueue.pending;
+              if (pending2 === null) {
                 update.next = update;
               } else {
-                update.next = pending.next;
-                pending.next = update;
+                update.next = pending2.next;
+                pending2.next = update;
               }
               sharedQueue.pending = update;
               return unsafe_markUpdateLaneFromFiberToRoot(fiber, lane);
@@ -17841,12 +17841,12 @@
           }
           function enqueueRenderPhaseUpdate(queue, update) {
             didScheduleRenderPhaseUpdateDuringThisPass = didScheduleRenderPhaseUpdate = true;
-            var pending = queue.pending;
-            if (pending === null) {
+            var pending2 = queue.pending;
+            if (pending2 === null) {
               update.next = update;
             } else {
-              update.next = pending.next;
-              pending.next = update;
+              update.next = pending2.next;
+              pending2.next = update;
             }
             queue.pending = update;
           }
@@ -27012,9 +27012,9 @@
     }
   });
 
-  // node_modules/react-dom/index.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/react-dom/index.js
   var require_react_dom = __commonJS({
-    "node_modules/react-dom/index.js"(exports, module) {
+    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/react-dom/index.js"(exports, module) {
       "use strict";
       if (false) {
         checkDCE();
@@ -27025,9 +27025,9 @@
     }
   });
 
-  // node_modules/react-dom/client.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/react-dom/client.js
   var require_client = __commonJS({
-    "node_modules/react-dom/client.js"(exports) {
+    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/react-dom/client.js"(exports) {
       "use strict";
       var m = require_react_dom();
       if (false) {
@@ -27056,16 +27056,16 @@
     }
   });
 
-  // node_modules/use-sync-external-store/cjs/use-sync-external-store-shim.development.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/use-sync-external-store/cjs/use-sync-external-store-shim.development.js
   var require_use_sync_external_store_shim_development = __commonJS({
-    "node_modules/use-sync-external-store/cjs/use-sync-external-store-shim.development.js"(exports) {
+    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/use-sync-external-store/cjs/use-sync-external-store-shim.development.js"(exports) {
       "use strict";
       (function() {
         function is(x, y) {
           return x === y && (0 !== x || 1 / x === 1 / y) || x !== x && y !== y;
         }
         function useSyncExternalStore$2(subscribe, getSnapshot) {
-          didWarnOld18Alpha || void 0 === React9.startTransition || (didWarnOld18Alpha = true, console.error(
+          didWarnOld18Alpha || void 0 === React13.startTransition || (didWarnOld18Alpha = true, console.error(
             "You are using an outdated, pre-release alpha of React 18 that does not support useSyncExternalStore. The use-sync-external-store shim will not work correctly. Upgrade to a newer pre-release."
           ));
           var value = getSnapshot();
@@ -27075,7 +27075,7 @@
               "The result of getSnapshot should be cached to avoid an infinite loop"
             ), didWarnUncachedGetSnapshot = true);
           }
-          cachedValue = useState6({
+          cachedValue = useState9({
             inst: { value, getSnapshot }
           });
           var inst = cachedValue[0].inst, forceUpdate = cachedValue[1];
@@ -27087,7 +27087,7 @@
             },
             [subscribe, value, getSnapshot]
           );
-          useEffect6(
+          useEffect9(
             function() {
               checkIfSnapshotChanged(inst) && forceUpdate({ inst });
               return subscribe(function() {
@@ -27113,16 +27113,16 @@
           return getSnapshot();
         }
         "undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
-        var React9 = require_react(), objectIs = "function" === typeof Object.is ? Object.is : is, useState6 = React9.useState, useEffect6 = React9.useEffect, useLayoutEffect = React9.useLayoutEffect, useDebugValue2 = React9.useDebugValue, didWarnOld18Alpha = false, didWarnUncachedGetSnapshot = false, shim = "undefined" === typeof window || "undefined" === typeof window.document || "undefined" === typeof window.document.createElement ? useSyncExternalStore$1 : useSyncExternalStore$2;
-        exports.useSyncExternalStore = void 0 !== React9.useSyncExternalStore ? React9.useSyncExternalStore : shim;
+        var React13 = require_react(), objectIs = "function" === typeof Object.is ? Object.is : is, useState9 = React13.useState, useEffect9 = React13.useEffect, useLayoutEffect = React13.useLayoutEffect, useDebugValue2 = React13.useDebugValue, didWarnOld18Alpha = false, didWarnUncachedGetSnapshot = false, shim = "undefined" === typeof window || "undefined" === typeof window.document || "undefined" === typeof window.document.createElement ? useSyncExternalStore$1 : useSyncExternalStore$2;
+        exports.useSyncExternalStore = void 0 !== React13.useSyncExternalStore ? React13.useSyncExternalStore : shim;
         "undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop(Error());
       })();
     }
   });
 
-  // node_modules/use-sync-external-store/shim/index.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/use-sync-external-store/shim/index.js
   var require_shim = __commonJS({
-    "node_modules/use-sync-external-store/shim/index.js"(exports, module) {
+    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/use-sync-external-store/shim/index.js"(exports, module) {
       "use strict";
       if (false) {
         module.exports = null;
@@ -27132,16 +27132,16 @@
     }
   });
 
-  // node_modules/use-sync-external-store/cjs/use-sync-external-store-shim/with-selector.development.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/use-sync-external-store/cjs/use-sync-external-store-shim/with-selector.development.js
   var require_with_selector_development = __commonJS({
-    "node_modules/use-sync-external-store/cjs/use-sync-external-store-shim/with-selector.development.js"(exports) {
+    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/use-sync-external-store/cjs/use-sync-external-store-shim/with-selector.development.js"(exports) {
       "use strict";
       (function() {
         function is(x, y) {
           return x === y && (0 !== x || 1 / x === 1 / y) || x !== x && y !== y;
         }
         "undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
-        var React9 = require_react(), shim = require_shim(), objectIs = "function" === typeof Object.is ? Object.is : is, useSyncExternalStore = shim.useSyncExternalStore, useRef6 = React9.useRef, useEffect6 = React9.useEffect, useMemo3 = React9.useMemo, useDebugValue2 = React9.useDebugValue;
+        var React13 = require_react(), shim = require_shim(), objectIs = "function" === typeof Object.is ? Object.is : is, useSyncExternalStore = shim.useSyncExternalStore, useRef6 = React13.useRef, useEffect9 = React13.useEffect, useMemo3 = React13.useMemo, useDebugValue2 = React13.useDebugValue;
         exports.useSyncExternalStoreWithSelector = function(subscribe, getSnapshot, getServerSnapshot, selector5, isEqual) {
           var instRef = useRef6(null);
           if (null === instRef.current) {
@@ -27184,7 +27184,7 @@
             [getSnapshot, getServerSnapshot, selector5, isEqual]
           );
           var value = useSyncExternalStore(subscribe, instRef[0], instRef[1]);
-          useEffect6(
+          useEffect9(
             function() {
               inst.hasValue = true;
               inst.value = value;
@@ -27199,9 +27199,9 @@
     }
   });
 
-  // node_modules/use-sync-external-store/shim/with-selector.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/use-sync-external-store/shim/with-selector.js
   var require_with_selector = __commonJS({
-    "node_modules/use-sync-external-store/shim/with-selector.js"(exports, module) {
+    "../../../../../../../../One/OpenSource/gert-vscode/node_modules/use-sync-external-store/shim/with-selector.js"(exports, module) {
       "use strict";
       if (false) {
         module.exports = null;
@@ -27214,19 +27214,19 @@
   // webview/graph.tsx
   var import_dagre = __toESM(require_dagre());
 
-  // node_modules/lucide-react/dist/esm/createLucideIcon.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/lucide-react/dist/esm/createLucideIcon.js
   var import_react2 = __toESM(require_react());
 
-  // node_modules/lucide-react/dist/esm/shared/src/utils.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/lucide-react/dist/esm/shared/src/utils.js
   var toKebabCase = (string) => string.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase();
-  var mergeClasses = (...classes) => classes.filter((className, index, array2) => {
-    return Boolean(className) && className.trim() !== "" && array2.indexOf(className) === index;
+  var mergeClasses = (...classes) => classes.filter((className, index, array3) => {
+    return Boolean(className) && className.trim() !== "" && array3.indexOf(className) === index;
   }).join(" ").trim();
 
-  // node_modules/lucide-react/dist/esm/Icon.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/lucide-react/dist/esm/Icon.js
   var import_react = __toESM(require_react());
 
-  // node_modules/lucide-react/dist/esm/defaultAttributes.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/lucide-react/dist/esm/defaultAttributes.js
   var defaultAttributes = {
     xmlns: "http://www.w3.org/2000/svg",
     width: 24,
@@ -27239,7 +27239,7 @@
     strokeLinejoin: "round"
   };
 
-  // node_modules/lucide-react/dist/esm/Icon.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/lucide-react/dist/esm/Icon.js
   var Icon = (0, import_react.forwardRef)(
     ({
       color: color2 = "currentColor",
@@ -27271,7 +27271,7 @@
     }
   );
 
-  // node_modules/lucide-react/dist/esm/createLucideIcon.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/lucide-react/dist/esm/createLucideIcon.js
   var createLucideIcon = (iconName, iconNode) => {
     const Component = (0, import_react2.forwardRef)(
       ({ className, ...props }, ref) => (0, import_react2.createElement)(Icon, {
@@ -27285,7 +27285,7 @@
     return Component;
   };
 
-  // node_modules/lucide-react/dist/esm/icons/activity.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/lucide-react/dist/esm/icons/activity.js
   var Activity = createLucideIcon("Activity", [
     [
       "path",
@@ -27296,19 +27296,19 @@
     ]
   ]);
 
-  // node_modules/lucide-react/dist/esm/icons/arrow-left.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/lucide-react/dist/esm/icons/arrow-left.js
   var ArrowLeft = createLucideIcon("ArrowLeft", [
     ["path", { d: "m12 19-7-7 7-7", key: "1l729n" }],
     ["path", { d: "M19 12H5", key: "x3x0zl" }]
   ]);
 
-  // node_modules/lucide-react/dist/esm/icons/arrow-right.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/lucide-react/dist/esm/icons/arrow-right.js
   var ArrowRight = createLucideIcon("ArrowRight", [
     ["path", { d: "M5 12h14", key: "1ays0h" }],
     ["path", { d: "m12 5 7 7-7 7", key: "xquz4c" }]
   ]);
 
-  // node_modules/lucide-react/dist/esm/icons/bug.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/lucide-react/dist/esm/icons/bug.js
   var Bug = createLucideIcon("Bug", [
     ["path", { d: "m8 2 1.88 1.88", key: "fmnt4t" }],
     ["path", { d: "M14.12 3.88 16 2", key: "qol33r" }],
@@ -27329,25 +27329,25 @@
     ["path", { d: "M17.2 17c2.1.1 3.8 1.9 3.8 4", key: "k3fwyw" }]
   ]);
 
-  // node_modules/lucide-react/dist/esm/icons/circle-check.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/lucide-react/dist/esm/icons/circle-check.js
   var CircleCheck = createLucideIcon("CircleCheck", [
     ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
     ["path", { d: "m9 12 2 2 4-4", key: "dzmm74" }]
   ]);
 
-  // node_modules/lucide-react/dist/esm/icons/circle-dot.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/lucide-react/dist/esm/icons/circle-dot.js
   var CircleDot = createLucideIcon("CircleDot", [
     ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
     ["circle", { cx: "12", cy: "12", r: "1", key: "41hilf" }]
   ]);
 
-  // node_modules/lucide-react/dist/esm/icons/clock-3.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/lucide-react/dist/esm/icons/clock-3.js
   var Clock3 = createLucideIcon("Clock3", [
     ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
     ["polyline", { points: "12 6 12 12 16.5 12", key: "1aq6pp" }]
   ]);
 
-  // node_modules/lucide-react/dist/esm/icons/file-input.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/lucide-react/dist/esm/icons/file-input.js
   var FileInput = createLucideIcon("FileInput", [
     ["path", { d: "M4 22h14a2 2 0 0 0 2-2V7l-5-5H6a2 2 0 0 0-2 2v4", key: "1pf5j1" }],
     ["path", { d: "M14 2v4a2 2 0 0 0 2 2h4", key: "tnqrlb" }],
@@ -27355,13 +27355,13 @@
     ["path", { d: "m9 18 3-3-3-3", key: "112psh" }]
   ]);
 
-  // node_modules/lucide-react/dist/esm/icons/flag.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/lucide-react/dist/esm/icons/flag.js
   var Flag = createLucideIcon("Flag", [
     ["path", { d: "M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z", key: "i9b6wo" }],
     ["line", { x1: "4", x2: "4", y1: "22", y2: "15", key: "1cm3nv" }]
   ]);
 
-  // node_modules/lucide-react/dist/esm/icons/git-branch.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/lucide-react/dist/esm/icons/git-branch.js
   var GitBranch = createLucideIcon("GitBranch", [
     ["line", { x1: "6", x2: "6", y1: "3", y2: "15", key: "17qcm7" }],
     ["circle", { cx: "18", cy: "6", r: "3", key: "1h7g24" }],
@@ -27369,7 +27369,7 @@
     ["path", { d: "M18 9a9 9 0 0 1-9 9", key: "n2h4wq" }]
   ]);
 
-  // node_modules/lucide-react/dist/esm/icons/list-checks.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/lucide-react/dist/esm/icons/list-checks.js
   var ListChecks = createLucideIcon("ListChecks", [
     ["path", { d: "m3 17 2 2 4-4", key: "1jhpwq" }],
     ["path", { d: "m3 7 2 2 4-4", key: "1obspn" }],
@@ -27378,7 +27378,7 @@
     ["path", { d: "M13 18h8", key: "oe0vm4" }]
   ]);
 
-  // node_modules/lucide-react/dist/esm/icons/locate-fixed.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/lucide-react/dist/esm/icons/locate-fixed.js
   var LocateFixed = createLucideIcon("LocateFixed", [
     ["line", { x1: "2", x2: "5", y1: "12", y2: "12", key: "bvdh0s" }],
     ["line", { x1: "19", x2: "22", y1: "12", y2: "12", key: "1tbv5k" }],
@@ -27388,14 +27388,14 @@
     ["circle", { cx: "12", cy: "12", r: "3", key: "1v7zrd" }]
   ]);
 
-  // node_modules/lucide-react/dist/esm/icons/message-square-text.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/lucide-react/dist/esm/icons/message-square-text.js
   var MessageSquareText = createLucideIcon("MessageSquareText", [
     ["path", { d: "M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z", key: "1lielz" }],
     ["path", { d: "M13 8H7", key: "14i4kc" }],
     ["path", { d: "M17 12H7", key: "16if0g" }]
   ]);
 
-  // node_modules/lucide-react/dist/esm/icons/package-open.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/lucide-react/dist/esm/icons/package-open.js
   var PackageOpen = createLucideIcon("PackageOpen", [
     ["path", { d: "M12 22v-9", key: "x3hkom" }],
     [
@@ -27421,18 +27421,18 @@
     ]
   ]);
 
-  // node_modules/lucide-react/dist/esm/icons/panel-right.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/lucide-react/dist/esm/icons/panel-right.js
   var PanelRight = createLucideIcon("PanelRight", [
     ["rect", { width: "18", height: "18", x: "3", y: "3", rx: "2", key: "afitv7" }],
     ["path", { d: "M15 3v18", key: "14nvp0" }]
   ]);
 
-  // node_modules/lucide-react/dist/esm/icons/play.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/lucide-react/dist/esm/icons/play.js
   var Play = createLucideIcon("Play", [
     ["polygon", { points: "6 3 20 12 6 21 6 3", key: "1oa8hb" }]
   ]);
 
-  // node_modules/lucide-react/dist/esm/icons/puzzle.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/lucide-react/dist/esm/icons/puzzle.js
   var Puzzle = createLucideIcon("Puzzle", [
     [
       "path",
@@ -27443,7 +27443,7 @@
     ]
   ]);
 
-  // node_modules/lucide-react/dist/esm/icons/radio.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/lucide-react/dist/esm/icons/radio.js
   var Radio = createLucideIcon("Radio", [
     ["path", { d: "M4.9 19.1C1 15.2 1 8.8 4.9 4.9", key: "1vaf9d" }],
     ["path", { d: "M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5", key: "u1ii0m" }],
@@ -27452,7 +27452,7 @@
     ["path", { d: "M19.1 4.9C23 8.8 23 15.1 19.1 19", key: "10b0cb" }]
   ]);
 
-  // node_modules/lucide-react/dist/esm/icons/repeat-2.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/lucide-react/dist/esm/icons/repeat-2.js
   var Repeat2 = createLucideIcon("Repeat2", [
     ["path", { d: "m2 9 3-3 3 3", key: "1ltn5i" }],
     ["path", { d: "M13 18H7a2 2 0 0 1-2-2V6", key: "1r6tfw" }],
@@ -27460,13 +27460,13 @@
     ["path", { d: "M11 6h6a2 2 0 0 1 2 2v10", key: "2f72bc" }]
   ]);
 
-  // node_modules/lucide-react/dist/esm/icons/rotate-ccw.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/lucide-react/dist/esm/icons/rotate-ccw.js
   var RotateCcw = createLucideIcon("RotateCcw", [
     ["path", { d: "M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8", key: "1357e3" }],
     ["path", { d: "M3 3v5h5", key: "1xhq8a" }]
   ]);
 
-  // node_modules/lucide-react/dist/esm/icons/shield-check.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/lucide-react/dist/esm/icons/shield-check.js
   var ShieldCheck = createLucideIcon("ShieldCheck", [
     [
       "path",
@@ -27478,31 +27478,31 @@
     ["path", { d: "m9 12 2 2 4-4", key: "dzmm74" }]
   ]);
 
-  // node_modules/lucide-react/dist/esm/icons/square.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/lucide-react/dist/esm/icons/square.js
   var Square = createLucideIcon("Square", [
     ["rect", { width: "18", height: "18", x: "3", y: "3", rx: "2", key: "afitv7" }]
   ]);
 
-  // node_modules/lucide-react/dist/esm/icons/terminal.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/lucide-react/dist/esm/icons/terminal.js
   var Terminal = createLucideIcon("Terminal", [
     ["polyline", { points: "4 17 10 11 4 5", key: "akl6gq" }],
     ["line", { x1: "12", x2: "20", y1: "19", y2: "19", key: "q2wloq" }]
   ]);
 
-  // node_modules/lucide-react/dist/esm/icons/undo-2.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/lucide-react/dist/esm/icons/undo-2.js
   var Undo2 = createLucideIcon("Undo2", [
     ["path", { d: "M9 14 4 9l5-5", key: "102s5s" }],
     ["path", { d: "M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5a5.5 5.5 0 0 1-5.5 5.5H11", key: "f3b9sd" }]
   ]);
 
-  // node_modules/lucide-react/dist/esm/icons/workflow.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/lucide-react/dist/esm/icons/workflow.js
   var Workflow = createLucideIcon("Workflow", [
     ["rect", { width: "8", height: "8", x: "3", y: "3", rx: "2", key: "by2w9f" }],
     ["path", { d: "M7 11v4a2 2 0 0 0 2 2h4", key: "xkn7yn" }],
     ["rect", { width: "8", height: "8", x: "13", y: "13", rx: "2", key: "1cgmvn" }]
   ]);
 
-  // node_modules/lucide-react/dist/esm/icons/wrench.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/lucide-react/dist/esm/icons/wrench.js
   var Wrench = createLucideIcon("Wrench", [
     [
       "path",
@@ -27514,13 +27514,13 @@
   ]);
 
   // webview/graph.tsx
-  var import_react11 = __toESM(require_react());
+  var import_react15 = __toESM(require_react());
   var import_client = __toESM(require_client());
 
-  // node_modules/@reactflow/core/dist/esm/index.mjs
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@reactflow/core/dist/esm/index.mjs
   var import_react4 = __toESM(require_react(), 1);
 
-  // node_modules/classcat/index.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/classcat/index.js
   function cc(names) {
     if (typeof names === "string" || typeof names === "number") return "" + names;
     let out = "";
@@ -27538,11 +27538,11 @@
     return out;
   }
 
-  // node_modules/zustand/esm/traditional.mjs
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/zustand/esm/traditional.mjs
   var import_react3 = __toESM(require_react(), 1);
   var import_with_selector = __toESM(require_with_selector(), 1);
 
-  // node_modules/zustand/esm/vanilla.mjs
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/zustand/esm/vanilla.mjs
   var import_meta = {};
   var createStoreImpl = (createState) => {
     let state;
@@ -27575,7 +27575,7 @@
   };
   var createStore = (createState) => createState ? createStoreImpl(createState) : createStoreImpl;
 
-  // node_modules/zustand/esm/traditional.mjs
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/zustand/esm/traditional.mjs
   var { useDebugValue } = import_react3.default;
   var { useSyncExternalStoreWithSelector } = import_with_selector.default;
   var identity = (arg) => arg;
@@ -27598,7 +27598,7 @@
   };
   var createWithEqualityFn = (createState, defaultEqualityFn) => createState ? createWithEqualityFnImpl(createState, defaultEqualityFn) : createWithEqualityFnImpl;
 
-  // node_modules/zustand/esm/shallow.mjs
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/zustand/esm/shallow.mjs
   function shallow$1(objA, objB) {
     if (Object.is(objA, objB)) {
       return true;
@@ -27636,7 +27636,7 @@
     return true;
   }
 
-  // node_modules/d3-dispatch/src/dispatch.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-dispatch/src/dispatch.js
   var noop = { value: () => {
   } };
   function dispatch() {
@@ -27706,7 +27706,7 @@
   }
   var dispatch_default = dispatch;
 
-  // node_modules/d3-selection/src/namespaces.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/namespaces.js
   var xhtml = "http://www.w3.org/1999/xhtml";
   var namespaces_default = {
     svg: "http://www.w3.org/2000/svg",
@@ -27716,14 +27716,14 @@
     xmlns: "http://www.w3.org/2000/xmlns/"
   };
 
-  // node_modules/d3-selection/src/namespace.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/namespace.js
   function namespace_default(name) {
     var prefix = name += "", i = prefix.indexOf(":");
     if (i >= 0 && (prefix = name.slice(0, i)) !== "xmlns") name = name.slice(i + 1);
     return namespaces_default.hasOwnProperty(prefix) ? { space: namespaces_default[prefix], local: name } : name;
   }
 
-  // node_modules/d3-selection/src/creator.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/creator.js
   function creatorInherit(name) {
     return function() {
       var document2 = this.ownerDocument, uri = this.namespaceURI;
@@ -27740,7 +27740,7 @@
     return (fullname.local ? creatorFixed : creatorInherit)(fullname);
   }
 
-  // node_modules/d3-selection/src/selector.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selector.js
   function none() {
   }
   function selector_default(selector5) {
@@ -27749,7 +27749,7 @@
     };
   }
 
-  // node_modules/d3-selection/src/selection/select.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/select.js
   function select_default(select) {
     if (typeof select !== "function") select = selector_default(select);
     for (var groups = this._groups, m = groups.length, subgroups = new Array(m), j = 0; j < m; ++j) {
@@ -27763,12 +27763,12 @@
     return new Selection(subgroups, this._parents);
   }
 
-  // node_modules/d3-selection/src/array.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/array.js
   function array(x) {
     return x == null ? [] : Array.isArray(x) ? x : Array.from(x);
   }
 
-  // node_modules/d3-selection/src/selectorAll.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selectorAll.js
   function empty() {
     return [];
   }
@@ -27778,7 +27778,7 @@
     };
   }
 
-  // node_modules/d3-selection/src/selection/selectAll.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/selectAll.js
   function arrayAll(select) {
     return function() {
       return array(select.apply(this, arguments));
@@ -27798,7 +27798,7 @@
     return new Selection(subgroups, parents);
   }
 
-  // node_modules/d3-selection/src/matcher.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/matcher.js
   function matcher_default(selector5) {
     return function() {
       return this.matches(selector5);
@@ -27810,7 +27810,7 @@
     };
   }
 
-  // node_modules/d3-selection/src/selection/selectChild.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/selectChild.js
   var find = Array.prototype.find;
   function childFind(match) {
     return function() {
@@ -27824,7 +27824,7 @@
     return this.select(match == null ? childFirst : childFind(typeof match === "function" ? match : childMatcher(match)));
   }
 
-  // node_modules/d3-selection/src/selection/selectChildren.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/selectChildren.js
   var filter = Array.prototype.filter;
   function children() {
     return Array.from(this.children);
@@ -27838,7 +27838,7 @@
     return this.selectAll(match == null ? children : childrenFilter(typeof match === "function" ? match : childMatcher(match)));
   }
 
-  // node_modules/d3-selection/src/selection/filter.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/filter.js
   function filter_default(match) {
     if (typeof match !== "function") match = matcher_default(match);
     for (var groups = this._groups, m = groups.length, subgroups = new Array(m), j = 0; j < m; ++j) {
@@ -27851,12 +27851,12 @@
     return new Selection(subgroups, this._parents);
   }
 
-  // node_modules/d3-selection/src/selection/sparse.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/sparse.js
   function sparse_default(update) {
     return new Array(update.length);
   }
 
-  // node_modules/d3-selection/src/selection/enter.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/enter.js
   function enter_default() {
     return new Selection(this._enter || this._groups.map(sparse_default), this._parents);
   }
@@ -27883,14 +27883,14 @@
     }
   };
 
-  // node_modules/d3-selection/src/constant.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/constant.js
   function constant_default(x) {
     return function() {
       return x;
     };
   }
 
-  // node_modules/d3-selection/src/selection/data.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/data.js
   function bindIndex(parent, group, enter, update, exit, data) {
     var i = 0, node, groupLength = group.length, dataLength = data.length;
     for (; i < dataLength; ++i) {
@@ -27962,12 +27962,12 @@
     return typeof data === "object" && "length" in data ? data : Array.from(data);
   }
 
-  // node_modules/d3-selection/src/selection/exit.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/exit.js
   function exit_default() {
     return new Selection(this._exit || this._groups.map(sparse_default), this._parents);
   }
 
-  // node_modules/d3-selection/src/selection/join.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/join.js
   function join_default(onenter, onupdate, onexit) {
     var enter = this.enter(), update = this, exit = this.exit();
     if (typeof onenter === "function") {
@@ -27985,10 +27985,10 @@
     return enter && update ? enter.merge(update).order() : update;
   }
 
-  // node_modules/d3-selection/src/selection/merge.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/merge.js
   function merge_default(context) {
-    var selection2 = context.selection ? context.selection() : context;
-    for (var groups0 = this._groups, groups1 = selection2._groups, m0 = groups0.length, m1 = groups1.length, m = Math.min(m0, m1), merges = new Array(m0), j = 0; j < m; ++j) {
+    var selection3 = context.selection ? context.selection() : context;
+    for (var groups0 = this._groups, groups1 = selection3._groups, m0 = groups0.length, m1 = groups1.length, m = Math.min(m0, m1), merges = new Array(m0), j = 0; j < m; ++j) {
       for (var group0 = groups0[j], group1 = groups1[j], n = group0.length, merge = merges[j] = new Array(n), node, i = 0; i < n; ++i) {
         if (node = group0[i] || group1[i]) {
           merge[i] = node;
@@ -28001,7 +28001,7 @@
     return new Selection(merges, this._parents);
   }
 
-  // node_modules/d3-selection/src/selection/order.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/order.js
   function order_default() {
     for (var groups = this._groups, j = -1, m = groups.length; ++j < m; ) {
       for (var group = groups[j], i = group.length - 1, next = group[i], node; --i >= 0; ) {
@@ -28014,7 +28014,7 @@
     return this;
   }
 
-  // node_modules/d3-selection/src/selection/sort.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/sort.js
   function sort_default(compare) {
     if (!compare) compare = ascending;
     function compareNode(a, b) {
@@ -28034,7 +28034,7 @@
     return a < b ? -1 : a > b ? 1 : a >= b ? 0 : NaN;
   }
 
-  // node_modules/d3-selection/src/selection/call.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/call.js
   function call_default() {
     var callback = arguments[0];
     arguments[0] = this;
@@ -28042,12 +28042,12 @@
     return this;
   }
 
-  // node_modules/d3-selection/src/selection/nodes.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/nodes.js
   function nodes_default() {
     return Array.from(this);
   }
 
-  // node_modules/d3-selection/src/selection/node.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/node.js
   function node_default() {
     for (var groups = this._groups, j = 0, m = groups.length; j < m; ++j) {
       for (var group = groups[j], i = 0, n = group.length; i < n; ++i) {
@@ -28058,19 +28058,19 @@
     return null;
   }
 
-  // node_modules/d3-selection/src/selection/size.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/size.js
   function size_default() {
     let size = 0;
     for (const node of this) ++size;
     return size;
   }
 
-  // node_modules/d3-selection/src/selection/empty.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/empty.js
   function empty_default() {
     return !this.node();
   }
 
-  // node_modules/d3-selection/src/selection/each.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/each.js
   function each_default(callback) {
     for (var groups = this._groups, j = 0, m = groups.length; j < m; ++j) {
       for (var group = groups[j], i = 0, n = group.length, node; i < n; ++i) {
@@ -28080,7 +28080,7 @@
     return this;
   }
 
-  // node_modules/d3-selection/src/selection/attr.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/attr.js
   function attrRemove(name) {
     return function() {
       this.removeAttribute(name);
@@ -28124,12 +28124,12 @@
     return this.each((value == null ? fullname.local ? attrRemoveNS : attrRemove : typeof value === "function" ? fullname.local ? attrFunctionNS : attrFunction : fullname.local ? attrConstantNS : attrConstant)(fullname, value));
   }
 
-  // node_modules/d3-selection/src/window.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/window.js
   function window_default(node) {
     return node.ownerDocument && node.ownerDocument.defaultView || node.document && node || node.defaultView;
   }
 
-  // node_modules/d3-selection/src/selection/style.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/style.js
   function styleRemove(name) {
     return function() {
       this.style.removeProperty(name);
@@ -28154,7 +28154,7 @@
     return node.style.getPropertyValue(name) || window_default(node).getComputedStyle(node, null).getPropertyValue(name);
   }
 
-  // node_modules/d3-selection/src/selection/property.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/property.js
   function propertyRemove(name) {
     return function() {
       delete this[name];
@@ -28176,7 +28176,7 @@
     return arguments.length > 1 ? this.each((value == null ? propertyRemove : typeof value === "function" ? propertyFunction : propertyConstant)(name, value)) : this.node()[name];
   }
 
-  // node_modules/d3-selection/src/selection/classed.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/classed.js
   function classArray(string) {
     return string.trim().split(/^|\s+/);
   }
@@ -28207,12 +28207,12 @@
     }
   };
   function classedAdd(node, names) {
-    var list = classList(node), i = -1, n = names.length;
-    while (++i < n) list.add(names[i]);
+    var list2 = classList(node), i = -1, n = names.length;
+    while (++i < n) list2.add(names[i]);
   }
   function classedRemove(node, names) {
-    var list = classList(node), i = -1, n = names.length;
-    while (++i < n) list.remove(names[i]);
+    var list2 = classList(node), i = -1, n = names.length;
+    while (++i < n) list2.remove(names[i]);
   }
   function classedTrue(names) {
     return function() {
@@ -28232,14 +28232,14 @@
   function classed_default(name, value) {
     var names = classArray(name + "");
     if (arguments.length < 2) {
-      var list = classList(this.node()), i = -1, n = names.length;
-      while (++i < n) if (!list.contains(names[i])) return false;
+      var list2 = classList(this.node()), i = -1, n = names.length;
+      while (++i < n) if (!list2.contains(names[i])) return false;
       return true;
     }
     return this.each((typeof value === "function" ? classedFunction : value ? classedTrue : classedFalse)(names, value));
   }
 
-  // node_modules/d3-selection/src/selection/text.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/text.js
   function textRemove() {
     this.textContent = "";
   }
@@ -28258,7 +28258,7 @@
     return arguments.length ? this.each(value == null ? textRemove : (typeof value === "function" ? textFunction : textConstant)(value)) : this.node().textContent;
   }
 
-  // node_modules/d3-selection/src/selection/html.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/html.js
   function htmlRemove() {
     this.innerHTML = "";
   }
@@ -28277,7 +28277,7 @@
     return arguments.length ? this.each(value == null ? htmlRemove : (typeof value === "function" ? htmlFunction : htmlConstant)(value)) : this.node().innerHTML;
   }
 
-  // node_modules/d3-selection/src/selection/raise.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/raise.js
   function raise() {
     if (this.nextSibling) this.parentNode.appendChild(this);
   }
@@ -28285,7 +28285,7 @@
     return this.each(raise);
   }
 
-  // node_modules/d3-selection/src/selection/lower.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/lower.js
   function lower() {
     if (this.previousSibling) this.parentNode.insertBefore(this, this.parentNode.firstChild);
   }
@@ -28293,7 +28293,7 @@
     return this.each(lower);
   }
 
-  // node_modules/d3-selection/src/selection/append.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/append.js
   function append_default(name) {
     var create2 = typeof name === "function" ? name : creator_default(name);
     return this.select(function() {
@@ -28301,7 +28301,7 @@
     });
   }
 
-  // node_modules/d3-selection/src/selection/insert.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/insert.js
   function constantNull() {
     return null;
   }
@@ -28312,7 +28312,7 @@
     });
   }
 
-  // node_modules/d3-selection/src/selection/remove.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/remove.js
   function remove() {
     var parent = this.parentNode;
     if (parent) parent.removeChild(this);
@@ -28321,7 +28321,7 @@
     return this.each(remove);
   }
 
-  // node_modules/d3-selection/src/selection/clone.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/clone.js
   function selection_cloneShallow() {
     var clone = this.cloneNode(false), parent = this.parentNode;
     return parent ? parent.insertBefore(clone, this.nextSibling) : clone;
@@ -28334,12 +28334,12 @@
     return this.select(deep ? selection_cloneDeep : selection_cloneShallow);
   }
 
-  // node_modules/d3-selection/src/selection/datum.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/datum.js
   function datum_default(value) {
     return arguments.length ? this.property("__data__", value) : this.node().__data__;
   }
 
-  // node_modules/d3-selection/src/selection/on.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/on.js
   function contextListener(listener) {
     return function(event) {
       listener.call(this, event, this.__data__);
@@ -28402,7 +28402,7 @@
     return this;
   }
 
-  // node_modules/d3-selection/src/selection/dispatch.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/dispatch.js
   function dispatchEvent(node, type, params) {
     var window2 = window_default(node), event = window2.CustomEvent;
     if (typeof event === "function") {
@@ -28428,7 +28428,7 @@
     return this.each((typeof params === "function" ? dispatchFunction : dispatchConstant)(type, params));
   }
 
-  // node_modules/d3-selection/src/selection/iterator.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/iterator.js
   function* iterator_default() {
     for (var groups = this._groups, j = 0, m = groups.length; j < m; ++j) {
       for (var group = groups[j], i = 0, n = group.length, node; i < n; ++i) {
@@ -28437,7 +28437,7 @@
     }
   }
 
-  // node_modules/d3-selection/src/selection/index.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/selection/index.js
   var root = [null];
   function Selection(groups, parents) {
     this._groups = groups;
@@ -28489,19 +28489,19 @@
   };
   var selection_default = selection;
 
-  // node_modules/d3-selection/src/select.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/select.js
   function select_default2(selector5) {
     return typeof selector5 === "string" ? new Selection([[document.querySelector(selector5)]], [document.documentElement]) : new Selection([[selector5]], root);
   }
 
-  // node_modules/d3-selection/src/sourceEvent.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/sourceEvent.js
   function sourceEvent_default(event) {
     let sourceEvent;
     while (sourceEvent = event.sourceEvent) event = sourceEvent;
     return event;
   }
 
-  // node_modules/d3-selection/src/pointer.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-selection/src/pointer.js
   function pointer_default(event, node) {
     event = sourceEvent_default(event);
     if (node === void 0) node = event.currentTarget;
@@ -28521,7 +28521,7 @@
     return [event.pageX, event.pageY];
   }
 
-  // node_modules/d3-drag/src/noevent.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-drag/src/noevent.js
   var nonpassive = { passive: false };
   var nonpassivecapture = { capture: true, passive: false };
   function nopropagation(event) {
@@ -28532,36 +28532,36 @@
     event.stopImmediatePropagation();
   }
 
-  // node_modules/d3-drag/src/nodrag.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-drag/src/nodrag.js
   function nodrag_default(view) {
-    var root3 = view.document.documentElement, selection2 = select_default2(view).on("dragstart.drag", noevent_default, nonpassivecapture);
+    var root3 = view.document.documentElement, selection3 = select_default2(view).on("dragstart.drag", noevent_default, nonpassivecapture);
     if ("onselectstart" in root3) {
-      selection2.on("selectstart.drag", noevent_default, nonpassivecapture);
+      selection3.on("selectstart.drag", noevent_default, nonpassivecapture);
     } else {
       root3.__noselect = root3.style.MozUserSelect;
       root3.style.MozUserSelect = "none";
     }
   }
   function yesdrag(view, noclick) {
-    var root3 = view.document.documentElement, selection2 = select_default2(view).on("dragstart.drag", null);
+    var root3 = view.document.documentElement, selection3 = select_default2(view).on("dragstart.drag", null);
     if (noclick) {
-      selection2.on("click.drag", noevent_default, nonpassivecapture);
+      selection3.on("click.drag", noevent_default, nonpassivecapture);
       setTimeout(function() {
-        selection2.on("click.drag", null);
+        selection3.on("click.drag", null);
       }, 0);
     }
     if ("onselectstart" in root3) {
-      selection2.on("selectstart.drag", null);
+      selection3.on("selectstart.drag", null);
     } else {
       root3.style.MozUserSelect = root3.__noselect;
       delete root3.__noselect;
     }
   }
 
-  // node_modules/d3-drag/src/constant.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-drag/src/constant.js
   var constant_default2 = (x) => () => x;
 
-  // node_modules/d3-drag/src/event.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-drag/src/event.js
   function DragEvent(type, {
     sourceEvent,
     subject,
@@ -28593,7 +28593,7 @@
     return value === this._ ? this : value;
   };
 
-  // node_modules/d3-drag/src/drag.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-drag/src/drag.js
   function defaultFilter(event) {
     return !event.ctrlKey && !event.button;
   }
@@ -28608,8 +28608,8 @@
   }
   function drag_default() {
     var filter2 = defaultFilter, container = defaultContainer, subject = defaultSubject, touchable = defaultTouchable, gestures = {}, listeners = dispatch_default("start", "drag", "end"), active = 0, mousedownx, mousedowny, mousemoving, touchending, clickDistance2 = 0;
-    function drag(selection2) {
-      selection2.on("mousedown.drag", mousedowned).filter(touchable).on("touchstart.drag", touchstarted).on("touchmove.drag", touchmoved, nonpassive).on("touchend.drag touchcancel.drag", touchended).style("touch-action", "none").style("-webkit-tap-highlight-color", "rgba(0,0,0,0)");
+    function drag(selection3) {
+      selection3.on("mousedown.drag", mousedowned).filter(touchable).on("touchstart.drag", touchstarted).on("touchmove.drag", touchmoved, nonpassive).on("touchend.drag touchcancel.drag", touchended).style("touch-action", "none").style("-webkit-tap-highlight-color", "rgba(0,0,0,0)");
     }
     function mousedowned(event, d) {
       if (touchending || !filter2.call(this, event, d)) return;
@@ -28738,7 +28738,7 @@
     return drag;
   }
 
-  // node_modules/d3-color/src/define.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-color/src/define.js
   function define_default(constructor, factory, prototype) {
     constructor.prototype = factory.prototype = prototype;
     prototype.constructor = constructor;
@@ -28749,7 +28749,7 @@
     return prototype;
   }
 
-  // node_modules/d3-color/src/color.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-color/src/color.js
   function Color() {
   }
   var darker = 0.7;
@@ -29086,7 +29086,7 @@
     return (h < 60 ? m1 + (m2 - m1) * h / 60 : h < 180 ? m2 : h < 240 ? m1 + (m2 - m1) * (240 - h) / 60 : m1) * 255;
   }
 
-  // node_modules/d3-interpolate/src/basis.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-interpolate/src/basis.js
   function basis(t1, v0, v1, v2, v3) {
     var t2 = t1 * t1, t3 = t2 * t1;
     return ((1 - 3 * t1 + 3 * t2 - t3) * v0 + (4 - 6 * t2 + 3 * t3) * v1 + (1 + 3 * t1 + 3 * t2 - 3 * t3) * v2 + t3 * v3) / 6;
@@ -29099,7 +29099,7 @@
     };
   }
 
-  // node_modules/d3-interpolate/src/basisClosed.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-interpolate/src/basisClosed.js
   function basisClosed_default(values) {
     var n = values.length;
     return function(t) {
@@ -29108,10 +29108,10 @@
     };
   }
 
-  // node_modules/d3-interpolate/src/constant.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-interpolate/src/constant.js
   var constant_default3 = (x) => () => x;
 
-  // node_modules/d3-interpolate/src/color.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-interpolate/src/color.js
   function linear(a, d) {
     return function(t) {
       return a + t * d;
@@ -29132,7 +29132,7 @@
     return d ? linear(a, d) : constant_default3(isNaN(a) ? b : a);
   }
 
-  // node_modules/d3-interpolate/src/rgb.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-interpolate/src/rgb.js
   var rgb_default = (function rgbGamma(y) {
     var color2 = gamma(y);
     function rgb2(start2, end) {
@@ -29149,10 +29149,10 @@
     return rgb2;
   })(1);
   function rgbSpline(spline) {
-    return function(colors) {
-      var n = colors.length, r = new Array(n), g = new Array(n), b = new Array(n), i, color2;
+    return function(colors2) {
+      var n = colors2.length, r = new Array(n), g = new Array(n), b = new Array(n), i, color2;
       for (i = 0; i < n; ++i) {
-        color2 = rgb(colors[i]);
+        color2 = rgb(colors2[i]);
         r[i] = color2.r || 0;
         g[i] = color2.g || 0;
         b[i] = color2.b || 0;
@@ -29172,14 +29172,14 @@
   var rgbBasis = rgbSpline(basis_default);
   var rgbBasisClosed = rgbSpline(basisClosed_default);
 
-  // node_modules/d3-interpolate/src/number.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-interpolate/src/number.js
   function number_default(a, b) {
     return a = +a, b = +b, function(t) {
       return a * (1 - t) + b * t;
     };
   }
 
-  // node_modules/d3-interpolate/src/string.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-interpolate/src/string.js
   var reA = /[-+]?(?:\d+\.?\d*|\.?\d+)(?:[eE][-+]?\d+)?/g;
   var reB = new RegExp(reA.source, "g");
   function zero(b) {
@@ -29221,7 +29221,7 @@
     });
   }
 
-  // node_modules/d3-interpolate/src/transform/decompose.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-interpolate/src/transform/decompose.js
   var degrees = 180 / Math.PI;
   var identity2 = {
     translateX: 0,
@@ -29247,7 +29247,7 @@
     };
   }
 
-  // node_modules/d3-interpolate/src/transform/parse.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-interpolate/src/transform/parse.js
   var svgNode;
   function parseCss(value) {
     const m = new (typeof DOMMatrix === "function" ? DOMMatrix : WebKitCSSMatrix)(value + "");
@@ -29262,7 +29262,7 @@
     return decompose_default(value.a, value.b, value.c, value.d, value.e, value.f);
   }
 
-  // node_modules/d3-interpolate/src/transform/index.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-interpolate/src/transform/index.js
   function interpolateTransform(parse, pxComma, pxParen, degParen) {
     function pop(s) {
       return s.length ? s.pop() + " " : "";
@@ -29317,7 +29317,7 @@
   var interpolateTransformCss = interpolateTransform(parseCss, "px, ", "px)", "deg)");
   var interpolateTransformSvg = interpolateTransform(parseSvg, ", ", ")", ")");
 
-  // node_modules/d3-interpolate/src/zoom.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-interpolate/src/zoom.js
   var epsilon2 = 1e-12;
   function cosh(x) {
     return ((x = Math.exp(x)) + 1 / x) / 2;
@@ -29362,7 +29362,7 @@
     return zoom;
   })(Math.SQRT2, 2, 4);
 
-  // node_modules/d3-timer/src/timer.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-timer/src/timer.js
   var frame = 0;
   var timeout = 0;
   var interval = 0;
@@ -29464,7 +29464,7 @@
     }
   }
 
-  // node_modules/d3-timer/src/timeout.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-timer/src/timeout.js
   function timeout_default(callback, delay, time) {
     var t = new Timer();
     delay = delay == null ? 0 : +delay;
@@ -29475,7 +29475,7 @@
     return t;
   }
 
-  // node_modules/d3-transition/src/transition/schedule.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-transition/src/transition/schedule.js
   var emptyOn = dispatch_default("start", "end", "cancel", "interrupt");
   var emptyTween = [];
   var CREATED = 0;
@@ -29531,7 +29531,7 @@
     }
     function start2(elapsed) {
       var i, j, n, o;
-      if (self.state !== SCHEDULED) return stop();
+      if (self.state !== SCHEDULED) return stop2();
       for (i in schedules) {
         o = schedules[i];
         if (o.name !== self.name) continue;
@@ -29568,16 +29568,16 @@
       tween.length = j + 1;
     }
     function tick(elapsed) {
-      var t = elapsed < self.duration ? self.ease.call(null, elapsed / self.duration) : (self.timer.restart(stop), self.state = ENDING, 1), i = -1, n = tween.length;
+      var t = elapsed < self.duration ? self.ease.call(null, elapsed / self.duration) : (self.timer.restart(stop2), self.state = ENDING, 1), i = -1, n = tween.length;
       while (++i < n) {
         tween[i].call(node, t);
       }
       if (self.state === ENDING) {
         self.on.call("end", node, node.__data__, self.index, self.group);
-        stop();
+        stop2();
       }
     }
-    function stop() {
+    function stop2() {
       self.state = ENDED;
       self.timer.stop();
       delete schedules[id2];
@@ -29586,7 +29586,7 @@
     }
   }
 
-  // node_modules/d3-transition/src/interrupt.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-transition/src/interrupt.js
   function interrupt_default(node, name) {
     var schedules = node.__transition, schedule, active, empty2 = true, i;
     if (!schedules) return;
@@ -29605,14 +29605,14 @@
     if (empty2) delete node.__transition;
   }
 
-  // node_modules/d3-transition/src/selection/interrupt.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-transition/src/selection/interrupt.js
   function interrupt_default2(name) {
     return this.each(function() {
       interrupt_default(this, name);
     });
   }
 
-  // node_modules/d3-transition/src/transition/tween.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-transition/src/transition/tween.js
   function tweenRemove(id2, name) {
     var tween0, tween1;
     return function() {
@@ -29673,13 +29673,13 @@
     };
   }
 
-  // node_modules/d3-transition/src/transition/interpolate.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-transition/src/transition/interpolate.js
   function interpolate_default(a, b) {
     var c;
     return (typeof b === "number" ? number_default : b instanceof color ? rgb_default : (c = color(b)) ? (b = c, rgb_default) : string_default)(a, b);
   }
 
-  // node_modules/d3-transition/src/transition/attr.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-transition/src/transition/attr.js
   function attrRemove2(name) {
     return function() {
       this.removeAttribute(name);
@@ -29729,7 +29729,7 @@
     return this.attrTween(name, typeof value === "function" ? (fullname.local ? attrFunctionNS2 : attrFunction2)(fullname, i, tweenValue(this, "attr." + name, value)) : value == null ? (fullname.local ? attrRemoveNS2 : attrRemove2)(fullname) : (fullname.local ? attrConstantNS2 : attrConstant2)(fullname, i, value));
   }
 
-  // node_modules/d3-transition/src/transition/attrTween.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-transition/src/transition/attrTween.js
   function attrInterpolate(name, i) {
     return function(t) {
       this.setAttribute(name, i.call(this, t));
@@ -29769,7 +29769,7 @@
     return this.tween(key, (fullname.local ? attrTweenNS : attrTween)(fullname, value));
   }
 
-  // node_modules/d3-transition/src/transition/delay.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-transition/src/transition/delay.js
   function delayFunction(id2, value) {
     return function() {
       init(this, id2).delay = +value.apply(this, arguments);
@@ -29785,7 +29785,7 @@
     return arguments.length ? this.each((typeof value === "function" ? delayFunction : delayConstant)(id2, value)) : get2(this.node(), id2).delay;
   }
 
-  // node_modules/d3-transition/src/transition/duration.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-transition/src/transition/duration.js
   function durationFunction(id2, value) {
     return function() {
       set2(this, id2).duration = +value.apply(this, arguments);
@@ -29801,7 +29801,7 @@
     return arguments.length ? this.each((typeof value === "function" ? durationFunction : durationConstant)(id2, value)) : get2(this.node(), id2).duration;
   }
 
-  // node_modules/d3-transition/src/transition/ease.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-transition/src/transition/ease.js
   function easeConstant(id2, value) {
     if (typeof value !== "function") throw new Error();
     return function() {
@@ -29813,7 +29813,7 @@
     return arguments.length ? this.each(easeConstant(id2, value)) : get2(this.node(), id2).ease;
   }
 
-  // node_modules/d3-transition/src/transition/easeVarying.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-transition/src/transition/easeVarying.js
   function easeVarying(id2, value) {
     return function() {
       var v = value.apply(this, arguments);
@@ -29826,7 +29826,7 @@
     return this.each(easeVarying(this._id, value));
   }
 
-  // node_modules/d3-transition/src/transition/filter.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-transition/src/transition/filter.js
   function filter_default2(match) {
     if (typeof match !== "function") match = matcher_default(match);
     for (var groups = this._groups, m = groups.length, subgroups = new Array(m), j = 0; j < m; ++j) {
@@ -29839,7 +29839,7 @@
     return new Transition(subgroups, this._parents, this._name, this._id);
   }
 
-  // node_modules/d3-transition/src/transition/merge.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-transition/src/transition/merge.js
   function merge_default2(transition2) {
     if (transition2._id !== this._id) throw new Error();
     for (var groups0 = this._groups, groups1 = transition2._groups, m0 = groups0.length, m1 = groups1.length, m = Math.min(m0, m1), merges = new Array(m0), j = 0; j < m; ++j) {
@@ -29855,7 +29855,7 @@
     return new Transition(merges, this._parents, this._name, this._id);
   }
 
-  // node_modules/d3-transition/src/transition/on.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-transition/src/transition/on.js
   function start(name) {
     return (name + "").trim().split(/^|\s+/).every(function(t) {
       var i = t.indexOf(".");
@@ -29876,7 +29876,7 @@
     return arguments.length < 2 ? get2(this.node(), id2).on.on(name) : this.each(onFunction(id2, name, listener));
   }
 
-  // node_modules/d3-transition/src/transition/remove.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-transition/src/transition/remove.js
   function removeFunction(id2) {
     return function() {
       var parent = this.parentNode;
@@ -29888,7 +29888,7 @@
     return this.on("end.remove", removeFunction(this._id));
   }
 
-  // node_modules/d3-transition/src/transition/select.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-transition/src/transition/select.js
   function select_default3(select) {
     var name = this._name, id2 = this._id;
     if (typeof select !== "function") select = selector_default(select);
@@ -29904,7 +29904,7 @@
     return new Transition(subgroups, this._parents, name, id2);
   }
 
-  // node_modules/d3-transition/src/transition/selectAll.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-transition/src/transition/selectAll.js
   function selectAll_default2(select) {
     var name = this._name, id2 = this._id;
     if (typeof select !== "function") select = selectorAll_default(select);
@@ -29924,13 +29924,13 @@
     return new Transition(subgroups, parents, name, id2);
   }
 
-  // node_modules/d3-transition/src/transition/selection.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-transition/src/transition/selection.js
   var Selection2 = selection_default.prototype.constructor;
   function selection_default2() {
     return new Selection2(this._groups, this._parents);
   }
 
-  // node_modules/d3-transition/src/transition/style.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-transition/src/transition/style.js
   function styleNull(name, interpolate) {
     var string00, string10, interpolate0;
     return function() {
@@ -29971,7 +29971,7 @@
     return value == null ? this.styleTween(name, styleNull(name, i)).on("end.style." + name, styleRemove2(name)) : typeof value === "function" ? this.styleTween(name, styleFunction2(name, i, tweenValue(this, "style." + name, value))).each(styleMaybeRemove(this._id, name)) : this.styleTween(name, styleConstant2(name, i, value), priority).on("end.style." + name, null);
   }
 
-  // node_modules/d3-transition/src/transition/styleTween.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-transition/src/transition/styleTween.js
   function styleInterpolate(name, i, priority) {
     return function(t) {
       this.style.setProperty(name, i.call(this, t), priority);
@@ -29995,7 +29995,7 @@
     return this.tween(key, styleTween(name, value, priority == null ? "" : priority));
   }
 
-  // node_modules/d3-transition/src/transition/text.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-transition/src/transition/text.js
   function textConstant2(value) {
     return function() {
       this.textContent = value;
@@ -30011,7 +30011,7 @@
     return this.tween("text", typeof value === "function" ? textFunction2(tweenValue(this, "text", value)) : textConstant2(value == null ? "" : value + ""));
   }
 
-  // node_modules/d3-transition/src/transition/textTween.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-transition/src/transition/textTween.js
   function textInterpolate(i) {
     return function(t) {
       this.textContent = i.call(this, t);
@@ -30035,7 +30035,7 @@
     return this.tween(key, textTween(value));
   }
 
-  // node_modules/d3-transition/src/transition/transition.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-transition/src/transition/transition.js
   function transition_default() {
     var name = this._name, id0 = this._id, id1 = newId();
     for (var groups = this._groups, m = groups.length, j = 0; j < m; ++j) {
@@ -30054,7 +30054,7 @@
     return new Transition(groups, this._parents, name, id1);
   }
 
-  // node_modules/d3-transition/src/transition/end.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-transition/src/transition/end.js
   function end_default() {
     var on0, on1, that = this, id2 = that._id, size = that.size();
     return new Promise(function(resolve, reject) {
@@ -30075,7 +30075,7 @@
     });
   }
 
-  // node_modules/d3-transition/src/transition/index.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-transition/src/transition/index.js
   var id = 0;
   function Transition(groups, parents, name, id2) {
     this._groups = groups;
@@ -30123,12 +30123,12 @@
     [Symbol.iterator]: selection_prototype[Symbol.iterator]
   };
 
-  // node_modules/d3-ease/src/cubic.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-ease/src/cubic.js
   function cubicInOut(t) {
     return ((t *= 2) <= 1 ? t * t * t : (t -= 2) * t * t + 2) / 2;
   }
 
-  // node_modules/d3-transition/src/selection/transition.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-transition/src/selection/transition.js
   var defaultTiming = {
     time: null,
     // Set on use.
@@ -30162,14 +30162,14 @@
     return new Transition(groups, this._parents, name, id2);
   }
 
-  // node_modules/d3-transition/src/selection/index.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-transition/src/selection/index.js
   selection_default.prototype.interrupt = interrupt_default2;
   selection_default.prototype.transition = transition_default2;
 
-  // node_modules/d3-zoom/src/constant.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-zoom/src/constant.js
   var constant_default4 = (x) => () => x;
 
-  // node_modules/d3-zoom/src/event.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-zoom/src/event.js
   function ZoomEvent(type, {
     sourceEvent,
     target,
@@ -30185,7 +30185,7 @@
     });
   }
 
-  // node_modules/d3-zoom/src/transform.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-zoom/src/transform.js
   function Transform(k, x, y) {
     this.k = k;
     this.x = x;
@@ -30234,7 +30234,7 @@
     return node.__zoom;
   }
 
-  // node_modules/d3-zoom/src/noevent.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-zoom/src/noevent.js
   function nopropagation2(event) {
     event.stopImmediatePropagation();
   }
@@ -30243,7 +30243,7 @@
     event.stopImmediatePropagation();
   }
 
-  // node_modules/d3-zoom/src/zoom.js
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/d3-zoom/src/zoom.js
   function defaultFilter2(event) {
     return (!event.ctrlKey || event.type === "wheel") && !event.button;
   }
@@ -30277,42 +30277,42 @@
   }
   function zoom_default2() {
     var filter2 = defaultFilter2, extent = defaultExtent, constrain = defaultConstrain, wheelDelta2 = defaultWheelDelta, touchable = defaultTouchable2, scaleExtent = [0, Infinity], translateExtent = [[-Infinity, -Infinity], [Infinity, Infinity]], duration = 250, interpolate = zoom_default, listeners = dispatch_default("start", "zoom", "end"), touchstarting, touchfirst, touchending, touchDelay = 500, wheelDelay = 150, clickDistance2 = 0, tapDistance = 10;
-    function zoom(selection2) {
-      selection2.property("__zoom", defaultTransform).on("wheel.zoom", wheeled, { passive: false }).on("mousedown.zoom", mousedowned).on("dblclick.zoom", dblclicked).filter(touchable).on("touchstart.zoom", touchstarted).on("touchmove.zoom", touchmoved).on("touchend.zoom touchcancel.zoom", touchended).style("-webkit-tap-highlight-color", "rgba(0,0,0,0)");
+    function zoom(selection3) {
+      selection3.property("__zoom", defaultTransform).on("wheel.zoom", wheeled, { passive: false }).on("mousedown.zoom", mousedowned).on("dblclick.zoom", dblclicked).filter(touchable).on("touchstart.zoom", touchstarted).on("touchmove.zoom", touchmoved).on("touchend.zoom touchcancel.zoom", touchended).style("-webkit-tap-highlight-color", "rgba(0,0,0,0)");
     }
     zoom.transform = function(collection, transform2, point, event) {
-      var selection2 = collection.selection ? collection.selection() : collection;
-      selection2.property("__zoom", defaultTransform);
-      if (collection !== selection2) {
+      var selection3 = collection.selection ? collection.selection() : collection;
+      selection3.property("__zoom", defaultTransform);
+      if (collection !== selection3) {
         schedule(collection, transform2, point, event);
       } else {
-        selection2.interrupt().each(function() {
+        selection3.interrupt().each(function() {
           gesture(this, arguments).event(event).start().zoom(null, typeof transform2 === "function" ? transform2.apply(this, arguments) : transform2).end();
         });
       }
     };
-    zoom.scaleBy = function(selection2, k, p, event) {
-      zoom.scaleTo(selection2, function() {
+    zoom.scaleBy = function(selection3, k, p, event) {
+      zoom.scaleTo(selection3, function() {
         var k0 = this.__zoom.k, k1 = typeof k === "function" ? k.apply(this, arguments) : k;
         return k0 * k1;
       }, p, event);
     };
-    zoom.scaleTo = function(selection2, k, p, event) {
-      zoom.transform(selection2, function() {
+    zoom.scaleTo = function(selection3, k, p, event) {
+      zoom.transform(selection3, function() {
         var e = extent.apply(this, arguments), t0 = this.__zoom, p0 = p == null ? centroid(e) : typeof p === "function" ? p.apply(this, arguments) : p, p1 = t0.invert(p0), k1 = typeof k === "function" ? k.apply(this, arguments) : k;
         return constrain(translate(scale(t0, k1), p0, p1), e, translateExtent);
       }, p, event);
     };
-    zoom.translateBy = function(selection2, x, y, event) {
-      zoom.transform(selection2, function() {
+    zoom.translateBy = function(selection3, x, y, event) {
+      zoom.transform(selection3, function() {
         return constrain(this.__zoom.translate(
           typeof x === "function" ? x.apply(this, arguments) : x,
           typeof y === "function" ? y.apply(this, arguments) : y
         ), extent.apply(this, arguments), translateExtent);
       }, null, event);
     };
-    zoom.translateTo = function(selection2, x, y, p, event) {
-      zoom.transform(selection2, function() {
+    zoom.translateTo = function(selection3, x, y, p, event) {
+      zoom.transform(selection3, function() {
         var e = extent.apply(this, arguments), t = this.__zoom, p0 = p == null ? centroid(e) : typeof p === "function" ? p.apply(this, arguments) : p;
         return constrain(identity3.translate(p0[0], p0[1]).scale(t.k).translate(
           typeof x === "function" ? -x.apply(this, arguments) : -x,
@@ -30558,7 +30558,7 @@
     return zoom;
   }
 
-  // node_modules/@reactflow/core/dist/esm/index.mjs
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@reactflow/core/dist/esm/index.mjs
   var import_react_dom = __toESM(require_react_dom(), 1);
   var StoreContext = (0, import_react4.createContext)(null);
   var Provider$1 = StoreContext.Provider;
@@ -31216,8 +31216,8 @@
     const y = height / 2 - boundsCenterY * clampedZoom;
     return { x, y, zoom: clampedZoom };
   };
-  var getD3Transition = (selection2, duration = 0) => {
-    return selection2.transition().duration(duration);
+  var getD3Transition = (selection3, duration = 0) => {
+    return selection3.transition().duration(duration);
   };
   function getHandles(node, handleBounds, type, currentHandle) {
     return (handleBounds[type] || []).reduce((res, h) => {
@@ -32316,19 +32316,19 @@
       if (zoomPane.current) {
         const bbox = zoomPane.current.getBoundingClientRect();
         const d3ZoomInstance = zoom_default2().scaleExtent([minZoom, maxZoom]).translateExtent(translateExtent);
-        const selection2 = select_default2(zoomPane.current).call(d3ZoomInstance);
+        const selection3 = select_default2(zoomPane.current).call(d3ZoomInstance);
         const updatedTransform = identity3.translate(defaultViewport.x, defaultViewport.y).scale(clamp(defaultViewport.zoom, minZoom, maxZoom));
         const extent = [
           [0, 0],
           [bbox.width, bbox.height]
         ];
         const constrainedTransform = d3ZoomInstance.constrain()(updatedTransform, extent, translateExtent);
-        d3ZoomInstance.transform(selection2, constrainedTransform);
+        d3ZoomInstance.transform(selection3, constrainedTransform);
         d3ZoomInstance.wheelDelta(wheelDelta);
         store.setState({
           d3Zoom: d3ZoomInstance,
-          d3Selection: selection2,
-          d3ZoomHandler: selection2.on("wheel.zoom"),
+          d3Selection: selection3,
+          d3ZoomHandler: selection3.on("wheel.zoom"),
           // we need to pass transform because zoom handler is not registered when we set the initial transform
           transform: [constrainedTransform.x, constrainedTransform.y, constrainedTransform.k],
           domNode: zoomPane.current.closest(".react-flow")
@@ -32966,7 +32966,7 @@
     const getPointerPosition = useGetPointerPosition();
     (0, import_react4.useEffect)(() => {
       if (nodeRef?.current) {
-        const selection2 = select_default2(nodeRef.current);
+        const selection3 = select_default2(nodeRef.current);
         const updateNodes = ({ x, y }) => {
           const { nodeInternals, onNodeDrag, onSelectionDrag, updateNodePositions, nodeExtent, snapGrid, snapToGrid, nodeOrigin, onError } = store.getState();
           lastPos.current = { x, y };
@@ -33057,7 +33057,7 @@
           }
         };
         if (disabled) {
-          selection2.on(".drag", null);
+          selection3.on(".drag", null);
         } else {
           const dragHandler = drag_default().on("start", (event) => {
             const { domNode, nodeDragThreshold } = store.getState();
@@ -33121,9 +33121,9 @@
             const isDraggable = !event.button && (!noDragClassName || !hasSelector(target, `.${noDragClassName}`, nodeRef)) && (!handleSelector || hasSelector(target, handleSelector, nodeRef));
             return isDraggable;
           });
-          selection2.call(dragHandler);
+          selection3.call(dragHandler);
           return () => {
-            selection2.on(".drag", null);
+            selection3.on(".drag", null);
           };
         }
       }
@@ -34356,7 +34356,7 @@
   var useNodesState = createUseItemsState(applyNodeChanges);
   var useEdgesState = createUseItemsState(applyEdgeChanges);
 
-  // node_modules/@reactflow/minimap/dist/esm/index.mjs
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@reactflow/minimap/dist/esm/index.mjs
   var import_react5 = __toESM(require_react(), 1);
   var MiniMapNode = ({ id: id2, x, y, width, height, style: style2, color: color2, strokeColor, strokeWidth, className, borderRadius, shapeRendering, onClick, selected }) => {
     const { background, backgroundColor } = style2 || {};
@@ -34452,7 +34452,7 @@
     viewScaleRef.current = viewScale;
     (0, import_react5.useEffect)(() => {
       if (svg.current) {
-        const selection2 = select_default2(svg.current);
+        const selection3 = select_default2(svg.current);
         const zoomHandler = (event) => {
           const { transform: transform2, d3Selection, d3Zoom } = store.getState();
           if (event.sourceEvent.type !== "wheel" || !d3Selection || !d3Zoom) {
@@ -34481,9 +34481,9 @@
           d3Zoom.transform(d3Selection, constrainedTransform);
         };
         const zoomAndPanHandler = zoom_default2().on("zoom", pannable ? panHandler : null).on("zoom.wheel", zoomable ? zoomHandler : null);
-        selection2.call(zoomAndPanHandler);
+        selection3.call(zoomAndPanHandler);
         return () => {
-          selection2.on("zoom", null);
+          selection3.on("zoom", null);
         };
       }
     }, [pannable, zoomable, inversePan, zoomStep]);
@@ -34511,7 +34511,7 @@
   MiniMap.displayName = "MiniMap";
   var MiniMap$1 = (0, import_react5.memo)(MiniMap);
 
-  // node_modules/@reactflow/controls/dist/esm/index.mjs
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@reactflow/controls/dist/esm/index.mjs
   var import_react6 = __toESM(require_react(), 1);
   function PlusIcon() {
     return import_react6.default.createElement(
@@ -34615,7 +34615,7 @@
   Controls.displayName = "Controls";
   var Controls$1 = (0, import_react6.memo)(Controls);
 
-  // node_modules/@reactflow/background/dist/esm/index.mjs
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@reactflow/background/dist/esm/index.mjs
   var import_react7 = __toESM(require_react(), 1);
   var BackgroundVariant;
   (function(BackgroundVariant2) {
@@ -34681,7 +34681,7 @@
   Background.displayName = "Background";
   var Background$1 = (0, import_react7.memo)(Background);
 
-  // node_modules/@reactflow/node-toolbar/dist/esm/index.mjs
+  // ../../../../../../../../One/OpenSource/gert-vscode/node_modules/@reactflow/node-toolbar/dist/esm/index.mjs
   var import_react8 = __toESM(require_react(), 1);
   var import_react_dom2 = __toESM(require_react_dom(), 1);
   var selector4 = (state) => state.domNode?.querySelector(".react-flow__renderer");
@@ -34768,27 +34768,1448 @@
     );
   }
 
-  // webview/inspector.tsx
-  var import_react9 = __toESM(require_react());
+  // src/presentationProtocol.ts
+  var MAX_SOURCE_BYTES = 8 * 1024 * 1024;
+  var MAX_CODE_UNITS = 32768;
+  var statuses = ["resolved", "unavailable", "ambiguous", "unsupported", "stale"];
+  var reasons = [
+    "missing-dependency",
+    "missing-descriptor",
+    "incomplete-identity",
+    "invalid-descriptor",
+    "ambiguous-binding",
+    "incomplete-source",
+    "unsupported-language",
+    "unsupported-version",
+    "unresolved-dynamic",
+    "invalid-source-range",
+    "stale-request",
+    "limit-exceeded",
+    "invalid-request"
+  ];
+  function record(value) {
+    if (!value || typeof value !== "object" || Array.isArray(value)) throw new Error("invalid-presentation-object");
+    return value;
+  }
+  function closed(value, keys) {
+    const result = record(value);
+    if (Object.keys(result).some((key) => !keys.includes(key))) throw new Error("unknown-presentation-field");
+    return result;
+  }
+  function text(value) {
+    if (typeof value !== "string" || !value.length) throw new Error("invalid-presentation-string");
+    return value;
+  }
+  function integer(value) {
+    if (typeof value !== "number" || !Number.isSafeInteger(value) || value < 0) throw new Error("invalid-presentation-integer");
+    return value;
+  }
+  function literal(value, values) {
+    if (typeof value !== "string" || !values.includes(value)) throw new Error("invalid-presentation-enum");
+    return value;
+  }
+  function list(value, decode, cap = 4096) {
+    if (!Array.isArray(value) || value.length > cap) throw new Error("invalid-presentation-list");
+    return value.map(decode);
+  }
+  function optionalText(value) {
+    return value === void 0 ? void 0 : text(value);
+  }
+  function availability(value) {
+    const status = literal(value.status, statuses);
+    const reason = value.reason === void 0 ? void 0 : literal(value.reason, reasons);
+    if (status !== "resolved" && !reason) throw new Error("missing-presentation-reason");
+    return { status, ...reason ? { reason } : {} };
+  }
+  function decodeDescriptor(value) {
+    const v = closed(value, ["version", "kind", "language"]);
+    const version = integer(v.version), language = text(v.language);
+    if (!version || !/^[a-z][a-z0-9-]{0,31}$/.test(language)) throw new Error("invalid-presentation-descriptor");
+    return { version, language, kind: literal(v.kind, ["code"]) };
+  }
+  function supportedDescriptor(value) {
+    return !!value && value.version === 1 && ["sql", "kql", "powershell"].includes(value.language);
+  }
+  function field(value) {
+    const v = closed(value, ["name", "value_type", "status", "reason", "presentation"]);
+    const result = {
+      name: text(v.name),
+      value_type: text(v.value_type),
+      ...availability(v),
+      ...v.presentation === void 0 ? {} : { presentation: decodeDescriptor(v.presentation) }
+    };
+    if (result.presentation && result.value_type !== "string") throw new Error("invalid-presentation-type");
+    if (result.status === "resolved" && !supportedDescriptor(result.presentation)) throw new Error("invalid-resolved-descriptor");
+    return result;
+  }
+  function fields(value) {
+    const result = list(value, field);
+    if (new Set(result.map((f) => f.name)).size !== result.length) throw new Error("duplicate-presentation-field");
+    return result;
+  }
+  function identity4(v, requireAction) {
+    const tool_id = optionalText(v.tool_id), tool_digest = optionalText(v.tool_digest), action = optionalText(v.action);
+    if (tool_digest && !/^sha256:[a-f0-9]{64}$/.test(tool_digest)) throw new Error("invalid-tool-digest");
+    if (v.status === "resolved" && (!tool_id || !tool_digest || requireAction && !action)) throw new Error("incomplete-presentation-identity");
+    return { ...tool_id ? { tool_id } : {}, ...tool_digest ? { tool_digest } : {}, ...action ? { action } : {} };
+  }
+  function decodeEnvelope(value) {
+    const v = closed(value, ["version", "status", "reason", "origin", "tool_id", "tool_digest", "action", "plan_snapshot_digest", "arguments", "outputs"]);
+    const version = integer(v.version);
+    if (!version) throw new Error("unsupported-presentation-envelope");
+    const origin = literal(v.origin, ["current", "frozen"]);
+    const digest = optionalText(v.plan_snapshot_digest);
+    if (origin === "frozen" && !digest) throw new Error("missing-frozen-digest");
+    if (digest && !/^sha256:[a-f0-9]{64}$/.test(digest)) throw new Error("invalid-frozen-digest");
+    const fallback = (values) => fields(values).map((field2) => version === 1 ? field2 : { ...field2, status: "unsupported", reason: "unsupported-version" });
+    return {
+      version,
+      origin,
+      ...availability(v),
+      ...identity4(v, true),
+      ...version === 1 ? {} : { status: "unsupported", reason: "unsupported-version" },
+      ...digest ? { plan_snapshot_digest: digest } : {},
+      arguments: fallback(v.arguments),
+      outputs: fallback(v.outputs)
+    };
+  }
+  function safeOutputs(envelope, output, status) {
+    const values = output && typeof output === "object" && !Array.isArray(output) ? record(output) : {};
+    const states = status && typeof status === "object" && !Array.isArray(status) ? record(status) : {};
+    return envelope.outputs.filter((f) => f.presentation).map((f) => {
+      const raw = states[f.name];
+      const state = raw === "available" || raw === "absent" || raw === "redacted" || raw === "truncated" ? raw : "unavailable";
+      const value = values[f.name];
+      const approved = (state === "available" || state === "truncated") && typeof value === "string";
+      return {
+        name: f.name,
+        status: approved ? state : state === "available" || state === "truncated" ? "unavailable" : state,
+        ...approved ? { text: value } : {},
+        ...f.status === "resolved" ? { descriptor: f.presentation } : {}
+      };
+    });
+  }
+  function decodeOutputStatuses(envelope, value) {
+    if (value === void 0) return {};
+    const object = record(value), result = {};
+    const names = new Set(envelope.outputs.filter((f) => f.presentation).map((f) => f.name));
+    for (const [name, state] of Object.entries(object)) {
+      if (!names.has(name)) throw new Error("unknown-output-classification");
+      Object.defineProperty(result, name, {
+        value: literal(state, ["available", "absent", "redacted", "truncated", "unavailable"]),
+        enumerable: true,
+        configurable: true,
+        writable: true
+      });
+    }
+    return result;
+  }
+
+  // src/displayPresentation.ts
+  function decodeDisplayPresentation(_value, _snapshotDigest) {
+    return void 0;
+  }
+  function selectDisplayPresentation(_metadata, _output, _snapshotDigest, _diagnostic) {
+    return { status: "unavailable", reason: "Display decoration is paused in this release" };
+  }
+  function hasDisplayPayload(value) {
+    return "display_presentation" in value || "display_presentation_diagnostic" in value;
+  }
+  function sanitizeDisplayPayload(payload, _snapshotDigest) {
+    if (!hasDisplayPayload(payload)) return;
+    if (payload.output && typeof payload.output === "object" && !Array.isArray(payload.output)) {
+      const { content: _, ...output } = payload.output;
+      payload.output = output;
+    }
+    delete payload.display_presentation;
+    payload.display_presentation_diagnostic = "feature-paused";
+  }
+  function mergeDisplayPayload(previous, incoming, snapshotDigest) {
+    const result = { ...previous, ...incoming };
+    if (hasDisplayPayload(previous) || hasDisplayPayload(incoming)) result.display_presentation_diagnostic = "feature-paused";
+    sanitizeDisplayPayload(result, snapshotDigest);
+    return result;
+  }
+
+  // src/presentationProjection.ts
+  var INVALID_PRESENTATION_DIAGNOSTIC = "Code presentation unavailable: invalid metadata; output omitted.";
+  var LIMITED_PRESENTATION_DIAGNOSTIC = "Code presentation unavailable: preview limit exceeded; output omitted.";
+  function terminalPresentation(payload, previous, expectedDisplaySnapshot = "missing-binding") {
+    if (previous?.displayPresentation || previous?.displayPresentationDiagnostic) {
+      const old = {
+        output: previous.output,
+        ...previous.displayPresentation ? { display_presentation: previous.displayPresentation } : {},
+        ...previous.displayPresentationDiagnostic ? { display_presentation_diagnostic: previous.displayPresentationDiagnostic } : {}
+      };
+      const merged = mergeDisplayPayload(old, payload, expectedDisplaySnapshot);
+      delete payload.display_presentation;
+      delete payload.display_presentation_diagnostic;
+      Object.assign(payload, merged);
+    }
+    sanitizeDisplayPayload(payload, expectedDisplaySnapshot);
+    sanitizePresentationPayload(payload);
+    const display = {
+      displayPresentation: decodeDisplayPresentation(payload.display_presentation),
+      ...payload.display_presentation_diagnostic ? { displayPresentationDiagnostic: "Unavailable \u2014 invalid frozen Markdown metadata" } : {}
+    };
+    if (payload.presentation_diagnostic === "invalid-metadata" || payload.presentation_diagnostic === "limit-exceeded") {
+      return { ...display, presentationDiagnostic: payload.presentation_diagnostic === "invalid-metadata" ? INVALID_PRESENTATION_DIAGNOSTIC : LIMITED_PRESENTATION_DIAGNOSTIC };
+    }
+    if (payload.code_presentation === void 0) return display;
+    const codePresentation = decodeEnvelope(payload.code_presentation);
+    const outputValueStatus = decodeOutputStatuses(codePresentation, payload.output_value_status);
+    return { ...display, codePresentation, outputValueStatus };
+  }
+  function sanitizePresentationPayload(payload) {
+    sanitizeDisplayPayload(payload);
+    if (payload.presentation_diagnostic === "invalid-metadata" || payload.presentation_diagnostic === "limit-exceeded") {
+      omitPresentation(payload, payload.presentation_diagnostic);
+      return;
+    }
+    if (payload.code_presentation === void 0) return;
+    let envelope;
+    let statuses2;
+    try {
+      envelope = decodeEnvelope(payload.code_presentation);
+      statuses2 = decodeOutputStatuses(envelope, payload.output_value_status);
+    } catch {
+      omitPresentation(payload, "invalid-metadata");
+      return;
+    }
+    payload.code_presentation = envelope;
+    payload.output_value_status = statuses2;
+    if (!payload.output || typeof payload.output !== "object" || Array.isArray(payload.output)) return;
+    const output = { ...record(payload.output) };
+    for (const value of safeOutputs(envelope, output, payload.output_value_status)) {
+      if (value.text === void 0) delete output[value.name];
+    }
+    payload.output = output;
+  }
+  function omitPresentation(payload, reason) {
+    delete payload.code_presentation;
+    delete payload.output_value_status;
+    delete payload.output;
+    payload.presentation_diagnostic = reason;
+  }
+
+  // src/displayObservations.ts
+  var identityFields = [
+    "phase",
+    "invocation",
+    "retry_attempt",
+    "occurrence_sequence",
+    "frame_id",
+    "frame_step_index",
+    "dispatch_occurrence_id",
+    "execution_lane",
+    "event_id"
+  ];
+  var AMBIGUOUS_WITHDRAWAL = "withdrawal-unassociated";
+  function identified(identity5) {
+    return ["before", "execute", "after"].includes(identity5.phase) && ["invocation", "retry_attempt", "occurrence_sequence"].every((key) => Number.isSafeInteger(identity5[key]) && identity5[key] > 0) && ["frame_id", "dispatch_occurrence_id", "execution_lane", "event_id"].every((key) => identity5[key] === void 0 || typeof identity5[key] === "string") && (identity5.frame_step_index === void 0 || Number.isSafeInteger(identity5.frame_step_index) && identity5.frame_step_index >= 0) && (!identity5.frame_id || identity5.frame_step_index !== void 0);
+  }
+  function sameScope(left, right) {
+    return left.runID === right.runID && left.snapshotDigest === right.snapshotDigest;
+  }
+  function compatible(left, right) {
+    return sameScope(left, right) && identityFields.every((key) => left.identity[key] === right.identity[key] || key === "event_id" && identified(left.identity) && identified(right.identity) || // Frame offset zero has no identity meaning outside a frame.
+    key === "frame_step_index" && !left.identity.frame_id && !right.identity.frame_id);
+  }
+  function selection2(items, candidate) {
+    return items.find((item) => sameScope(item, candidate) && item.display_presentation_diagnostic === AMBIGUOUS_WITHDRAWAL) ?? items.find((item) => compatible(item, candidate));
+  }
+  function presentationRecord(value) {
+    return {
+      identity: value.identity,
+      runID: value.runID,
+      snapshotDigest: value.snapshotDigest,
+      qualifiedNodeID: value.qualifiedNodeID,
+      occurrenceID: value.occurrenceID,
+      output: value.output,
+      ...value.status !== void 0 ? { status: value.status } : {},
+      ...value.error !== void 0 ? { error: value.error } : {},
+      ...value.display_presentation !== void 0 ? { display_presentation: value.display_presentation } : {},
+      ...value.display_presentation_diagnostic !== void 0 ? { display_presentation_diagnostic: value.display_presentation_diagnostic } : {}
+    };
+  }
+  function retainDisplayObservation(current, nodeID, runID, payload, snapshotDigest, status, historical = false) {
+    snapshotDigest ??= "missing-binding";
+    const identity5 = Object.fromEntries(identityFields.filter((key) => payload[key] !== void 0).map((key) => [key, payload[key]]));
+    const observation = {
+      ...payload,
+      identity: identity5,
+      runID,
+      snapshotDigest,
+      qualifiedNodeID: nodeID,
+      ...status ? { status } : {}
+    };
+    if (historical && observation.display_presentation === void 0 && observation.display_presentation_diagnostic === void 0) {
+      delete observation.display_presentation;
+      delete observation.display_presentation_diagnostic;
+    }
+    sanitizeDisplayPayload(observation, snapshotDigest);
+    if (observation.display_presentation_diagnostic === AMBIGUOUS_WITHDRAWAL || !identified(identity5) && hasDisplayPayload(observation) && selectDisplayPresentation(observation.display_presentation, observation.output, snapshotDigest).text === void 0) {
+      observation.identity = {};
+      for (const key of identityFields) delete observation[key];
+      delete observation.status;
+      delete observation.error;
+      observation.display_presentation_diagnostic = AMBIGUOUS_WITHDRAWAL;
+      delete observation.display_presentation;
+    }
+    observation.output = Object.fromEntries(["content", "terminal", "outcome_category", "outcome_code"].filter((key) => observation.output && Object.prototype.hasOwnProperty.call(observation.output, key)).map((key) => [key, observation.output[key]]));
+    const previous = current[nodeID] || [];
+    const candidates = previous.map((item, index2) => compatible(item, observation) ? index2 : -1).filter((index2) => index2 >= 0);
+    const index = candidates.at(-1) ?? -1;
+    if (index >= 0) {
+      const target = observation;
+      const aliases = candidates.filter((i) => compatible(previous[i], target));
+      const retained = aliases.reduce((value, i) => mergeDisplayPayload(value, previous[i], snapshotDigest), {});
+      const merged = mergeDisplayPayload(retained, observation, snapshotDigest);
+      merged.identity = target.identity;
+      merged.occurrenceID = previous[index].occurrenceID;
+      if (!status) merged.status = previous[index].status ?? payload.status;
+      if (["completed", "failed", "cancelled", "denied", "blocked", "skipped", "indeterminate"].includes(previous[index].status)) {
+        merged.status = previous[index].status;
+        merged.error = previous[index].error;
+      }
+      if (merged.display_presentation_diagnostic === AMBIGUOUS_WITHDRAWAL) {
+        delete merged.status;
+        delete merged.error;
+      }
+      return { ...current, [nodeID]: previous.flatMap((item, i) => i === index ? [presentationRecord(merged)] : aliases.includes(i) ? [] : [item]) };
+    }
+    observation.occurrenceID = JSON.stringify([runID, nodeID, snapshotDigest, observation.identity]);
+    return { ...current, [nodeID]: historical ? [presentationRecord(observation), ...previous] : [...previous, presentationRecord(observation)] };
+  }
+  function reconcileDisplayDocument(document2, current) {
+    if (!document2?.presentation_state) return document2;
+    const state = document2.presentation_state;
+    let resolved = current;
+    const latest = /* @__PURE__ */ new Map();
+    for (const item of state.occurrences) if (item.details?.kind === "display") latest.set(item.identity.qualified_node_id, item);
+    for (const [nodeID, item] of latest) {
+      resolved = retainDisplayObservation(
+        resolved,
+        nodeID,
+        state.run_id,
+        { ...item, ...item.identity },
+        state.plan_snapshot_digest
+      );
+    }
+    return { ...document2, presentation_state: { ...state, occurrences: state.occurrences.map((item) => {
+      if (item.details?.kind !== "display") return item;
+      const candidate = { runID: state.run_id, snapshotDigest: state.plan_snapshot_digest, identity: item.identity };
+      const matched = selection2(resolved[item.identity.qualified_node_id] || [], candidate);
+      if (!matched || !hasDisplayPayload(matched)) return item;
+      const merged = mergeDisplayPayload(item, matched, state.plan_snapshot_digest);
+      return {
+        ...item,
+        output: merged.output,
+        display_presentation: merged.display_presentation,
+        ...merged.display_presentation_diagnostic ? { display_presentation_diagnostic: merged.display_presentation_diagnostic } : {}
+      };
+    }) } };
+  }
+  function reconcileDirectDisplayState(state, previous) {
+    let observations = {};
+    const observe = (value) => {
+      if (!value) return;
+      for (const [nodeID, items] of Object.entries(value.displayObservations ?? {})) {
+        for (const item of items) observations = retainDisplayObservation(
+          observations,
+          nodeID,
+          item.runID,
+          { ...item, ...item.identity },
+          item.snapshotDigest,
+          item.status
+        );
+      }
+      const scope2 = value.retainedDisplayScope;
+      const retained2 = value.retainedPresentations ?? [];
+      if (scope2) for (const item of [...retained2].reverse()) {
+        if (item.details?.kind !== "display" || item.details?.format !== "markdown") continue;
+        observations = retainDisplayObservation(
+          observations,
+          item.identity.qualified_node_id,
+          scope2.runID,
+          {
+            ...item.identity,
+            ...item.display_presentation !== void 0 ? { display_presentation: item.display_presentation } : {},
+            ...item.display_presentation_diagnostic !== void 0 ? { display_presentation_diagnostic: item.display_presentation_diagnostic } : {},
+            output: item.output
+          },
+          scope2.snapshotDigest,
+          void 0,
+          item !== retained2.at(-1)
+        );
+      }
+      for (const item of value.occurrences ?? []) {
+        const payload = directDisplayPayload(item);
+        if (!hasDisplayPayload(payload) && !observations[item.qualifiedNodeID]?.length) continue;
+        observations = retainDisplayObservation(
+          observations,
+          item.qualifiedNodeID,
+          item.runID,
+          payload,
+          item.directDisplaySnapshot ?? "missing-binding",
+          item.status
+        );
+      }
+    };
+    observe(previous);
+    observe(state);
+    const scope = state.retainedDisplayScope;
+    const retained = scope ? reconcileDisplayDocument({ presentation_state: {
+      run_id: scope.runID,
+      plan_snapshot_digest: scope.snapshotDigest,
+      occurrences: state.retainedPresentations ?? []
+    } }, observations)?.presentation_state.occurrences : state.retainedPresentations;
+    const occurrences = state.occurrences?.map((item) => {
+      const payload = directDisplayPayload(item);
+      const isCurrent = item.occurrenceID === state.occurrenceID;
+      const candidate = {
+        runID: item.runID,
+        snapshotDigest: item.directDisplaySnapshot ?? "missing-binding",
+        identity: payload
+      };
+      const matched = selection2(observations[item.qualifiedNodeID] ?? [], candidate);
+      if (!matched || !hasDisplayPayload(matched)) return item;
+      const output = { ...item.output };
+      if (typeof matched.output?.content === "string") output.content = matched.output.content;
+      else delete output.content;
+      return {
+        ...item,
+        output,
+        displayPresentation: matched.display_presentation,
+        displayPresentationDiagnostic: matched.display_presentation_diagnostic
+      };
+    });
+    const active = occurrences?.find((item) => item.occurrenceID === state.occurrenceID);
+    const summary = !state.occurrenceID ? selection2(observations[state.qualifiedNodeID] ?? [], {
+      runID: state.runID,
+      snapshotDigest: state.directDisplaySnapshot,
+      identity: state.displaySummaryIdentity ?? {}
+    }) : void 0;
+    return {
+      ...state,
+      displayObservations: observations,
+      ...scope ? { retainedPresentations: retained } : {},
+      ...occurrences ? { occurrences } : {},
+      ...summary && hasDisplayPayload(summary) ? {
+        output: summary.output,
+        displayPresentation: summary.display_presentation,
+        displayPresentationDiagnostic: summary.display_presentation_diagnostic
+      } : {},
+      ...active && (active.displayPresentation || active.displayPresentationDiagnostic) ? {
+        output: active.output,
+        displayPresentation: active.displayPresentation,
+        displayPresentationDiagnostic: active.displayPresentationDiagnostic
+      } : {}
+    };
+  }
+  function directDisplayPayload(value) {
+    return {
+      phase: value.phase,
+      invocation: value.invocation,
+      retry_attempt: value.retryAttempt,
+      occurrence_sequence: value.occurrenceSequence,
+      frame_id: value.frameID,
+      frame_step_index: value.frameStepIndex,
+      dispatch_occurrence_id: value.dispatchOccurrenceID,
+      execution_lane: value.executionLane,
+      output: value.output,
+      ...value.displayPresentation !== void 0 ? { display_presentation: value.displayPresentation } : {},
+      ...value.displayPresentationDiagnostic !== void 0 ? { display_presentation_diagnostic: value.displayPresentationDiagnostic } : {}
+    };
+  }
+  function applyDirectDisplaySummary(state, payload, nodeID, runID, snapshotDigest) {
+    const current = reconcileDirectDisplayState(state);
+    if (!hasDisplayPayload(payload) && !current.displayObservations[nodeID]?.length) return current;
+    const identity5 = Object.fromEntries(identityFields.filter((key) => payload[key] !== void 0).map((key) => [key, payload[key]]));
+    const observations = retainDisplayObservation(
+      current.displayObservations ?? {},
+      nodeID,
+      runID,
+      {
+        ...Object.fromEntries(identityFields.filter((key) => identity5[key] !== void 0).map((key) => [key, identity5[key]])),
+        ...payload
+      },
+      snapshotDigest
+    );
+    return reconcileDirectDisplayState({
+      ...current,
+      runID,
+      qualifiedNodeID: nodeID,
+      ...state.runID !== runID || state.directDisplaySnapshot !== snapshotDigest ? { occurrenceID: void 0 } : {},
+      directDisplaySnapshot: snapshotDigest,
+      displayObservations: observations,
+      displaySummaryIdentity: identity5
+    });
+  }
+  function retainDirectDisplayWithdrawals(history, nodes) {
+    let result = history;
+    for (const state of Object.values(nodes)) {
+      for (const [nodeID, items] of Object.entries(state.displayObservations ?? {})) {
+        for (const item of items) {
+          if (!hasDisplayPayload(item) || selectDisplayPresentation(item.display_presentation, item.output, item.snapshotDigest).text !== void 0) continue;
+          result = retainDisplayObservation(result, nodeID, item.runID, {
+            ...item.identity,
+            output: {},
+            display_presentation_diagnostic: item.display_presentation_diagnostic ?? "withdrawn"
+          }, item.snapshotDigest);
+        }
+      }
+    }
+    return result;
+  }
+  function restoreDirectDisplayWithdrawals(nodes, history, runID, snapshotDigest) {
+    const result = { ...nodes };
+    for (const [nodeID, items] of Object.entries(history)) {
+      if (!Array.isArray(items)) continue;
+      const scoped = items.filter((item) => item && typeof item === "object" && item.identity && typeof item.identity === "object" && !Array.isArray(item.identity) && item.runID === runID && item.snapshotDigest === snapshotDigest);
+      if (!scoped.length) continue;
+      const current = result[nodeID] ?? { status: "retained", runID, qualifiedNodeID: nodeID, directDisplaySnapshot: snapshotDigest };
+      result[nodeID] = reconcileDirectDisplayState({
+        ...current,
+        displayObservations: { [nodeID]: scoped }
+      }, current);
+    }
+    return result;
+  }
+  function beginDirectDisplayOccurrence(state, payload, runID, snapshotDigest) {
+    const nodeID = payload.qualified_node_id ?? payload.node_id ?? payload.step_id;
+    if (typeof nodeID !== "string") return state;
+    const observations = retainDisplayObservation(
+      state.displayObservations ?? {},
+      nodeID,
+      runID,
+      payload,
+      snapshotDigest,
+      "running"
+    );
+    return { ...state, displayObservations: observations };
+  }
+  function applyDirectRetainedDocument(current, document2) {
+    const state = document2.presentation_state;
+    if (!state) return current;
+    const scope = { runID: state.run_id, snapshotDigest: state.plan_snapshot_digest };
+    const retained = Object.fromEntries(Object.entries(current).filter(([, value]) => value.runID === scope.runID && value.directDisplaySnapshot === scope.snapshotDigest).map(([id2, value]) => [id2, {
+      ...value,
+      retainedPresentations: value.retainedPresentations ?? [],
+      retainedDisplayScope: scope
+    }]));
+    for (const item of state.occurrences) {
+      const nodeID = item.identity.qualified_node_id;
+      const sameScope2 = current[nodeID]?.runID === state.run_id && current[nodeID]?.directDisplaySnapshot === state.plan_snapshot_digest;
+      const node = retained[nodeID] ?? {
+        ...sameScope2 ? current[nodeID] : { status: "retained" },
+        retainedPresentations: [],
+        runID: state.run_id,
+        directDisplaySnapshot: state.plan_snapshot_digest,
+        retainedDisplayScope: scope
+      };
+      const identity5 = JSON.stringify(item.identity);
+      const index = node.retainedPresentations.findIndex((value) => JSON.stringify(value.identity) === identity5);
+      node.retainedPresentations = index < 0 ? [...node.retainedPresentations, item] : node.retainedPresentations.map((value, i) => i === index ? item : value);
+      retained[nodeID] = node;
+    }
+    return Object.fromEntries(Object.entries(retained).map(([id2, state2]) => [id2, reconcileDirectDisplayState(state2, current[id2])]));
+  }
+
+  // src/displayObservationStorage.ts
+  function isIdentity(value) {
+    return !!value && typeof value === "object" && !Array.isArray(value) && Object.values(value).every((field2) => typeof field2 === "string" || typeof field2 === "number" && Number.isSafeInteger(field2) && field2 >= 0);
+  }
+  function decodeDisplayWithdrawals(value, runID) {
+    let result = {};
+    if (!value || typeof value !== "object" || Array.isArray(value)) return result;
+    for (const [nodeID, items] of Object.entries(value)) {
+      if (!Array.isArray(items)) continue;
+      for (const item of items) {
+        if (!item || typeof item.runID !== "string" || runID !== void 0 && item.runID !== runID || typeof item.snapshotDigest !== "string" || !isIdentity(item.identity)) continue;
+        result = retainDisplayObservation(result, nodeID, item.runID, {
+          ...item.identity,
+          output: {},
+          display_presentation_diagnostic: "withdrawn"
+        }, item.snapshotDigest);
+      }
+    }
+    return result;
+  }
+
+  // src/workflowProjection.ts
+  function isWorkflowIssue(value) {
+    return ["failed", "denied", "indeterminate", "cancelled", "blocked"].includes(value.status) || value.output?.outcome_category === "blocked";
+  }
+  function workflowIssueIndex(runtime) {
+    const result = [];
+    for (const [nodeID, node] of Object.entries(runtime)) {
+      const occurrences = node.occurrences ?? [];
+      for (const value of occurrences) {
+        if (isWorkflowIssue(value)) result.push({
+          nodeID,
+          occurrenceID: value.occurrenceID,
+          graphRevision: value.graphRevision,
+          segmentID: value.segmentID,
+          qualifiedNodeID: value.qualifiedNodeID,
+          runID: value.runID,
+          status: value.status,
+          blockedOutcome: value.output?.outcome_category === "blocked"
+        });
+      }
+      if (isWorkflowIssue(node) && !occurrences.some((value) => isWorkflowIssue(value) && value.status === node.status && value.output?.outcome_category === node.output?.outcome_category)) {
+        result.push({ nodeID, status: node.status, blockedOutcome: node.output?.outcome_category === "blocked" });
+      }
+    }
+    return result;
+  }
+  function cycleMembers(ids, outgoing, incoming) {
+    const seen = /* @__PURE__ */ new Set(), order = [];
+    for (const root3 of ids) {
+      if (seen.has(root3)) continue;
+      seen.add(root3);
+      const stack = [{ id: root3, next: 0 }];
+      while (stack.length) {
+        const top = stack[stack.length - 1], edges = outgoing.get(top.id) ?? [];
+        if (top.next === edges.length) {
+          order.push(top.id);
+          stack.pop();
+          continue;
+        }
+        const id2 = edges[top.next++].target;
+        if (!seen.has(id2)) {
+          seen.add(id2);
+          stack.push({ id: id2, next: 0 });
+        }
+      }
+    }
+    seen.clear();
+    const cyclic = /* @__PURE__ */ new Set();
+    for (let i = order.length - 1; i >= 0; i--) {
+      const root3 = order[i];
+      if (seen.has(root3)) continue;
+      const members = [], stack = [root3];
+      seen.add(root3);
+      while (stack.length) {
+        const id2 = stack.pop();
+        members.push(id2);
+        for (const edge of incoming.get(id2) ?? []) if (!seen.has(edge.source)) {
+          seen.add(edge.source);
+          stack.push(edge.source);
+        }
+      }
+      if (members.length > 1 || (outgoing.get(root3) ?? []).some((edge) => edge.target === root3)) {
+        for (const id2 of members) cyclic.add(id2);
+      }
+    }
+    return cyclic;
+  }
+  function projectWorkflow(structuralDocument, runtime, options, routeDocument = structuralDocument) {
+    const nodes = new Map(structuralDocument.nodes.map((node) => [node.id, node]));
+    const groups = new Map(structuralDocument.groups.map((group) => [group.id, group]));
+    const frames = new Map(structuralDocument.frames.map((frame2) => [frame2.id, frame2]));
+    const incoming = /* @__PURE__ */ new Map(), outgoing = /* @__PURE__ */ new Map();
+    for (const edge of structuralDocument.edges) {
+      if (!nodes.has(edge.source) || !nodes.has(edge.target)) continue;
+      if (!incoming.has(edge.target)) incoming.set(edge.target, []);
+      if (!outgoing.has(edge.source)) outgoing.set(edge.source, []);
+      incoming.get(edge.target).push(edge);
+      outgoing.get(edge.source).push(edge);
+    }
+    const forced = /* @__PURE__ */ new Set(), expandedGroups = /* @__PURE__ */ new Set();
+    const issueRoots = workflowIssueIndex(runtime).map((issue) => issue.nodeID);
+    const prerequisites = /* @__PURE__ */ new Set(), reverse = [...issueRoots];
+    for (let i = 0; i < reverse.length; i++) {
+      const id2 = reverse[i];
+      if (prerequisites.has(id2)) continue;
+      prerequisites.add(id2);
+      for (const edge of incoming.get(id2) ?? []) reverse.push(edge.source);
+    }
+    const queue = [...options.pinnedNodeIDs, ...prerequisites];
+    const visitedGroups = /* @__PURE__ */ new Set();
+    for (let i = 0; i < queue.length; i++) {
+      const id2 = queue[i];
+      if (forced.has(id2)) continue;
+      forced.add(id2);
+      const node = nodes.get(id2);
+      if (!node) continue;
+      const groupID = String(node.data.group_id ?? "");
+      if (groupID && !visitedGroups.has(groupID)) {
+        visitedGroups.add(groupID);
+        expandedGroups.add(groupID);
+        const parent = groups.get(groupID)?.parent_node_id;
+        if (parent) queue.push(parent);
+      }
+      if (node.parentNode) {
+        const parentGroup = groups.get(node.parentNode);
+        if (parentGroup) {
+          expandedGroups.add(parentGroup.id);
+          if (parentGroup.parent_node_id) queue.push(parentGroup.parent_node_id);
+        } else queue.push(node.parentNode);
+      }
+      const include = frames.get(String(node.data.frame_id ?? ""))?.parent_include_node_id;
+      if (include) queue.push(include);
+    }
+    const routeIDs = new Set(routeDocument.nodes.map((node) => node.id));
+    const source = [...forced].some((id2) => nodes.has(id2) && !routeIDs.has(id2)) ? structuralDocument : routeDocument;
+    const owners = new Set(structuralDocument.groups.map((group) => group.parent_node_id));
+    for (const frame2 of structuralDocument.frames) if (frame2.parent_include_node_id) owners.add(frame2.parent_include_node_id);
+    const eligible = new Set(source.nodes.filter((node) => options.mode === "workflow" && (node.data.kind === "noop" || node.data.kind === "assert" || node.data.kind === "assign") && node.data.synthetic !== true && !owners.has(node.id) && !forced.has(node.id) && !options.expandedNodeIDs.has(node.id)).map((node) => node.id));
+    const ids = [...nodes.keys()].sort();
+    const cyclic = eligible.size ? cycleMembers(ids, outgoing, incoming) : /* @__PURE__ */ new Set();
+    const sameScope2 = (a, b) => ["frame_id", "group_id", "segment_id"].every(
+      (field2) => (nodes.get(a)?.data[field2] ?? "") === (nodes.get(b)?.data[field2] ?? "")
+    );
+    const routeEdges = new Set(source.edges.map((edge) => edge.id));
+    const next = /* @__PURE__ */ new Map(), previous = /* @__PURE__ */ new Set();
+    for (const id2 of eligible) {
+      const edges = outgoing.get(id2) ?? [];
+      if (cyclic.has(id2) || edges.length !== 1 || incoming.get(id2)?.length !== 1) continue;
+      const edge = edges[0], target = edge.target;
+      if (!eligible.has(target) || cyclic.has(target) || !sameScope2(id2, target) || outgoing.get(target)?.length !== 1 || incoming.get(target)?.length !== 1 || edge.type !== "sequence" || !!edge.label || !routeEdges.has(edge.id) || Object.keys(edge).some((key) => (key === "routeKind" || key.startsWith("runtime")) && edge[key] !== void 0)) continue;
+      next.set(id2, edge);
+      previous.add(target);
+    }
+    const reserved = /* @__PURE__ */ new Set([
+      ...structuralDocument.nodes.map((node) => node.id),
+      ...structuralDocument.groups.map((group) => group.id),
+      ...structuralDocument.edges.map((edge) => edge.id),
+      ...source.nodes.map((node) => node.id),
+      ...source.groups.map((group) => group.id),
+      ...source.edges.map((edge) => edge.id)
+    ]);
+    const segments = /* @__PURE__ */ new Map(), representatives = /* @__PURE__ */ new Map();
+    const internal = /* @__PURE__ */ new Set();
+    for (const node of source.nodes) representatives.set(node.id, node.id);
+    for (const first of [...eligible].sort()) {
+      if (previous.has(first)) continue;
+      const members = [first], edges = [];
+      let link = next.get(first);
+      while (link) {
+        members.push(link.target);
+        edges.push(link.id);
+        internal.add(link.id);
+        link = next.get(link.target);
+      }
+      const base = "__gert_workflow_v1__:" + encodeURIComponent(JSON.stringify(members));
+      let id2 = base, suffix = 0;
+      while (reserved.has(id2)) id2 = `${base}:${++suffix}`;
+      reserved.add(id2);
+      const data = nodes.get(first).data;
+      segments.set(id2, {
+        id: id2,
+        memberNodeIDs: members,
+        internalEdgeIDs: edges,
+        groupID: String(data.group_id ?? ""),
+        frameID: String(data.frame_id ?? ""),
+        ...typeof data.segment_id === "string" ? { segmentID: data.segment_id } : {}
+      });
+      for (const member of members) representatives.set(member, id2);
+    }
+    const provenance = /* @__PURE__ */ new Map();
+    const projectedEdges = source.edges.filter((edge) => !internal.has(edge.id)).map((edge) => {
+      provenance.set(edge.id, { originalEdgeID: edge.id, originalSource: edge.source, originalTarget: edge.target });
+      return {
+        ...edge,
+        source: representatives.get(edge.source) ?? edge.source,
+        target: representatives.get(edge.target) ?? edge.target,
+        runtimeNodeID: edge.runtimeNodeID ?? edge.target
+      };
+    });
+    return {
+      document: { ...source, nodes: [
+        ...source.nodes.filter((node) => !eligible.has(node.id)),
+        ...[...segments.values()].map((segment) => ({
+          id: segment.id,
+          type: "technicalSegment",
+          position: { x: 0, y: 0 },
+          data: {
+            id: segment.id,
+            kind: "technical-segment",
+            synthetic: true,
+            title: `${segment.memberNodeIDs.length} technical ${segment.memberNodeIDs.length === 1 ? "step" : "steps"}`,
+            group_id: segment.groupID,
+            frame_id: segment.frameID,
+            segment_id: segment.segmentID
+          }
+        }))
+      ], edges: projectedEdges },
+      segments,
+      representativeByNodeID: representatives,
+      edgeProvenance: provenance,
+      forcedNodeIDs: forced,
+      expandedGroupIDs: expandedGroups
+    };
+  }
+
+  // src/graphLayoutMeasurements.ts
+  function preserveLayoutMeasurements(layout, measured) {
+    const previous = new Map(measured.map((node) => [node.id, node]));
+    return layout.map((node) => {
+      const current = previous.get(node.id);
+      if (!current || current.type !== node.type || current.style?.width !== node.style?.width || current.style?.height !== node.style?.height) return node;
+      return { ...node, width: current.width, height: current.height };
+    });
+  }
 
   // src/runStatus.ts
-  var TERMINAL_RUN_STATUSES = /* @__PURE__ */ new Set(["completed", "failed", "cancelled", "indeterminate"]);
-  var SETTLED_STEP_STATUSES = /* @__PURE__ */ new Set(["completed", "failed", "skipped", "denied", "indeterminate", "cancelled"]);
-  var ISSUE_STEP_STATUSES = /* @__PURE__ */ new Set(["failed", "denied", "indeterminate", "cancelled"]);
+  var TERMINAL_RUN_STATUSES = /* @__PURE__ */ new Set(["completed", "failed", "cancelled", "indeterminate", "blocked", "denied"]);
+  var SETTLED_STEP_STATUSES = /* @__PURE__ */ new Set(["completed", "failed", "skipped", "denied", "indeterminate", "cancelled", "blocked"]);
   function isTerminalRunStatus(status) {
     return TERMINAL_RUN_STATUSES.has(status);
   }
   function isSettledStepStatus(status) {
     return SETTLED_STEP_STATUSES.has(status);
   }
-  function isIssueStepStatus(status) {
-    return ISSUE_STEP_STATUSES.has(status);
+
+  // src/executionProgress.ts
+  var isActiveStepStatus = (status) => ["running", "delaying", "waiting"].includes(status);
+  var isExecutionEnded = (status) => isTerminalRunStatus(status) || ["resolved", "escalated", "abandoned"].includes(status);
+  function graphProgressAliases(document2) {
+    const groups = new Map(document2.groups.map((group) => [group.id, group]));
+    const nodes = new Map(document2.nodes.map((node) => [node.id, node]));
+    const aliases = /* @__PURE__ */ new Map();
+    const visiting = /* @__PURE__ */ new Set();
+    const resolve = (id2) => {
+      if (aliases.has(id2)) return aliases.get(id2);
+      if (visiting.has(id2)) return id2;
+      visiting.add(id2);
+      const node = nodes.get(id2);
+      const group = groups.get(String(node?.data.group_id ?? node?.parentNode ?? ""));
+      const alias = group?.kind === "parallel-branch" && group.parent_node_id && node ? `${resolve(group.parent_node_id)}/${String(node.data.step_id || id2)}` : id2;
+      visiting.delete(id2);
+      aliases.set(id2, alias);
+      return alias;
+    };
+    for (const node of document2.nodes) resolve(node.id);
+    return aliases;
+  }
+  function directOccurrenceID(runID, nodeID, payload) {
+    const evidence = (value) => value === void 0 ? ["absent"] : ["supplied", value];
+    return JSON.stringify([runID, nodeID, ...[
+      payload.phase,
+      payload.invocation,
+      payload.retry_attempt === void 0 ? payload.attempt : payload.retry_attempt,
+      payload.occurrence_sequence,
+      payload.frame_id,
+      payload.frame_step_index,
+      payload.dispatch_occurrence_id,
+      payload.execution_lane
+    ].map(evidence)]);
+  }
+  function validProgressIdentity(payload) {
+    return ["invocation", "retry_attempt", "attempt", "occurrence_sequence", "frame_step_index"].every((key) => payload[key] === void 0 || typeof payload[key] === "number" && Number.isSafeInteger(payload[key]) && payload[key] >= (key === "frame_step_index" ? 0 : 1)) && ["phase", "frame_id", "dispatch_occurrence_id", "execution_lane"].every((key) => payload[key] === void 0 || typeof payload[key] === "string" && payload[key].length > 0);
+  }
+  function producerStepKind(payload) {
+    const kind = payload.step_kind ?? payload.kind;
+    return typeof kind === "string" && /^[a-z][a-z0-9_-]*$/.test(kind) ? kind : void 0;
+  }
+  function compareOccurrences(left, right) {
+    if (left.runID === right.runID && left.phase === right.phase && left.frameID === right.frameID && left.frameStepIndex === right.frameStepIndex && left.executionLane === right.executionLane) {
+      if (left.invocation !== void 0 && right.invocation !== void 0) {
+        const invocation = left.invocation - right.invocation;
+        if (invocation) return invocation;
+        if (left.retryAttempt !== void 0 && right.retryAttempt !== void 0) {
+          const retry = left.retryAttempt - right.retryAttempt;
+          if (retry) return retry;
+        }
+        if (left.retryAttempt === right.retryAttempt && left.dispatchOccurrenceID === right.dispatchOccurrenceID && left.occurrenceSequence !== void 0 && right.occurrenceSequence !== void 0) {
+          const occurrence = left.occurrenceSequence - right.occurrenceSequence;
+          if (occurrence) return occurrence;
+        }
+      }
+    }
+    if (left.startedEventSequence !== void 0 && right.startedEventSequence !== void 0) {
+      return left.startedEventSequence - right.startedEventSequence;
+    }
+    return 0;
+  }
+  function latestProgress(node) {
+    const history = node.occurrences?.filter((value) => !node.runID || value.runID === node.runID);
+    if (!history?.length) return node;
+    const latest = history.reduce((left, right) => compareOccurrences(left, right) > 0 ? left : right);
+    if (!latest.runID) return node;
+    if (isSettledStepStatus(latest.status)) return latest;
+    if (isSettledStepStatus(node.status) && (!node.occurrenceID || node.occurrenceID === latest.occurrenceID)) return node;
+    return latest;
+  }
+  function normalizeRuntimeStatuses(runtime) {
+    return Object.fromEntries(Object.entries(runtime).map(([id2, value]) => {
+      const latest = latestProgress(value);
+      return [id2, latest.status === value.status ? value : { ...value, status: latest.status }];
+    }));
+  }
+  function displayRuntimeStatuses(runtime, runStatus, document2) {
+    const values = { ...runtime };
+    if (document2) for (const [id2, alias] of graphProgressAliases(document2)) {
+      if (!values[id2] && runtime[alias]) values[id2] = runtime[alias];
+    }
+    return Object.fromEntries(Object.entries(values).map(([id2, value]) => {
+      const status = latestProgress(value).status;
+      return [id2, { ...value, status: isExecutionEnded(runStatus) && isActiveStepStatus(status) ? "no-final-status" : status }];
+    }));
+  }
+  function canonicalProgress(document2, runtime, runStatus) {
+    const result = { total: 0, completed: 0, issues: 0, skipped: 0, running: 0, remaining: 0, missingFinal: 0 };
+    const aliases = graphProgressAliases(document2);
+    for (const node of document2.nodes) {
+      if (node.data.synthetic === true || node.data.kind === "session-entry") continue;
+      result.total++;
+      const observation = runtime[node.id] ?? runtime[aliases.get(node.id) ?? node.id];
+      const value = observation ? latestProgress(observation) : void 0;
+      const status = value?.status ?? "pending";
+      if (["failed", "denied", "indeterminate", "cancelled", "blocked"].includes(status) || value?.output?.outcome_category === "blocked") result.issues++;
+      else if (status === "completed") result.completed++;
+      else if (status === "skipped") result.skipped++;
+      else if (isActiveStepStatus(status) && !isExecutionEnded(runStatus)) result.running++;
+      else {
+        result.remaining++;
+        if (isExecutionEnded(runStatus)) result.missingFinal++;
+      }
+    }
+    return result;
+  }
+  function currentActivities(document2, runtime, runStatus, runID, pending2) {
+    if (isExecutionEnded(runStatus) || ["idle", "not-started"].includes(runStatus)) return [];
+    const nodes = new Map(document2.nodes.map((node) => [node.id, node]));
+    for (const [id2, alias] of graphProgressAliases(document2)) {
+      if (!nodes.has(alias)) nodes.set(alias, nodes.get(id2));
+    }
+    const values = [];
+    for (const [nodeID, state] of Object.entries(runtime)) {
+      const lanes = /* @__PURE__ */ new Map();
+      for (const observation of state.occurrences ?? []) {
+        if (runID && observation.runID && observation.runID !== runID) continue;
+        const key = JSON.stringify([
+          observation.runID,
+          observation.phase,
+          observation.frameID,
+          observation.frameStepIndex,
+          observation.dispatchOccurrenceID,
+          observation.executionLane
+        ]);
+        const prior = lanes.get(key);
+        if (!prior || compareOccurrences(prior, observation) <= 0) lanes.set(key, observation);
+      }
+      const latest = latestProgress(state);
+      if (!lanes.size) lanes.set("", latest);
+      for (const observation of lanes.values()) {
+        const effective = isSettledStepStatus(state.status) && state.occurrenceID === observation.occurrenceID ? state : observation;
+        if ((!runID || !effective.runID || effective.runID === runID) && isActiveStepStatus(effective.status)) values.push([nodeID, effective]);
+      }
+    }
+    const pendingID = pending2?.turnID && (!runID || !pending2.runID || pending2.runID === runID) ? pending2.nodeID || pending2.stepID : void 0;
+    if (pendingID && !values.some(([id2]) => id2 === pendingID)) values.push([pendingID, { status: "waiting" }]);
+    const paused = ["paused", "paused_at_boundary", "handoff_pending"].includes(runStatus);
+    return values.map(([nodeID, value]) => {
+      const node = nodes.get(nodeID);
+      const path = value.qualifiedNodeID || String(node?.data.original_node_id || nodeID);
+      const kind = String(node?.data.kind || value.stepKind || "");
+      const container = ["include", "parallel", "branch", "iterate"].includes(kind);
+      const hasChild = container && values.some(([otherID, other]) => otherID !== nodeID && (other.qualifiedNodeID || String(nodes.get(otherID)?.data.original_node_id || otherID)).startsWith(path + "/"));
+      const interaction = pendingID === nodeID;
+      const label = paused || interaction && pending2?.kind === "debug_break" ? "Paused" : interaction ? pending2?.kind === "host_action" ? "Waiting for host action" : "Waiting for input" : value.status === "delaying" ? "Waiting \u2014 retry delay" : hasChild ? "Waiting for child steps" : kind === "tool" ? "Waiting for tool result" : value.status === "waiting" ? "Waiting \u2014 reason not reported" : container ? "Active container" : "Active";
+      return {
+        ...value,
+        nodeID: node?.id ?? nodeID,
+        path,
+        title: String(node?.data.title || node?.data.step_id || path),
+        label,
+        container,
+        inGraph: !!node
+      };
+    }).sort((left, right) => Number(left.container) - Number(right.container) || (right.startedEventSequence ?? 0) - (left.startedEventSequence ?? 0) || (right.occurrenceSequence ?? 0) - (left.occurrenceSequence ?? 0) || left.path.localeCompare(right.path));
+  }
+
+  // webview/CurrentActivity.tsx
+  var import_react9 = __toESM(require_react());
+  function CurrentActivity({ activities, runStatus, remaining, onLocate, locationNotice }) {
+    const [now2, setNow] = (0, import_react9.useState)(Date.now);
+    (0, import_react9.useEffect)(() => {
+      if (!activities.some((value) => value.lastActivityAt || value.startedAt)) return;
+      const timer2 = setInterval(() => setNow(Date.now()), 1e3);
+      return () => clearInterval(timer2);
+    }, [activities]);
+    const terminal = isExecutionEnded(runStatus);
+    const leafCount = activities.filter((value) => !value.container).length;
+    const containerCount = activities.length - leafCount;
+    const message = terminal ? remaining > 0 ? "Run ended, some steps lack final status." : `Run ${runStatus}.` : runStatus === "idle" ? "Not started." : ["paused", "paused_at_boundary", "handoff_pending"].includes(runStatus) ? "Paused \u2014 waiting for a resume command." : runStatus === "starting" ? "Starting \u2014 waiting for the first step event." : "Waiting for runtime activity \u2014 no active step reported.";
+    return /* @__PURE__ */ import_react9.default.createElement("section", { className: "execution-position-strip current-activity", "aria-label": "Current activity" }, /* @__PURE__ */ import_react9.default.createElement("div", null, /* @__PURE__ */ import_react9.default.createElement("span", null, "Current activity"), /* @__PURE__ */ import_react9.default.createElement("strong", { role: "status" }, activities.length ? `${leafCount} active runtime ${leafCount === 1 ? "step" : "steps"}${containerCount ? ` \xB7 ${containerCount} active ${containerCount === 1 ? "container" : "containers"}` : ""}` : message), activities.slice(0, 4).map((activity) => {
+      const timestamp = activity.lastActivityAt || activity.startedAt;
+      const time = timestamp ? Date.parse(timestamp) : NaN;
+      return /* @__PURE__ */ import_react9.default.createElement("div", { className: "current-activity-item", key: `${activity.nodeID}:${activity.occurrenceID ?? ""}` }, /* @__PURE__ */ import_react9.default.createElement("div", null, /* @__PURE__ */ import_react9.default.createElement("strong", null, activity.label, ": ", activity.title), /* @__PURE__ */ import_react9.default.createElement("code", { title: activity.path }, activity.path), activity.runID ? /* @__PURE__ */ import_react9.default.createElement("small", null, "Run ", activity.runID, activity.invocation !== void 0 ? ` \xB7 invocation ${activity.invocation}` : "", activity.retryAttempt !== void 0 ? ` \xB7 retry ${activity.retryAttempt}` : "", activity.executionLane ? ` \xB7 lane ${activity.executionLane}` : "") : null, Number.isFinite(time) ? /* @__PURE__ */ import_react9.default.createElement("small", { title: timestamp }, "Last update ", Math.max(0, Math.floor((now2 - time) / 1e3)), "s ago") : null, !activity.inGraph ? /* @__PURE__ */ import_react9.default.createElement("small", null, "Executing outside the loaded graph \u2014 exact runtime path shown.") : null), /* @__PURE__ */ import_react9.default.createElement("button", { type: "button", onClick: () => onLocate(activity), title: `Locate ${activity.path}` }, /* @__PURE__ */ import_react9.default.createElement(LocateFixed, { "aria-hidden": "true" }), /* @__PURE__ */ import_react9.default.createElement("span", null, "Locate")));
+    }), activities.length > 4 ? /* @__PURE__ */ import_react9.default.createElement("small", null, "+", activities.length - 4, " other active runtime locations") : null, locationNotice ? /* @__PURE__ */ import_react9.default.createElement("p", { role: "status" }, locationNotice) : null));
+  }
+
+  // src/workflowView.ts
+  function decodeWorkflowPreference(value) {
+    const item = value;
+    return { version: 1, workflowMode: item?.version === 1 && item.workflowMode === "all" ? "all" : "workflow" };
+  }
+  function mergeWorkflowPreference(state, preference) {
+    return {
+      ...state && typeof state === "object" && !Array.isArray(state) ? state : {},
+      workflowView: decodeWorkflowPreference(preference)
+    };
+  }
+
+  // webview/ResultsViewer.tsx
+  var import_react10 = __toESM(require_react());
+
+  // src/typedResultsCanonical.ts
+  var MAX_RESULTS_BYTES = 256 * 1024 * 1024;
+  function stringJSON(value) {
+    for (const char of value) {
+      const unit = char.charCodeAt(0);
+      if (char.length === 1 && unit >= 55296 && unit <= 57343) throw new Error("invalid-results-unicode");
+    }
+    return JSON.stringify(value).replace(/[<>&\u2028\u2029]/g, (char) => `\\u${char.charCodeAt(0).toString(16).padStart(4, "0")}`);
+  }
+  function canonicalResultsJSON(value, pretty = false) {
+    const utf8 = new TextEncoder();
+    let bytes = 0;
+    const budget = (size) => {
+      bytes += size;
+      if (bytes > MAX_RESULTS_BYTES) throw new Error("results-budget-exceeded");
+    };
+    const literal2 = (text2) => {
+      budget(utf8.encode(text2).length);
+      return text2;
+    };
+    const compare = (a, b) => {
+      const x = utf8.encode(a), y = utf8.encode(b);
+      for (let i = 0; i < Math.min(x.length, y.length); i++) if (x[i] !== y[i]) return x[i] - y[i];
+      return x.length - y.length;
+    };
+    function encode(value2, depth) {
+      if (depth > 128) throw new Error("results-depth-exceeded");
+      if (value2 === null) return literal2("null");
+      if (typeof value2 === "string") return literal2(stringJSON(value2));
+      if (typeof value2 === "boolean") return literal2(value2 ? "true" : "false");
+      if (typeof value2 === "number") {
+        if (!Number.isFinite(value2)) throw new Error("invalid-results-number");
+        return literal2(Object.is(value2, -0) ? "-0" : JSON.stringify(value2));
+      }
+      const pad = pretty ? "\n" + "  ".repeat(depth + 1) : "";
+      const close = pretty ? "\n" + "  ".repeat(depth) : "";
+      if (Array.isArray(value2)) {
+        budget(value2.length ? 2 + pad.length + close.length + (value2.length - 1) * (1 + pad.length) : 2);
+        return value2.length ? `[${pad}${value2.map((item) => encode(item, depth + 1)).join("," + pad)}${close}]` : "[]";
+      }
+      if (!value2 || typeof value2 !== "object") throw new Error("invalid-results-object");
+      const object = value2;
+      const keys = Object.keys(object).sort(compare);
+      budget(keys.length ? 2 + pad.length + close.length + (keys.length - 1) * (1 + pad.length) + keys.length * (pretty ? 2 : 1) : 2);
+      return keys.length ? `{${pad}${keys.map((key) => `${literal2(stringJSON(key))}:${pretty ? " " : ""}${encode(object[key], depth + 1)}`).join("," + pad)}${close}}` : "{}";
+    }
+    const result = encode(value, 0);
+    return result;
+  }
+
+  // webview/ResultsViewer.tsx
+  function ResultsViewer({ results, nodeID }) {
+    if (!results || results.state === "unavailable") {
+      return /* @__PURE__ */ import_react10.default.createElement("section", { className: "typed-results", "aria-label": "Results", "data-results-state": "unavailable" }, /* @__PURE__ */ import_react10.default.createElement("h2", null, "Results"), /* @__PURE__ */ import_react10.default.createElement("p", { role: "status" }, "Full structured result unavailable", results?.state === "unavailable" ? ` \u2014 ${results.reason}` : " \u2014 not published", "."), /* @__PURE__ */ import_react10.default.createElement("p", null, "Execution status is unchanged. A preview is not a complete result."));
+    }
+    const publication = results.canonicalJSON ? JSON.parse(results.canonicalJSON) : results.publication;
+    if (publication.origin.node_id !== nodeID) {
+      return /* @__PURE__ */ import_react10.default.createElement("section", { className: "typed-results", "data-results-state": "unavailable" }, /* @__PURE__ */ import_react10.default.createElement("h2", null, "Results"), /* @__PURE__ */ import_react10.default.createElement("p", null, "This scope has no retrieved public publication. Select the root Results operation for its named outputs."));
+    }
+    let rendered;
+    try {
+      rendered = Object.entries(publication.outputs).map(([name, output]) => ({ name, type: output.type, text: canonicalResultsJSON(output.value, true) }));
+    } catch {
+      return /* @__PURE__ */ import_react10.default.createElement("section", { className: "typed-results", "data-results-state": "unavailable" }, /* @__PURE__ */ import_react10.default.createElement("h2", null, "Results"), /* @__PURE__ */ import_react10.default.createElement("p", null, "Full structured result unavailable \u2014 exceeds the viewer budget. Execution status is unchanged; no rerun was requested."));
+    }
+    return /* @__PURE__ */ import_react10.default.createElement("section", { className: "typed-results", "aria-label": "Results", "data-results-state": "available" }, /* @__PURE__ */ import_react10.default.createElement("h2", null, "Results"), /* @__PURE__ */ import_react10.default.createElement("p", null, "Full structured JSON \xB7 verified canonical publication"), /* @__PURE__ */ import_react10.default.createElement("dl", null, /* @__PURE__ */ import_react10.default.createElement("dt", null, "Publication"), /* @__PURE__ */ import_react10.default.createElement("dd", null, /* @__PURE__ */ import_react10.default.createElement("code", null, publication.publication_id)), /* @__PURE__ */ import_react10.default.createElement("dt", null, "Digest"), /* @__PURE__ */ import_react10.default.createElement("dd", null, /* @__PURE__ */ import_react10.default.createElement("code", null, publication.digest))), rendered.map(({ name, type, text: text2 }) => /* @__PURE__ */ import_react10.default.createElement("section", { key: name, "data-result-name": name }, /* @__PURE__ */ import_react10.default.createElement("h3", null, name, " ", /* @__PURE__ */ import_react10.default.createElement("small", null, "(", type, ")")), /* @__PURE__ */ import_react10.default.createElement("pre", { className: "json-block" }, text2))));
+  }
+
+  // webview/highlighting/browserClient.ts
+  var workerURL = "";
+  var worker;
+  var ready;
+  var sequence = 0;
+  var idleTimer;
+  var pending = /* @__PURE__ */ new Map();
+  function configureHighlighting(url) {
+    workerURL = url;
+  }
+  function palette() {
+    if (document.body.classList.contains("vscode-high-contrast-light")) return "hc-light";
+    if (document.body.classList.contains("vscode-high-contrast") || matchMedia("(forced-colors: active)").matches) return "hc";
+    return document.body.classList.contains("vscode-light") ? "light" : "dark";
+  }
+  function stop(reason) {
+    clearTimeout(idleTimer);
+    worker?.terminate();
+    worker = void 0;
+    ready = void 0;
+    for (const item of pending.values()) {
+      clearTimeout(item.timer);
+      item.reject(new Error(reason));
+    }
+    pending.clear();
+  }
+  function ensureWorker() {
+    if (!workerURL) return Promise.reject(new Error("worker-unavailable"));
+    if (ready) return ready;
+    ready = new Promise((resolve, reject) => {
+      void (async () => {
+        try {
+          const response = await fetch(workerURL, { signal: AbortSignal.timeout(5e3) });
+          if (!response.ok) throw new Error("worker-unavailable");
+          const blobURL = URL.createObjectURL(new Blob([await response.text()], { type: "text/javascript" }));
+          worker = new Worker(blobURL, { type: "module" });
+          URL.revokeObjectURL(blobURL);
+          const timer2 = setTimeout(() => {
+            stop("warmup-deadline");
+            reject(new Error("warmup-deadline"));
+          }, 5e3);
+          worker.onerror = () => {
+            clearTimeout(timer2);
+            stop("worker-unavailable");
+            reject(new Error("worker-unavailable"));
+          };
+          worker.onmessage = (event) => {
+            const data = event.data;
+            if (!data || typeof data !== "object") return;
+            if ("ready" in data && data.ready === true) {
+              clearTimeout(timer2);
+              resolve();
+              return;
+            }
+            if ("failed" in data) {
+              clearTimeout(timer2);
+              stop("worker-unavailable");
+              reject(new Error("worker-unavailable"));
+              return;
+            }
+            if (!("id" in data) || typeof data.id !== "number") return;
+            const item = pending.get(data.id);
+            if (!item) return;
+            clearTimeout(item.timer);
+            pending.delete(data.id);
+            if (!pending.size) idleTimer = setTimeout(() => stop("idle"), 3e3);
+            if (!("spans" in data) || !Array.isArray(data.spans)) {
+              item.reject(new Error("tokenization-unavailable"));
+              return;
+            }
+            const spans = [];
+            let previousEnd = 0;
+            for (const entry of data.spans) {
+              if (!entry || typeof entry !== "object" || typeof entry.start !== "number" || typeof entry.end !== "number" || !Number.isSafeInteger(entry.start) || !Number.isSafeInteger(entry.end) || entry.start < previousEnd || entry.end <= entry.start || typeof entry.color !== "string" || !/^#[0-9a-f]{6}$/i.test(entry.color)) {
+                item.reject(new Error("invalid-tokens"));
+                return;
+              }
+              previousEnd = entry.end;
+              spans.push({ start: entry.start, end: entry.end, color: entry.color, macro: entry.macro === true });
+            }
+            item.resolve(spans);
+          };
+        } catch {
+          ready = void 0;
+          reject(new Error("worker-unavailable"));
+        }
+      })();
+    });
+    return ready;
+  }
+  async function browserTokens(text2, descriptor, signal, legacyMacros = false) {
+    if (!supportedDescriptor(descriptor)) throw new Error("unsupported-language");
+    if (text2.length > MAX_CODE_UNITS) throw new Error("limit-exceeded");
+    await ensureWorker();
+    clearTimeout(idleTimer);
+    if (signal.aborted) throw new Error("stale-request");
+    if (pending.size >= 32) throw new Error("limit-exceeded");
+    const id2 = ++sequence;
+    return new Promise((resolve, reject) => {
+      const aborted = () => {
+        const item = pending.get(id2);
+        if (item) {
+          clearTimeout(item.timer);
+          pending.delete(id2);
+          reject(new Error("stale-request"));
+        }
+      };
+      const cleanup = () => signal.removeEventListener("abort", aborted);
+      pending.set(id2, { resolve: (spans) => {
+        cleanup();
+        if (spans.some((s) => s.end > text2.length)) reject(new Error("invalid-tokens"));
+        else resolve(spans);
+      }, reject: (error) => {
+        cleanup();
+        reject(error);
+      }, timer: setTimeout(() => stop("tokenizer-deadline"), 250) });
+      signal.addEventListener("abort", aborted, { once: true });
+      worker?.postMessage({ id: id2, text: text2, descriptor, palette: palette(), legacyMacros });
+    });
+  }
+
+  // webview/inspector.tsx
+  var import_react13 = __toESM(require_react());
+
+  // webview/highlighting/CodeValue.tsx
+  var import_react12 = __toESM(require_react());
+
+  // webview/highlighting/AuthoredValue.tsx
+  var import_react11 = __toESM(require_react());
+
+  // src/expressionPresentationProtocol.ts
+  var EXPRESSION_GRAMMAR = "gert-expression/v2";
+  var EXPRESSION_CLASSES = [
+    "variable",
+    "property",
+    "namespace",
+    "function",
+    "keyword",
+    "string",
+    "number",
+    "boolean",
+    "null",
+    "operator",
+    "delimiter",
+    "interpolation",
+    "comment"
+  ];
+  function closed2(value, keys) {
+    const v = record(value);
+    if (Object.keys(v).some((k) => !keys.includes(k))) throw new Error("unknown-expression-field");
+    return v;
+  }
+  function integer2(value) {
+    if (typeof value !== "number" || !Number.isSafeInteger(value) || value < 0) throw new Error("invalid-expression-offset");
+    return value;
+  }
+  function expressionPointer(value) {
+    if (typeof value !== "string" || !value.startsWith("/") || /~(?![01])/u.test(value) || value.split("/").length > 129) throw new Error("invalid-expression-pointer");
+    return value;
+  }
+  function bounded(value) {
+    if (new TextEncoder().encode(JSON.stringify(value)).length > MAX_SOURCE_BYTES) throw new Error("limit-exceeded");
+  }
+  function array2(value, cap) {
+    if (!Array.isArray(value) || value.length > cap) throw new Error("limit-exceeded");
+    return value;
+  }
+  var valueKeys = ["mode", "text_length", "text_digest", "tokens"];
+  function supportedGrammar(value) {
+    return value === "gert-expression/v1" || value === EXPRESSION_GRAMMAR;
+  }
+  function decodeValue(v, grammar) {
+    const text_length = integer2(v.text_length);
+    if (text_length > MAX_CODE_UNITS || v.mode !== "gxl" && v.mode !== "gis" && !(grammar === EXPRESSION_GRAMMAR && v.mode === "regex") || typeof v.text_digest !== "string" || !/^sha256:[a-f0-9]{64}$/.test(v.text_digest)) throw new Error("invalid-expression-value");
+    let end = 0;
+    const tokens = array2(v.tokens, 65536).map((item) => {
+      const token = closed2(item, ["start", "end", "class"]);
+      const start2 = integer2(token.start), stop2 = integer2(token.end);
+      if (start2 < end || stop2 <= start2 || stop2 > text_length || !EXPRESSION_CLASSES.includes(token.class)) throw new Error("invalid-expression-token");
+      end = stop2;
+      return { start: start2, end: stop2, class: token.class };
+    });
+    return { mode: v.mode, text_length, text_digest: v.text_digest, tokens };
+  }
+  function tokenBudget(values) {
+    if (values.reduce((sum, v) => sum + v.tokens.length, 0) > 65536) throw new Error("limit-exceeded");
+  }
+  function decodeExpressionPresentation(value) {
+    try {
+      bounded(value);
+      const v = closed2(value, ["version", "grammar_version", "values"]);
+      if (v.version !== 1 || !supportedGrammar(v.grammar_version)) return void 0;
+      const grammar = v.grammar_version;
+      const values = array2(v.values, 4096).map((item) => {
+        const entry = closed2(item, [...valueKeys, "path"]);
+        return { ...decodeValue(entry, grammar), path: expressionPointer(entry.path) };
+      });
+      tokenBudget(values);
+      if (new Set(values.map((v2) => v2.path)).size !== values.length) return void 0;
+      return { version: 1, grammar_version: grammar, values };
+    } catch {
+      return void 0;
+    }
+  }
+  function expressionTextMatches(text2, value, digest) {
+    const boundary = (offset) => !(offset > 0 && offset < text2.length && /[\uD800-\uDBFF]/.test(text2[offset - 1]) && /[\uDC00-\uDFFF]/.test(text2[offset]));
+    return text2.length === value.text_length && digest === value.text_digest && value.tokens.every((t) => boundary(t.start) && boundary(t.end));
+  }
+  function pointerParts(pointer) {
+    return expressionPointer(pointer).slice(1).split("/").map((p) => p.replace(/~1/g, "/").replace(/~0/g, "~"));
+  }
+  function safeExpressionText(root3, pointer) {
+    try {
+      const parts = pointerParts(pointer);
+      let value = root3;
+      for (const [index, key] of parts.entries()) {
+        if (!value || typeof value !== "object" || !Object.hasOwn(value, key)) return void 0;
+        if (Array.isArray(value) && !/^(?:0|[1-9]\d*)$/.test(key)) return void 0;
+        if (index === 2 && ["arguments", "bindings", "request", "filter", "collect"].includes(parts[0]) && Array.isArray(root3[parts[0]]) && value.redacted === true) return void 0;
+        value = value[key];
+      }
+      return typeof value === "string" && !/(?:\[(?:redacted|sensitive|truncated)\]|<(?:redacted|sensitive|truncated)>)/i.test(value) ? value : void 0;
+    } catch {
+      return void 0;
+    }
+  }
+
+  // src/expressionPresentationColors.ts
+  var colors = {
+    variable: ["#005CC5", "#79B8FF", "#9CDCFE", "#000080"],
+    property: ["#24292E", "#B3D7FF", "#FFFFFF", "#000000"],
+    namespace: ["#6F42C1", "#B392F0", "#FFAAFF", "#800080"],
+    function: ["#6F42C1", "#D2A8FF", "#FFFF00", "#800080"],
+    keyword: ["#D73A49", "#F97583", "#FFFF00", "#000080"],
+    string: ["#032F62", "#9ECBFF", "#00FFFF", "#800000"],
+    number: ["#005CC5", "#79B8FF", "#B5CEA8", "#006400"],
+    boolean: ["#005CC5", "#FFAB70", "#FFFF00", "#000080"],
+    null: ["#005CC5", "#FFAB70", "#FFFF00", "#000080"],
+    operator: ["#D73A49", "#F97583", "#FFFF00", "#800000"],
+    delimiter: ["#24292E", "#E1E4E8", "#FFFFFF", "#000000"],
+    interpolation: ["#A04100", "#FFAB70", "#00FFFF", "#800000"],
+    comment: ["#57606A", "#8B949E", "#00FF00", "#006400"]
+  };
+  function expressionColor(kind, palette2) {
+    return colors[kind][["light", "dark", "hc", "hc-light"].indexOf(palette2)];
+  }
+  function expressionSpans(value, palette2) {
+    return value.tokens.map((token) => ({ start: token.start, end: token.end, color: expressionColor(token.class, palette2), macro: true, expressionClass: token.class }));
+  }
+  function overlayExpressionSpans(host, expressions) {
+    const overlay = [...expressions].sort((a, b) => a.start - b.start);
+    const output = [];
+    let first = 0;
+    for (const token of host) {
+      while (first < overlay.length && overlay[first].end <= token.start) first++;
+      let cursor = token.start;
+      for (let i = first; i < overlay.length && overlay[i].start < token.end; i++) {
+        const span = overlay[i];
+        if (span.start > cursor) output.push({ ...token, start: cursor, end: Math.min(span.start, token.end) });
+        cursor = Math.max(cursor, span.end);
+        if (cursor >= token.end) break;
+      }
+      if (cursor < token.end) output.push({ ...token, start: cursor });
+    }
+    return [...output, ...overlay].sort((a, b) => a.start - b.start);
+  }
+
+  // webview/highlighting/expressions.ts
+  async function verifiedExpressionValues(details, signal) {
+    const result = /* @__PURE__ */ new Map();
+    if (!details || typeof details !== "object") return result;
+    const envelope = decodeExpressionPresentation(details.expression_presentation);
+    if (!envelope) return result;
+    for (const value of envelope.values) {
+      if (signal.aborted) return /* @__PURE__ */ new Map();
+      const text2 = safeExpressionText(details, value.path);
+      if (text2 === void 0 || text2.length !== value.text_length) continue;
+      try {
+        const bytes = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text2));
+        const digest = "sha256:" + [...new Uint8Array(bytes)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
+        if (expressionTextMatches(text2, value, digest)) result.set(value.path, { ...value, verifiedText: text2 });
+      } catch {
+      }
+    }
+    return signal.aborted ? /* @__PURE__ */ new Map() : result;
+  }
+  function currentExpressionSpans(value) {
+    return value && document.body.dataset.highlightingEnabled !== "false" ? expressionSpans(value, palette()) : [];
+  }
+
+  // webview/highlighting/AuthoredValue.tsx
+  var AuthoredContext = (0, import_react11.createContext)({ values: /* @__PURE__ */ new Map() });
+  function AuthoredValues({ details, children: children2 }) {
+    const [verified, setVerified] = (0, import_react11.useState)();
+    const [, setAppearance] = (0, import_react11.useState)(0);
+    (0, import_react11.useEffect)(() => {
+      const observer = new MutationObserver(() => setAppearance((value) => value + 1));
+      observer.observe(document.body, { attributes: true, attributeFilter: ["class", "data-highlighting-enabled"] });
+      return () => observer.disconnect();
+    }, []);
+    (0, import_react11.useEffect)(() => {
+      const controller = new AbortController();
+      void verifiedExpressionValues(details, controller.signal).then((values) => {
+        if (!controller.signal.aborted) setVerified({ details, values });
+      });
+      return () => controller.abort();
+    }, [details]);
+    return /* @__PURE__ */ import_react11.default.createElement(AuthoredContext.Provider, { value: { details, values: verified && verified.details === details ? verified.values : /* @__PURE__ */ new Map() } }, children2);
+  }
+  function useAuthoredExpression(path, text2) {
+    const context = (0, import_react11.useContext)(AuthoredContext);
+    if (!path || text2 === void 0 || typeof document === "undefined" || document.body.dataset.highlightingEnabled === "false" || safeExpressionText(context.details, path) !== text2) return void 0;
+    const value = context.values.get(path);
+    return value?.verifiedText === text2 ? value : void 0;
+  }
+  function TokenText({ text: text2, spans }) {
+    const parts = [];
+    let offset = 0;
+    for (const span of spans) {
+      parts.push(text2.slice(offset, span.start));
+      parts.push(/* @__PURE__ */ import_react11.default.createElement("span", { key: `${span.start}:${span.end}`, "data-expression-class": span.expressionClass, style: { color: span.color } }, text2.slice(span.start, span.end)));
+      offset = span.end;
+    }
+    parts.push(text2.slice(offset));
+    return /* @__PURE__ */ import_react11.default.createElement(import_react11.default.Fragment, null, parts);
+  }
+  function AuthoredValue({ value, path, depth = 0 }) {
+    const expression = useAuthoredExpression(path, typeof value === "string" ? value : void 0);
+    if (typeof value === "string") return /* @__PURE__ */ import_react11.default.createElement("span", { className: "authored-value", "data-expression-path": expression ? path : void 0 }, /* @__PURE__ */ import_react11.default.createElement(TokenText, { text: value, spans: currentExpressionSpans(expression) }));
+    if (depth >= 128) return /* @__PURE__ */ import_react11.default.createElement(import_react11.default.Fragment, null, "\u2026");
+    if (value && typeof value === "object") {
+      const entries = Object.entries(value);
+      return /* @__PURE__ */ import_react11.default.createElement(import_react11.default.Fragment, null, Array.isArray(value) ? "[" : "{", entries.map(([key, child], index) => /* @__PURE__ */ import_react11.default.createElement(import_react11.default.Fragment, { key }, index ? ", " : "", Array.isArray(value) ? "" : `${JSON.stringify(key)}: `, /* @__PURE__ */ import_react11.default.createElement(AuthoredValue, { value: child, path: `${path}/${key.replace(/~/g, "~0").replace(/\//g, "~1")}`, depth: depth + 1 }))), Array.isArray(value) ? "]" : "}");
+    }
+    return /* @__PURE__ */ import_react11.default.createElement(import_react11.default.Fragment, null, value === void 0 ? "\u2014" : String(value));
+  }
+
+  // webview/highlighting/CodeValue.tsx
+  function CodeValue({ text: text2, descriptor, label, status = "available", expressionPath }) {
+    const safe = status === "available" || status === "truncated" ? text2 : void 0;
+    const expression = useAuthoredExpression(expressionPath, safe);
+    const [rendered, setRendered] = (0, import_react12.useState)();
+    const [reason, setReason] = (0, import_react12.useState)("");
+    const [appearance, setAppearance] = (0, import_react12.useState)(0);
+    (0, import_react12.useEffect)(() => {
+      const changed = () => setAppearance((value) => value + 1);
+      const observer = new MutationObserver(changed);
+      observer.observe(document.body, { attributes: true, attributeFilter: ["class", "data-highlighting-enabled"] });
+      return () => observer.disconnect();
+    }, []);
+    (0, import_react12.useEffect)(() => {
+      const controller = new AbortController();
+      setRendered(void 0);
+      setReason("");
+      if (safe !== void 0 && supportedDescriptor(descriptor) && document.body.dataset.highlightingEnabled !== "false") {
+        void browserTokens(safe, descriptor, controller.signal).then(
+          (spans2) => {
+            if (!controller.signal.aborted) setRendered({ text: safe, spans: spans2 });
+          },
+          (error) => {
+            if (!controller.signal.aborted) setReason(error instanceof Error ? error.message : "unavailable");
+          }
+        );
+      }
+      return () => controller.abort();
+    }, [safe, descriptor?.language, descriptor?.version, status, appearance]);
+    if (safe === void 0) return /* @__PURE__ */ import_react12.default.createElement("div", { className: "gert-code" }, /* @__PURE__ */ import_react12.default.createElement("strong", null, label), /* @__PURE__ */ import_react12.default.createElement("p", null, status));
+    const spans = overlayExpressionSpans(rendered?.text === safe ? rendered.spans : [], currentExpressionSpans(expression));
+    const parts = [];
+    let offset = 0;
+    for (const span of spans) {
+      parts.push(safe.slice(offset, span.start));
+      parts.push(/* @__PURE__ */ import_react12.default.createElement("span", { key: `${span.start}:${span.end}`, "data-expression-class": span.expressionClass, style: { color: span.color } }, safe.slice(span.start, span.end)));
+      offset = span.end;
+    }
+    parts.push(safe.slice(offset));
+    return /* @__PURE__ */ import_react12.default.createElement("figure", { className: "gert-code" }, /* @__PURE__ */ import_react12.default.createElement("figcaption", null, label, status === "truncated" ? " \xB7 safe excerpt (truncated)" : "", safe.length > MAX_CODE_UNITS ? " \xB7 plaintext (highlighting limit)" : reason ? ` \xB7 plaintext (${reason})` : !descriptor ? " \xB7 plaintext" : "", /* @__PURE__ */ import_react12.default.createElement("button", { type: "button", onClick: () => {
+      void navigator.clipboard.writeText(safe);
+    }, "aria-label": `Copy ${label}` }, "Copy")), /* @__PURE__ */ import_react12.default.createElement("pre", null, /* @__PURE__ */ import_react12.default.createElement("code", { "data-expression-path": expression ? expressionPath : void 0 }, parts)));
   }
 
   // webview/inspector.tsx
   var KIND_LABELS = {
     approve: "Approval",
     assert: "Assertion",
+    assign: "Assign bindings",
     branch: "Branch",
     choice: "Choice",
     cli: "Command",
@@ -34803,51 +36224,56 @@
     iterate: "Iteration",
     noop: "No-op",
     parallel: "Parallel",
+    results: "Results",
     tool: "Tool call",
     wait_for_event: "Event wait"
   };
   function KindIcon({ kind }) {
     switch (kind) {
       case "cli":
-        return /* @__PURE__ */ import_react9.default.createElement(Terminal, { "aria-hidden": "true" });
+        return /* @__PURE__ */ import_react13.default.createElement(Terminal, { "aria-hidden": "true" });
       case "tool":
-        return /* @__PURE__ */ import_react9.default.createElement(Wrench, { "aria-hidden": "true" });
+        return /* @__PURE__ */ import_react13.default.createElement(Wrench, { "aria-hidden": "true" });
       case "include":
-        return /* @__PURE__ */ import_react9.default.createElement(PackageOpen, { "aria-hidden": "true" });
+        return /* @__PURE__ */ import_react13.default.createElement(PackageOpen, { "aria-hidden": "true" });
       case "branch":
-        return /* @__PURE__ */ import_react9.default.createElement(GitBranch, { "aria-hidden": "true" });
+        return /* @__PURE__ */ import_react13.default.createElement(GitBranch, { "aria-hidden": "true" });
       case "choice":
-        return /* @__PURE__ */ import_react9.default.createElement(ListChecks, { "aria-hidden": "true" });
+        return /* @__PURE__ */ import_react13.default.createElement(ListChecks, { "aria-hidden": "true" });
       case "decision":
-        return /* @__PURE__ */ import_react9.default.createElement(Workflow, { "aria-hidden": "true" });
+        return /* @__PURE__ */ import_react13.default.createElement(Workflow, { "aria-hidden": "true" });
       case "collector":
-        return /* @__PURE__ */ import_react9.default.createElement(FileInput, { "aria-hidden": "true" });
+        return /* @__PURE__ */ import_react13.default.createElement(FileInput, { "aria-hidden": "true" });
       case "iterate":
-        return /* @__PURE__ */ import_react9.default.createElement(Repeat2, { "aria-hidden": "true" });
+        return /* @__PURE__ */ import_react13.default.createElement(Repeat2, { "aria-hidden": "true" });
       case "parallel":
-        return /* @__PURE__ */ import_react9.default.createElement(Workflow, { "aria-hidden": "true" });
+        return /* @__PURE__ */ import_react13.default.createElement(Workflow, { "aria-hidden": "true" });
       case "approve":
-        return /* @__PURE__ */ import_react9.default.createElement(ShieldCheck, { "aria-hidden": "true" });
+        return /* @__PURE__ */ import_react13.default.createElement(ShieldCheck, { "aria-hidden": "true" });
       case "assert":
-        return /* @__PURE__ */ import_react9.default.createElement(CircleCheck, { "aria-hidden": "true" });
+        return /* @__PURE__ */ import_react13.default.createElement(CircleCheck, { "aria-hidden": "true" });
       case "wait_for_event":
-        return /* @__PURE__ */ import_react9.default.createElement(Radio, { "aria-hidden": "true" });
+        return /* @__PURE__ */ import_react13.default.createElement(Radio, { "aria-hidden": "true" });
       case "display":
-        return /* @__PURE__ */ import_react9.default.createElement(MessageSquareText, { "aria-hidden": "true" });
+        return /* @__PURE__ */ import_react13.default.createElement(MessageSquareText, { "aria-hidden": "true" });
       case "end":
-        return /* @__PURE__ */ import_react9.default.createElement(Flag, { "aria-hidden": "true" });
+        return /* @__PURE__ */ import_react13.default.createElement(Flag, { "aria-hidden": "true" });
       case "compensate":
-        return /* @__PURE__ */ import_react9.default.createElement(Undo2, { "aria-hidden": "true" });
+        return /* @__PURE__ */ import_react13.default.createElement(Undo2, { "aria-hidden": "true" });
       case "extension":
-        return /* @__PURE__ */ import_react9.default.createElement(Puzzle, { "aria-hidden": "true" });
+        return /* @__PURE__ */ import_react13.default.createElement(Puzzle, { "aria-hidden": "true" });
       case "noop":
-        return /* @__PURE__ */ import_react9.default.createElement(Clock3, { "aria-hidden": "true" });
+        return /* @__PURE__ */ import_react13.default.createElement(Clock3, { "aria-hidden": "true" });
+      case "assign":
+        return /* @__PURE__ */ import_react13.default.createElement(FileInput, { "aria-hidden": "true" });
+      case "results":
+        return /* @__PURE__ */ import_react13.default.createElement(CircleCheck, { "aria-hidden": "true" });
       default:
-        return /* @__PURE__ */ import_react9.default.createElement(Activity, { "aria-hidden": "true" });
+        return /* @__PURE__ */ import_react13.default.createElement(Activity, { "aria-hidden": "true" });
     }
   }
   function StatusBadge({ status }) {
-    return /* @__PURE__ */ import_react9.default.createElement("span", { className: `inspector-status status-${status}` }, status);
+    return /* @__PURE__ */ import_react13.default.createElement("span", { className: `inspector-status status-${status}` }, status === "no-final-status" ? "No final status" : status);
   }
   function formatDuration(milliseconds) {
     if (milliseconds === void 0) return "\u2014";
@@ -34872,38 +36298,38 @@
     }
   }
   function Section({ title, count, children: children2, className = "" }) {
-    return /* @__PURE__ */ import_react9.default.createElement("section", { className: `inspector-section ${className}` }, /* @__PURE__ */ import_react9.default.createElement("div", { className: "section-heading" }, /* @__PURE__ */ import_react9.default.createElement("h3", null, title), count !== void 0 ? /* @__PURE__ */ import_react9.default.createElement("span", null, count) : null), children2);
+    return /* @__PURE__ */ import_react13.default.createElement("section", { className: `inspector-section ${className}` }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "section-heading" }, /* @__PURE__ */ import_react13.default.createElement("h3", null, title), count !== void 0 ? /* @__PURE__ */ import_react13.default.createElement("span", null, count) : null), children2);
   }
   function KeyValueRows({ rows }) {
     const visible = rows.filter((row) => row.value !== void 0 && row.value !== "" && row.value !== false);
-    if (visible.length === 0) return /* @__PURE__ */ import_react9.default.createElement("p", { className: "inspector-muted" }, "No additional configuration.");
-    return /* @__PURE__ */ import_react9.default.createElement("dl", { className: "detail-grid" }, visible.map((row) => /* @__PURE__ */ import_react9.default.createElement(import_react9.default.Fragment, { key: row.label }, /* @__PURE__ */ import_react9.default.createElement("dt", null, row.label), /* @__PURE__ */ import_react9.default.createElement("dd", { className: row.code ? "code-value" : "" }, scalarText(row.value)))));
+    if (visible.length === 0) return /* @__PURE__ */ import_react13.default.createElement("p", { className: "inspector-muted" }, "No additional configuration.");
+    return /* @__PURE__ */ import_react13.default.createElement("dl", { className: "detail-grid" }, visible.map((row) => /* @__PURE__ */ import_react13.default.createElement(import_react13.default.Fragment, { key: row.label }, /* @__PURE__ */ import_react13.default.createElement("dt", null, row.label), /* @__PURE__ */ import_react13.default.createElement("dd", { className: row.code ? "code-value" : "" }, row.path ? /* @__PURE__ */ import_react13.default.createElement(AuthoredValue, { path: row.path, value: row.value }) : scalarText(row.value)))));
   }
-  function NamedValueRows({ values, empty: empty2 = "None" }) {
-    if (!values || values.length === 0) return /* @__PURE__ */ import_react9.default.createElement("p", { className: "inspector-muted" }, empty2);
-    return /* @__PURE__ */ import_react9.default.createElement("div", { className: "named-value-list" }, values.map((item) => /* @__PURE__ */ import_react9.default.createElement("div", { className: "named-value-row", key: item.name }, /* @__PURE__ */ import_react9.default.createElement("code", null, item.name), /* @__PURE__ */ import_react9.default.createElement("span", { className: item.redacted ? "redacted-value" : "" }, item.redacted ? "redacted" : scalarText(item.value)))));
+  function NamedValueRows({ values, empty: empty2 = "None", path, startIndex = 0 }) {
+    if (!values || values.length === 0) return /* @__PURE__ */ import_react13.default.createElement("p", { className: "inspector-muted" }, empty2);
+    return /* @__PURE__ */ import_react13.default.createElement("div", { className: "named-value-list" }, values.map((item, index) => /* @__PURE__ */ import_react13.default.createElement("div", { className: "named-value-row", key: item.name }, /* @__PURE__ */ import_react13.default.createElement("code", null, item.name), /* @__PURE__ */ import_react13.default.createElement("span", { className: item.redacted ? "redacted-value" : "" }, item.redacted ? "redacted" : path ? /* @__PURE__ */ import_react13.default.createElement(AuthoredValue, { path: `${path}/${index + startIndex}/value`, value: item.value }) : scalarText(item.value)))));
   }
   function DataObject({ value, empty: empty2 }) {
-    if (!value || Object.keys(value).length === 0) return /* @__PURE__ */ import_react9.default.createElement("p", { className: "inspector-muted" }, empty2);
+    if (!value || Object.keys(value).length === 0) return /* @__PURE__ */ import_react13.default.createElement("p", { className: "inspector-muted" }, empty2);
     const entries = Object.entries(value).sort(([left], [right]) => left.localeCompare(right));
-    return /* @__PURE__ */ import_react9.default.createElement("div", { className: "runtime-data" }, entries.map(([key, item]) => /* @__PURE__ */ import_react9.default.createElement("div", { className: "runtime-data-row", key }, /* @__PURE__ */ import_react9.default.createElement("code", null, key), typeof item === "object" && item !== null ? /* @__PURE__ */ import_react9.default.createElement("pre", null, JSON.stringify(item, null, 2)) : /* @__PURE__ */ import_react9.default.createElement("span", null, scalarText(item)))));
+    return /* @__PURE__ */ import_react13.default.createElement("div", { className: "runtime-data" }, entries.map(([key, item]) => /* @__PURE__ */ import_react13.default.createElement("div", { className: "runtime-data-row", key }, /* @__PURE__ */ import_react13.default.createElement("code", null, key), typeof item === "object" && item !== null ? /* @__PURE__ */ import_react13.default.createElement("pre", null, JSON.stringify(item, null, 2)) : /* @__PURE__ */ import_react13.default.createElement("span", null, scalarText(item)))));
   }
-  function RuntimePane({ runtime }) {
+  function RuntimePane({ runtime, markdownDeclared = false, snapshotDigest }) {
     if (!runtime || runtime.status === "pending") {
-      return /* @__PURE__ */ import_react9.default.createElement("div", { className: "inspector-blank" }, /* @__PURE__ */ import_react9.default.createElement(Activity, { "aria-hidden": "true" }), /* @__PURE__ */ import_react9.default.createElement("strong", null, "Not run yet"), /* @__PURE__ */ import_react9.default.createElement("span", null, "Execution data will appear here."));
+      return /* @__PURE__ */ import_react13.default.createElement("div", { className: "inspector-blank" }, /* @__PURE__ */ import_react13.default.createElement(Activity, { "aria-hidden": "true" }), /* @__PURE__ */ import_react13.default.createElement("strong", null, "Not run yet"), /* @__PURE__ */ import_react13.default.createElement("span", null, "Execution data will appear here."));
     }
-    return /* @__PURE__ */ import_react9.default.createElement("div", { className: "inspector-pane" }, /* @__PURE__ */ import_react9.default.createElement(Section, { title: "Execution" }, /* @__PURE__ */ import_react9.default.createElement(KeyValueRows, { rows: [
-      { label: "Status", value: runtime.status },
+    return /* @__PURE__ */ import_react13.default.createElement("div", { className: "inspector-pane" }, /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Execution" }, /* @__PURE__ */ import_react13.default.createElement(KeyValueRows, { rows: [
+      { label: "Status", value: runtime.status === "no-final-status" ? "No final status" : runtime.status },
       { label: "Duration", value: formatDuration(runtime.durationMs) },
       { label: "Attempt", value: runtime.attempt },
       { label: "Started", value: formatTime(runtime.startedAt) },
       { label: "Finished", value: formatTime(runtime.finishedAt) },
       { label: "Delay", value: runtime.delay },
       { label: "Skip reason", value: runtime.skipReason }
-    ] })), runtime.error ? /* @__PURE__ */ import_react9.default.createElement(Section, { title: "Error", className: "error-section" }, /* @__PURE__ */ import_react9.default.createElement("pre", null, runtime.error)) : null, /* @__PURE__ */ import_react9.default.createElement(Section, { title: "Output", count: runtime.output ? Object.keys(runtime.output).length : 0 }, /* @__PURE__ */ import_react9.default.createElement(DataObject, { value: runtime.output, empty: "No output was retained." })), /* @__PURE__ */ import_react9.default.createElement(Section, { title: "Captures", count: runtime.captures ? Object.keys(runtime.captures).length : 0 }, /* @__PURE__ */ import_react9.default.createElement(DataObject, { value: runtime.captures, empty: "No variables were captured." })), runtime.logs && runtime.logs.length > 0 ? /* @__PURE__ */ import_react9.default.createElement(Section, { title: "Process output", count: runtime.logs.length }, /* @__PURE__ */ import_react9.default.createElement("div", { className: "runtime-log" }, runtime.logs.map((entry, index) => /* @__PURE__ */ import_react9.default.createElement("pre", { className: `stream-${entry.stream}`, key: `${index}:${entry.stream}` }, entry.line)))) : null, runtime.evidence ? /* @__PURE__ */ import_react9.default.createElement(Section, { title: "Evidence" }, /* @__PURE__ */ import_react9.default.createElement("pre", { className: "json-block" }, JSON.stringify(runtime.evidence, null, 2))) : null);
+    ] })), runtime.error ? /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Error", className: "error-section" }, /* @__PURE__ */ import_react13.default.createElement("pre", null, runtime.error)) : null, runtime.presentationDiagnostic ? /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Code presentation" }, /* @__PURE__ */ import_react13.default.createElement("p", { className: "inspector-muted" }, runtime.presentationDiagnostic)) : null, runtime.codePresentation || runtime.retainedPresentations?.length ? /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Execution-resolved inputs" }, /* @__PURE__ */ import_react13.default.createElement("p", { className: "inspector-muted" }, "Unavailable \u2014 not retained")) : null, runtime.retainedPresentations?.map((occurrence, index) => /* @__PURE__ */ import_react13.default.createElement(Section, { key: index, title: "Retained occurrence" }, /* @__PURE__ */ import_react13.default.createElement(KeyValueRows, { rows: Object.entries(occurrence.identity).map(([label, value]) => ({ label, value })) }), occurrence.details.code_presentation && safeOutputs(occurrence.details.code_presentation, occurrence.output, occurrence.output_value_status).map((value) => /* @__PURE__ */ import_react13.default.createElement(CodeValue, { key: value.name, label: value.name, text: value.text, descriptor: value.descriptor, status: value.status })))), runtime.codePresentation ? /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Declared code outputs" }, safeOutputs(runtime.codePresentation, runtime.output, runtime.outputValueStatus).map((value) => /* @__PURE__ */ import_react13.default.createElement(CodeValue, { key: value.name, label: value.name, text: value.text, descriptor: value.descriptor, status: value.status }))) : null, /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Output", count: runtime.output ? Object.keys(runtime.output).length : 0 }, /* @__PURE__ */ import_react13.default.createElement(DataObject, { value: runtime.output && Object.fromEntries(Object.entries(runtime.output).filter(([name]) => !runtime.codePresentation?.outputs.some((field2) => field2.name === name && field2.presentation))), empty: "No additional output was retained." })), /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Captures", count: runtime.captures ? Object.keys(runtime.captures).length : 0 }, /* @__PURE__ */ import_react13.default.createElement(DataObject, { value: runtime.captures, empty: "No variables were captured." })), runtime.logs && runtime.logs.length > 0 ? /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Process output", count: runtime.logs.length }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "runtime-log" }, runtime.logs.map((entry, index) => /* @__PURE__ */ import_react13.default.createElement("pre", { className: `stream-${entry.stream}`, key: `${index}:${entry.stream}` }, entry.line)))) : null, runtime.evidence ? /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Evidence" }, /* @__PURE__ */ import_react13.default.createElement("pre", { className: "json-block" }, JSON.stringify(runtime.evidence, null, 2))) : null);
   }
   function DebugPane({ controls, override }) {
-    return /* @__PURE__ */ import_react9.default.createElement("div", { className: "inspector-pane" }, override ? /* @__PURE__ */ import_react9.default.createElement(Section, { title: "Applied override", className: "debug-audit" }, /* @__PURE__ */ import_react9.default.createElement("pre", { className: "json-block" }, JSON.stringify(override, null, 2))) : null, controls);
+    return /* @__PURE__ */ import_react13.default.createElement("div", { className: "inspector-pane" }, override ? /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Applied override", className: "debug-audit" }, /* @__PURE__ */ import_react13.default.createElement("pre", { className: "json-block" }, JSON.stringify(override, null, 2))) : null, controls);
   }
   function RunOverview({
     document: document2,
@@ -34916,34 +36342,31 @@
     diagnostics,
     activeNodeIDs
   }) {
-    const activeNodes = document2.nodes.filter((node) => activeNodeIDs.has(node.id));
-    const states = activeNodes.map((node) => runtimeNodes[node.id]?.status ?? "pending");
-    const completed = states.filter((status) => status === "completed").length;
-    const issues = states.filter(isIssueStepStatus).length;
-    const skipped = states.filter((status) => status === "skipped").length;
+    const counts = canonicalProgress(document2, runtimeNodes, runStatus);
+    const { completed, issues, running, skipped, remaining, total } = counts;
     const executionNode = document2.nodes.find((node) => node.id === executionNodeID);
-    const settled = states.filter(isSettledStepStatus).length;
-    const terminal = isTerminalRunStatus(runStatus);
-    const progress = terminal ? 100 : activeNodes.length === 0 ? 0 : Math.round(settled / activeNodes.length * 100);
-    return /* @__PURE__ */ import_react9.default.createElement("div", { className: "run-overview" }, /* @__PURE__ */ import_react9.default.createElement("header", { className: "overview-header" }, /* @__PURE__ */ import_react9.default.createElement("div", { className: "inspector-icon" }, /* @__PURE__ */ import_react9.default.createElement(Activity, { "aria-hidden": "true" })), /* @__PURE__ */ import_react9.default.createElement("div", null, /* @__PURE__ */ import_react9.default.createElement("span", null, "Run overview"), /* @__PURE__ */ import_react9.default.createElement("h2", null, document2.runbook.name ?? document2.runbook.id ?? "Runbook")), /* @__PURE__ */ import_react9.default.createElement(StatusBadge, { status: runStatus })), /* @__PURE__ */ import_react9.default.createElement(
+    const settled = completed + issues + skipped;
+    const terminal = isExecutionEnded(runStatus);
+    const progress = total === 0 ? 0 : Math.round(settled / total * 100);
+    return /* @__PURE__ */ import_react13.default.createElement("div", { className: "run-overview" }, /* @__PURE__ */ import_react13.default.createElement("header", { className: "overview-header" }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "inspector-icon" }, /* @__PURE__ */ import_react13.default.createElement(Activity, { "aria-hidden": "true" })), /* @__PURE__ */ import_react13.default.createElement("div", null, /* @__PURE__ */ import_react13.default.createElement("span", null, "Run overview"), /* @__PURE__ */ import_react13.default.createElement("h2", null, document2.runbook.name ?? document2.runbook.id ?? "Runbook")), /* @__PURE__ */ import_react13.default.createElement(StatusBadge, { status: runStatus })), /* @__PURE__ */ import_react13.default.createElement(
       "div",
       {
         className: "overview-progress",
         role: "progressbar",
-        "aria-label": "Run progress",
+        "aria-label": "Canonical step statuses",
         "aria-valuemin": 0,
         "aria-valuemax": 100,
         "aria-valuenow": progress,
-        "aria-valuetext": `${progress}% complete`
+        "aria-valuetext": `${settled} of ${total} canonical steps have final status`
       },
-      /* @__PURE__ */ import_react9.default.createElement("span", { style: { width: `${progress}%` } })
-    ), /* @__PURE__ */ import_react9.default.createElement("div", { className: "overview-stats" }, /* @__PURE__ */ import_react9.default.createElement("div", null, /* @__PURE__ */ import_react9.default.createElement("strong", null, completed), /* @__PURE__ */ import_react9.default.createElement("span", null, "Done")), /* @__PURE__ */ import_react9.default.createElement("div", null, /* @__PURE__ */ import_react9.default.createElement("strong", null, issues), /* @__PURE__ */ import_react9.default.createElement("span", null, "Issues")), /* @__PURE__ */ import_react9.default.createElement("div", null, /* @__PURE__ */ import_react9.default.createElement("strong", null, skipped), /* @__PURE__ */ import_react9.default.createElement("span", null, "Skipped")), /* @__PURE__ */ import_react9.default.createElement("div", null, /* @__PURE__ */ import_react9.default.createElement("strong", null, activeNodes.length - settled), /* @__PURE__ */ import_react9.default.createElement("span", null, terminal ? "Unvisited" : "Remaining"))), /* @__PURE__ */ import_react9.default.createElement(Section, { title: "Run" }, /* @__PURE__ */ import_react9.default.createElement(KeyValueRows, { rows: [
+      /* @__PURE__ */ import_react13.default.createElement("span", { style: { width: `${progress}%` } })
+    ), /* @__PURE__ */ import_react13.default.createElement("div", { className: "overview-stats" }, /* @__PURE__ */ import_react13.default.createElement("div", null, /* @__PURE__ */ import_react13.default.createElement("strong", null, completed), /* @__PURE__ */ import_react13.default.createElement("span", null, "Done")), /* @__PURE__ */ import_react13.default.createElement("div", null, /* @__PURE__ */ import_react13.default.createElement("strong", null, issues), /* @__PURE__ */ import_react13.default.createElement("span", null, "Issues")), /* @__PURE__ */ import_react13.default.createElement("div", null, /* @__PURE__ */ import_react13.default.createElement("strong", null, skipped), /* @__PURE__ */ import_react13.default.createElement("span", null, "Skipped")), /* @__PURE__ */ import_react13.default.createElement("div", null, /* @__PURE__ */ import_react13.default.createElement("strong", null, running), /* @__PURE__ */ import_react13.default.createElement("span", null, "Running")), /* @__PURE__ */ import_react13.default.createElement("div", null, /* @__PURE__ */ import_react13.default.createElement("strong", null, remaining), /* @__PURE__ */ import_react13.default.createElement("span", null, terminal ? "No final status" : "Remaining"))), /* @__PURE__ */ import_react13.default.createElement("p", { className: "overview-hint" }, total, " canonical steps \xB7 latest observed status per step, including containers. Runtime child activity is listed separately."), terminal && remaining > 0 ? /* @__PURE__ */ import_react13.default.createElement("p", { role: "status" }, "Run ended, some steps lack final status.") : null, /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Run" }, /* @__PURE__ */ import_react13.default.createElement(KeyValueRows, { rows: [
       { label: terminal ? "Last reached" : "Current", value: executionNode?.data.title ?? executionNode?.id, code: true },
       { label: "Run ID", value: runID, code: true },
       { label: "Steps", value: document2.nodes.length },
       { label: "Breakpoints", value: breakpointCount },
       { label: "Source", value: document2.runbook.path, code: true }
-    ] })), /* @__PURE__ */ import_react9.default.createElement(Section, { title: "Inputs", count: inputs.length }, /* @__PURE__ */ import_react9.default.createElement("div", { className: "named-value-list" }, inputs.map((input) => /* @__PURE__ */ import_react9.default.createElement("div", { className: "named-value-row", key: input.name }, /* @__PURE__ */ import_react9.default.createElement("code", null, input.name), /* @__PURE__ */ import_react9.default.createElement("span", { className: input.secret ? "redacted-value" : "" }, input.secret && input.value ? "set" : input.value || "unset"))))), diagnostics ? /* @__PURE__ */ import_react9.default.createElement(Section, { title: "Diagnostics" }, /* @__PURE__ */ import_react9.default.createElement("pre", { className: "runtime-log overview-diagnostics" }, diagnostics)) : null, /* @__PURE__ */ import_react9.default.createElement("p", { className: "overview-hint" }, "Select a step for definition and execution details."));
+    ] })), /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Inputs", count: inputs.length }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "named-value-list" }, inputs.map((input) => /* @__PURE__ */ import_react13.default.createElement("div", { className: "named-value-row", key: input.name }, /* @__PURE__ */ import_react13.default.createElement("code", null, input.name), /* @__PURE__ */ import_react13.default.createElement("span", { className: input.secret ? "redacted-value" : "" }, input.secret && input.value ? "set" : input.value || "unset"))))), diagnostics ? /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Diagnostics" }, /* @__PURE__ */ import_react13.default.createElement("pre", { className: "runtime-log overview-diagnostics" }, diagnostics)) : null, /* @__PURE__ */ import_react13.default.createElement("p", { className: "overview-hint" }, "Select a step for definition and execution details."));
   }
   function StepInspector({
     node,
@@ -34951,21 +36374,43 @@
     availableGraphRevisions = [],
     selectedGraphRevision,
     onGraphRevisionChange,
+    requestedOccurrenceID,
+    onOccurrenceChange,
+    snapshotDigest,
     debugControls
   }) {
     const tabOrder = ["definition", "run", "debug"];
-    const [tab, setTab] = (0, import_react9.useState)(runtime && runtime.status !== "pending" ? "run" : "definition");
-    const [selectedOccurrenceID, setSelectedOccurrenceID] = (0, import_react9.useState)();
-    const tabBaseID = (0, import_react9.useId)();
-    const tabRefs = (0, import_react9.useRef)({ definition: null, run: null, debug: null });
-    const occurrences = runtime?.occurrences ?? [];
-    const selectedOccurrence = occurrences.find((occurrence) => occurrence.occurrenceID === selectedOccurrenceID) ?? occurrences.find((occurrence) => occurrence.occurrenceID === runtime?.occurrenceID) ?? occurrences[occurrences.length - 1];
+    const [tab, setTab] = (0, import_react13.useState)(runtime && runtime.status !== "pending" ? "run" : "definition");
+    const [selectedOccurrenceID, setSelectedOccurrenceID] = (0, import_react13.useState)();
+    const tabBaseID = (0, import_react13.useId)();
+    const tabRefs = (0, import_react13.useRef)({ definition: null, run: null, debug: null });
+    const occurrences = runtime?.occurrences?.length ? runtime.occurrences : (runtime?.retainedPresentations ?? []).map((occurrence) => ({
+      occurrenceID: JSON.stringify(occurrence.identity),
+      runID: runtime?.runID ?? "",
+      segmentID: "",
+      qualifiedNodeID: occurrence.identity.qualified_node_id,
+      phase: "execute",
+      invocation: occurrence.identity.invocation ?? 1,
+      retryAttempt: occurrence.identity.retry_attempt ?? 1,
+      occurrenceSequence: occurrence.identity.occurrence_sequence ?? 0,
+      executionSource: "saved",
+      status: "retained",
+      output: occurrence.output,
+      codePresentation: occurrence.details.code_presentation,
+      outputValueStatus: occurrence.output_value_status,
+      displayPresentation: occurrence.display_presentation,
+      retainedDetails: occurrence.details
+    }));
+    const selectedOccurrence = occurrences.find((occurrence) => occurrence.occurrenceID === (selectedOccurrenceID ?? requestedOccurrenceID)) ?? occurrences.find((occurrence) => occurrence.occurrenceID === runtime?.occurrenceID) ?? occurrences[occurrences.length - 1];
     const displayedRuntime = selectedOccurrence ?? runtime;
-    (0, import_react9.useEffect)(() => {
+    (0, import_react13.useEffect)(() => {
+      setSelectedOccurrenceID(requestedOccurrenceID);
+    }, [requestedOccurrenceID]);
+    (0, import_react13.useEffect)(() => {
       setTab(displayedRuntime && displayedRuntime.status !== "pending" ? "run" : "definition");
       setSelectedOccurrenceID(void 0);
     }, [node.id]);
-    (0, import_react9.useEffect)(() => {
+    (0, import_react13.useEffect)(() => {
       if (displayedRuntime && displayedRuntime.status !== "pending" && tab === "definition") setTab("run");
     }, [displayedRuntime?.status]);
     const kind = String(node.data.kind ?? "step");
@@ -34989,29 +36434,40 @@
     };
     const tabID = (value) => `${tabBaseID}-${value}-tab`;
     const panelID = (value) => `${tabBaseID}-${value}-panel`;
-    return /* @__PURE__ */ import_react9.default.createElement("div", { className: "step-inspector" }, /* @__PURE__ */ import_react9.default.createElement("div", { className: "inspector-sticky" }, /* @__PURE__ */ import_react9.default.createElement("header", { className: "step-inspector-header" }, /* @__PURE__ */ import_react9.default.createElement("div", { className: "inspector-icon" }, /* @__PURE__ */ import_react9.default.createElement(KindIcon, { kind })), /* @__PURE__ */ import_react9.default.createElement("div", { className: "inspector-title" }, /* @__PURE__ */ import_react9.default.createElement("span", null, KIND_LABELS[kind] ?? kind, segmentOrdinal ? ` | Segment ${segmentOrdinal}` : ""), /* @__PURE__ */ import_react9.default.createElement("h2", null, title), /* @__PURE__ */ import_react9.default.createElement("code", { title: node.id }, displayNodeID)), /* @__PURE__ */ import_react9.default.createElement(StatusBadge, { status: displayedRuntime?.status ?? "pending" })), /* @__PURE__ */ import_react9.default.createElement("div", { className: "inspector-metrics" }, /* @__PURE__ */ import_react9.default.createElement("span", null, /* @__PURE__ */ import_react9.default.createElement(Clock3, { "aria-hidden": "true" }), formatDuration(displayedRuntime?.durationMs)), selectedOccurrence ? /* @__PURE__ */ import_react9.default.createElement("span", null, "Invocation ", selectedOccurrence.invocation) : null, selectedOccurrence?.retryAttempt && selectedOccurrence.retryAttempt > 1 ? /* @__PURE__ */ import_react9.default.createElement("span", null, "Retry ", selectedOccurrence.retryAttempt) : displayedRuntime?.attempt ? /* @__PURE__ */ import_react9.default.createElement("span", null, "Attempt ", displayedRuntime.attempt) : null, node.data.call_path && Array.isArray(node.data.call_path) && node.data.call_path.length > 0 ? /* @__PURE__ */ import_react9.default.createElement("span", null, node.data.call_path.length, " levels deep") : null, executionSource ? /* @__PURE__ */ import_react9.default.createElement("span", null, executionSource === "saved" ? "Saved result" : "Live execution") : null, segmentStatus ? /* @__PURE__ */ import_react9.default.createElement("span", null, "Segment ", segmentStatus.replaceAll("_", " ")) : null, sessionRunID ? /* @__PURE__ */ import_react9.default.createElement("span", { title: sessionRunID }, "Run ", sessionRunID.slice(0, 8)) : null), availableGraphRevisions.length > 1 && selectedGraphRevision !== void 0 ? /* @__PURE__ */ import_react9.default.createElement("label", { className: "revision-selector" }, /* @__PURE__ */ import_react9.default.createElement("span", null, "Graph revision"), /* @__PURE__ */ import_react9.default.createElement(
+    return /* @__PURE__ */ import_react13.default.createElement("div", { className: "step-inspector" }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "inspector-sticky" }, /* @__PURE__ */ import_react13.default.createElement("header", { className: "step-inspector-header" }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "inspector-icon" }, /* @__PURE__ */ import_react13.default.createElement(KindIcon, { kind })), /* @__PURE__ */ import_react13.default.createElement("div", { className: "inspector-title" }, /* @__PURE__ */ import_react13.default.createElement("span", null, KIND_LABELS[kind] ?? kind, segmentOrdinal ? ` | Segment ${segmentOrdinal}` : ""), /* @__PURE__ */ import_react13.default.createElement("h2", null, title), /* @__PURE__ */ import_react13.default.createElement("code", { title: node.id }, displayNodeID)), /* @__PURE__ */ import_react13.default.createElement(StatusBadge, { status: displayedRuntime?.status ?? "pending" })), /* @__PURE__ */ import_react13.default.createElement("div", { className: "inspector-metrics" }, /* @__PURE__ */ import_react13.default.createElement("span", null, /* @__PURE__ */ import_react13.default.createElement(Clock3, { "aria-hidden": "true" }), formatDuration(displayedRuntime?.durationMs)), selectedOccurrence ? /* @__PURE__ */ import_react13.default.createElement("span", null, "Invocation ", selectedOccurrence.invocation) : null, selectedOccurrence?.retryAttempt && selectedOccurrence.retryAttempt > 1 ? /* @__PURE__ */ import_react13.default.createElement("span", null, "Retry ", selectedOccurrence.retryAttempt) : displayedRuntime?.attempt ? /* @__PURE__ */ import_react13.default.createElement("span", null, "Attempt ", displayedRuntime.attempt) : null, node.data.call_path && Array.isArray(node.data.call_path) && node.data.call_path.length > 0 ? /* @__PURE__ */ import_react13.default.createElement("span", null, node.data.call_path.length, " levels deep") : null, executionSource ? /* @__PURE__ */ import_react13.default.createElement("span", null, executionSource === "saved" ? "Saved result" : "Live execution") : null, segmentStatus ? /* @__PURE__ */ import_react13.default.createElement("span", null, "Segment ", segmentStatus.replaceAll("_", " ")) : null, sessionRunID ? /* @__PURE__ */ import_react13.default.createElement("span", { title: sessionRunID }, "Run ", sessionRunID.slice(0, 8)) : null), availableGraphRevisions.length > 1 && selectedGraphRevision !== void 0 ? /* @__PURE__ */ import_react13.default.createElement("label", { className: "revision-selector" }, /* @__PURE__ */ import_react13.default.createElement("span", null, "Graph revision"), /* @__PURE__ */ import_react13.default.createElement(
       "select",
       {
         "aria-label": "Graph revision",
         value: selectedGraphRevision,
         onChange: (event) => onGraphRevisionChange?.(Number(event.target.value))
       },
-      [...availableGraphRevisions].reverse().map((revision, index) => /* @__PURE__ */ import_react9.default.createElement("option", { key: revision, value: revision }, "Revision ", revision, index === 0 ? " (latest)" : ""))
-    )) : null, occurrences.length > 1 ? /* @__PURE__ */ import_react9.default.createElement("label", { className: "occurrence-selector" }, /* @__PURE__ */ import_react9.default.createElement("span", null, "Execution occurrence"), /* @__PURE__ */ import_react9.default.createElement(
+      [...availableGraphRevisions].reverse().map((revision, index) => /* @__PURE__ */ import_react13.default.createElement("option", { key: revision, value: revision }, "Revision ", revision, index === 0 ? " (latest)" : ""))
+    )) : null, occurrences.length > 1 ? /* @__PURE__ */ import_react13.default.createElement("label", { className: "occurrence-selector" }, /* @__PURE__ */ import_react13.default.createElement("span", null, "Execution occurrence"), /* @__PURE__ */ import_react13.default.createElement(
       "select",
       {
         "aria-label": "Execution occurrence",
         value: selectedOccurrence?.occurrenceID ?? "",
-        onChange: (event) => setSelectedOccurrenceID(event.target.value)
+        onChange: (event) => {
+          setSelectedOccurrenceID(event.target.value);
+          const occurrence = occurrences.find((value) => value.occurrenceID === event.target.value);
+          if (occurrence) onOccurrenceChange?.(occurrence);
+        }
       },
-      occurrences.map((occurrence) => /* @__PURE__ */ import_react9.default.createElement("option", { key: occurrence.occurrenceID, value: occurrence.occurrenceID }, occurrence.executionSource === "saved" ? "Saved" : "Live", " | run ", occurrence.runID.slice(0, 8), " | invocation ", occurrence.invocation))
-    )) : null, /* @__PURE__ */ import_react9.default.createElement("div", { className: "inspector-tabs", role: "tablist", "aria-label": "Step information" }, /* @__PURE__ */ import_react9.default.createElement("button", { ref: (element) => {
+      occurrences.map((occurrence) => /* @__PURE__ */ import_react13.default.createElement("option", { key: occurrence.occurrenceID, value: occurrence.occurrenceID }, occurrence.executionSource === "saved" ? "Saved" : "Live", " | run ", occurrence.runID.slice(0, 8), " | invocation ", occurrence.invocation))
+    )) : null, /* @__PURE__ */ import_react13.default.createElement("div", { className: "inspector-tabs", role: "tablist", "aria-label": "Step information" }, /* @__PURE__ */ import_react13.default.createElement("button", { ref: (element) => {
       tabRefs.current.definition = element;
-    }, id: tabID("definition"), type: "button", role: "tab", "aria-controls": panelID("definition"), "aria-selected": tab === "definition", tabIndex: tab === "definition" ? 0 : -1, className: tab === "definition" ? "active" : "", onKeyDown: onTabKeyDown, onClick: () => setTab("definition") }, "Definition"), /* @__PURE__ */ import_react9.default.createElement("button", { ref: (element) => {
+    }, id: tabID("definition"), type: "button", role: "tab", "aria-controls": panelID("definition"), "aria-selected": tab === "definition", tabIndex: tab === "definition" ? 0 : -1, className: tab === "definition" ? "active" : "", onKeyDown: onTabKeyDown, onClick: () => setTab("definition") }, "Definition"), /* @__PURE__ */ import_react13.default.createElement("button", { ref: (element) => {
       tabRefs.current.run = element;
-    }, id: tabID("run"), type: "button", role: "tab", "aria-controls": panelID("run"), "aria-selected": tab === "run", tabIndex: tab === "run" ? 0 : -1, className: tab === "run" ? "active" : "", onKeyDown: onTabKeyDown, onClick: () => setTab("run") }, "Run"), /* @__PURE__ */ import_react9.default.createElement("button", { ref: (element) => {
+    }, id: tabID("run"), type: "button", role: "tab", "aria-controls": panelID("run"), "aria-selected": tab === "run", tabIndex: tab === "run" ? 0 : -1, className: tab === "run" ? "active" : "", onKeyDown: onTabKeyDown, onClick: () => setTab("run") }, "Run"), /* @__PURE__ */ import_react13.default.createElement("button", { ref: (element) => {
       tabRefs.current.debug = element;
-    }, id: tabID("debug"), type: "button", role: "tab", "aria-controls": panelID("debug"), "aria-selected": tab === "debug", tabIndex: tab === "debug" ? 0 : -1, className: tab === "debug" ? "active" : "", onKeyDown: onTabKeyDown, onClick: () => setTab("debug") }, "Debug"))), tab === "definition" ? /* @__PURE__ */ import_react9.default.createElement("div", { id: panelID("definition"), role: "tabpanel", "aria-labelledby": tabID("definition"), tabIndex: 0 }, /* @__PURE__ */ import_react9.default.createElement(DefinitionPane, { details: node.data.details }), /* @__PURE__ */ import_react9.default.createElement(SessionProvenance, { node })) : null, tab === "run" ? /* @__PURE__ */ import_react9.default.createElement("div", { id: panelID("run"), role: "tabpanel", "aria-labelledby": tabID("run"), tabIndex: 0 }, /* @__PURE__ */ import_react9.default.createElement(RuntimePane, { runtime: displayedRuntime })) : null, tab === "debug" ? /* @__PURE__ */ import_react9.default.createElement("div", { id: panelID("debug"), role: "tabpanel", "aria-labelledby": tabID("debug"), tabIndex: 0 }, /* @__PURE__ */ import_react9.default.createElement(DebugPane, { controls: debugControls, override: displayedRuntime?.debugOverride })) : null);
+    }, id: tabID("debug"), type: "button", role: "tab", "aria-controls": panelID("debug"), "aria-selected": tab === "debug", tabIndex: tab === "debug" ? 0 : -1, className: tab === "debug" ? "active" : "", onKeyDown: onTabKeyDown, onClick: () => setTab("debug") }, "Debug"))), tab === "definition" ? /* @__PURE__ */ import_react13.default.createElement("div", { id: panelID("definition"), role: "tabpanel", "aria-labelledby": tabID("definition"), tabIndex: 0 }, /* @__PURE__ */ import_react13.default.createElement(DefinitionPane, { details: node.data.details }), /* @__PURE__ */ import_react13.default.createElement(SessionProvenance, { node })) : null, tab === "run" ? /* @__PURE__ */ import_react13.default.createElement("div", { id: panelID("run"), role: "tabpanel", "aria-labelledby": tabID("run"), tabIndex: 0 }, /* @__PURE__ */ import_react13.default.createElement(
+      RuntimePane,
+      {
+        runtime: displayedRuntime,
+        markdownDeclared: (selectedOccurrence?.retainedDetails ?? node.data.details)?.kind === "display" && (selectedOccurrence?.retainedDetails ?? node.data.details)?.format === "markdown",
+        snapshotDigest: displayedRuntime?.directDisplaySnapshot ?? snapshotDigest ?? "missing-binding"
+      }
+    )) : null, tab === "debug" ? /* @__PURE__ */ import_react13.default.createElement("div", { id: panelID("debug"), role: "tabpanel", "aria-labelledby": tabID("debug"), tabIndex: 0 }, /* @__PURE__ */ import_react13.default.createElement(DebugPane, { controls: debugControls, override: displayedRuntime?.debugOverride })) : null);
   }
   function SessionProvenance({ node }) {
     if (typeof node.data.session_id !== "string") return null;
@@ -35019,7 +36475,7 @@
       ...recordList(node.data.incoming_transitions).map((transition2) => ({ direction: "From", transition: transition2 })),
       ...recordList(node.data.outgoing_transitions).map((transition2) => ({ direction: "To", transition: transition2 }))
     ];
-    return /* @__PURE__ */ import_react9.default.createElement("div", { className: "inspector-pane session-provenance" }, /* @__PURE__ */ import_react9.default.createElement(Section, { title: "Snapshot" }, /* @__PURE__ */ import_react9.default.createElement(KeyValueRows, { rows: [
+    return /* @__PURE__ */ import_react13.default.createElement("div", { className: "inspector-pane session-provenance" }, /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Snapshot" }, /* @__PURE__ */ import_react13.default.createElement(KeyValueRows, { rows: [
       { label: "Runbook", value: node.data.runbook_name ?? node.data.runbook_id },
       { label: "Runbook ID", value: node.data.runbook_id, code: true },
       { label: "Graph revision", value: node.data.graph_revision },
@@ -35029,7 +36485,7 @@
       { label: "Catalog", value: node.data.catalog_digest, code: true },
       { label: "Package lock", value: node.data.package_lock_digest, code: true },
       { label: "Profile", value: node.data.profile_digest, code: true }
-    ] })), transitions.length > 0 ? /* @__PURE__ */ import_react9.default.createElement(Section, { title: "Handoffs", count: transitions.length }, /* @__PURE__ */ import_react9.default.createElement("div", { className: "compact-list" }, transitions.map(({ direction, transition: transition2 }) => /* @__PURE__ */ import_react9.default.createElement("div", { key: `${direction}:${String(transition2.transition_id)}` }, /* @__PURE__ */ import_react9.default.createElement("strong", null, direction, " ", String(direction === "From" ? transition2.source_segment_id : transition2.target_segment_id)), /* @__PURE__ */ import_react9.default.createElement("span", null, String(transition2.reason_summary ?? transition2.reason_code ?? transition2.status ?? "")))))) : null);
+    ] })), transitions.length > 0 ? /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Handoffs", count: transitions.length }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "compact-list" }, transitions.map(({ direction, transition: transition2 }) => /* @__PURE__ */ import_react13.default.createElement("div", { key: `${direction}:${String(transition2.transition_id)}` }, /* @__PURE__ */ import_react13.default.createElement("strong", null, direction, " ", String(direction === "From" ? transition2.source_segment_id : transition2.target_segment_id)), /* @__PURE__ */ import_react13.default.createElement("span", null, String(transition2.reason_summary ?? transition2.reason_code ?? transition2.status ?? "")))))) : null);
   }
   function recordList(value) {
     return Array.isArray(value) ? value.filter((item) => typeof item === "object" && item !== null && !Array.isArray(item)) : [];
@@ -35037,7 +36493,7 @@
   function CommonDefinition({ common }) {
     if (!common) return null;
     const executionRows = [
-      { label: "When", value: common.when, code: true },
+      { label: "When", value: common.when, code: true, path: "/common/when" },
       { label: "Timeout", value: common.timeout },
       { label: "Delay", value: common.delay },
       { label: "On error", value: common.on_error || (common.continue_on_fail ? "continue" : void 0) },
@@ -35045,84 +36501,107 @@
       { label: "Retry", value: common.retry ? `${common.retry.max} max${common.retry.interval ? ` \xB7 ${common.retry.interval}` : ""}${common.retry.backoff ? ` \xB7 ${common.retry.backoff}` : ""}` : void 0 }
     ];
     const hasExecutionPolicy = executionRows.some((row) => row.value !== void 0 && row.value !== "");
-    return /* @__PURE__ */ import_react9.default.createElement(import_react9.default.Fragment, null, common.subtitle ? /* @__PURE__ */ import_react9.default.createElement("p", { className: "definition-summary" }, common.subtitle) : null, hasExecutionPolicy ? /* @__PURE__ */ import_react9.default.createElement(Section, { title: "Execution" }, /* @__PURE__ */ import_react9.default.createElement(KeyValueRows, { rows: executionRows })) : null, common.captures && common.captures.length > 0 ? /* @__PURE__ */ import_react9.default.createElement(Section, { title: "Captures", count: common.captures.length }, /* @__PURE__ */ import_react9.default.createElement(NamedValueRows, { values: common.captures.map((capture) => ({ name: capture.name, value: capture.has_default ? `${capture.source} \xB7 default ${scalarText(capture.default)}` : capture.source })) })) : null, common.exports && common.exports.length > 0 ? /* @__PURE__ */ import_react9.default.createElement(Section, { title: "Exports" }, /* @__PURE__ */ import_react9.default.createElement("div", { className: "tag-list" }, common.exports.map((item) => /* @__PURE__ */ import_react9.default.createElement("code", { key: item }, item)))) : null, common.contract ? /* @__PURE__ */ import_react9.default.createElement(Section, { title: "Contract" }, /* @__PURE__ */ import_react9.default.createElement(KeyValueRows, { rows: [
+    return /* @__PURE__ */ import_react13.default.createElement(import_react13.default.Fragment, null, common.subtitle ? /* @__PURE__ */ import_react13.default.createElement("p", { className: "definition-summary" }, common.subtitle) : null, hasExecutionPolicy ? /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Execution" }, /* @__PURE__ */ import_react13.default.createElement(KeyValueRows, { rows: executionRows })) : null, common.captures && common.captures.length > 0 ? /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Captures", count: common.captures.length }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "named-value-list" }, common.captures.map((capture, index) => /* @__PURE__ */ import_react13.default.createElement("div", { className: "named-value-row", key: capture.name }, /* @__PURE__ */ import_react13.default.createElement("code", null, capture.name), /* @__PURE__ */ import_react13.default.createElement("span", null, /* @__PURE__ */ import_react13.default.createElement(AuthoredValue, { value: capture.source, path: `/common/captures/${index}/source` }), capture.has_default ? ` \xB7 default ${scalarText(capture.default)}` : ""))))) : null, common.exports && common.exports.length > 0 ? /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Exports" }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "tag-list" }, common.exports.map((item) => /* @__PURE__ */ import_react13.default.createElement("code", { key: item }, item)))) : null, common.contract ? /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Contract" }, /* @__PURE__ */ import_react13.default.createElement(KeyValueRows, { rows: [
       { label: "Effects", value: common.contract.effects?.join(", ") },
       { label: "Reads", value: common.contract.reads?.join(", ") },
       { label: "Writes", value: common.contract.writes?.join(", ") },
       { label: "Idempotent", value: common.contract.idempotent ? "yes" : void 0 },
       { label: "Deterministic", value: common.contract.deterministic ? "yes" : void 0 }
-    ] })) : null, common.evidence && common.evidence.length > 0 ? /* @__PURE__ */ import_react9.default.createElement(Section, { title: "Required evidence", count: common.evidence.length }, /* @__PURE__ */ import_react9.default.createElement("div", { className: "compact-list" }, common.evidence.map((item) => /* @__PURE__ */ import_react9.default.createElement("div", { key: `${item.kind}:${item.name}` }, /* @__PURE__ */ import_react9.default.createElement("strong", null, item.label || item.name), /* @__PURE__ */ import_react9.default.createElement("span", null, item.kind))))) : null);
+    ] })) : null, common.evidence && common.evidence.length > 0 ? /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Required evidence", count: common.evidence.length }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "compact-list" }, common.evidence.map((item) => /* @__PURE__ */ import_react13.default.createElement("div", { key: `${item.kind}:${item.name}` }, /* @__PURE__ */ import_react13.default.createElement("strong", null, item.label || item.name), /* @__PURE__ */ import_react13.default.createElement("span", null, item.kind))))) : null);
   }
   function DefinitionPane({ details }) {
-    if (!details) return /* @__PURE__ */ import_react9.default.createElement("div", { className: "inspector-blank" }, /* @__PURE__ */ import_react9.default.createElement(Activity, { "aria-hidden": "true" }), /* @__PURE__ */ import_react9.default.createElement("strong", null, "Definition unavailable"), /* @__PURE__ */ import_react9.default.createElement("span", null, "Rebuild the Gert CLI to load enriched step details."));
-    return /* @__PURE__ */ import_react9.default.createElement("div", { className: "inspector-pane" }, /* @__PURE__ */ import_react9.default.createElement(KindDefinition, { details }), /* @__PURE__ */ import_react9.default.createElement(CommonDefinition, { common: details.common }));
+    if (!details) return /* @__PURE__ */ import_react13.default.createElement("div", { className: "inspector-blank" }, /* @__PURE__ */ import_react13.default.createElement(Activity, { "aria-hidden": "true" }), /* @__PURE__ */ import_react13.default.createElement("strong", null, "Definition unavailable"), /* @__PURE__ */ import_react13.default.createElement("span", null, "Rebuild the Gert CLI to load enriched step details."));
+    return /* @__PURE__ */ import_react13.default.createElement(AuthoredValues, { details }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "inspector-pane" }, /* @__PURE__ */ import_react13.default.createElement(KindDefinition, { details }), /* @__PURE__ */ import_react13.default.createElement(CommonDefinition, { common: details.common })));
   }
   function KindDefinition({ details }) {
     switch (details.kind) {
       case "cli":
-        return /* @__PURE__ */ import_react9.default.createElement(import_react9.default.Fragment, null, /* @__PURE__ */ import_react9.default.createElement(Section, { title: "Command" }, details.command || details.args?.length ? /* @__PURE__ */ import_react9.default.createElement("pre", { className: "command-block" }, [details.command, ...details.args ?? []].filter(Boolean).join(" ")) : /* @__PURE__ */ import_react9.default.createElement("p", { className: "inspector-muted" }, "No command declared."), details.script ? /* @__PURE__ */ import_react9.default.createElement("pre", { className: "command-block" }, scalarText(details.script)) : null), /* @__PURE__ */ import_react9.default.createElement(Section, { title: "Process" }, /* @__PURE__ */ import_react9.default.createElement(KeyValueRows, { rows: [
-          { label: "Shell", value: details.shell, code: true },
-          { label: "Working dir", value: details.workdir, code: true },
+        return /* @__PURE__ */ import_react13.default.createElement(import_react13.default.Fragment, null, /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Command" }, details.command || details.args?.length ? /* @__PURE__ */ import_react13.default.createElement("pre", { className: "command-block" }, details.command ? /* @__PURE__ */ import_react13.default.createElement(AuthoredValue, { value: details.command, path: "/command" }) : null, details.args?.map((arg, index) => /* @__PURE__ */ import_react13.default.createElement(import_react13.default.Fragment, { key: index }, details.command || index ? " " : "", /* @__PURE__ */ import_react13.default.createElement(AuthoredValue, { value: arg, path: `/args/${index}` })))) : /* @__PURE__ */ import_react13.default.createElement("p", { className: "inspector-muted" }, "No command declared."), details.script ? /* @__PURE__ */ import_react13.default.createElement("pre", { className: "command-block" }, /* @__PURE__ */ import_react13.default.createElement(AuthoredValue, { value: details.script, path: "/script" })) : null), /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Process" }, /* @__PURE__ */ import_react13.default.createElement(KeyValueRows, { rows: [
+          { label: "Shell", value: details.shell, code: true, path: "/shell" },
+          { label: "Working dir", value: details.workdir, code: true, path: "/workdir" },
           { label: "Environment", value: details.env_names?.length ? `${details.env_names.length} variables` : void 0 },
           { label: "Stdin", value: details.stdin ? "provided" : void 0 }
-        ] }), details.env_names && details.env_names.length > 0 ? /* @__PURE__ */ import_react9.default.createElement("div", { className: "tag-list" }, details.env_names.map((name) => /* @__PURE__ */ import_react9.default.createElement("code", { key: name }, name))) : null));
+        ] }), details.env_names && details.env_names.length > 0 ? /* @__PURE__ */ import_react13.default.createElement("div", { className: "tag-list" }, details.env_names.map((name) => /* @__PURE__ */ import_react13.default.createElement("code", { key: name }, name))) : null));
       case "tool":
-        return /* @__PURE__ */ import_react9.default.createElement(import_react9.default.Fragment, null, /* @__PURE__ */ import_react9.default.createElement(Section, { title: "Tool action" }, /* @__PURE__ */ import_react9.default.createElement("div", { className: "definition-call" }, /* @__PURE__ */ import_react9.default.createElement(Wrench, { "aria-hidden": "true" }), /* @__PURE__ */ import_react9.default.createElement("code", null, details.tool || "unknown", " / ", details.action || "unknown")), details.version ? /* @__PURE__ */ import_react9.default.createElement(KeyValueRows, { rows: [{ label: "Version", value: details.version }] }) : null), /* @__PURE__ */ import_react9.default.createElement(Section, { title: "Arguments", count: details.arguments?.length ?? 0 }, /* @__PURE__ */ import_react9.default.createElement(NamedValueRows, { values: details.arguments })));
+        return /* @__PURE__ */ import_react13.default.createElement(import_react13.default.Fragment, null, /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Tool action" }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "definition-call" }, /* @__PURE__ */ import_react13.default.createElement(Wrench, { "aria-hidden": "true" }), /* @__PURE__ */ import_react13.default.createElement("code", null, /* @__PURE__ */ import_react13.default.createElement(AuthoredValue, { value: details.tool || "unknown", path: "/tool" }), " / ", /* @__PURE__ */ import_react13.default.createElement(AuthoredValue, { value: details.action || "unknown", path: "/action" }))), details.version ? /* @__PURE__ */ import_react13.default.createElement(KeyValueRows, { rows: [{ label: "Version", value: details.version }] }) : null), /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Authored template", count: details.arguments?.length ?? 0 }, details.arguments?.map((item, index) => {
+          const field2 = details.code_presentation?.arguments.find((f) => f.name === item.name);
+          return field2?.presentation && typeof item.value === "string" ? /* @__PURE__ */ import_react13.default.createElement(
+            CodeValue,
+            {
+              key: item.name,
+              label: item.name,
+              text: item.redacted ? void 0 : item.value,
+              expressionPath: `/arguments/${index}/value`,
+              descriptor: field2.status === "resolved" ? field2.presentation : void 0,
+              status: item.redacted ? "redacted" : "available"
+            }
+          ) : /* @__PURE__ */ import_react13.default.createElement(NamedValueRows, { key: item.name, values: [item], path: "/arguments", startIndex: index });
+        })));
       case "include":
-        return /* @__PURE__ */ import_react9.default.createElement(import_react9.default.Fragment, null, /* @__PURE__ */ import_react9.default.createElement(Section, { title: "Target" }, /* @__PURE__ */ import_react9.default.createElement(KeyValueRows, { rows: [
-          { label: "Runbook", value: details.reference, code: true },
+        return /* @__PURE__ */ import_react13.default.createElement(import_react13.default.Fragment, null, /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Target" }, /* @__PURE__ */ import_react13.default.createElement(KeyValueRows, { rows: [
+          { label: "Runbook", value: details.reference, code: true, path: "/reference" },
           { label: "Resolution", value: details.dynamic ? `dynamic \xB7 ${details.resolve_from || "catalog"}` : "static" },
           { label: "Expansion", value: details.expand || "inherited" },
           { label: "Not found", value: details.on_not_found || "fail" },
           { label: "Child steps", value: details.steps }
-        ] })), /* @__PURE__ */ import_react9.default.createElement(Section, { title: "Bindings", count: details.bindings?.length ?? 0 }, /* @__PURE__ */ import_react9.default.createElement(NamedValueRows, { values: details.bindings })), details.stop_if && details.stop_if.length > 0 ? /* @__PURE__ */ import_react9.default.createElement(Section, { title: "Stop outcomes" }, /* @__PURE__ */ import_react9.default.createElement("div", { className: "tag-list" }, details.stop_if.map((item) => /* @__PURE__ */ import_react9.default.createElement("code", { key: item }, item)))) : null);
+        ] })), /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Bindings", count: details.bindings?.length ?? 0 }, /* @__PURE__ */ import_react13.default.createElement(NamedValueRows, { values: details.bindings, path: "/bindings" })), details.stop_if && details.stop_if.length > 0 ? /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Stop outcomes" }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "tag-list" }, details.stop_if.map((item) => /* @__PURE__ */ import_react13.default.createElement("code", { key: item }, item)))) : null);
       case "choice":
-        return /* @__PURE__ */ import_react9.default.createElement(import_react9.default.Fragment, null, /* @__PURE__ */ import_react9.default.createElement(Section, { title: "Prompt" }, /* @__PURE__ */ import_react9.default.createElement("p", { className: "definition-copy" }, details.prompt || "No prompt.")), /* @__PURE__ */ import_react9.default.createElement(Section, { title: "Selection" }, /* @__PURE__ */ import_react9.default.createElement(KeyValueRows, { rows: [
+        return /* @__PURE__ */ import_react13.default.createElement(import_react13.default.Fragment, null, /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Prompt" }, /* @__PURE__ */ import_react13.default.createElement("p", { className: "definition-copy" }, /* @__PURE__ */ import_react13.default.createElement(AuthoredValue, { value: details.prompt || "No prompt.", path: "/prompt" }))), /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Selection" }, /* @__PURE__ */ import_react13.default.createElement(KeyValueRows, { rows: [
           { label: "Variable", value: details.variable, code: true },
           { label: "Mode", value: details.multiple ? "multiple" : "single" },
           { label: "Required", value: details.multiple ? `${details.min ?? 0}\u2013${details.max ?? "any"}` : void 0 },
-          { label: "Default", value: details.default, code: true }
-        ] })), /* @__PURE__ */ import_react9.default.createElement(Section, { title: "Options", count: details.options?.length ?? 0 }, /* @__PURE__ */ import_react9.default.createElement("div", { className: "compact-list" }, details.options?.map((option) => /* @__PURE__ */ import_react9.default.createElement("div", { key: option.value }, /* @__PURE__ */ import_react9.default.createElement("strong", null, option.label), /* @__PURE__ */ import_react9.default.createElement("code", null, option.value), option.hint ? /* @__PURE__ */ import_react9.default.createElement("span", null, option.hint) : null)))));
+          { label: "Default", value: details.default, code: true, path: "/default" }
+        ] })), /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Options", count: details.options?.length ?? 0 }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "compact-list" }, details.options?.map((option, index) => /* @__PURE__ */ import_react13.default.createElement("div", { key: option.value }, /* @__PURE__ */ import_react13.default.createElement("strong", null, /* @__PURE__ */ import_react13.default.createElement(AuthoredValue, { value: option.label, path: `/options/${index}/label` })), /* @__PURE__ */ import_react13.default.createElement("code", null, option.value), option.hint ? /* @__PURE__ */ import_react13.default.createElement("span", null, /* @__PURE__ */ import_react13.default.createElement(AuthoredValue, { value: option.hint, path: `/options/${index}/hint` })) : null)))));
       case "decision":
-        return /* @__PURE__ */ import_react9.default.createElement(import_react9.default.Fragment, null, /* @__PURE__ */ import_react9.default.createElement(Section, { title: "Prompt" }, /* @__PURE__ */ import_react9.default.createElement("p", { className: "definition-copy" }, details.prompt || "No prompt."), /* @__PURE__ */ import_react9.default.createElement(KeyValueRows, { rows: [{ label: "Variable", value: details.variable, code: true }] })), /* @__PURE__ */ import_react9.default.createElement(Section, { title: "Routes", count: details.routes?.length ?? 0 }, /* @__PURE__ */ import_react9.default.createElement("div", { className: "compact-list" }, details.routes?.map((route, index) => /* @__PURE__ */ import_react9.default.createElement("div", { key: `${index}:${route.label}` }, /* @__PURE__ */ import_react9.default.createElement("strong", null, route.label), /* @__PURE__ */ import_react9.default.createElement("code", null, route.goto || route.runbook || "inline"), route.hint ? /* @__PURE__ */ import_react9.default.createElement("span", null, route.hint) : null)))));
+        return /* @__PURE__ */ import_react13.default.createElement(import_react13.default.Fragment, null, /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Prompt" }, /* @__PURE__ */ import_react13.default.createElement("p", { className: "definition-copy" }, /* @__PURE__ */ import_react13.default.createElement(AuthoredValue, { value: details.prompt || "No prompt.", path: "/prompt" })), /* @__PURE__ */ import_react13.default.createElement(KeyValueRows, { rows: [{ label: "Variable", value: details.variable, code: true }] })), /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Routes", count: details.routes?.length ?? 0 }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "compact-list" }, details.routes?.map((route, index) => /* @__PURE__ */ import_react13.default.createElement("div", { key: `${index}:${route.label}` }, /* @__PURE__ */ import_react13.default.createElement("strong", null, /* @__PURE__ */ import_react13.default.createElement(AuthoredValue, { value: route.label, path: `/routes/${index}/label` })), /* @__PURE__ */ import_react13.default.createElement("code", null, route.goto || route.runbook || "inline"), route.hint ? /* @__PURE__ */ import_react13.default.createElement("span", null, /* @__PURE__ */ import_react13.default.createElement(AuthoredValue, { value: route.hint, path: `/routes/${index}/hint` })) : null)))));
       case "collector":
-        return /* @__PURE__ */ import_react9.default.createElement(import_react9.default.Fragment, null, /* @__PURE__ */ import_react9.default.createElement(Section, { title: "Prompt" }, /* @__PURE__ */ import_react9.default.createElement("p", { className: "definition-copy" }, details.prompt || "No prompt.")), /* @__PURE__ */ import_react9.default.createElement(Section, { title: "Fields", count: details.fields?.length ?? 0 }, /* @__PURE__ */ import_react9.default.createElement("div", { className: "field-list" }, details.fields?.map((field, index) => {
-          const name = typeof field.name === "string" ? field.name : `field-${index + 1}`;
-          const type = typeof field.type === "string" ? field.type : "text";
-          const label = typeof field.label === "string" ? field.label : name;
-          return /* @__PURE__ */ import_react9.default.createElement("div", { key: name }, /* @__PURE__ */ import_react9.default.createElement("div", null, /* @__PURE__ */ import_react9.default.createElement("strong", null, label), /* @__PURE__ */ import_react9.default.createElement("code", null, name)), /* @__PURE__ */ import_react9.default.createElement("span", null, type, field.required === true ? " \xB7 required" : "", field.multiple === true ? " \xB7 multiple" : "", field.multiline === true ? " \xB7 multiline" : ""), typeof field.hint === "string" ? /* @__PURE__ */ import_react9.default.createElement("p", null, field.hint) : null);
+        return /* @__PURE__ */ import_react13.default.createElement(import_react13.default.Fragment, null, /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Prompt" }, /* @__PURE__ */ import_react13.default.createElement("p", { className: "definition-copy" }, /* @__PURE__ */ import_react13.default.createElement(AuthoredValue, { value: details.prompt || "No prompt.", path: "/prompt" }))), /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Fields", count: details.fields?.length ?? 0 }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "field-list" }, details.fields?.map((field2, index) => {
+          const name = typeof field2.name === "string" ? field2.name : `field-${index + 1}`;
+          const type = typeof field2.type === "string" ? field2.type : "text";
+          const label = typeof field2.label === "string" ? field2.label : name;
+          return /* @__PURE__ */ import_react13.default.createElement("div", { key: name }, /* @__PURE__ */ import_react13.default.createElement("div", null, /* @__PURE__ */ import_react13.default.createElement("strong", null, /* @__PURE__ */ import_react13.default.createElement(AuthoredValue, { value: label, path: `/fields/${index}/label` })), /* @__PURE__ */ import_react13.default.createElement("code", null, name)), /* @__PURE__ */ import_react13.default.createElement("span", null, type, field2.required === true ? " \xB7 required" : "", field2.multiple === true ? " \xB7 multiple" : "", field2.multiline === true ? " \xB7 multiline" : ""), typeof field2.hint === "string" ? /* @__PURE__ */ import_react13.default.createElement("p", null, /* @__PURE__ */ import_react13.default.createElement(AuthoredValue, { value: field2.hint, path: `/fields/${index}/hint` })) : null, /* @__PURE__ */ import_react13.default.createElement(KeyValueRows, { rows: [
+            { label: "When", value: field2.when, path: `/fields/${index}/when`, code: true },
+            { label: "Default", value: field2.default, path: `/fields/${index}/default` }
+          ] }), Array.isArray(field2.options) ? /* @__PURE__ */ import_react13.default.createElement("div", { className: "compact-list" }, field2.options.map((option, optionIndex) => {
+            if (!option || typeof option !== "object") return null;
+            return /* @__PURE__ */ import_react13.default.createElement("div", { key: optionIndex }, /* @__PURE__ */ import_react13.default.createElement("strong", null, /* @__PURE__ */ import_react13.default.createElement(AuthoredValue, { value: option.label, path: `/fields/${index}/options/${optionIndex}/label` })), option.hint ? /* @__PURE__ */ import_react13.default.createElement("span", null, /* @__PURE__ */ import_react13.default.createElement(AuthoredValue, { value: option.hint, path: `/fields/${index}/options/${optionIndex}/hint` })) : null);
+          })) : null);
         }))));
       case "host_action":
-        return /* @__PURE__ */ import_react9.default.createElement(import_react9.default.Fragment, null, /* @__PURE__ */ import_react9.default.createElement(Section, { title: "Host capability" }, /* @__PURE__ */ import_react9.default.createElement("div", { className: "definition-call" }, /* @__PURE__ */ import_react9.default.createElement(Puzzle, { "aria-hidden": "true" }), /* @__PURE__ */ import_react9.default.createElement("code", null, details.capability || "unknown"))), /* @__PURE__ */ import_react9.default.createElement(Section, { title: "Request", count: details.request?.length ?? 0 }, /* @__PURE__ */ import_react9.default.createElement(NamedValueRows, { values: details.request })));
+        return /* @__PURE__ */ import_react13.default.createElement(import_react13.default.Fragment, null, /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Host capability" }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "definition-call" }, /* @__PURE__ */ import_react13.default.createElement(Puzzle, { "aria-hidden": "true" }), /* @__PURE__ */ import_react13.default.createElement("code", null, details.capability || "unknown"))), /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Request", count: details.request?.length ?? 0 }, /* @__PURE__ */ import_react13.default.createElement(NamedValueRows, { values: details.request, path: "/request" })));
       case "branch":
-        return /* @__PURE__ */ import_react9.default.createElement(Section, { title: "Ordered arms", count: details.arms?.length ?? 0 }, /* @__PURE__ */ import_react9.default.createElement("div", { className: "arm-list" }, details.arms?.map((arm, index) => /* @__PURE__ */ import_react9.default.createElement("div", { key: index }, /* @__PURE__ */ import_react9.default.createElement("span", null, index + 1), /* @__PURE__ */ import_react9.default.createElement("div", null, /* @__PURE__ */ import_react9.default.createElement("strong", null, arm.label || (arm.else ? "Otherwise" : `Arm ${index + 1}`)), /* @__PURE__ */ import_react9.default.createElement("code", null, arm.else ? "else" : arm.condition || "always")), /* @__PURE__ */ import_react9.default.createElement("em", null, arm.steps, " steps")))));
+        return /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Ordered arms", count: details.arms?.length ?? 0 }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "arm-list" }, details.arms?.map((arm, index) => /* @__PURE__ */ import_react13.default.createElement("div", { key: index }, /* @__PURE__ */ import_react13.default.createElement("span", null, index + 1), /* @__PURE__ */ import_react13.default.createElement("div", null, /* @__PURE__ */ import_react13.default.createElement("strong", null, arm.label || (arm.else ? "Otherwise" : `Arm ${index + 1}`)), /* @__PURE__ */ import_react13.default.createElement("code", null, arm.else ? "else" : /* @__PURE__ */ import_react13.default.createElement(AuthoredValue, { value: arm.condition || "always", path: `/arms/${index}/condition` }))), /* @__PURE__ */ import_react13.default.createElement("em", null, arm.steps, " steps")))));
       case "iterate":
-        return /* @__PURE__ */ import_react9.default.createElement(import_react9.default.Fragment, null, /* @__PURE__ */ import_react9.default.createElement(Section, { title: "Loop" }, /* @__PURE__ */ import_react9.default.createElement(KeyValueRows, { rows: [
-          { label: "Over", value: details.over, code: true },
+        return /* @__PURE__ */ import_react13.default.createElement(import_react13.default.Fragment, null, /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Loop" }, /* @__PURE__ */ import_react13.default.createElement(KeyValueRows, { rows: [
+          { label: "Over", value: details.over, code: true, path: "/over" },
           { label: "As", value: details.as, code: true },
-          { label: "Until", value: details.until, code: true },
+          { label: "Until", value: details.until, code: true, path: "/until" },
           { label: "Maximum", value: details.max },
           { label: "Concurrency", value: details.concurrency || 1 },
           { label: "Body", value: details.steps !== void 0 ? `${details.steps} steps` : void 0 }
-        ] })), /* @__PURE__ */ import_react9.default.createElement(Section, { title: "Collect" }, /* @__PURE__ */ import_react9.default.createElement(NamedValueRows, { values: details.collect })));
+        ] })), /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Collect" }, /* @__PURE__ */ import_react13.default.createElement(NamedValueRows, { values: details.collect, path: "/collect" })));
       case "parallel":
-        return /* @__PURE__ */ import_react9.default.createElement(import_react9.default.Fragment, null, /* @__PURE__ */ import_react9.default.createElement(Section, { title: "Branches" }, /* @__PURE__ */ import_react9.default.createElement(KeyValueRows, { rows: [{ label: "Count", value: details.branches }, { label: "Wait for", value: details.wait_for || "all" }, { label: "On failure", value: details.on_failure || "fail" }] })), details.branch_labels && details.branch_labels.length > 0 ? /* @__PURE__ */ import_react9.default.createElement(Section, { title: "Branch labels" }, /* @__PURE__ */ import_react9.default.createElement("div", { className: "tag-list" }, details.branch_labels.map((label, index) => /* @__PURE__ */ import_react9.default.createElement("span", { key: `${index}:${label}` }, label || `Branch ${index + 1}`)))) : null);
+        return /* @__PURE__ */ import_react13.default.createElement(import_react13.default.Fragment, null, /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Branches" }, /* @__PURE__ */ import_react13.default.createElement(KeyValueRows, { rows: [{ label: "Count", value: details.branches }, { label: "Wait for", value: details.wait_for || "all" }, { label: "On failure", value: details.on_failure || "fail" }] })), details.branch_labels && details.branch_labels.length > 0 ? /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Branch labels" }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "tag-list" }, details.branch_labels.map((label, index) => /* @__PURE__ */ import_react13.default.createElement("span", { key: `${index}:${label}` }, label || `Branch ${index + 1}`)))) : null);
       case "approve":
-        return /* @__PURE__ */ import_react9.default.createElement(import_react9.default.Fragment, null, /* @__PURE__ */ import_react9.default.createElement(Section, { title: "Approval policy" }, /* @__PURE__ */ import_react9.default.createElement(KeyValueRows, { rows: [{ label: "Required", value: details.required || 1 }, { label: "Timeout", value: details.timeout }, { label: "On timeout", value: details.on_timeout }, { label: "Timezone", value: details.timezone }, { label: "Calendar", value: details.business_calendar }] })), details.roles && details.roles.length > 0 ? /* @__PURE__ */ import_react9.default.createElement(Section, { title: "Roles" }, /* @__PURE__ */ import_react9.default.createElement("div", { className: "tag-list" }, details.roles.map((role) => /* @__PURE__ */ import_react9.default.createElement("span", { key: role }, role)))) : null, details.pool && details.pool.length > 0 ? /* @__PURE__ */ import_react9.default.createElement(Section, { title: "Approver pool" }, /* @__PURE__ */ import_react9.default.createElement("div", { className: "tag-list" }, details.pool.map((member) => /* @__PURE__ */ import_react9.default.createElement("span", { key: member }, member)))) : null, details.escalate_to && details.escalate_to.length > 0 ? /* @__PURE__ */ import_react9.default.createElement(Section, { title: "Escalation" }, /* @__PURE__ */ import_react9.default.createElement("div", { className: "tag-list" }, details.escalate_to.map((role) => /* @__PURE__ */ import_react9.default.createElement("span", { key: role }, role)))) : null);
+        return /* @__PURE__ */ import_react13.default.createElement(import_react13.default.Fragment, null, /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Approval policy" }, /* @__PURE__ */ import_react13.default.createElement(KeyValueRows, { rows: [{ label: "Required", value: details.required || 1 }, { label: "Timeout", value: details.timeout }, { label: "On timeout", value: details.on_timeout }, { label: "Timezone", value: details.timezone }, { label: "Calendar", value: details.business_calendar }] })), details.roles && details.roles.length > 0 ? /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Roles" }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "tag-list" }, details.roles.map((role) => /* @__PURE__ */ import_react13.default.createElement("span", { key: role }, role)))) : null, details.pool && details.pool.length > 0 ? /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Approver pool" }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "tag-list" }, details.pool.map((member) => /* @__PURE__ */ import_react13.default.createElement("span", { key: member }, member)))) : null, details.escalate_to && details.escalate_to.length > 0 ? /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Escalation" }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "tag-list" }, details.escalate_to.map((role) => /* @__PURE__ */ import_react13.default.createElement("span", { key: role }, role)))) : null);
       case "assert":
-        return /* @__PURE__ */ import_react9.default.createElement(Section, { title: "Assertions", count: details.assertions?.length ?? 0 }, /* @__PURE__ */ import_react9.default.createElement("div", { className: "assertion-list" }, details.assertions?.map((assertion, index) => /* @__PURE__ */ import_react9.default.createElement("div", { key: index }, /* @__PURE__ */ import_react9.default.createElement(CircleCheck, { "aria-hidden": "true" }), /* @__PURE__ */ import_react9.default.createElement("div", null, /* @__PURE__ */ import_react9.default.createElement("strong", null, assertion.type), /* @__PURE__ */ import_react9.default.createElement("code", null, assertion.subject), assertion.expected ? /* @__PURE__ */ import_react9.default.createElement("span", null, "Expected: ", assertion.expected) : null, assertion.path ? /* @__PURE__ */ import_react9.default.createElement("span", null, "Path: ", assertion.path) : null)))));
+        return /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Assertions", count: details.assertions?.length ?? 0 }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "assertion-list" }, details.assertions?.map((assertion, index) => /* @__PURE__ */ import_react13.default.createElement("div", { key: index }, /* @__PURE__ */ import_react13.default.createElement(CircleCheck, { "aria-hidden": "true" }), /* @__PURE__ */ import_react13.default.createElement("div", null, /* @__PURE__ */ import_react13.default.createElement("strong", null, assertion.type), /* @__PURE__ */ import_react13.default.createElement("code", null, /* @__PURE__ */ import_react13.default.createElement(AuthoredValue, { value: assertion.subject, path: `/assertions/${index}/subject` })), assertion.expected ? /* @__PURE__ */ import_react13.default.createElement("span", null, "Expected: ", /* @__PURE__ */ import_react13.default.createElement(AuthoredValue, { value: assertion.expected, path: `/assertions/${index}/expected` })) : null, assertion.path ? /* @__PURE__ */ import_react13.default.createElement("span", null, "Path: ", assertion.path) : null)))));
       case "wait_for_event":
-        return /* @__PURE__ */ import_react9.default.createElement(import_react9.default.Fragment, null, /* @__PURE__ */ import_react9.default.createElement(Section, { title: "Event" }, /* @__PURE__ */ import_react9.default.createElement(KeyValueRows, { rows: [{ label: "Source", value: details.source }, { label: "ID", value: details.event_id, code: true }, { label: "Schema", value: details.payload_schema, code: true }, { label: "On timeout", value: details.on_timeout }] })), /* @__PURE__ */ import_react9.default.createElement(Section, { title: "Filter", count: details.filter?.length ?? 0 }, /* @__PURE__ */ import_react9.default.createElement(NamedValueRows, { values: details.filter })));
+        return /* @__PURE__ */ import_react13.default.createElement(import_react13.default.Fragment, null, /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Event" }, /* @__PURE__ */ import_react13.default.createElement(KeyValueRows, { rows: [{ label: "Source", value: details.source }, { label: "ID", value: details.event_id, code: true, path: "/event_id" }, { label: "Schema", value: details.payload_schema, code: true }, { label: "On timeout", value: details.on_timeout }] })), /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Filter", count: details.filter?.length ?? 0 }, /* @__PURE__ */ import_react13.default.createElement(NamedValueRows, { values: details.filter, path: "/filter" })));
       case "display":
-        return /* @__PURE__ */ import_react9.default.createElement(Section, { title: "Rendered content" }, /* @__PURE__ */ import_react9.default.createElement(KeyValueRows, { rows: [{ label: "Format", value: details.format || "text" }] }), /* @__PURE__ */ import_react9.default.createElement("pre", { className: "content-preview" }, details.content || "No content."));
+        return /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Rendered content" }, /* @__PURE__ */ import_react13.default.createElement(KeyValueRows, { rows: [{ label: "Format", value: details.format || "text" }] }), /* @__PURE__ */ import_react13.default.createElement("pre", { className: "content-preview" }, /* @__PURE__ */ import_react13.default.createElement(AuthoredValue, { value: details.content || "No content.", path: "/content" })));
       case "end":
-        return /* @__PURE__ */ import_react9.default.createElement(Section, { title: "Terminal outcome" }, /* @__PURE__ */ import_react9.default.createElement("div", { className: "outcome-display" }, /* @__PURE__ */ import_react9.default.createElement(Flag, { "aria-hidden": "true" }), /* @__PURE__ */ import_react9.default.createElement("div", null, /* @__PURE__ */ import_react9.default.createElement("strong", null, details.category || "unspecified"), /* @__PURE__ */ import_react9.default.createElement("code", null, details.code || "no code"))));
+        return /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Terminal outcome" }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "outcome-display" }, /* @__PURE__ */ import_react13.default.createElement(Flag, { "aria-hidden": "true" }), /* @__PURE__ */ import_react13.default.createElement("div", null, /* @__PURE__ */ import_react13.default.createElement("strong", null, details.category || "unspecified"), /* @__PURE__ */ import_react13.default.createElement("code", null, details.code || "no code"))));
       case "compensate":
-        return /* @__PURE__ */ import_react9.default.createElement(Section, { title: "Compensation" }, /* @__PURE__ */ import_react9.default.createElement(KeyValueRows, { rows: [{ label: "Trigger", value: details.on || "failure" }, { label: "Body", value: details.steps !== void 0 ? `${details.steps} steps` : void 0 }] }));
+        return /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Compensation" }, /* @__PURE__ */ import_react13.default.createElement(KeyValueRows, { rows: [{ label: "Trigger", value: details.on || "failure" }, { label: "Body", value: details.steps !== void 0 ? `${details.steps} steps` : void 0 }] }));
       case "noop":
-        return /* @__PURE__ */ import_react9.default.createElement(Section, { title: "No-op" }, /* @__PURE__ */ import_react9.default.createElement("p", { className: "definition-copy" }, "This step changes no external state. Execution policy, delay, and captures are shown below."));
+        return /* @__PURE__ */ import_react13.default.createElement(Section, { title: "No-op" }, /* @__PURE__ */ import_react13.default.createElement("p", { className: "definition-copy" }, "This step changes no external state. Execution policy, delay, and captures are shown below."));
+      case "assign":
+        return /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Atomic binding assignments", count: details.assign?.length }, /* @__PURE__ */ import_react13.default.createElement("p", { className: "definition-copy" }, "Technical operation. All writes validate together; no external work is performed."), /* @__PURE__ */ import_react13.default.createElement(NamedValueRows, { values: details.assign, path: "/assign" }));
+      case "results":
+        return /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Results" }, /* @__PURE__ */ import_react13.default.createElement("p", { className: "definition-copy" }, "Publishes this runbook's declared named outputs atomically and finishes this scope. The full structured result is shown only after canonical transport validation."));
       case "extension":
-        return /* @__PURE__ */ import_react9.default.createElement(Section, { title: "Extension" }, /* @__PURE__ */ import_react9.default.createElement("p", { className: "definition-copy" }, "Execution is delegated to a registered Gert extension."));
+        return /* @__PURE__ */ import_react13.default.createElement(Section, { title: "Extension" }, /* @__PURE__ */ import_react13.default.createElement("p", { className: "definition-copy" }, "Execution is delegated to a registered Gert extension."));
     }
   }
 
@@ -35457,12 +36936,12 @@
   }
   function reachable(startID, adjacency) {
     const visited = /* @__PURE__ */ new Set();
-    const pending = [...adjacency.get(startID) ?? []];
-    while (pending.length > 0) {
-      const nodeID = pending.pop();
+    const pending2 = [...adjacency.get(startID) ?? []];
+    while (pending2.length > 0) {
+      const nodeID = pending2.pop();
       if (nodeID === startID || visited.has(nodeID)) continue;
       visited.add(nodeID);
-      pending.push(...adjacency.get(nodeID) ?? []);
+      pending2.push(...adjacency.get(nodeID) ?? []);
     }
     return visited;
   }
@@ -35723,6 +37202,31 @@
     }) !== void 0);
   }
 
+  // src/stepDetails.ts
+  var FIELDS_BY_KIND = {
+    cli: ["command", "args", "script", "shell", "workdir", "env_names", "stdin"],
+    tool: ["tool", "action", "version", "arguments"],
+    include: ["reference", "dynamic", "resolve_from", "on_not_found", "expand", "bindings", "stop_if", "steps"],
+    choice: ["prompt", "variable", "default", "multiple", "min", "max", "options"],
+    decision: ["prompt", "variable", "routes"],
+    collector: ["prompt", "fields"],
+    host_action: ["capability", "request"],
+    branch: ["arms"],
+    approve: ["roles", "pool", "required", "timeout", "on_timeout", "timezone", "business_calendar", "escalate_to"],
+    assert: ["assertions"],
+    wait_for_event: ["source", "event_id", "filter", "payload_schema", "on_timeout"],
+    display: ["content", "format"],
+    end: ["category", "code"],
+    compensate: ["on", "steps"],
+    noop: [],
+    assign: ["assign"],
+    results: [],
+    iterate: ["over", "as", "max", "until", "collect", "concurrency", "steps"],
+    parallel: ["branches", "branch_labels", "wait_for", "on_failure"],
+    extension: []
+  };
+  var KNOWN_DETAIL_FIELDS = new Set(Object.values(FIELDS_BY_KIND).flat());
+
   // src/sessionCompositeGraph.ts
   function sessionGraphTopologyKey(document2) {
     return JSON.stringify({
@@ -35788,9 +37292,9 @@
   function isRecord(value) {
     return typeof value === "object" && value !== null && !Array.isArray(value);
   }
-  function hasExactFields(value, fields) {
+  function hasExactFields(value, fields2) {
     const keys = Object.keys(value);
-    return keys.length === fields.size && keys.every((key) => fields.has(key));
+    return keys.length === fields2.size && keys.every((key) => fields2.has(key));
   }
   function isWireString(value) {
     return typeof value === "string" && value.length > 0 && value.length <= MAX_ENVELOPE_STRING_LENGTH;
@@ -35814,8 +37318,8 @@
   }
 
   // src/collectorFieldValues.ts
-  function fieldLabel(field) {
-    return field.label ?? field.display_name ?? field.name;
+  function fieldLabel(field2) {
+    return field2.label ?? field2.display_name ?? field2.name;
   }
   function collectorInputType(type) {
     if (type === "integer" || type === "number") return "number";
@@ -35826,68 +37330,68 @@
     if (type === "url") return "url";
     return "text";
   }
-  function normalizeCollectorValues(fields, values) {
+  function normalizeCollectorValues(fields2, values) {
     const result = {};
-    for (const field of fields) {
-      const value = values[field.name];
+    for (const field2 of fields2) {
+      const value = values[field2.name];
       const empty2 = value === void 0 || value === null || value === "" || Array.isArray(value) && value.length === 0;
-      if (field.required && empty2) {
-        throw new Error(`${fieldLabel(field)} is required.`);
+      if (field2.required && empty2) {
+        throw new Error(`${fieldLabel(field2)} is required.`);
       }
       if (empty2) continue;
-      const rawValues = field.multiple ? Array.isArray(value) ? value : [value] : [value];
-      const normalized = rawValues.map((rawValue) => normalizeCollectorFieldValue(field, rawValue));
-      result[field.name] = field.multiple ? normalized : normalized[0];
+      const rawValues = field2.multiple ? Array.isArray(value) ? value : [value] : [value];
+      const normalized = rawValues.map((rawValue) => normalizeCollectorFieldValue(field2, rawValue));
+      result[field2.name] = field2.multiple ? normalized : normalized[0];
     }
     return result;
   }
-  function normalizeCollectorFieldValue(field, value) {
+  function normalizeCollectorFieldValue(field2, value) {
     let normalized;
-    if (field.type === "number") {
+    if (field2.type === "number") {
       const number = Number(value);
-      if (!Number.isFinite(number)) throw new Error(`${fieldLabel(field)} must be a number.`);
+      if (!Number.isFinite(number)) throw new Error(`${fieldLabel(field2)} must be a number.`);
       normalized = number;
-    } else if (field.type === "integer") {
+    } else if (field2.type === "integer") {
       const number = Number(value);
-      if (!Number.isInteger(number)) throw new Error(`${fieldLabel(field)} must be an integer.`);
+      if (!Number.isInteger(number)) throw new Error(`${fieldLabel(field2)} must be an integer.`);
       normalized = number;
-    } else if (field.type === "boolean") {
-      if (typeof value !== "boolean") throw new Error(`${fieldLabel(field)} must be true or false.`);
+    } else if (field2.type === "boolean") {
+      if (typeof value !== "boolean") throw new Error(`${fieldLabel(field2)} must be true or false.`);
       normalized = value;
     } else {
-      if (typeof value !== "string") throw new Error(`${fieldLabel(field)} must be text.`);
+      if (typeof value !== "string") throw new Error(`${fieldLabel(field2)} must be text.`);
       normalized = value;
     }
-    if (field.options?.length && typeof normalized === "string" && !field.options.some((option) => option.value === normalized)) {
-      throw new Error(`${fieldLabel(field)} must use a declared option.`);
+    if (field2.options?.length && typeof normalized === "string" && !field2.options.some((option) => option.value === normalized)) {
+      throw new Error(`${fieldLabel(field2)} must use a declared option.`);
     }
-    const validation = field.validation;
+    const validation = field2.validation;
     if (typeof normalized === "string" && validation) {
-      if (validation.min_length !== void 0 && normalized.length < validation.min_length) throw new Error(`${fieldLabel(field)} is too short.`);
-      if (validation.max_length !== void 0 && normalized.length > validation.max_length) throw new Error(`${fieldLabel(field)} is too long.`);
+      if (validation.min_length !== void 0 && normalized.length < validation.min_length) throw new Error(`${fieldLabel(field2)} is too short.`);
+      if (validation.max_length !== void 0 && normalized.length > validation.max_length) throw new Error(`${fieldLabel(field2)} is too long.`);
       if (validation.pattern) {
         let pattern;
         try {
           pattern = new RegExp(validation.pattern);
         } catch {
-          throw new Error(`${fieldLabel(field)} has an invalid validation pattern.`);
+          throw new Error(`${fieldLabel(field2)} has an invalid validation pattern.`);
         }
-        if (!pattern.test(normalized)) throw new Error(`${fieldLabel(field)} has an invalid format.`);
+        if (!pattern.test(normalized)) throw new Error(`${fieldLabel(field2)} has an invalid format.`);
       }
     }
     if (typeof normalized === "number" && validation) {
-      if (validation.min !== void 0 && normalized < validation.min) throw new Error(`${fieldLabel(field)} is below the minimum.`);
-      if (validation.max !== void 0 && normalized > validation.max) throw new Error(`${fieldLabel(field)} is above the maximum.`);
+      if (validation.min !== void 0 && normalized < validation.min) throw new Error(`${fieldLabel(field2)} is below the minimum.`);
+      if (validation.max !== void 0 && normalized > validation.max) throw new Error(`${fieldLabel(field2)} is above the maximum.`);
       if (validation.step !== void 0 && validation.step !== 0 && Math.abs((normalized - (validation.min ?? 0)) / validation.step - Math.round((normalized - (validation.min ?? 0)) / validation.step)) > 1e-9) {
-        throw new Error(`${fieldLabel(field)} does not match the required step.`);
+        throw new Error(`${fieldLabel(field2)} does not match the required step.`);
       }
     }
     return normalized;
   }
-  function formatCollectorReviewValue(field, value) {
-    if (field.type === "secret" || field.type === "password") return "<redacted>";
-    if (field.type === "boolean") return value ? "Yes" : "No";
-    const option = field.options?.find((candidate) => candidate.value === value);
+  function formatCollectorReviewValue(field2, value) {
+    if (field2.type === "secret" || field2.type === "password") return "<redacted>";
+    if (field2.type === "boolean") return value ? "Yes" : "No";
+    const option = field2.options?.find((candidate) => candidate.value === value);
     if (option) return option.label ?? option.display_label ?? option.display_value ?? option.value;
     if (Array.isArray(value)) return value.join(", ");
     if (value === void 0 || value === null || value === "") return "Not set";
@@ -35901,7 +37405,7 @@
   }
 
   // webview/routeTestPane.tsx
-  var import_react10 = __toESM(require_react());
+  var import_react14 = __toESM(require_react());
   function routeTestMatchesTarget(artifact, node) {
     return selectorKey(artifact.target) === selectorKey(selectorForNode(node, "before"));
   }
@@ -35924,16 +37428,16 @@
     onClose
   }) {
     const targetName = nodeTitle(target);
-    const [id2] = (0, import_react10.useState)(initial?.id ?? `${slug(selectorForNode(target).step)}-route-${Date.now().toString(36)}`);
-    const [stage, setStage] = (0, import_react10.useState)("conditions");
-    const [name, setName] = (0, import_react10.useState)(initial?.name ?? `Reach ${targetName}`);
-    const [reviewer, setReviewer] = (0, import_react10.useState)(firstReviewer(initial) ?? "");
-    const [acknowledged, setAcknowledged] = (0, import_react10.useState)(false);
-    const [sensitivityReviewed, setSensitivityReviewed] = (0, import_react10.useState)(firstSensitivityReview(initial));
-    const [localError, setLocalError] = (0, import_react10.useState)();
-    const [executedArtifact, setExecutedArtifact] = (0, import_react10.useState)();
-    const [inputs, setInputs] = (0, import_react10.useState)(() => initial?.inputs ?? routeTestInputs(document2, inputValues));
-    const [conditions, setConditions] = (0, import_react10.useState)(() => candidates.map((node) => conditionForNode(node, initial)));
+    const [id2] = (0, import_react14.useState)(initial?.id ?? `${slug(selectorForNode(target).step)}-route-${Date.now().toString(36)}`);
+    const [stage, setStage] = (0, import_react14.useState)("conditions");
+    const [name, setName] = (0, import_react14.useState)(initial?.name ?? `Reach ${targetName}`);
+    const [reviewer, setReviewer] = (0, import_react14.useState)(firstReviewer(initial) ?? "");
+    const [acknowledged, setAcknowledged] = (0, import_react14.useState)(false);
+    const [sensitivityReviewed, setSensitivityReviewed] = (0, import_react14.useState)(firstSensitivityReview(initial));
+    const [localError, setLocalError] = (0, import_react14.useState)();
+    const [executedArtifact, setExecutedArtifact] = (0, import_react14.useState)();
+    const [inputs, setInputs] = (0, import_react14.useState)(() => initial?.inputs ?? routeTestInputs(document2, inputValues));
+    const [conditions, setConditions] = (0, import_react14.useState)(() => candidates.map((node) => conditionForNode(node, initial)));
     const updateCondition = (nodeID, patch) => {
       const materialEdit = ["status", "nestedStatus", "objectValue", "selected", "label", "values", "testApproval", "approvalGranted"].some((key) => Object.prototype.hasOwnProperty.call(patch, key));
       setConditions((current) => current.map((condition) => condition.node.id === nodeID ? { ...condition, ...patch, ...materialEdit ? { source: { kind: "manual" } } : {} } : condition));
@@ -35979,11 +37483,11 @@
             review
           });
         } else if (kind === "collector") {
-          const fields = collectorFields(condition.node);
-          for (const field of fields) {
-            if (field.ephemeral) throw new Error(`${field.label ?? field.name} is ephemeral and cannot be saved in a route test.`);
+          const fields2 = collectorFields(condition.node);
+          for (const field2 of fields2) {
+            if (field2.ephemeral) throw new Error(`${field2.label ?? field2.name} is ephemeral and cannot be saved in a route test.`);
           }
-          const values = normalizeCollectorValues(fields, condition.values);
+          const values = normalizeCollectorValues(fields2, condition.values);
           (artifact.interaction_answers ??= []).push({
             at: selectorForNode(condition.node),
             kind,
@@ -36053,7 +37557,7 @@
       }
     };
     if (stage === "running" && outcome?.passed) {
-      return /* @__PURE__ */ import_react10.default.createElement("section", { className: "route-test-pane route-test-result", "aria-label": "Route test passed", "aria-live": "assertive" }, /* @__PURE__ */ import_react10.default.createElement("h2", null, "Step reached - command not run"), /* @__PURE__ */ import_react10.default.createElement("p", null, "Gert reached ", /* @__PURE__ */ import_react10.default.createElement("strong", null, targetName), " and stopped before running it."), /* @__PURE__ */ import_react10.default.createElement("dl", null, /* @__PURE__ */ import_react10.default.createElement("dt", null, "External actions"), /* @__PURE__ */ import_react10.default.createElement("dd", null, outcome.externalDispatches), /* @__PURE__ */ import_react10.default.createElement("dt", null, "Saved answers used"), /* @__PURE__ */ import_react10.default.createElement("dd", null, conditions.filter((condition) => condition.enabled).length)), localError || error ? /* @__PURE__ */ import_react10.default.createElement("div", { className: "interaction-error", role: "alert" }, localError ?? error) : null, /* @__PURE__ */ import_react10.default.createElement("button", { type: "button", className: "primary", onClick: () => {
+      return /* @__PURE__ */ import_react14.default.createElement("section", { className: "route-test-pane route-test-result", "aria-label": "Route test passed", "aria-live": "assertive" }, /* @__PURE__ */ import_react14.default.createElement("h2", null, "Step reached - command not run"), /* @__PURE__ */ import_react14.default.createElement("p", null, "Gert reached ", /* @__PURE__ */ import_react14.default.createElement("strong", null, targetName), " and stopped before running it."), /* @__PURE__ */ import_react14.default.createElement("dl", null, /* @__PURE__ */ import_react14.default.createElement("dt", null, "External actions"), /* @__PURE__ */ import_react14.default.createElement("dd", null, outcome.externalDispatches), /* @__PURE__ */ import_react14.default.createElement("dt", null, "Saved answers used"), /* @__PURE__ */ import_react14.default.createElement("dd", null, conditions.filter((condition) => condition.enabled).length)), localError || error ? /* @__PURE__ */ import_react14.default.createElement("div", { className: "interaction-error", role: "alert" }, localError ?? error) : null, /* @__PURE__ */ import_react14.default.createElement("button", { type: "button", className: "primary", onClick: () => {
         try {
           if (!executedArtifact) throw new Error("The executed route-test conditions are unavailable.");
           const artifact = { ...executedArtifact };
@@ -36071,77 +37575,77 @@
       } }, "Save route test"));
     }
     if (stage === "running" && !runStarting && (runStatus === "cancelled" || outcome?.status === "stopped")) {
-      return /* @__PURE__ */ import_react10.default.createElement("section", { className: "route-test-pane route-test-result", "aria-label": "Route test stopped", "aria-live": "assertive" }, /* @__PURE__ */ import_react10.default.createElement("h2", null, "Route test stopped"), /* @__PURE__ */ import_react10.default.createElement("p", null, "The operator stopped this route test before it reached the selected step."), /* @__PURE__ */ import_react10.default.createElement("button", { type: "button", className: "primary", onClick: () => setStage("conditions") }, "Review test conditions"));
+      return /* @__PURE__ */ import_react14.default.createElement("section", { className: "route-test-pane route-test-result", "aria-label": "Route test stopped", "aria-live": "assertive" }, /* @__PURE__ */ import_react14.default.createElement("h2", null, "Route test stopped"), /* @__PURE__ */ import_react14.default.createElement("p", null, "The operator stopped this route test before it reached the selected step."), /* @__PURE__ */ import_react14.default.createElement("button", { type: "button", className: "primary", onClick: () => setStage("conditions") }, "Review test conditions"));
     }
     if (stage === "running" && (error || outcome || !runStarting && runStatus === "failed")) {
       const status = outcome?.status ?? (error?.toLowerCase().includes("safety failure") ? "safety-failed" : "runtime-failed");
       const routeChanged = status === "route-changed";
       const safetyFailed = status === "safety-failed";
-      return /* @__PURE__ */ import_react10.default.createElement("section", { className: "route-test-pane route-test-result", "aria-label": routeChanged ? "Route test changed" : safetyFailed ? "Route test safety failure" : "Route test failed", "aria-live": "assertive" }, /* @__PURE__ */ import_react10.default.createElement("h2", null, routeChanged ? "The route went somewhere else" : safetyFailed ? "External action blocked" : "Route test failed"), /* @__PURE__ */ import_react10.default.createElement("p", null, outcome?.message || error || "Gert did not reach the selected step under these saved conditions."), /* @__PURE__ */ import_react10.default.createElement("button", { type: "button", className: "primary", onClick: () => setStage("conditions") }, "Fix test conditions"));
+      return /* @__PURE__ */ import_react14.default.createElement("section", { className: "route-test-pane route-test-result", "aria-label": routeChanged ? "Route test changed" : safetyFailed ? "Route test safety failure" : "Route test failed", "aria-live": "assertive" }, /* @__PURE__ */ import_react14.default.createElement("h2", null, routeChanged ? "The route went somewhere else" : safetyFailed ? "External action blocked" : "Route test failed"), /* @__PURE__ */ import_react14.default.createElement("p", null, outcome?.message || error || "Gert did not reach the selected step under these saved conditions."), /* @__PURE__ */ import_react14.default.createElement("button", { type: "button", className: "primary", onClick: () => setStage("conditions") }, "Fix test conditions"));
     }
     if (stage === "running") {
-      return /* @__PURE__ */ import_react10.default.createElement("section", { className: "route-test-pane", "aria-label": "Route test running" }, /* @__PURE__ */ import_react10.default.createElement("h2", null, targetName), /* @__PURE__ */ import_react10.default.createElement("p", null, runStarting ? "Starting route test..." : "Testing the saved route toward this step."), /* @__PURE__ */ import_react10.default.createElement("button", { type: "button", className: "danger", onClick: onStop }, "Stop test"));
+      return /* @__PURE__ */ import_react14.default.createElement("section", { className: "route-test-pane", "aria-label": "Route test running" }, /* @__PURE__ */ import_react14.default.createElement("h2", null, targetName), /* @__PURE__ */ import_react14.default.createElement("p", null, runStarting ? "Starting route test..." : "Testing the saved route toward this step."), /* @__PURE__ */ import_react14.default.createElement("button", { type: "button", className: "danger", onClick: onStop }, "Stop test"));
     }
     if (stage === "review") {
-      return /* @__PURE__ */ import_react10.default.createElement("section", { className: "route-test-pane", "aria-label": "Check route" }, /* @__PURE__ */ import_react10.default.createElement("strong", { className: "route-test-review-safety" }, "No external actions will run."), /* @__PURE__ */ import_react10.default.createElement("div", { className: "route-test-stepper" }, /* @__PURE__ */ import_react10.default.createElement("strong", null, "1 Set conditions"), /* @__PURE__ */ import_react10.default.createElement("strong", null, "2 Check route")), /* @__PURE__ */ import_react10.default.createElement("h2", null, targetName), /* @__PURE__ */ import_react10.default.createElement("p", null, "Gert will stop before this step. XTS, commands, tools, transfers, and connectors are blocked."), /* @__PURE__ */ import_react10.default.createElement("ol", { className: "route-test-review-list" }, conditions.filter((condition) => condition.enabled).map((condition) => /* @__PURE__ */ import_react10.default.createElement("li", { key: condition.node.id }, /* @__PURE__ */ import_react10.default.createElement("strong", null, nodeTitle(condition.node)), /* @__PURE__ */ import_react10.default.createElement("span", null, conditionSummary(condition), " \xB7 ", sourceSummary(condition.source)))), /* @__PURE__ */ import_react10.default.createElement("li", null, /* @__PURE__ */ import_react10.default.createElement("strong", null, targetName), /* @__PURE__ */ import_react10.default.createElement("span", null, "Stop before this step"))), /* @__PURE__ */ import_react10.default.createElement("label", { className: "route-test-field" }, /* @__PURE__ */ import_react10.default.createElement("span", null, "Reviewed by"), /* @__PURE__ */ import_react10.default.createElement("input", { value: reviewer, onChange: (event) => setReviewer(event.target.value) })), /* @__PURE__ */ import_react10.default.createElement("label", { className: "route-test-ack" }, /* @__PURE__ */ import_react10.default.createElement("input", { type: "checkbox", checked: acknowledged, onChange: (event) => setAcknowledged(event.target.checked) }), /* @__PURE__ */ import_react10.default.createElement("span", null, "This tests the runbook route, not Azure or the external service.")), /* @__PURE__ */ import_react10.default.createElement("label", { className: "route-test-ack" }, /* @__PURE__ */ import_react10.default.createElement("input", { type: "checkbox", checked: sensitivityReviewed, onChange: (event) => setSensitivityReviewed(event.target.checked) }), /* @__PURE__ */ import_react10.default.createElement("span", null, "I reviewed the saved values. They contain no credentials, tokens, customer data, or raw XTS output.")), localError || error ? /* @__PURE__ */ import_react10.default.createElement("div", { className: "interaction-error", role: "alert" }, localError ?? error) : null, /* @__PURE__ */ import_react10.default.createElement("div", { className: "route-test-actions" }, /* @__PURE__ */ import_react10.default.createElement("button", { type: "button", className: "primary", disabled: !acknowledged || !sensitivityReviewed || runStarting, onClick: run }, "Run route test"), /* @__PURE__ */ import_react10.default.createElement("button", { type: "button", onClick: () => setStage("conditions") }, "Edit conditions"), /* @__PURE__ */ import_react10.default.createElement("button", { type: "button", onClick: save }, "Save draft")));
+      return /* @__PURE__ */ import_react14.default.createElement("section", { className: "route-test-pane", "aria-label": "Check route" }, /* @__PURE__ */ import_react14.default.createElement("strong", { className: "route-test-review-safety" }, "No external actions will run."), /* @__PURE__ */ import_react14.default.createElement("div", { className: "route-test-stepper" }, /* @__PURE__ */ import_react14.default.createElement("strong", null, "1 Set conditions"), /* @__PURE__ */ import_react14.default.createElement("strong", null, "2 Check route")), /* @__PURE__ */ import_react14.default.createElement("h2", null, targetName), /* @__PURE__ */ import_react14.default.createElement("p", null, "Gert will stop before this step. XTS, commands, tools, transfers, and connectors are blocked."), /* @__PURE__ */ import_react14.default.createElement("ol", { className: "route-test-review-list" }, conditions.filter((condition) => condition.enabled).map((condition) => /* @__PURE__ */ import_react14.default.createElement("li", { key: condition.node.id }, /* @__PURE__ */ import_react14.default.createElement("strong", null, nodeTitle(condition.node)), /* @__PURE__ */ import_react14.default.createElement("span", null, conditionSummary(condition), " \xB7 ", sourceSummary(condition.source)))), /* @__PURE__ */ import_react14.default.createElement("li", null, /* @__PURE__ */ import_react14.default.createElement("strong", null, targetName), /* @__PURE__ */ import_react14.default.createElement("span", null, "Stop before this step"))), /* @__PURE__ */ import_react14.default.createElement("label", { className: "route-test-field" }, /* @__PURE__ */ import_react14.default.createElement("span", null, "Reviewed by"), /* @__PURE__ */ import_react14.default.createElement("input", { value: reviewer, onChange: (event) => setReviewer(event.target.value) })), /* @__PURE__ */ import_react14.default.createElement("label", { className: "route-test-ack" }, /* @__PURE__ */ import_react14.default.createElement("input", { type: "checkbox", checked: acknowledged, onChange: (event) => setAcknowledged(event.target.checked) }), /* @__PURE__ */ import_react14.default.createElement("span", null, "This tests the runbook route, not Azure or the external service.")), /* @__PURE__ */ import_react14.default.createElement("label", { className: "route-test-ack" }, /* @__PURE__ */ import_react14.default.createElement("input", { type: "checkbox", checked: sensitivityReviewed, onChange: (event) => setSensitivityReviewed(event.target.checked) }), /* @__PURE__ */ import_react14.default.createElement("span", null, "I reviewed the saved values. They contain no credentials, tokens, customer data, or raw XTS output.")), localError || error ? /* @__PURE__ */ import_react14.default.createElement("div", { className: "interaction-error", role: "alert" }, localError ?? error) : null, /* @__PURE__ */ import_react14.default.createElement("div", { className: "route-test-actions" }, /* @__PURE__ */ import_react14.default.createElement("button", { type: "button", className: "primary", disabled: !acknowledged || !sensitivityReviewed || runStarting, onClick: run }, "Run route test"), /* @__PURE__ */ import_react14.default.createElement("button", { type: "button", onClick: () => setStage("conditions") }, "Edit conditions"), /* @__PURE__ */ import_react14.default.createElement("button", { type: "button", onClick: save }, "Save draft")));
     }
-    return /* @__PURE__ */ import_react10.default.createElement("section", { className: "route-test-pane", "aria-label": "Set route-test conditions" }, /* @__PURE__ */ import_react10.default.createElement("div", { className: "route-test-stepper" }, /* @__PURE__ */ import_react10.default.createElement("strong", null, "1 Set conditions"), /* @__PURE__ */ import_react10.default.createElement("span", null, "2 Check route")), /* @__PURE__ */ import_react10.default.createElement("h2", null, "Test reaching ", targetName), needsReview ? /* @__PURE__ */ import_react10.default.createElement("p", { className: "route-test-warning" }, "The runbook changed. Review these conditions before running again.") : null, blockers.length > 0 ? /* @__PURE__ */ import_react10.default.createElement("p", { className: "route-test-warning" }, "This route cannot run yet: ", blockers.join("; "), ".") : null, /* @__PURE__ */ import_react10.default.createElement("label", { className: "route-test-field" }, /* @__PURE__ */ import_react10.default.createElement("span", null, "Route test name"), /* @__PURE__ */ import_react10.default.createElement("input", { value: name, onChange: (event) => setName(event.target.value) })), graphInputs(document2).length > 0 ? /* @__PURE__ */ import_react10.default.createElement("fieldset", { className: "route-test-group" }, /* @__PURE__ */ import_react10.default.createElement("legend", null, "Runbook inputs"), graphInputs(document2).filter((input) => input.type !== "secret").map((input) => /* @__PURE__ */ import_react10.default.createElement("label", { className: "route-test-field", key: input.name }, /* @__PURE__ */ import_react10.default.createElement("span", null, input.name), /* @__PURE__ */ import_react10.default.createElement("input", { value: inputs[input.name] ?? "", onChange: (event) => setInputs((current) => ({ ...current, [input.name]: event.target.value })) }))), graphInputs(document2).some((input) => input.type === "secret") ? /* @__PURE__ */ import_react10.default.createElement("p", null, "Secret inputs are not saved in route tests.") : null) : null, /* @__PURE__ */ import_react10.default.createElement("div", { className: "route-test-conditions" }, conditions.length === 0 ? /* @__PURE__ */ import_react10.default.createElement("p", null, "This route reaches the selected step using only Gert logic.") : null, conditions.map((condition) => /* @__PURE__ */ import_react10.default.createElement(ConditionEditor, { key: condition.node.id, condition, onChange: (patch) => updateCondition(condition.node.id, patch) }))), /* @__PURE__ */ import_react10.default.createElement("label", { className: "route-test-ack" }, /* @__PURE__ */ import_react10.default.createElement("input", { type: "checkbox", checked: sensitivityReviewed, onChange: (event) => setSensitivityReviewed(event.target.checked) }), /* @__PURE__ */ import_react10.default.createElement("span", null, "I reviewed the saved values. They contain no credentials, tokens, customer data, or raw external output.")), localError || error ? /* @__PURE__ */ import_react10.default.createElement("div", { className: "interaction-error", role: "alert" }, localError ?? error) : null, /* @__PURE__ */ import_react10.default.createElement("div", { className: "route-test-actions" }, /* @__PURE__ */ import_react10.default.createElement("button", { type: "button", className: "primary", disabled: !sensitivityReviewed || blockers.length > 0, onClick: check }, "Check this route"), /* @__PURE__ */ import_react10.default.createElement("button", { type: "button", disabled: !sensitivityReviewed, onClick: save }, "Save draft"), /* @__PURE__ */ import_react10.default.createElement("button", { type: "button", onClick: onClose }, "Close")));
+    return /* @__PURE__ */ import_react14.default.createElement("section", { className: "route-test-pane", "aria-label": "Set route-test conditions" }, /* @__PURE__ */ import_react14.default.createElement("div", { className: "route-test-stepper" }, /* @__PURE__ */ import_react14.default.createElement("strong", null, "1 Set conditions"), /* @__PURE__ */ import_react14.default.createElement("span", null, "2 Check route")), /* @__PURE__ */ import_react14.default.createElement("h2", null, "Test reaching ", targetName), needsReview ? /* @__PURE__ */ import_react14.default.createElement("p", { className: "route-test-warning" }, "The runbook changed. Review these conditions before running again.") : null, blockers.length > 0 ? /* @__PURE__ */ import_react14.default.createElement("p", { className: "route-test-warning" }, "This route cannot run yet: ", blockers.join("; "), ".") : null, /* @__PURE__ */ import_react14.default.createElement("label", { className: "route-test-field" }, /* @__PURE__ */ import_react14.default.createElement("span", null, "Route test name"), /* @__PURE__ */ import_react14.default.createElement("input", { value: name, onChange: (event) => setName(event.target.value) })), graphInputs(document2).length > 0 ? /* @__PURE__ */ import_react14.default.createElement("fieldset", { className: "route-test-group" }, /* @__PURE__ */ import_react14.default.createElement("legend", null, "Runbook inputs"), graphInputs(document2).filter((input) => input.type !== "secret").map((input) => /* @__PURE__ */ import_react14.default.createElement("label", { className: "route-test-field", key: input.name }, /* @__PURE__ */ import_react14.default.createElement("span", null, input.name), /* @__PURE__ */ import_react14.default.createElement("input", { value: inputs[input.name] ?? "", onChange: (event) => setInputs((current) => ({ ...current, [input.name]: event.target.value })) }))), graphInputs(document2).some((input) => input.type === "secret") ? /* @__PURE__ */ import_react14.default.createElement("p", null, "Secret inputs are not saved in route tests.") : null) : null, /* @__PURE__ */ import_react14.default.createElement("div", { className: "route-test-conditions" }, conditions.length === 0 ? /* @__PURE__ */ import_react14.default.createElement("p", null, "This route reaches the selected step using only Gert logic.") : null, conditions.map((condition) => /* @__PURE__ */ import_react14.default.createElement(ConditionEditor, { key: condition.node.id, condition, onChange: (patch) => updateCondition(condition.node.id, patch) }))), /* @__PURE__ */ import_react14.default.createElement("label", { className: "route-test-ack" }, /* @__PURE__ */ import_react14.default.createElement("input", { type: "checkbox", checked: sensitivityReviewed, onChange: (event) => setSensitivityReviewed(event.target.checked) }), /* @__PURE__ */ import_react14.default.createElement("span", null, "I reviewed the saved values. They contain no credentials, tokens, customer data, or raw external output.")), localError || error ? /* @__PURE__ */ import_react14.default.createElement("div", { className: "interaction-error", role: "alert" }, localError ?? error) : null, /* @__PURE__ */ import_react14.default.createElement("div", { className: "route-test-actions" }, /* @__PURE__ */ import_react14.default.createElement("button", { type: "button", className: "primary", disabled: !sensitivityReviewed || blockers.length > 0, onClick: check }, "Check this route"), /* @__PURE__ */ import_react14.default.createElement("button", { type: "button", disabled: !sensitivityReviewed, onClick: save }, "Save draft"), /* @__PURE__ */ import_react14.default.createElement("button", { type: "button", onClick: onClose }, "Close")));
   }
   function ConditionEditor({ condition, onChange }) {
     const kind = nodeKind2(condition.node);
     const capability = hostCapability(condition.node);
     const details = condition.node.data.details;
-    return /* @__PURE__ */ import_react10.default.createElement("article", { className: `route-test-condition${condition.enabled ? " enabled" : ""}` }, /* @__PURE__ */ import_react10.default.createElement("label", { className: "route-test-enable" }, /* @__PURE__ */ import_react10.default.createElement("input", { type: "checkbox", checked: condition.enabled, onChange: (event) => onChange({ enabled: event.target.checked }) }), /* @__PURE__ */ import_react10.default.createElement("span", null, /* @__PURE__ */ import_react10.default.createElement("strong", null, nodeTitle(condition.node)), /* @__PURE__ */ import_react10.default.createElement("small", null, kindLabels[kind] ?? kind))), condition.enabled && kind === "host_action" ? /* @__PURE__ */ import_react10.default.createElement("div", { className: "route-test-condition-fields" }, /* @__PURE__ */ import_react10.default.createElement("p", null, "Source: ", sourceSummary(condition.source)), capability === "xts.open-view" ? /* @__PURE__ */ import_react10.default.createElement("p", null, "XTS will not open in this route test.") : null, /* @__PURE__ */ import_react10.default.createElement("label", { className: "route-test-field" }, /* @__PURE__ */ import_react10.default.createElement("span", null, "Assume host result"), /* @__PURE__ */ import_react10.default.createElement("select", { value: condition.status, onChange: (event) => onChange({ status: event.target.value }) }, ["completed", "failed", "timed-out", "execution-not-started", "unsupported"].map((status) => /* @__PURE__ */ import_react10.default.createElement("option", { key: status }, status)))), condition.status === "completed" && capability === "xts.open-view" ? /* @__PURE__ */ import_react10.default.createElement("label", { className: "route-test-field" }, /* @__PURE__ */ import_react10.default.createElement("span", null, "Assume XTS launch result"), /* @__PURE__ */ import_react10.default.createElement("select", { value: condition.nestedStatus, onChange: (event) => onChange({ nestedStatus: event.target.value }) }, ["opened", "view-not-found", "environment-not-found", "invalid-parameters", "execution-not-started"].map((status) => /* @__PURE__ */ import_react10.default.createElement("option", { key: status }, status)))) : condition.status === "completed" ? /* @__PURE__ */ import_react10.default.createElement(JSONField, { label: "Saved result", value: condition.objectValue, onChange: (objectValue) => onChange({ objectValue }) }) : null) : null, condition.enabled && (kind === "cli" || kind === "tool") ? /* @__PURE__ */ import_react10.default.createElement("div", { className: "route-test-condition-fields" }, /* @__PURE__ */ import_react10.default.createElement("p", null, "Source: ", sourceSummary(condition.source)), /* @__PURE__ */ import_react10.default.createElement("label", { className: "route-test-field" }, /* @__PURE__ */ import_react10.default.createElement("span", null, "Saved result status"), /* @__PURE__ */ import_react10.default.createElement("select", { value: condition.status, onChange: (event) => onChange({ status: event.target.value }) }, /* @__PURE__ */ import_react10.default.createElement("option", { value: "completed" }, "completed"), /* @__PURE__ */ import_react10.default.createElement("option", { value: "failed" }, "failed"), /* @__PURE__ */ import_react10.default.createElement("option", { value: "skipped" }, "skipped"))), /* @__PURE__ */ import_react10.default.createElement(JSONField, { label: "Saved result", value: condition.objectValue, onChange: (objectValue) => onChange({ objectValue }) })) : null, condition.enabled && kind === "collector" ? /* @__PURE__ */ import_react10.default.createElement("fieldset", { className: "route-test-condition-fields" }, /* @__PURE__ */ import_react10.default.createElement("legend", null, "Saved findings"), /* @__PURE__ */ import_react10.default.createElement("p", null, "Source: ", sourceSummary(condition.source)), collectorFields(condition.node).map((field) => /* @__PURE__ */ import_react10.default.createElement("label", { className: "route-test-field", key: field.name }, /* @__PURE__ */ import_react10.default.createElement("span", null, field.label ?? field.name, field.required ? " *" : ""), field.ephemeral ? /* @__PURE__ */ import_react10.default.createElement("small", null, "Ephemeral field cannot be saved in a route test.") : null, field.type === "boolean" ? /* @__PURE__ */ import_react10.default.createElement(
+    return /* @__PURE__ */ import_react14.default.createElement("article", { className: `route-test-condition${condition.enabled ? " enabled" : ""}` }, /* @__PURE__ */ import_react14.default.createElement("label", { className: "route-test-enable" }, /* @__PURE__ */ import_react14.default.createElement("input", { type: "checkbox", checked: condition.enabled, onChange: (event) => onChange({ enabled: event.target.checked }) }), /* @__PURE__ */ import_react14.default.createElement("span", null, /* @__PURE__ */ import_react14.default.createElement("strong", null, nodeTitle(condition.node)), /* @__PURE__ */ import_react14.default.createElement("small", null, kindLabels[kind] ?? kind))), condition.enabled && kind === "host_action" ? /* @__PURE__ */ import_react14.default.createElement("div", { className: "route-test-condition-fields" }, /* @__PURE__ */ import_react14.default.createElement("p", null, "Source: ", sourceSummary(condition.source)), capability === "xts.open-view" ? /* @__PURE__ */ import_react14.default.createElement("p", null, "XTS will not open in this route test.") : null, /* @__PURE__ */ import_react14.default.createElement("label", { className: "route-test-field" }, /* @__PURE__ */ import_react14.default.createElement("span", null, "Assume host result"), /* @__PURE__ */ import_react14.default.createElement("select", { value: condition.status, onChange: (event) => onChange({ status: event.target.value }) }, ["completed", "failed", "timed-out", "execution-not-started", "unsupported"].map((status) => /* @__PURE__ */ import_react14.default.createElement("option", { key: status }, status)))), condition.status === "completed" && capability === "xts.open-view" ? /* @__PURE__ */ import_react14.default.createElement("label", { className: "route-test-field" }, /* @__PURE__ */ import_react14.default.createElement("span", null, "Assume XTS launch result"), /* @__PURE__ */ import_react14.default.createElement("select", { value: condition.nestedStatus, onChange: (event) => onChange({ nestedStatus: event.target.value }) }, ["opened", "view-not-found", "environment-not-found", "invalid-parameters", "execution-not-started"].map((status) => /* @__PURE__ */ import_react14.default.createElement("option", { key: status }, status)))) : condition.status === "completed" ? /* @__PURE__ */ import_react14.default.createElement(JSONField, { label: "Saved result", value: condition.objectValue, onChange: (objectValue) => onChange({ objectValue }) }) : null) : null, condition.enabled && (kind === "cli" || kind === "tool") ? /* @__PURE__ */ import_react14.default.createElement("div", { className: "route-test-condition-fields" }, /* @__PURE__ */ import_react14.default.createElement("p", null, "Source: ", sourceSummary(condition.source)), /* @__PURE__ */ import_react14.default.createElement("label", { className: "route-test-field" }, /* @__PURE__ */ import_react14.default.createElement("span", null, "Saved result status"), /* @__PURE__ */ import_react14.default.createElement("select", { value: condition.status, onChange: (event) => onChange({ status: event.target.value }) }, /* @__PURE__ */ import_react14.default.createElement("option", { value: "completed" }, "completed"), /* @__PURE__ */ import_react14.default.createElement("option", { value: "failed" }, "failed"), /* @__PURE__ */ import_react14.default.createElement("option", { value: "skipped" }, "skipped"))), /* @__PURE__ */ import_react14.default.createElement(JSONField, { label: "Saved result", value: condition.objectValue, onChange: (objectValue) => onChange({ objectValue }) })) : null, condition.enabled && kind === "collector" ? /* @__PURE__ */ import_react14.default.createElement("fieldset", { className: "route-test-condition-fields" }, /* @__PURE__ */ import_react14.default.createElement("legend", null, "Saved findings"), /* @__PURE__ */ import_react14.default.createElement("p", null, "Source: ", sourceSummary(condition.source)), collectorFields(condition.node).map((field2) => /* @__PURE__ */ import_react14.default.createElement("label", { className: "route-test-field", key: field2.name }, /* @__PURE__ */ import_react14.default.createElement("span", null, field2.label ?? field2.name, field2.required ? " *" : ""), field2.ephemeral ? /* @__PURE__ */ import_react14.default.createElement("small", null, "Ephemeral field cannot be saved in a route test.") : null, field2.type === "boolean" ? /* @__PURE__ */ import_react14.default.createElement(
       "input",
       {
         type: "checkbox",
-        checked: condition.values[field.name] === true,
-        onChange: (event) => onChange({ values: { ...condition.values, [field.name]: event.target.checked } })
+        checked: condition.values[field2.name] === true,
+        onChange: (event) => onChange({ values: { ...condition.values, [field2.name]: event.target.checked } })
       }
-    ) : field.options.length > 0 ? /* @__PURE__ */ import_react10.default.createElement(
+    ) : field2.options.length > 0 ? /* @__PURE__ */ import_react14.default.createElement(
       "select",
       {
-        multiple: field.multiple,
-        value: field.multiple ? Array.isArray(condition.values[field.name]) ? condition.values[field.name] : [] : String(condition.values[field.name] ?? ""),
+        multiple: field2.multiple,
+        value: field2.multiple ? Array.isArray(condition.values[field2.name]) ? condition.values[field2.name] : [] : String(condition.values[field2.name] ?? ""),
         onChange: (event) => onChange({ values: {
           ...condition.values,
-          [field.name]: field.multiple ? Array.from(event.target.selectedOptions).map((option) => option.value) : event.target.value
+          [field2.name]: field2.multiple ? Array.from(event.target.selectedOptions).map((option) => option.value) : event.target.value
         } })
       },
-      !field.multiple ? /* @__PURE__ */ import_react10.default.createElement("option", { value: "" }, "Select...") : null,
-      field.options.map((option) => /* @__PURE__ */ import_react10.default.createElement("option", { value: option.value, key: option.value }, option.label))
-    ) : field.multiple ? /* @__PURE__ */ import_react10.default.createElement(
+      !field2.multiple ? /* @__PURE__ */ import_react14.default.createElement("option", { value: "" }, "Select...") : null,
+      field2.options.map((option) => /* @__PURE__ */ import_react14.default.createElement("option", { value: option.value, key: option.value }, option.label))
+    ) : field2.multiple ? /* @__PURE__ */ import_react14.default.createElement(
       "textarea",
       {
         rows: 3,
-        value: formatMultipleCollectorText(condition.values[field.name]),
+        value: formatMultipleCollectorText(condition.values[field2.name]),
         placeholder: "One value per line",
         onChange: (event) => onChange({ values: {
           ...condition.values,
-          [field.name]: parseMultipleCollectorText(event.target.value)
+          [field2.name]: parseMultipleCollectorText(event.target.value)
         } })
       }
-    ) : /* @__PURE__ */ import_react10.default.createElement(
+    ) : /* @__PURE__ */ import_react14.default.createElement(
       "input",
       {
-        type: collectorInputType(field.type),
-        step: field.type === "integer" ? 1 : field.type === "number" ? "any" : void 0,
-        value: String(condition.values[field.name] ?? ""),
-        onChange: (event) => onChange({ values: { ...condition.values, [field.name]: event.target.value } })
+        type: collectorInputType(field2.type),
+        step: field2.type === "integer" ? 1 : field2.type === "number" ? "any" : void 0,
+        value: String(condition.values[field2.name] ?? ""),
+        onChange: (event) => onChange({ values: { ...condition.values, [field2.name]: event.target.value } })
       }
-    )))) : null, condition.enabled && kind === "choice" ? /* @__PURE__ */ import_react10.default.createElement("label", { className: "route-test-field" }, /* @__PURE__ */ import_react10.default.createElement("span", null, "Saved choice"), /* @__PURE__ */ import_react10.default.createElement(
+    )))) : null, condition.enabled && kind === "choice" ? /* @__PURE__ */ import_react14.default.createElement("label", { className: "route-test-field" }, /* @__PURE__ */ import_react14.default.createElement("span", null, "Saved choice"), /* @__PURE__ */ import_react14.default.createElement(
       "select",
       {
         multiple: details?.multiple === true,
         value: details?.multiple === true ? condition.selected : condition.selected[0] ?? "",
         onChange: (event) => onChange({ selected: Array.from(event.target.selectedOptions).map((option) => option.value) })
       },
-      /* @__PURE__ */ import_react10.default.createElement("option", { value: "" }, "Select..."),
-      detailOptions(condition.node).map((option) => /* @__PURE__ */ import_react10.default.createElement("option", { key: option.value, value: option.value }, option.label))
-    )) : null, condition.enabled && kind === "decision" ? /* @__PURE__ */ import_react10.default.createElement("label", { className: "route-test-field" }, /* @__PURE__ */ import_react10.default.createElement("span", null, "Saved decision"), /* @__PURE__ */ import_react10.default.createElement("select", { value: condition.label, onChange: (event) => onChange({ label: event.target.value }) }, /* @__PURE__ */ import_react10.default.createElement("option", { value: "" }, "Select..."), detailRoutes(condition.node).map((route) => /* @__PURE__ */ import_react10.default.createElement("option", { key: route.label, value: route.label }, route.label)))) : null, condition.enabled && kind === "approve" ? /* @__PURE__ */ import_react10.default.createElement("label", { className: "route-test-field" }, /* @__PURE__ */ import_react10.default.createElement("span", null, "Test approval"), /* @__PURE__ */ import_react10.default.createElement("select", { value: condition.approvalGranted ? "approved" : "denied", onChange: (event) => onChange({ approvalGranted: event.target.value === "approved" }) }, /* @__PURE__ */ import_react10.default.createElement("option", { value: "approved" }, "Approve for this route test"), /* @__PURE__ */ import_react10.default.createElement("option", { value: "denied" }, "Deny for this route test"))) : null, condition.enabled && ["cli", "tool", "host_action"].includes(kind) ? /* @__PURE__ */ import_react10.default.createElement("label", { className: "route-test-ack" }, /* @__PURE__ */ import_react10.default.createElement("input", { type: "checkbox", checked: condition.testApproval, onChange: (event) => onChange({ testApproval: event.target.checked }) }), /* @__PURE__ */ import_react10.default.createElement("span", null, "Use a non-production test approval for this step.")) : null);
+      /* @__PURE__ */ import_react14.default.createElement("option", { value: "" }, "Select..."),
+      detailOptions(condition.node).map((option) => /* @__PURE__ */ import_react14.default.createElement("option", { key: option.value, value: option.value }, option.label))
+    )) : null, condition.enabled && kind === "decision" ? /* @__PURE__ */ import_react14.default.createElement("label", { className: "route-test-field" }, /* @__PURE__ */ import_react14.default.createElement("span", null, "Saved decision"), /* @__PURE__ */ import_react14.default.createElement("select", { value: condition.label, onChange: (event) => onChange({ label: event.target.value }) }, /* @__PURE__ */ import_react14.default.createElement("option", { value: "" }, "Select..."), detailRoutes(condition.node).map((route) => /* @__PURE__ */ import_react14.default.createElement("option", { key: route.label, value: route.label }, route.label)))) : null, condition.enabled && kind === "approve" ? /* @__PURE__ */ import_react14.default.createElement("label", { className: "route-test-field" }, /* @__PURE__ */ import_react14.default.createElement("span", null, "Test approval"), /* @__PURE__ */ import_react14.default.createElement("select", { value: condition.approvalGranted ? "approved" : "denied", onChange: (event) => onChange({ approvalGranted: event.target.value === "approved" }) }, /* @__PURE__ */ import_react14.default.createElement("option", { value: "approved" }, "Approve for this route test"), /* @__PURE__ */ import_react14.default.createElement("option", { value: "denied" }, "Deny for this route test"))) : null, condition.enabled && ["cli", "tool", "host_action"].includes(kind) ? /* @__PURE__ */ import_react14.default.createElement("label", { className: "route-test-ack" }, /* @__PURE__ */ import_react14.default.createElement("input", { type: "checkbox", checked: condition.testApproval, onChange: (event) => onChange({ testApproval: event.target.checked }) }), /* @__PURE__ */ import_react14.default.createElement("span", null, "Use a non-production test approval for this step.")) : null);
   }
   function JSONField({ label, value, onChange }) {
-    return /* @__PURE__ */ import_react10.default.createElement("label", { className: "route-test-field" }, /* @__PURE__ */ import_react10.default.createElement("span", null, label), /* @__PURE__ */ import_react10.default.createElement("textarea", { rows: 4, spellCheck: false, value, onChange: (event) => onChange(event.target.value) }));
+    return /* @__PURE__ */ import_react14.default.createElement("label", { className: "route-test-field" }, /* @__PURE__ */ import_react14.default.createElement("span", null, label), /* @__PURE__ */ import_react14.default.createElement("textarea", { rows: 4, spellCheck: false, value, onChange: (event) => onChange(event.target.value) }));
   }
   function conditionForNode(node, artifact) {
     const selector5 = selectorForNode(node);
@@ -36150,9 +37654,9 @@
     const host = artifact?.host_action_responses?.find((binding) => selectorKey(binding.at) === key);
     const interaction = artifact?.interaction_answers?.find((binding) => selectorKey(binding.at) === key);
     const approval = artifact?.test_approvals?.find((binding) => selectorKey(binding.at) === key);
-    const values = interaction?.values ?? Object.fromEntries(collectorFields(node).flatMap((field) => {
-      if (field.default !== void 0) return [[field.name, field.default]];
-      return field.type === "boolean" && field.required ? [[field.name, false]] : [];
+    const values = interaction?.values ?? Object.fromEntries(collectorFields(node).flatMap((field2) => {
+      if (field2.default !== void 0) return [[field2.name, field2.default]];
+      return field2.type === "boolean" && field2.required ? [[field2.name, false]] : [];
     }));
     return {
       node,
@@ -36203,22 +37707,22 @@
   function collectorFields(node) {
     const details = node.data.details;
     return Array.isArray(details?.fields) ? details.fields.flatMap((raw) => {
-      const field = raw;
-      if (typeof field.name !== "string") return [];
-      const options = Array.isArray(field.options) ? field.options.flatMap((item) => {
+      const field2 = raw;
+      if (typeof field2.name !== "string") return [];
+      const options = Array.isArray(field2.options) ? field2.options.flatMap((item) => {
         const option = item;
         return typeof option.label === "string" && typeof option.value === "string" ? [{ label: option.label, value: option.value }] : [];
       }) : [];
-      const validation = typeof field.validation === "object" && field.validation !== null && !Array.isArray(field.validation) ? field.validation : void 0;
+      const validation = typeof field2.validation === "object" && field2.validation !== null && !Array.isArray(field2.validation) ? field2.validation : void 0;
       return [{
-        name: field.name,
-        type: typeof field.type === "string" ? field.type : "text",
-        label: typeof field.label === "string" ? field.label : void 0,
-        display_name: typeof field.display_name === "string" ? field.display_name : void 0,
-        required: field.required === true,
-        multiple: field.multiple === true,
-        ephemeral: field.ephemeral === true,
-        default: field.default,
+        name: field2.name,
+        type: typeof field2.type === "string" ? field2.type : "text",
+        label: typeof field2.label === "string" ? field2.label : void 0,
+        display_name: typeof field2.display_name === "string" ? field2.display_name : void 0,
+        required: field2.required === true,
+        multiple: field2.multiple === true,
+        ephemeral: field2.ephemeral === true,
+        default: field2.default,
         options,
         validation
       }];
@@ -36288,6 +37792,7 @@
   };
 
   // webview/graph.tsx
+  configureHighlighting(document.body.dataset.highlightingWorker ?? "");
   var vscode = acquireVsCodeApi();
   var DEFAULT_INSPECTOR_RATIO = 0.31;
   var MIN_INSPECTOR_RATIO = 0.2;
@@ -36327,26 +37832,29 @@
     include: "Include",
     iterate: "Iterate",
     noop: "No-op",
+    assign: "Assign bindings",
+    results: "Results",
     parallel: "Parallel",
     tool: "Tool",
     wait_for_event: "Wait event"
   };
-  var RuntimeNodesContext = (0, import_react11.createContext)({});
-  var DebugBreakpointsContext = (0, import_react11.createContext)(/* @__PURE__ */ new Set());
-  var ExecutionPositionContext = (0, import_react11.createContext)({ terminal: false });
+  var RuntimeNodesContext = (0, import_react15.createContext)({});
+  var DebugBreakpointsContext = (0, import_react15.createContext)(/* @__PURE__ */ new Set());
+  var ExecutionPositionContext = (0, import_react15.createContext)({ terminal: false });
   function breakpointKey(nodeID, phase) {
     return `${nodeID}:${phase}`;
   }
   function StepNode({ data, selected }) {
-    const runtimeNodes = (0, import_react11.useContext)(RuntimeNodesContext);
-    const debugBreakpoints = (0, import_react11.useContext)(DebugBreakpointsContext);
-    const executionPosition = (0, import_react11.useContext)(ExecutionPositionContext);
+    const runtimeNodes = (0, import_react15.useContext)(RuntimeNodesContext);
+    const debugBreakpoints = (0, import_react15.useContext)(DebugBreakpointsContext);
+    const executionPosition = (0, import_react15.useContext)(ExecutionPositionContext);
     const kind = typeof data.kind === "string" ? data.kind : "step";
     const id2 = typeof data.id === "string" ? data.id : "";
     const title = typeof data.title === "string" ? data.title : "";
     const isTerminal = kind === "end";
     const runtime = runtimeNodes[id2];
-    const status = runtime?.status ?? (typeof data.status === "string" ? data.status : "pending");
+    const observedStatus = runtime?.status ?? (typeof data.status === "string" ? data.status : "pending");
+    const status = executionPosition.terminal && ["running", "delaying", "waiting"].includes(observedStatus) ? "no-final-status" : observedStatus;
     const error = runtime?.error ?? (typeof data.error === "string" ? data.error : "");
     const hasBeforeBreakpoint = debugBreakpoints.has(breakpointKey(id2, "before"));
     const hasAfterBreakpoint = debugBreakpoints.has(breakpointKey(id2, "after"));
@@ -36356,19 +37864,22 @@
     const currentLabel = `Current step: ${locatorText}`;
     const executionLabel = executionPosition.terminal ? "Last reached" : "Current";
     const executionAriaLabel = executionPosition.terminal ? `Last reached step: ${locatorText}` : currentLabel;
-    return /* @__PURE__ */ import_react11.default.createElement(import_react11.default.Fragment, null, /* @__PURE__ */ import_react11.default.createElement(NodeToolbar, { isVisible: selected, position: Position.Left, align: "center", offset: 12 }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "node-locator focused", role: "status", "aria-label": focusedLabel, title: focusedLabel }, /* @__PURE__ */ import_react11.default.createElement("span", null, "Focused"), /* @__PURE__ */ import_react11.default.createElement("code", { title: id2 }, locatorText), /* @__PURE__ */ import_react11.default.createElement(ArrowRight, { "aria-hidden": "true" }))), /* @__PURE__ */ import_react11.default.createElement(NodeToolbar, { isVisible: isCurrent, position: Position.Right, align: "center", offset: 12 }, /* @__PURE__ */ import_react11.default.createElement("div", { className: `node-locator ${executionPosition.terminal ? "last-reached" : "current"}`, role: "status", "aria-label": executionAriaLabel, title: executionAriaLabel }, /* @__PURE__ */ import_react11.default.createElement(ArrowLeft, { "aria-hidden": "true" }), /* @__PURE__ */ import_react11.default.createElement("span", null, executionLabel), /* @__PURE__ */ import_react11.default.createElement("code", { title: id2 }, locatorText))), /* @__PURE__ */ import_react11.default.createElement("div", { className: `step-node kind-${kind} status-${status}${selected ? " selected" : ""}${isCurrent ? executionPosition.terminal ? " execution-last" : " execution-current" : ""}` }, /* @__PURE__ */ import_react11.default.createElement(Handle$1, { type: "target", position: Position.Top }), /* @__PURE__ */ import_react11.default.createElement("div", { className: "step-heading" }, /* @__PURE__ */ import_react11.default.createElement("span", { className: "kind-mark", "aria-hidden": "true" }, kind.slice(0, 2).toUpperCase()), /* @__PURE__ */ import_react11.default.createElement("span", null, kindLabels2[kind] ?? kind)), /* @__PURE__ */ import_react11.default.createElement("div", { className: "debug-node-markers" }, hasBeforeBreakpoint ? /* @__PURE__ */ import_react11.default.createElement("span", { "aria-label": "Before breakpoint", title: "Pause before execution" }, /* @__PURE__ */ import_react11.default.createElement(CircleDot, { className: "debug-before-marker", "aria-hidden": "true" })) : null, hasAfterBreakpoint ? /* @__PURE__ */ import_react11.default.createElement("span", { "aria-label": "After breakpoint", title: "Pause after execution" }, /* @__PURE__ */ import_react11.default.createElement(CircleDot, { className: "debug-after-marker", "aria-hidden": "true" })) : null, runtime?.debugOverride ? /* @__PURE__ */ import_react11.default.createElement("span", { "aria-label": "Debug override applied", title: "Debug override applied" }, /* @__PURE__ */ import_react11.default.createElement(Bug, { className: "debug-override-marker", "aria-hidden": "true" })) : null), /* @__PURE__ */ import_react11.default.createElement("div", { className: "step-id" }, id2), title && title !== id2 ? /* @__PURE__ */ import_react11.default.createElement("div", { className: "step-title" }, title) : null, status !== "pending" ? /* @__PURE__ */ import_react11.default.createElement("div", { className: "step-status" }, status, error ? `: ${error}` : "") : null, !isTerminal ? /* @__PURE__ */ import_react11.default.createElement(Handle$1, { type: "source", position: Position.Bottom }) : null));
+    return /* @__PURE__ */ import_react15.default.createElement(import_react15.default.Fragment, null, /* @__PURE__ */ import_react15.default.createElement(NodeToolbar, { isVisible: selected, position: Position.Left, align: "center", offset: 12 }, /* @__PURE__ */ import_react15.default.createElement("div", { className: "node-locator focused", role: "status", "aria-label": focusedLabel, title: focusedLabel }, /* @__PURE__ */ import_react15.default.createElement("span", null, "Focused"), /* @__PURE__ */ import_react15.default.createElement("code", { title: id2 }, locatorText), /* @__PURE__ */ import_react15.default.createElement(ArrowRight, { "aria-hidden": "true" }))), /* @__PURE__ */ import_react15.default.createElement(NodeToolbar, { isVisible: isCurrent, position: Position.Right, align: "center", offset: 12 }, /* @__PURE__ */ import_react15.default.createElement("div", { className: `node-locator ${executionPosition.terminal ? "last-reached" : "current"}`, role: "status", "aria-label": executionAriaLabel, title: executionAriaLabel }, /* @__PURE__ */ import_react15.default.createElement(ArrowLeft, { "aria-hidden": "true" }), /* @__PURE__ */ import_react15.default.createElement("span", null, executionLabel), /* @__PURE__ */ import_react15.default.createElement("code", { title: id2 }, locatorText))), /* @__PURE__ */ import_react15.default.createElement("div", { className: `step-node kind-${kind} status-${status}${selected ? " selected" : ""}${isCurrent ? executionPosition.terminal ? " execution-last" : " execution-current" : ""}` }, /* @__PURE__ */ import_react15.default.createElement(Handle$1, { type: "target", position: Position.Top }), /* @__PURE__ */ import_react15.default.createElement("div", { className: "step-heading" }, /* @__PURE__ */ import_react15.default.createElement("span", { className: "kind-mark", "aria-hidden": "true" }, kind.slice(0, 2).toUpperCase()), /* @__PURE__ */ import_react15.default.createElement("span", null, kindLabels2[kind] ?? kind)), /* @__PURE__ */ import_react15.default.createElement("div", { className: "debug-node-markers" }, hasBeforeBreakpoint ? /* @__PURE__ */ import_react15.default.createElement("span", { "aria-label": "Before breakpoint", title: "Pause before execution" }, /* @__PURE__ */ import_react15.default.createElement(CircleDot, { className: "debug-before-marker", "aria-hidden": "true" })) : null, hasAfterBreakpoint ? /* @__PURE__ */ import_react15.default.createElement("span", { "aria-label": "After breakpoint", title: "Pause after execution" }, /* @__PURE__ */ import_react15.default.createElement(CircleDot, { className: "debug-after-marker", "aria-hidden": "true" })) : null, runtime?.debugOverride ? /* @__PURE__ */ import_react15.default.createElement("span", { "aria-label": "Debug override applied", title: "Debug override applied" }, /* @__PURE__ */ import_react15.default.createElement(Bug, { className: "debug-override-marker", "aria-hidden": "true" })) : null), /* @__PURE__ */ import_react15.default.createElement("div", { className: "step-id" }, id2), title && title !== id2 ? /* @__PURE__ */ import_react15.default.createElement("div", { className: "step-title" }, title) : null, status !== "pending" ? /* @__PURE__ */ import_react15.default.createElement("div", { className: "step-status" }, status === "no-final-status" ? "No final status" : status, error ? `: ${error}` : "") : null, !isTerminal ? /* @__PURE__ */ import_react15.default.createElement(Handle$1, { type: "source", position: Position.Bottom }) : null));
   }
   function FrameNode({ data }) {
     const segmentStatus = typeof data.segment_status === "string" ? data.segment_status : "";
-    return /* @__PURE__ */ import_react11.default.createElement("div", { className: "frame-content" }, /* @__PURE__ */ import_react11.default.createElement("span", null, String(data.label ?? data.kind ?? "")), segmentStatus ? /* @__PURE__ */ import_react11.default.createElement("em", { className: `segment-status status-${segmentStatus}` }, segmentStatus.replaceAll("_", " ")) : null, data.graph_loaded === false ? /* @__PURE__ */ import_react11.default.createElement("em", null, "Load on demand") : null, data.empty ? /* @__PURE__ */ import_react11.default.createElement("em", null, "Empty route") : null);
+    return /* @__PURE__ */ import_react15.default.createElement("div", { className: "frame-content" }, /* @__PURE__ */ import_react15.default.createElement("span", null, String(data.label ?? data.kind ?? "")), segmentStatus ? /* @__PURE__ */ import_react15.default.createElement("em", { className: `segment-status status-${segmentStatus}` }, segmentStatus.replaceAll("_", " ")) : null, data.graph_loaded === false ? /* @__PURE__ */ import_react15.default.createElement("em", null, "Load on demand") : null, data.empty ? /* @__PURE__ */ import_react15.default.createElement("em", null, "Empty route") : null);
   }
   function BranchMergeNode() {
-    return /* @__PURE__ */ import_react11.default.createElement("div", { className: "branch-merge-node", title: "Branch merge" }, /* @__PURE__ */ import_react11.default.createElement(Handle$1, { type: "target", position: Position.Top }), /* @__PURE__ */ import_react11.default.createElement("span", { "aria-hidden": "true" }), /* @__PURE__ */ import_react11.default.createElement(Handle$1, { type: "source", position: Position.Bottom }));
+    return /* @__PURE__ */ import_react15.default.createElement("div", { className: "branch-merge-node", title: "Branch merge" }, /* @__PURE__ */ import_react15.default.createElement(Handle$1, { type: "target", position: Position.Top }), /* @__PURE__ */ import_react15.default.createElement("span", { "aria-hidden": "true" }), /* @__PURE__ */ import_react15.default.createElement(Handle$1, { type: "source", position: Position.Bottom }));
   }
   function SessionEntryNode() {
-    return /* @__PURE__ */ import_react11.default.createElement("div", { className: "session-entry-node", title: "Segment entry" }, /* @__PURE__ */ import_react11.default.createElement(Handle$1, { type: "target", position: Position.Top }), /* @__PURE__ */ import_react11.default.createElement("span", { "aria-hidden": "true" }), /* @__PURE__ */ import_react11.default.createElement(Handle$1, { type: "source", position: Position.Bottom }));
+    return /* @__PURE__ */ import_react15.default.createElement("div", { className: "session-entry-node", title: "Segment entry" }, /* @__PURE__ */ import_react15.default.createElement(Handle$1, { type: "target", position: Position.Top }), /* @__PURE__ */ import_react15.default.createElement("span", { "aria-hidden": "true" }), /* @__PURE__ */ import_react15.default.createElement(Handle$1, { type: "source", position: Position.Bottom }));
   }
-  var nodeTypes = { gertStep: StepNode, branchMerge: BranchMergeNode, sessionEntry: SessionEntryNode, frameBox: FrameNode };
+  function TechnicalSegmentNode({ data }) {
+    return /* @__PURE__ */ import_react15.default.createElement("div", { className: "technical-segment", title: "Visual grouping only, not execution evidence. Click to expand without rerunning." }, /* @__PURE__ */ import_react15.default.createElement(Handle$1, { type: "target", position: Position.Top }), /* @__PURE__ */ import_react15.default.createElement("button", { type: "button", className: "nodrag", onClick: () => data.expand?.() }, String(data.title)), /* @__PURE__ */ import_react15.default.createElement("small", null, String(data.memberSummary ?? "Visual grouping \u2014 not skipped")), /* @__PURE__ */ import_react15.default.createElement(Handle$1, { type: "source", position: Position.Bottom }));
+  }
+  var nodeTypes = { technicalSegment: TechnicalSegmentNode, gertStep: StepNode, branchMerge: BranchMergeNode, sessionEntry: SessionEntryNode, frameBox: FrameNode };
   function InputsForm({
     declarations,
     values,
@@ -36376,10 +37887,10 @@
     onChange
   }) {
     if (declarations.length === 0) return null;
-    return /* @__PURE__ */ import_react11.default.createElement("section", { className: "run-inputs", "aria-label": "Runbook inputs" }, declarations.map((declaration) => {
+    return /* @__PURE__ */ import_react15.default.createElement("section", { className: "run-inputs", "aria-label": "Runbook inputs" }, declarations.map((declaration) => {
       const value = values[declaration.name] ?? "";
       const label = `${declaration.name}${declaration.required ? " *" : ""}`;
-      return /* @__PURE__ */ import_react11.default.createElement("label", { key: declaration.name, title: declaration.description }, /* @__PURE__ */ import_react11.default.createElement("span", null, label), declaration.enum && !declaration.enumRedacted ? /* @__PURE__ */ import_react11.default.createElement(
+      return /* @__PURE__ */ import_react15.default.createElement("label", { key: declaration.name, title: declaration.description }, /* @__PURE__ */ import_react15.default.createElement("span", null, label), declaration.enum && !declaration.enumRedacted ? /* @__PURE__ */ import_react15.default.createElement(
         "select",
         {
           value,
@@ -36387,9 +37898,9 @@
           required: declaration.required,
           onChange: (event) => onChange(declaration.name, event.target.value)
         },
-        /* @__PURE__ */ import_react11.default.createElement("option", { value: "" }, declaration.required ? "Select..." : "Unset"),
-        declaration.enum.map((member) => /* @__PURE__ */ import_react11.default.createElement("option", { key: member, value: member }, member))
-      ) : /* @__PURE__ */ import_react11.default.createElement(
+        /* @__PURE__ */ import_react15.default.createElement("option", { value: "" }, declaration.required ? "Select..." : "Unset"),
+        declaration.enum.map((member) => /* @__PURE__ */ import_react15.default.createElement("option", { key: member, value: member }, member))
+      ) : /* @__PURE__ */ import_react15.default.createElement(
         "input",
         {
           type: declaration.type === "secret" ? "password" : "text",
@@ -36464,17 +37975,17 @@
     onSubmit
   }) {
     const debug = interaction.debug;
-    const [variablePatch, setVariablePatch] = (0, import_react11.useState)("{}");
-    const [outputPatch, setOutputPatch] = (0, import_react11.useState)("{}");
-    const [effectiveStatus, setEffectiveStatus] = (0, import_react11.useState)(debug?.actual?.status ?? "completed");
-    const [effectiveError, setEffectiveError] = (0, import_react11.useState)("");
-    const [submitting, setSubmitting] = (0, import_react11.useState)(false);
-    const [validationError, setValidationError] = (0, import_react11.useState)();
-    const pauseHeadingRef = (0, import_react11.useRef)(null);
-    (0, import_react11.useEffect)(() => {
+    const [variablePatch, setVariablePatch] = (0, import_react15.useState)("{}");
+    const [outputPatch, setOutputPatch] = (0, import_react15.useState)("{}");
+    const [effectiveStatus, setEffectiveStatus] = (0, import_react15.useState)(debug?.actual?.status ?? "completed");
+    const [effectiveError, setEffectiveError] = (0, import_react15.useState)("");
+    const [submitting, setSubmitting] = (0, import_react15.useState)(false);
+    const [validationError, setValidationError] = (0, import_react15.useState)();
+    const pauseHeadingRef = (0, import_react15.useRef)(null);
+    (0, import_react15.useEffect)(() => {
       pauseHeadingRef.current?.focus();
     }, [interaction.turnID]);
-    if (!debug) return /* @__PURE__ */ import_react11.default.createElement("div", { className: "interaction-error" }, "Debug pause payload is missing.");
+    if (!debug) return /* @__PURE__ */ import_react15.default.createElement("div", { className: "interaction-error" }, "Debug pause payload is missing.");
     const submit = (action, apply) => {
       try {
         let set3;
@@ -36503,7 +38014,7 @@
       }
     };
     const callPath = [...(debug.callPath ?? []).map((frame2) => frame2.step_id), interaction.stepID].join(" / ");
-    return /* @__PURE__ */ import_react11.default.createElement("section", { className: "interaction-pane debug-break", "aria-label": "Debug pause" }, /* @__PURE__ */ import_react11.default.createElement("span", { className: "interaction-kind" }, "Debug pause \xB7 ", debug.phase), /* @__PURE__ */ import_react11.default.createElement("h2", { ref: pauseHeadingRef, tabIndex: -1 }, interaction.stepID), /* @__PURE__ */ import_react11.default.createElement("div", { className: "debug-breadcrumb" }, callPath), /* @__PURE__ */ import_react11.default.createElement("dl", { className: "debug-metadata" }, /* @__PURE__ */ import_react11.default.createElement("dt", null, "Invocation"), /* @__PURE__ */ import_react11.default.createElement("dd", null, debug.invocation), /* @__PURE__ */ import_react11.default.createElement("dt", null, "Attempt"), /* @__PURE__ */ import_react11.default.createElement("dd", null, debug.attempt)), debug.watches && debug.watches.length > 0 ? /* @__PURE__ */ import_react11.default.createElement("section", { className: "debug-values", "aria-label": "Watch expressions" }, /* @__PURE__ */ import_react11.default.createElement("h3", null, "Watches"), debug.watches.map((watch) => /* @__PURE__ */ import_react11.default.createElement("div", { key: watch.expression, className: "debug-watch" }, /* @__PURE__ */ import_react11.default.createElement("code", null, watch.expression), /* @__PURE__ */ import_react11.default.createElement("span", null, watch.error ?? JSON.stringify(watch.value))))) : null, /* @__PURE__ */ import_react11.default.createElement("details", { className: "debug-values" }, /* @__PURE__ */ import_react11.default.createElement("summary", null, "Runtime variables"), /* @__PURE__ */ import_react11.default.createElement("pre", null, JSON.stringify(debug.variables ?? {}, null, 2))), debug.actual ? /* @__PURE__ */ import_react11.default.createElement("details", { className: "debug-values", open: true }, /* @__PURE__ */ import_react11.default.createElement("summary", null, "Actual result \xB7 ", debug.actual.status), /* @__PURE__ */ import_react11.default.createElement("pre", null, JSON.stringify(debug.actual.output ?? {}, null, 2)), debug.actual.error ? /* @__PURE__ */ import_react11.default.createElement("p", null, debug.actual.error) : null) : null, /* @__PURE__ */ import_react11.default.createElement("label", { className: "debug-field" }, /* @__PURE__ */ import_react11.default.createElement("span", null, "Variable patch"), /* @__PURE__ */ import_react11.default.createElement(
+    return /* @__PURE__ */ import_react15.default.createElement("section", { className: "interaction-pane debug-break", "aria-label": "Debug pause" }, /* @__PURE__ */ import_react15.default.createElement("span", { className: "interaction-kind" }, "Debug pause \xB7 ", debug.phase), /* @__PURE__ */ import_react15.default.createElement("h2", { ref: pauseHeadingRef, tabIndex: -1 }, interaction.stepID), /* @__PURE__ */ import_react15.default.createElement("div", { className: "debug-breadcrumb" }, callPath), /* @__PURE__ */ import_react15.default.createElement("dl", { className: "debug-metadata" }, /* @__PURE__ */ import_react15.default.createElement("dt", null, "Invocation"), /* @__PURE__ */ import_react15.default.createElement("dd", null, debug.invocation), /* @__PURE__ */ import_react15.default.createElement("dt", null, "Attempt"), /* @__PURE__ */ import_react15.default.createElement("dd", null, debug.attempt)), debug.watches && debug.watches.length > 0 ? /* @__PURE__ */ import_react15.default.createElement("section", { className: "debug-values", "aria-label": "Watch expressions" }, /* @__PURE__ */ import_react15.default.createElement("h3", null, "Watches"), debug.watches.map((watch) => /* @__PURE__ */ import_react15.default.createElement("div", { key: watch.expression, className: "debug-watch" }, /* @__PURE__ */ import_react15.default.createElement("code", null, watch.expression), /* @__PURE__ */ import_react15.default.createElement("span", null, watch.error ?? JSON.stringify(watch.value))))) : null, /* @__PURE__ */ import_react15.default.createElement("details", { className: "debug-values" }, /* @__PURE__ */ import_react15.default.createElement("summary", null, "Runtime variables"), /* @__PURE__ */ import_react15.default.createElement("pre", null, JSON.stringify(debug.variables ?? {}, null, 2))), debug.actual ? /* @__PURE__ */ import_react15.default.createElement("details", { className: "debug-values", open: true }, /* @__PURE__ */ import_react15.default.createElement("summary", null, "Actual result \xB7 ", debug.actual.status), /* @__PURE__ */ import_react15.default.createElement("pre", null, JSON.stringify(debug.actual.output ?? {}, null, 2)), debug.actual.error ? /* @__PURE__ */ import_react15.default.createElement("p", null, debug.actual.error) : null) : null, /* @__PURE__ */ import_react15.default.createElement("label", { className: "debug-field" }, /* @__PURE__ */ import_react15.default.createElement("span", null, "Variable patch"), /* @__PURE__ */ import_react15.default.createElement(
       "textarea",
       {
         value: variablePatch,
@@ -36511,7 +38022,7 @@
         spellCheck: false,
         onChange: (event) => setVariablePatch(event.target.value)
       }
-    )), debug.phase === "after" ? /* @__PURE__ */ import_react11.default.createElement(import_react11.default.Fragment, null, /* @__PURE__ */ import_react11.default.createElement("label", { className: "debug-field" }, /* @__PURE__ */ import_react11.default.createElement("span", null, "Output patch"), /* @__PURE__ */ import_react11.default.createElement(
+    )), debug.phase === "after" ? /* @__PURE__ */ import_react15.default.createElement(import_react15.default.Fragment, null, /* @__PURE__ */ import_react15.default.createElement("label", { className: "debug-field" }, /* @__PURE__ */ import_react15.default.createElement("span", null, "Output patch"), /* @__PURE__ */ import_react15.default.createElement(
       "textarea",
       {
         value: outputPatch,
@@ -36519,7 +38030,7 @@
         spellCheck: false,
         onChange: (event) => setOutputPatch(event.target.value)
       }
-    )), debug.outputProtected ? /* @__PURE__ */ import_react11.default.createElement("p", { className: "debug-protected" }, "Output is protected and cannot be overridden.") : null, /* @__PURE__ */ import_react11.default.createElement("label", { className: "debug-field compact" }, /* @__PURE__ */ import_react11.default.createElement("span", null, "Effective status"), /* @__PURE__ */ import_react11.default.createElement(
+    )), debug.outputProtected ? /* @__PURE__ */ import_react15.default.createElement("p", { className: "debug-protected" }, "Output is protected and cannot be overridden.") : null, /* @__PURE__ */ import_react15.default.createElement("label", { className: "debug-field compact" }, /* @__PURE__ */ import_react15.default.createElement("span", null, "Effective status"), /* @__PURE__ */ import_react15.default.createElement(
       "select",
       {
         value: effectiveStatus,
@@ -36529,18 +38040,18 @@
           if (event.target.value !== "failed") setEffectiveError("");
         }
       },
-      /* @__PURE__ */ import_react11.default.createElement("option", { value: "completed" }, "Completed"),
-      /* @__PURE__ */ import_react11.default.createElement("option", { value: "failed" }, "Failed"),
-      /* @__PURE__ */ import_react11.default.createElement("option", { value: "skipped" }, "Skipped")
-    )), effectiveStatus === "failed" ? /* @__PURE__ */ import_react11.default.createElement("label", { className: "debug-field compact" }, /* @__PURE__ */ import_react11.default.createElement("span", null, "Effective error"), /* @__PURE__ */ import_react11.default.createElement("input", { value: effectiveError, disabled: submitting, onChange: (event) => setEffectiveError(event.target.value) })) : null) : null, debug.protectedVariables && debug.protectedVariables.length > 0 ? /* @__PURE__ */ import_react11.default.createElement("p", { className: "debug-protected" }, "Protected: ", debug.protectedVariables.join(", ")) : null, validationError ? /* @__PURE__ */ import_react11.default.createElement("div", { className: "interaction-error", role: "alert" }, validationError) : null, /* @__PURE__ */ import_react11.default.createElement("div", { className: "debug-actions" }, /* @__PURE__ */ import_react11.default.createElement("button", { type: "button", disabled: submitting, onClick: () => submit("continue", false) }, "Continue unchanged"), /* @__PURE__ */ import_react11.default.createElement("button", { type: "button", className: "primary", disabled: submitting, onClick: () => submit("continue", true) }, "Apply and continue"), /* @__PURE__ */ import_react11.default.createElement("button", { type: "button", disabled: submitting || !debug.canStepInto, onClick: () => submit("step_into", true) }, "Step into"), /* @__PURE__ */ import_react11.default.createElement("button", { type: "button", disabled: submitting, onClick: () => submit("step_over", true) }, "Step over"), /* @__PURE__ */ import_react11.default.createElement("button", { type: "button", disabled: submitting, onClick: () => submit("step_out", true) }, "Step out"), /* @__PURE__ */ import_react11.default.createElement("button", { type: "button", className: "danger", disabled: submitting, onClick: () => submit("stop", false) }, "Stop")));
+      /* @__PURE__ */ import_react15.default.createElement("option", { value: "completed" }, "Completed"),
+      /* @__PURE__ */ import_react15.default.createElement("option", { value: "failed" }, "Failed"),
+      /* @__PURE__ */ import_react15.default.createElement("option", { value: "skipped" }, "Skipped")
+    )), effectiveStatus === "failed" ? /* @__PURE__ */ import_react15.default.createElement("label", { className: "debug-field compact" }, /* @__PURE__ */ import_react15.default.createElement("span", null, "Effective error"), /* @__PURE__ */ import_react15.default.createElement("input", { value: effectiveError, disabled: submitting, onChange: (event) => setEffectiveError(event.target.value) })) : null) : null, debug.protectedVariables && debug.protectedVariables.length > 0 ? /* @__PURE__ */ import_react15.default.createElement("p", { className: "debug-protected" }, "Protected: ", debug.protectedVariables.join(", ")) : null, validationError ? /* @__PURE__ */ import_react15.default.createElement("div", { className: "interaction-error", role: "alert" }, validationError) : null, /* @__PURE__ */ import_react15.default.createElement("div", { className: "debug-actions" }, /* @__PURE__ */ import_react15.default.createElement("button", { type: "button", disabled: submitting, onClick: () => submit("continue", false) }, "Continue unchanged"), /* @__PURE__ */ import_react15.default.createElement("button", { type: "button", className: "primary", disabled: submitting, onClick: () => submit("continue", true) }, "Apply and continue"), /* @__PURE__ */ import_react15.default.createElement("button", { type: "button", disabled: submitting || !debug.canStepInto, onClick: () => submit("step_into", true) }, "Step into"), /* @__PURE__ */ import_react15.default.createElement("button", { type: "button", disabled: submitting, onClick: () => submit("step_over", true) }, "Step over"), /* @__PURE__ */ import_react15.default.createElement("button", { type: "button", disabled: submitting, onClick: () => submit("step_out", true) }, "Step out"), /* @__PURE__ */ import_react15.default.createElement("button", { type: "button", className: "danger", disabled: submitting, onClick: () => submit("stop", false) }, "Stop")));
   }
   function ApprovalInteractionPane({
     interaction,
     onSubmit
   }) {
-    const [approver, setApprover] = (0, import_react11.useState)("");
-    const [submitting, setSubmitting] = (0, import_react11.useState)(false);
-    return /* @__PURE__ */ import_react11.default.createElement("section", { className: "interaction-pane approval-pane", "aria-label": "Governance approval" }, /* @__PURE__ */ import_react11.default.createElement("span", { className: "interaction-kind" }, "Approval"), /* @__PURE__ */ import_react11.default.createElement("h2", null, interaction.title ?? interaction.stepID), interaction.prompt ? /* @__PURE__ */ import_react11.default.createElement("p", null, interaction.prompt) : null, /* @__PURE__ */ import_react11.default.createElement("label", { className: "debug-field compact" }, /* @__PURE__ */ import_react11.default.createElement("span", null, "Approver identity"), /* @__PURE__ */ import_react11.default.createElement(
+    const [approver, setApprover] = (0, import_react15.useState)("");
+    const [submitting, setSubmitting] = (0, import_react15.useState)(false);
+    return /* @__PURE__ */ import_react15.default.createElement("section", { className: "interaction-pane approval-pane", "aria-label": "Governance approval" }, /* @__PURE__ */ import_react15.default.createElement("span", { className: "interaction-kind" }, "Approval"), /* @__PURE__ */ import_react15.default.createElement("h2", null, interaction.title ?? interaction.stepID), interaction.prompt ? /* @__PURE__ */ import_react15.default.createElement("p", null, interaction.prompt) : null, /* @__PURE__ */ import_react15.default.createElement("label", { className: "debug-field compact" }, /* @__PURE__ */ import_react15.default.createElement("span", null, "Approver identity"), /* @__PURE__ */ import_react15.default.createElement(
       "input",
       {
         value: approver,
@@ -36550,7 +38061,7 @@
         placeholder: "name or email",
         onChange: (event) => setApprover(event.target.value)
       }
-    )), /* @__PURE__ */ import_react11.default.createElement("div", { className: "debug-actions" }, /* @__PURE__ */ import_react11.default.createElement(
+    )), /* @__PURE__ */ import_react15.default.createElement("div", { className: "debug-actions" }, /* @__PURE__ */ import_react15.default.createElement(
       "button",
       {
         type: "button",
@@ -36562,7 +38073,7 @@
         }
       },
       "Approve"
-    ), /* @__PURE__ */ import_react11.default.createElement(
+    ), /* @__PURE__ */ import_react15.default.createElement(
       "button",
       {
         type: "button",
@@ -36582,17 +38093,17 @@
     onConfirmHostAction,
     xtsOpened
   }) {
-    const [selected, setSelected] = (0, import_react11.useState)([]);
-    const [values, setValues] = (0, import_react11.useState)(() => {
+    const [selected, setSelected] = (0, import_react15.useState)([]);
+    const [values, setValues] = (0, import_react15.useState)(() => {
       const initial = {};
-      for (const field of interaction.fields ?? []) {
-        if (field.default !== void 0) initial[field.name] = field.default;
+      for (const field2 of interaction.fields ?? []) {
+        if (field2.default !== void 0) initial[field2.name] = field2.default;
       }
       return initial;
     });
-    const [submitting, setSubmitting] = (0, import_react11.useState)(false);
-    const [validationError, setValidationError] = (0, import_react11.useState)();
-    const [collectorReview, setCollectorReview] = (0, import_react11.useState)();
+    const [submitting, setSubmitting] = (0, import_react15.useState)(false);
+    const [validationError, setValidationError] = (0, import_react15.useState)();
+    const [collectorReview, setCollectorReview] = (0, import_react15.useState)();
     const choiceMax = interaction.kind === "choice" && interaction.multiple && typeof interaction.max === "number" && Number.isInteger(interaction.max) && interaction.max >= 0 ? interaction.max : void 0;
     const choiceLimitID = `choice-limit-${interaction.turnID}`;
     const submit = (answer) => {
@@ -36601,8 +38112,8 @@
     };
     if (interaction.kind === "host_action") {
       const isXts = interaction.host_action?.capability === "xts.open-view";
-      if (!isXts) return /* @__PURE__ */ import_react11.default.createElement("div", { className: "interaction-wait", role: "status" }, "Opening host view...");
-      return /* @__PURE__ */ import_react11.default.createElement("section", { className: "interaction-pane host-action-pane", "aria-label": isXts ? "Open XTS view" : "Open host view" }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "actual-run-stepper", "aria-label": "Actual run progress" }, /* @__PURE__ */ import_react11.default.createElement("strong", null, "1 Open XTS"), /* @__PURE__ */ import_react11.default.createElement("span", null, "2 Answer questions"), /* @__PURE__ */ import_react11.default.createElement("span", null, "3 Review")), /* @__PURE__ */ import_react11.default.createElement("span", { className: "interaction-kind" }, isXts ? "Actual run \xB7 XTS" : "Host action"), /* @__PURE__ */ import_react11.default.createElement("h2", null, interaction.title ?? interaction.stepID), interaction.prompt ? /* @__PURE__ */ import_react11.default.createElement("p", null, interaction.prompt) : null, isXts ? /* @__PURE__ */ import_react11.default.createElement("p", null, "VS Code will switch to XTS. Review the view, then return here to record your findings.") : null, /* @__PURE__ */ import_react11.default.createElement(
+      if (!isXts) return /* @__PURE__ */ import_react15.default.createElement("div", { className: "interaction-wait", role: "status" }, "Opening host view...");
+      return /* @__PURE__ */ import_react15.default.createElement("section", { className: "interaction-pane host-action-pane", "aria-label": isXts ? "Open XTS view" : "Open host view" }, /* @__PURE__ */ import_react15.default.createElement("div", { className: "actual-run-stepper", "aria-label": "Actual run progress" }, /* @__PURE__ */ import_react15.default.createElement("strong", null, "1 Open XTS"), /* @__PURE__ */ import_react15.default.createElement("span", null, "2 Answer questions"), /* @__PURE__ */ import_react15.default.createElement("span", null, "3 Review")), /* @__PURE__ */ import_react15.default.createElement("span", { className: "interaction-kind" }, isXts ? "Actual run \xB7 XTS" : "Host action"), /* @__PURE__ */ import_react15.default.createElement("h2", null, interaction.title ?? interaction.stepID), interaction.prompt ? /* @__PURE__ */ import_react15.default.createElement("p", null, interaction.prompt) : null, isXts ? /* @__PURE__ */ import_react15.default.createElement("p", null, "VS Code will switch to XTS. Review the view, then return here to record your findings.") : null, /* @__PURE__ */ import_react15.default.createElement(
         "button",
         {
           type: "button",
@@ -36613,27 +38124,27 @@
             onConfirmHostAction(interaction);
           }
         },
-        submitting ? "Opening XTS..." : /* @__PURE__ */ import_react11.default.createElement("span", null, "Open XTS")
+        submitting ? "Opening XTS..." : /* @__PURE__ */ import_react15.default.createElement("span", null, "Open XTS")
       ));
     }
     if (interaction.kind === "approval") {
-      return /* @__PURE__ */ import_react11.default.createElement(ApprovalInteractionPane, { interaction, onSubmit });
+      return /* @__PURE__ */ import_react15.default.createElement(ApprovalInteractionPane, { interaction, onSubmit });
     }
     if (interaction.kind === "debug_break") {
-      return /* @__PURE__ */ import_react11.default.createElement(DebugInteractionPane, { interaction, onSubmit });
+      return /* @__PURE__ */ import_react15.default.createElement(DebugInteractionPane, { interaction, onSubmit });
     }
-    return /* @__PURE__ */ import_react11.default.createElement("section", { className: "interaction-pane", "aria-label": "Runbook interaction" }, /* @__PURE__ */ import_react11.default.createElement("span", { className: "interaction-kind" }, interaction.kind), /* @__PURE__ */ import_react11.default.createElement("h2", null, interaction.title ?? interaction.stepID), interaction.prompt ? /* @__PURE__ */ import_react11.default.createElement("p", null, interaction.prompt) : null, interaction.kind === "choice" ? /* @__PURE__ */ import_react11.default.createElement("form", { onSubmit: (event) => {
+    return /* @__PURE__ */ import_react15.default.createElement("section", { className: "interaction-pane", "aria-label": "Runbook interaction" }, /* @__PURE__ */ import_react15.default.createElement("span", { className: "interaction-kind" }, interaction.kind), /* @__PURE__ */ import_react15.default.createElement("h2", null, interaction.title ?? interaction.stepID), interaction.prompt ? /* @__PURE__ */ import_react15.default.createElement("p", null, interaction.prompt) : null, interaction.kind === "choice" ? /* @__PURE__ */ import_react15.default.createElement("form", { onSubmit: (event) => {
       event.preventDefault();
       if (choiceMax !== void 0 && selected.length > choiceMax) {
         setValidationError(`Select no more than ${choiceMax} options.`);
         return;
       }
       submit({ kind: "choice", selected });
-    } }, /* @__PURE__ */ import_react11.default.createElement("fieldset", { disabled: submitting }, (interaction.options ?? []).map((option) => {
+    } }, /* @__PURE__ */ import_react15.default.createElement("fieldset", { disabled: submitting }, (interaction.options ?? []).map((option) => {
       const checked = selected.includes(option.value);
       const disabledByMax = choiceMax !== void 0 && !checked && selected.length >= choiceMax;
       const disabledTitle = disabledByMax ? `Maximum of ${choiceMax} options selected. Deselect one to choose another.` : void 0;
-      return /* @__PURE__ */ import_react11.default.createElement("label", { className: "interaction-option", key: option.value, "aria-disabled": disabledByMax, title: disabledTitle }, /* @__PURE__ */ import_react11.default.createElement(
+      return /* @__PURE__ */ import_react15.default.createElement("label", { className: "interaction-option", key: option.value, "aria-disabled": disabledByMax, title: disabledTitle }, /* @__PURE__ */ import_react15.default.createElement(
         "input",
         {
           type: interaction.multiple ? "checkbox" : "radio",
@@ -36651,15 +38162,15 @@
             });
           }
         }
-      ), /* @__PURE__ */ import_react11.default.createElement("span", null, /* @__PURE__ */ import_react11.default.createElement("strong", null, optionText(option)), option.hint ? /* @__PURE__ */ import_react11.default.createElement("small", null, option.hint) : null));
-    })), choiceMax !== void 0 ? /* @__PURE__ */ import_react11.default.createElement("p", { id: choiceLimitID, className: "choice-limit", role: "status" }, selected.length >= choiceMax ? `${selected.length} of ${choiceMax} selected. Deselect an option to choose another.` : `${selected.length} of ${choiceMax} selected. Select up to ${choiceMax} options.`) : null, validationError ? /* @__PURE__ */ import_react11.default.createElement("p", { className: "interaction-error", role: "alert" }, validationError) : null, /* @__PURE__ */ import_react11.default.createElement(
+      ), /* @__PURE__ */ import_react15.default.createElement("span", null, /* @__PURE__ */ import_react15.default.createElement("strong", null, optionText(option)), option.hint ? /* @__PURE__ */ import_react15.default.createElement("small", null, option.hint) : null));
+    })), choiceMax !== void 0 ? /* @__PURE__ */ import_react15.default.createElement("p", { id: choiceLimitID, className: "choice-limit", role: "status" }, selected.length >= choiceMax ? `${selected.length} of ${choiceMax} selected. Deselect an option to choose another.` : `${selected.length} of ${choiceMax} selected. Select up to ${choiceMax} options.`) : null, validationError ? /* @__PURE__ */ import_react15.default.createElement("p", { className: "interaction-error", role: "alert" }, validationError) : null, /* @__PURE__ */ import_react15.default.createElement(
       "button",
       {
         type: "submit",
         disabled: submitting || selected.length < (interaction.min ?? 1) || choiceMax !== void 0 && selected.length > choiceMax
       },
       "Continue"
-    )) : null, interaction.kind === "decision" ? /* @__PURE__ */ import_react11.default.createElement("div", { className: "decision-options" }, (interaction.routes ?? []).map((route) => /* @__PURE__ */ import_react11.default.createElement(
+    )) : null, interaction.kind === "decision" ? /* @__PURE__ */ import_react15.default.createElement("div", { className: "decision-options" }, (interaction.routes ?? []).map((route) => /* @__PURE__ */ import_react15.default.createElement(
       "button",
       {
         key: route.label,
@@ -36667,9 +38178,9 @@
         disabled: submitting,
         onClick: () => submit({ kind: "decision", label: route.label })
       },
-      /* @__PURE__ */ import_react11.default.createElement("strong", null, optionText(route)),
-      route.hint ? /* @__PURE__ */ import_react11.default.createElement("small", null, route.hint) : null
-    ))) : null, interaction.kind === "collector" && collectorReview ? /* @__PURE__ */ import_react11.default.createElement("section", { className: "collector-review review-before-submit", "aria-label": "Review collected answers" }, xtsOpened ? /* @__PURE__ */ import_react11.default.createElement("div", { className: "actual-run-stepper", "aria-label": "Actual run progress" }, /* @__PURE__ */ import_react11.default.createElement("span", null, "1 Open XTS"), /* @__PURE__ */ import_react11.default.createElement("span", null, "2 Answer questions"), /* @__PURE__ */ import_react11.default.createElement("strong", null, "3 Review")) : null, /* @__PURE__ */ import_react11.default.createElement("span", { className: "interaction-kind" }, "Collected in this actual run"), /* @__PURE__ */ import_react11.default.createElement("h3", null, "Review answers"), /* @__PURE__ */ import_react11.default.createElement("dl", null, (interaction.fields ?? []).map((field) => /* @__PURE__ */ import_react11.default.createElement(import_react11.default.Fragment, { key: field.name }, /* @__PURE__ */ import_react11.default.createElement("dt", null, field.label ?? field.display_name ?? field.name), /* @__PURE__ */ import_react11.default.createElement("dd", null, formatCollectorReviewValue(field, collectorReview[field.name]))))), /* @__PURE__ */ import_react11.default.createElement("p", null, "Saving submits these answers and resumes the run. The next route may depend on them."), /* @__PURE__ */ import_react11.default.createElement("div", { className: "debug-actions" }, /* @__PURE__ */ import_react11.default.createElement("button", { type: "button", className: "primary", disabled: submitting, onClick: () => submit({ kind: "collector", values: collectorReview }) }, "Save answers and continue"), /* @__PURE__ */ import_react11.default.createElement("button", { type: "button", disabled: submitting, onClick: () => setCollectorReview(void 0) }, "Edit answers"))) : interaction.kind === "collector" ? /* @__PURE__ */ import_react11.default.createElement("form", { onSubmit: (event) => {
+      /* @__PURE__ */ import_react15.default.createElement("strong", null, optionText(route)),
+      route.hint ? /* @__PURE__ */ import_react15.default.createElement("small", null, route.hint) : null
+    ))) : null, interaction.kind === "collector" && collectorReview ? /* @__PURE__ */ import_react15.default.createElement("section", { className: "collector-review review-before-submit", "aria-label": "Review collected answers" }, xtsOpened ? /* @__PURE__ */ import_react15.default.createElement("div", { className: "actual-run-stepper", "aria-label": "Actual run progress" }, /* @__PURE__ */ import_react15.default.createElement("span", null, "1 Open XTS"), /* @__PURE__ */ import_react15.default.createElement("span", null, "2 Answer questions"), /* @__PURE__ */ import_react15.default.createElement("strong", null, "3 Review")) : null, /* @__PURE__ */ import_react15.default.createElement("span", { className: "interaction-kind" }, "Collected in this actual run"), /* @__PURE__ */ import_react15.default.createElement("h3", null, "Review answers"), /* @__PURE__ */ import_react15.default.createElement("dl", null, (interaction.fields ?? []).map((field2) => /* @__PURE__ */ import_react15.default.createElement(import_react15.default.Fragment, { key: field2.name }, /* @__PURE__ */ import_react15.default.createElement("dt", null, field2.label ?? field2.display_name ?? field2.name), /* @__PURE__ */ import_react15.default.createElement("dd", null, formatCollectorReviewValue(field2, collectorReview[field2.name]))))), /* @__PURE__ */ import_react15.default.createElement("p", null, "Saving submits these answers and resumes the run. The next route may depend on them."), /* @__PURE__ */ import_react15.default.createElement("div", { className: "debug-actions" }, /* @__PURE__ */ import_react15.default.createElement("button", { type: "button", className: "primary", disabled: submitting, onClick: () => submit({ kind: "collector", values: collectorReview }) }, "Save answers and continue"), /* @__PURE__ */ import_react15.default.createElement("button", { type: "button", disabled: submitting, onClick: () => setCollectorReview(void 0) }, "Edit answers"))) : interaction.kind === "collector" ? /* @__PURE__ */ import_react15.default.createElement("form", { onSubmit: (event) => {
       event.preventDefault();
       try {
         setValidationError(void 0);
@@ -36677,52 +38188,53 @@
       } catch (error) {
         setValidationError(error instanceof Error ? error.message : String(error));
       }
-    } }, xtsOpened ? /* @__PURE__ */ import_react11.default.createElement("div", { className: "actual-run-stepper", "aria-label": "Actual run progress" }, /* @__PURE__ */ import_react11.default.createElement("span", null, "1 Open XTS"), /* @__PURE__ */ import_react11.default.createElement("strong", null, "2 Answer questions"), /* @__PURE__ */ import_react11.default.createElement("span", null, "3 Review")) : null, (interaction.fields ?? []).map((field) => /* @__PURE__ */ import_react11.default.createElement("label", { className: "collector-field", "data-field-name": field.name, key: field.name }, /* @__PURE__ */ import_react11.default.createElement("span", null, field.label ?? field.display_name ?? field.name, field.required ? " *" : ""), field.type === "boolean" ? /* @__PURE__ */ import_react11.default.createElement(
+    } }, xtsOpened ? /* @__PURE__ */ import_react15.default.createElement("div", { className: "actual-run-stepper", "aria-label": "Actual run progress" }, /* @__PURE__ */ import_react15.default.createElement("span", null, "1 Open XTS"), /* @__PURE__ */ import_react15.default.createElement("strong", null, "2 Answer questions"), /* @__PURE__ */ import_react15.default.createElement("span", null, "3 Review")) : null, (interaction.fields ?? []).map((field2) => /* @__PURE__ */ import_react15.default.createElement("label", { className: "collector-field", "data-field-name": field2.name, key: field2.name }, /* @__PURE__ */ import_react15.default.createElement("span", null, field2.label ?? field2.display_name ?? field2.name, field2.required ? " *" : ""), field2.type === "boolean" ? /* @__PURE__ */ import_react15.default.createElement(
       "input",
       {
         type: "checkbox",
         disabled: submitting,
-        checked: Boolean(values[field.name]),
-        onChange: (event) => setValues((current) => ({ ...current, [field.name]: event.target.checked }))
+        checked: Boolean(values[field2.name]),
+        onChange: (event) => setValues((current) => ({ ...current, [field2.name]: event.target.checked }))
       }
-    ) : field.options && field.options.length > 0 ? /* @__PURE__ */ import_react11.default.createElement(
+    ) : field2.options && field2.options.length > 0 ? /* @__PURE__ */ import_react15.default.createElement(
       "select",
       {
-        required: field.required,
-        multiple: field.multiple,
+        required: field2.required,
+        multiple: field2.multiple,
         disabled: submitting,
-        value: field.multiple ? Array.isArray(values[field.name]) ? values[field.name] : [] : String(values[field.name] ?? ""),
+        value: field2.multiple ? Array.isArray(values[field2.name]) ? values[field2.name] : [] : String(values[field2.name] ?? ""),
         onChange: (event) => setValues((current) => ({
           ...current,
-          [field.name]: field.multiple ? Array.from(event.target.selectedOptions).map((option) => option.value) : event.target.value
+          [field2.name]: field2.multiple ? Array.from(event.target.selectedOptions).map((option) => option.value) : event.target.value
         }))
       },
-      !field.multiple ? /* @__PURE__ */ import_react11.default.createElement("option", { value: "" }, "Select...") : null,
-      field.options.map((option) => /* @__PURE__ */ import_react11.default.createElement("option", { key: option.value, value: option.value }, optionText(option)))
-    ) : field.type === "textarea" ? /* @__PURE__ */ import_react11.default.createElement(
+      !field2.multiple ? /* @__PURE__ */ import_react15.default.createElement("option", { value: "" }, "Select...") : null,
+      field2.options.map((option) => /* @__PURE__ */ import_react15.default.createElement("option", { key: option.value, value: option.value }, optionText(option)))
+    ) : field2.type === "textarea" ? /* @__PURE__ */ import_react15.default.createElement(
       "textarea",
       {
-        required: field.required,
+        required: field2.required,
         disabled: submitting,
-        value: String(values[field.name] ?? ""),
-        placeholder: field.hint,
+        value: String(values[field2.name] ?? ""),
+        placeholder: field2.hint,
         rows: 3,
-        onChange: (event) => setValues((current) => ({ ...current, [field.name]: event.target.value }))
+        onChange: (event) => setValues((current) => ({ ...current, [field2.name]: event.target.value }))
       }
-    ) : /* @__PURE__ */ import_react11.default.createElement(
+    ) : /* @__PURE__ */ import_react15.default.createElement(
       "input",
       {
-        type: collectorInputType(field.type),
-        step: field.type === "integer" ? 1 : field.type === "number" ? "any" : void 0,
-        required: field.required,
+        type: collectorInputType(field2.type),
+        step: field2.type === "integer" ? 1 : field2.type === "number" ? "any" : void 0,
+        required: field2.required,
         disabled: submitting,
-        value: String(values[field.name] ?? ""),
-        placeholder: field.hint,
-        onChange: (event) => setValues((current) => ({ ...current, [field.name]: event.target.value }))
+        value: String(values[field2.name] ?? ""),
+        placeholder: field2.hint,
+        onChange: (event) => setValues((current) => ({ ...current, [field2.name]: event.target.value }))
       }
-    ))), validationError ? /* @__PURE__ */ import_react11.default.createElement("div", { className: "interaction-error", role: "alert" }, validationError) : null, /* @__PURE__ */ import_react11.default.createElement("button", { type: "submit", disabled: submitting }, "Review answers")) : null);
+    ))), validationError ? /* @__PURE__ */ import_react15.default.createElement("div", { className: "interaction-error", role: "alert" }, validationError) : null, /* @__PURE__ */ import_react15.default.createElement("button", { type: "submit", disabled: submitting }, "Review answers")) : null);
   }
   function nodeDimensions(kind, style2) {
+    if (kind === "technical-segment") return { width: 200, height: 58 };
     if (kind === "merge" || kind === "session-entry") return { width: 14, height: 14 };
     if (style2 === "minimalist") {
       if (kind === "end") return { width: 164, height: 48 };
@@ -36911,7 +38423,7 @@
       const parentBounds = groupID ? groupBounds.get(groupID) : void 0;
       return {
         id: node.id,
-        type: node.data.kind === "session-entry" ? "sessionEntry" : node.data.synthetic === true ? "branchMerge" : "gertStep",
+        type: node.data.kind === "technical-segment" ? "technicalSegment" : node.data.kind === "session-entry" ? "sessionEntry" : node.data.synthetic === true ? "branchMerge" : "gertStep",
         position: {
           x: position.x - (parentBounds?.x ?? 0),
           y: position.y - (parentBounds?.y ?? 0)
@@ -36998,6 +38510,7 @@
   }
   function eventNodeID(event) {
     const payload = event.payload ?? {};
+    if (typeof payload.qualified_node_id === "string" && payload.qualified_node_id) return payload.qualified_node_id;
     const explicitNodeID = payload.node_id;
     if (typeof explicitNodeID === "string" && explicitNodeID) return explicitNodeID;
     const stepID = payload.step_id;
@@ -37029,10 +38542,10 @@
     }
     return kept;
   }
-  function applyRuntimeEvent(current, event) {
+  function applyRuntimeEvent(current, event, expectedDisplaySnapshot = "missing-binding") {
     const nodeID = eventNodeID(event);
     if (!nodeID) return { ...current };
-    const previous = current[nodeID] ?? { status: "pending" };
+    let previous = current[nodeID] ?? { status: "pending" };
     if (event.kind === "debug/override_applied") {
       return {
         ...current,
@@ -37043,7 +38556,11 @@
       const payload2 = event.payload ?? {};
       return {
         ...current,
-        [nodeID]: { ...previous, logs: appendRuntimeLog(previous.logs, payload2) }
+        [nodeID]: {
+          ...previous,
+          logs: appendRuntimeLog(previous.logs, payload2),
+          lastActivityAt: event.timestamp ?? previous.lastActivityAt
+        }
       };
     }
     let status = previous.status;
@@ -37053,38 +38570,134 @@
     else if (event.kind === "step/failed") status = "failed";
     else if (event.kind === "step/indeterminate") status = "indeterminate";
     else if (event.kind === "step/skipped") status = "skipped";
+    else if (event.kind === "step/cancelled") status = "cancelled";
+    else if (event.kind === "step/denied") status = "denied";
+    else if (event.kind === "step/blocked") status = "blocked";
     else return current;
     const payload = event.payload ?? {};
-    return {
-      ...current,
-      [nodeID]: {
+    const counter = (value2, minimum = 1) => typeof value2 === "number" && Number.isSafeInteger(value2) && value2 >= minimum ? value2 : void 0;
+    const invocation = counter(payload.invocation);
+    const retryAttempt = counter(payload.retry_attempt === void 0 ? payload.attempt : payload.retry_attempt);
+    const occurrenceID = directOccurrenceID(event.run_id, nodeID, payload) + (validProgressIdentity(payload) ? "" : `:uncertain:${event.sequence}`);
+    const existingOccurrence = previous.occurrences?.find((item) => item.occurrenceID === occurrenceID);
+    const directDisplaySnapshot = existingOccurrence?.directDisplaySnapshot ?? expectedDisplaySnapshot;
+    if (["step/started", "step/resumed", "step/delaying"].includes(event.kind) && !existingOccurrence && validProgressIdentity(payload)) {
+      previous = beginDirectDisplayOccurrence(previous, payload, event.run_id, directDisplaySnapshot);
+    }
+    if (event.run_id && existingOccurrence && isSettledStepStatus(existingOccurrence.status) && ["step/started", "step/resumed", "step/delaying"].includes(event.kind)) return current;
+    const retainedSameOccurrence = event.kind === "step/started" ? previous.occurrences?.find((item) => item.occurrenceID === occurrenceID && (item.displayPresentation || item.displayPresentationDiagnostic)) : void 0;
+    const presentation = event.kind === "step/completed" || event.kind === "step/failed" ? terminalPresentation(payload, existingOccurrence, directDisplaySnapshot) : void 0;
+    if (existingOccurrence && isSettledStepStatus(existingOccurrence.status) && (existingOccurrence.displayPresentation || existingOccurrence.displayPresentationDiagnostic || presentation?.displayPresentation || presentation?.displayPresentationDiagnostic) && (event.kind === "step/completed" || event.kind === "step/failed")) {
+      const update = {
+        output: recordValue(payload.output),
+        displayPresentation: presentation?.displayPresentation,
+        displayPresentationDiagnostic: presentation?.displayPresentationDiagnostic
+      };
+      return { ...current, [nodeID]: reconcileDirectDisplayState({
         ...previous,
-        status,
-        error: typeof payload.error === "string" ? payload.error : previous.error,
-        durationMs: typeof payload.duration_ms === "number" ? payload.duration_ms : previous.durationMs,
-        attempt: typeof payload.attempt === "number" ? payload.attempt : typeof payload.attempt_number === "number" ? payload.attempt_number : previous.attempt,
-        delay: typeof payload.delay === "string" ? payload.delay : previous.delay,
-        skipReason: typeof payload.reason === "string" ? payload.reason : previous.skipReason,
-        output: recordValue(payload.output) ?? previous.output,
-        captures: recordValue(payload.captures) ?? previous.captures,
-        evidence: payload.evidence ?? previous.evidence,
-        ...event.kind === "step/started" && event.timestamp ? { startedAt: event.timestamp } : {},
-        ...(event.kind === "step/completed" || event.kind === "step/failed" || event.kind === "step/indeterminate" || event.kind === "step/skipped") && event.timestamp ? { finishedAt: event.timestamp } : {}
-      }
+        ...previous.occurrenceID === occurrenceID ? update : {},
+        occurrences: previous.occurrences.map((item) => item.occurrenceID === occurrenceID ? { ...item, ...update } : item)
+      }, previous) };
+    }
+    const value = {
+      ...previous,
+      directDisplaySnapshot,
+      status,
+      ...event.kind === "step/started" && !existingOccurrence ? {
+        error: void 0,
+        durationMs: void 0,
+        startedAt: void 0,
+        finishedAt: void 0
+      } : {},
+      lastActivityAt: event.timestamp ?? existingOccurrence?.lastActivityAt,
+      stepKind: producerStepKind(payload) ?? previous.stepKind,
+      error: typeof payload.error === "string" ? payload.error : event.kind === "step/started" && !existingOccurrence ? void 0 : previous.error,
+      durationMs: typeof payload.duration_ms === "number" ? payload.duration_ms : event.kind === "step/started" && !existingOccurrence ? void 0 : previous.durationMs,
+      attempt: typeof payload.attempt === "number" ? payload.attempt : typeof payload.attempt_number === "number" ? payload.attempt_number : previous.attempt,
+      delay: typeof payload.delay === "string" ? payload.delay : previous.delay,
+      skipReason: typeof payload.reason === "string" ? payload.reason : previous.skipReason,
+      output: event.kind === "step/completed" || event.kind === "step/failed" ? recordValue(payload.output) : previous.output,
+      ...event.kind === "step/completed" || event.kind === "step/failed" ? {
+        codePresentation: void 0,
+        outputValueStatus: void 0,
+        presentationDiagnostic: void 0,
+        displayPresentation: void 0,
+        displayPresentationDiagnostic: void 0,
+        ...presentation
+      } : {},
+      ...event.kind === "step/started" ? {
+        output: void 0,
+        codePresentation: void 0,
+        outputValueStatus: void 0,
+        presentationDiagnostic: void 0,
+        displayPresentation: void 0,
+        displayPresentationDiagnostic: void 0
+      } : {},
+      ...retainedSameOccurrence ? {
+        output: retainedSameOccurrence.output,
+        displayPresentation: retainedSameOccurrence.displayPresentation,
+        displayPresentationDiagnostic: retainedSameOccurrence.displayPresentationDiagnostic
+      } : {},
+      captures: recordValue(payload.captures) ?? previous.captures,
+      evidence: payload.evidence ?? previous.evidence,
+      ...event.kind === "step/started" && event.timestamp ? { startedAt: event.timestamp } : {},
+      ...(event.kind === "step/completed" || event.kind === "step/failed" || event.kind === "step/indeterminate" || event.kind === "step/skipped") && event.timestamp ? { finishedAt: event.timestamp } : {}
     };
+    const { occurrences: _history, retainedPresentations: _retained, displayObservations: _displayHistory, ...observation } = value;
+    const occurrence = {
+      ...observation,
+      occurrenceID,
+      runID: event.run_id,
+      segmentID: "",
+      qualifiedNodeID: nodeID,
+      phase: typeof payload.phase === "string" ? payload.phase : void 0,
+      invocation,
+      retryAttempt,
+      frameID: typeof payload.frame_id === "string" ? payload.frame_id : void 0,
+      frameStepIndex: counter(payload.frame_step_index, 0),
+      dispatchOccurrenceID: typeof payload.dispatch_occurrence_id === "string" ? payload.dispatch_occurrence_id : void 0,
+      executionLane: typeof payload.execution_lane === "string" ? payload.execution_lane : void 0,
+      startedEventSequence: existingOccurrence?.startedEventSequence ?? (event.kind === "step/started" || event.kind === "step/resumed" ? event.sequence : void 0),
+      occurrenceSequence: counter(payload.occurrence_sequence) ?? existingOccurrence?.occurrenceSequence,
+      executionSource: "live"
+    };
+    const history = [...previous.occurrences ?? []];
+    const index = history.findIndex((item) => item.occurrenceID === occurrenceID);
+    if (index < 0) history.push(occurrence);
+    else if (!(event.kind === "step/started" && ["completed", "failed", "denied", "indeterminate", "cancelled", "blocked", "skipped"].includes(history[index].status))) {
+      history[index] = occurrence;
+    }
+    const latest = history.filter((item) => item.runID === event.run_id).reduce((left, right) => compareOccurrences(left, right) > 0 ? left : right);
+    return { ...current, [nodeID]: reconcileDirectDisplayState({
+      ...latest.occurrenceID === occurrenceID ? value : previous,
+      runID: latest.runID,
+      occurrenceID: latest.occurrenceID,
+      occurrences: history
+    }, previous) };
   }
-  function applyTerminalSteps(current, steps) {
+  function applyTerminalSteps(current, steps, expectedDisplaySnapshot = "missing-binding", runID) {
     if (!steps) return { ...current };
     const next = { ...current };
     for (const step of steps) {
       const nodeID = step.node_id || step.step_id;
       if (!nodeID || !step.status) continue;
+      const prior = next[nodeID];
+      const display = applyDirectDisplaySummary(
+        prior ?? {},
+        step,
+        nodeID,
+        runID ?? prior?.runID ?? "",
+        expectedDisplaySnapshot
+      );
+      const frozenOutcome = prior && prior.runID === display.runID && prior.directDisplaySnapshot === display.directDisplaySnapshot && isSettledStepStatus(prior.status) && display.displayObservations?.[nodeID]?.length;
       next[nodeID] = {
-        ...next[nodeID],
-        status: step.status,
-        error: step.error || next[nodeID]?.error,
-        durationMs: step.duration_ms ?? next[nodeID]?.durationMs,
-        output: step.output ?? next[nodeID]?.output
+        ...display,
+        status: frozenOutcome ? prior.status : step.status,
+        error: frozenOutcome ? prior.error : step.error || prior?.error,
+        durationMs: frozenOutcome ? prior.durationMs : step.duration_ms ?? prior?.durationMs,
+        // Summary previews have no slot classifications; keep the terminal event's
+        // approved values and frozen metadata together instead of replacing them.
+        output: display.displayPresentation || display.displayPresentationDiagnostic ? display.output : prior?.codePresentation || prior?.presentationDiagnostic ? prior.output : step.output ?? prior?.output
       };
     }
     return next;
@@ -37138,7 +38751,7 @@
     const supported = debugTargetSupported(document2, node);
     const hasBefore = breakpoints.some((breakpoint) => breakpoint.nodeID === node.id && breakpoint.phase === "before");
     const hasAfter = breakpoints.some((breakpoint) => breakpoint.nodeID === node.id && breakpoint.phase === "after");
-    return /* @__PURE__ */ import_react11.default.createElement("section", { className: "debug-controls", "aria-label": "Debugger settings" }, /* @__PURE__ */ import_react11.default.createElement("h3", null, /* @__PURE__ */ import_react11.default.createElement(Bug, { "aria-hidden": "true" }), "Debugger"), supported ? /* @__PURE__ */ import_react11.default.createElement("div", { className: "breakpoint-options" }, /* @__PURE__ */ import_react11.default.createElement("label", null, /* @__PURE__ */ import_react11.default.createElement("input", { type: "checkbox", checked: hasBefore, disabled, onChange: () => onToggle(node.id, "before") }), /* @__PURE__ */ import_react11.default.createElement("span", null, "Pause before execution")), /* @__PURE__ */ import_react11.default.createElement("label", null, /* @__PURE__ */ import_react11.default.createElement("input", { type: "checkbox", checked: hasAfter, disabled, onChange: () => onToggle(node.id, "after") }), /* @__PURE__ */ import_react11.default.createElement("span", null, "Pause after execution"))) : /* @__PURE__ */ import_react11.default.createElement("p", { className: "debug-protected" }, "Breakpoints are unavailable for this concurrent or structural step."), /* @__PURE__ */ import_react11.default.createElement("label", { className: "debug-field" }, /* @__PURE__ */ import_react11.default.createElement("span", null, "Watch expressions"), /* @__PURE__ */ import_react11.default.createElement(
+    return /* @__PURE__ */ import_react15.default.createElement("section", { className: "debug-controls", "aria-label": "Debugger settings" }, /* @__PURE__ */ import_react15.default.createElement("h3", null, /* @__PURE__ */ import_react15.default.createElement(Bug, { "aria-hidden": "true" }), "Debugger"), supported ? /* @__PURE__ */ import_react15.default.createElement("div", { className: "breakpoint-options" }, /* @__PURE__ */ import_react15.default.createElement("label", null, /* @__PURE__ */ import_react15.default.createElement("input", { type: "checkbox", checked: hasBefore, disabled, onChange: () => onToggle(node.id, "before") }), /* @__PURE__ */ import_react15.default.createElement("span", null, "Pause before execution")), /* @__PURE__ */ import_react15.default.createElement("label", null, /* @__PURE__ */ import_react15.default.createElement("input", { type: "checkbox", checked: hasAfter, disabled, onChange: () => onToggle(node.id, "after") }), /* @__PURE__ */ import_react15.default.createElement("span", null, "Pause after execution"))) : /* @__PURE__ */ import_react15.default.createElement("p", { className: "debug-protected" }, "Breakpoints are unavailable for this concurrent or structural step."), /* @__PURE__ */ import_react15.default.createElement("label", { className: "debug-field" }, /* @__PURE__ */ import_react15.default.createElement("span", null, "Watch expressions"), /* @__PURE__ */ import_react15.default.createElement(
       "textarea",
       {
         value: watches,
@@ -37151,13 +38764,14 @@
   }
   function GraphView2({
     document: document2,
+    results,
     testMode,
     style: style2,
-    runtimeNodes,
+    runtimeNodes: observedRuntimeNodes,
     executionNodeID,
     breakpoints,
     watches,
-    pending,
+    pending: pending2,
     sessionID,
     sessionStatus,
     sessionAttached,
@@ -37194,46 +38808,111 @@
     onRunRouteTest,
     xtsOpened
   }) {
-    const [selectedId, setSelectedId] = (0, import_react11.useState)();
-    const [showPanel, setShowPanel] = (0, import_react11.useState)(true);
-    const [inspectorRatio, setInspectorRatio] = (0, import_react11.useState)(restoredInspectorRatio);
-    const [routeTargetID, setRouteTargetID] = (0, import_react11.useState)();
-    const [routeScope, setRouteScope] = (0, import_react11.useState)("through");
-    const [routeTestEditor, setRouteTestEditor] = (0, import_react11.useState)();
-    const [locateNodeID, setLocateNodeID] = (0, import_react11.useState)();
-    const [closeStatus, setCloseStatus] = (0, import_react11.useState)("resolved");
-    const [inspectionRevision, setInspectionRevision] = (0, import_react11.useState)();
-    const flowRef = (0, import_react11.useRef)();
-    const canvasRef = (0, import_react11.useRef)(null);
-    const workspaceRef = (0, import_react11.useRef)(null);
-    const resizePointerIDRef = (0, import_react11.useRef)();
-    const restoreViewportRef = (0, import_react11.useRef)();
-    const declarations = (0, import_react11.useMemo)(() => graphInputDeclarations(document2), [document2]);
-    const structuralDocument = (0, import_react11.useMemo)(() => withBranchMerges(document2), [document2]);
-    const routeSourceDocument = (0, import_react11.useMemo)(
+    const runtimeNodes = (0, import_react15.useMemo)(() => displayRuntimeStatuses(observedRuntimeNodes, runStatus, document2), [observedRuntimeNodes, runStatus, document2]);
+    const [selectedId, setSelectedId] = (0, import_react15.useState)();
+    (0, import_react15.useEffect)(() => {
+      if (!testMode) return;
+      const report = (event) => vscode.postMessage({ type: "test.error", message: event.message, stack: event.error?.stack });
+      window.addEventListener("error", report);
+      return () => window.removeEventListener("error", report);
+    }, [testMode]);
+    const [viewPreference, setViewPreference] = (0, import_react15.useState)(() => decodeWorkflowPreference(recordValue(vscode.getState?.())?.workflowView));
+    const [expandedTechnicalIDs, setExpandedTechnicalIDs] = (0, import_react15.useState)(/* @__PURE__ */ new Set());
+    const [issueSelection, setIssueSelection] = (0, import_react15.useState)();
+    const [issueNotice, setIssueNotice] = (0, import_react15.useState)(false);
+    const issues = (0, import_react15.useMemo)(() => workflowIssueIndex(runtimeNodes), [runtimeNodes]);
+    const changePreference = (patch) => {
+      const preference = decodeWorkflowPreference({ ...viewPreference, ...patch });
+      setViewPreference(preference);
+      vscode.setState?.(mergeWorkflowPreference(vscode.getState?.(), preference));
+    };
+    (0, import_react15.useEffect)(() => {
+      const canonicalIDs = new Set(document2.nodes.map((node) => node.id));
+      setExpandedTechnicalIDs((current) => new Set([...current].filter((id2) => canonicalIDs.has(id2))));
+      setSelectedId((current) => current && canonicalIDs.has(current) ? current : void 0);
+    }, [document2.hash, document2.runbook.path, sessionID]);
+    const [showPanel, setShowPanel] = (0, import_react15.useState)(true);
+    (0, import_react15.useEffect)(() => {
+      if (results?.state === "available" && runStatus === "completed") {
+        const origin = results.publication.origin.node_id;
+        if (document2.nodes.some((node) => node.id === origin && node.data.kind === "results")) {
+          setSelectedId(origin);
+          setShowPanel(true);
+        }
+      }
+    }, [results, runStatus]);
+    const [inspectorRatio, setInspectorRatio] = (0, import_react15.useState)(restoredInspectorRatio);
+    const [routeTargetID, setRouteTargetID] = (0, import_react15.useState)();
+    const [routeScope, setRouteScope] = (0, import_react15.useState)("through");
+    const [routeTestEditor, setRouteTestEditor] = (0, import_react15.useState)();
+    const [locateNodeID, setLocateNodeID] = (0, import_react15.useState)();
+    const [activityLocationNotice, setActivityLocationNotice] = (0, import_react15.useState)();
+    const activities = (0, import_react15.useMemo)(
+      () => currentActivities(document2, observedRuntimeNodes, runStatus, runID, pending2),
+      [document2, observedRuntimeNodes, runStatus, runID, pending2]
+    );
+    const progressCounts = (0, import_react15.useMemo)(() => canonicalProgress(document2, observedRuntimeNodes, runStatus), [document2, observedRuntimeNodes, runStatus]);
+    const [closeStatus, setCloseStatus] = (0, import_react15.useState)("resolved");
+    const [inspectionRevision, setInspectionRevision] = (0, import_react15.useState)();
+    const flowRef = (0, import_react15.useRef)();
+    const canvasRef = (0, import_react15.useRef)(null);
+    const workspaceRef = (0, import_react15.useRef)(null);
+    const resizePointerIDRef = (0, import_react15.useRef)();
+    const restoreViewportRef = (0, import_react15.useRef)();
+    const declarations = (0, import_react15.useMemo)(() => graphInputDeclarations(document2), [document2]);
+    const structuralDocument = (0, import_react15.useMemo)(() => withBranchMerges(document2), [document2]);
+    const routeSourceDocument = (0, import_react15.useMemo)(
       () => sessionID ? sessionRouteDocument(structuralDocument, runtimeNodes, routeTargetID) : structuralDocument,
       [routeTargetID, runtimeNodes, sessionID, structuralDocument]
     );
-    const routeIndex2 = (0, import_react11.useMemo)(() => buildRouteProjectionIndex(routeSourceDocument), [routeSourceDocument]);
-    const routeProjection = (0, import_react11.useMemo)(
+    const routeIndex2 = (0, import_react15.useMemo)(() => buildRouteProjectionIndex(routeSourceDocument), [routeSourceDocument]);
+    const routeProjection = (0, import_react15.useMemo)(
       () => routeTargetID ? sessionID ? computeSessionRouteProjection(routeSourceDocument, routeTargetID, routeScope, routeIndex2) : computeRouteProjection(routeSourceDocument, routeTargetID, routeScope, routeIndex2) : void 0,
       [routeIndex2, routeScope, routeSourceDocument, routeTargetID, sessionID]
     );
-    const prerequisiteProjection = (0, import_react11.useMemo)(
+    const prerequisiteProjection = (0, import_react15.useMemo)(
       () => routeTargetID ? sessionID ? computeSessionRouteProjection(routeSourceDocument, routeTargetID, "to", routeIndex2) : computeRouteProjection(routeSourceDocument, routeTargetID, "to", routeIndex2) : void 0,
       [routeIndex2, routeSourceDocument, routeTargetID, sessionID]
     );
-    const displayDocument = (0, import_react11.useMemo)(
+    const routeDisplayDocument = (0, import_react15.useMemo)(
       () => routeProjection ? projectRouteDocument(routeSourceDocument, routeProjection) : structuralDocument,
       [routeProjection, routeSourceDocument, structuralDocument]
     );
-    const layoutTopologyKey = (0, import_react11.useMemo)(() => sessionGraphTopologyKey(displayDocument), [displayDocument]);
-    const layoutGeometry = (0, import_react11.useMemo)(() => layoutDocument(displayDocument, style2), [layoutTopologyKey, style2]);
-    const layout = (0, import_react11.useMemo)(
+    const pinnedNodeIDs = (0, import_react15.useMemo)(() => /* @__PURE__ */ new Set([
+      ...selectedId ? [selectedId] : [],
+      ...locateNodeID ? [locateNodeID] : [],
+      ...activities.filter((value) => value.inGraph).map((value) => value.nodeID),
+      ...pending2?.nodeID ? [pending2.nodeID] : [],
+      ...breakpoints.map((value) => value.nodeID)
+    ]), [selectedId, locateNodeID, pending2?.nodeID, breakpoints, activities]);
+    const issueContextDocument = (0, import_react15.useMemo)(() => {
+      const structuralIDs = new Set(structuralDocument.nodes.map((node) => node.id));
+      const canonicalIDs = new Set(document2.nodes.map((node) => node.id));
+      return issues.some((issue) => !structuralIDs.has(issue.nodeID) && canonicalIDs.has(issue.nodeID)) ? document2 : structuralDocument;
+    }, [document2, structuralDocument, issues]);
+    const workflow = (0, import_react15.useMemo)(() => projectWorkflow(issueContextDocument, runtimeNodes, {
+      mode: viewPreference.workflowMode,
+      expandedNodeIDs: expandedTechnicalIDs,
+      pinnedNodeIDs,
+      collapsedGroupIDs: /* @__PURE__ */ new Set()
+    }, routeDisplayDocument), [issueContextDocument, runtimeNodes, viewPreference.workflowMode, expandedTechnicalIDs, pinnedNodeIDs, routeDisplayDocument]);
+    const displayDocument = workflow.document;
+    (0, import_react15.useEffect)(() => {
+      if (!routeTargetID) return;
+      const visible = new Set(routeDisplayDocument.nodes.map((node) => node.id));
+      if ([...workflow.forcedNodeIDs].some((id2) => !visible.has(id2))) {
+        setRouteTargetID(void 0);
+        setRouteTestEditor(void 0);
+        setIssueNotice(true);
+      }
+    }, [issues, routeTargetID, routeDisplayDocument, workflow]);
+    const layoutTopologyKey = (0, import_react15.useMemo)(() => sessionGraphTopologyKey(displayDocument), [displayDocument]);
+    const layoutGeometry = (0, import_react15.useMemo)(() => layoutDocument(displayDocument, style2), [layoutTopologyKey, style2]);
+    const layout = (0, import_react15.useMemo)(
       () => refreshLayoutMetadata(layoutGeometry, displayDocument, style2),
       [displayDocument, layoutGeometry, style2]
     );
-    const runtimeEdges = (0, import_react11.useMemo)(() => layout.edges.map((edge) => ({
+    const runtimeEdges = (0, import_react15.useMemo)(() => layout.edges.map((edge) => ({
       ...edge,
       className: edge.data?.graphEdge ? [
         edge.data.graphEdge.type === "session-transition" ? "edge-session-transition" : "",
@@ -37241,23 +38920,41 @@
       ].filter(Boolean).join(" ") || void 0 : void 0
     })), [layout.edges, runtimeNodes]);
     const focusedNodeID = routeTargetID ?? selectedId;
-    const displayNodes = (0, import_react11.useMemo)(() => layout.nodes.map((node) => ({
+    const displayNodes = (0, import_react15.useMemo)(() => layout.nodes.map((node) => ({
       ...node,
+      ...workflow.segments.has(node.id) ? { data: {
+        ...node.data,
+        expand: () => setExpandedTechnicalIDs((current) => /* @__PURE__ */ new Set([...current, ...workflow.segments.get(node.id).memberNodeIDs])),
+        memberSummary: (() => {
+          const counts = /* @__PURE__ */ new Map();
+          for (const id2 of workflow.segments.get(node.id).memberNodeIDs) {
+            const status = runtimeNodes[id2]?.status;
+            if (status) counts.set(status, (counts.get(status) ?? 0) + 1);
+          }
+          return counts.size ? [...counts].map(([status, count]) => `${count} ${status === "no-final-status" ? "No final status" : status}`).join(", ") : "Visual grouping \u2014 not skipped";
+        })()
+      } } : {},
       selected: node.id === focusedNodeID
-    })), [focusedNodeID, layout.nodes]);
-    const activeNodeIDs = (0, import_react11.useMemo)(() => activeGraphNodeIDs(structuralDocument, runtimeNodes), [structuralDocument, runtimeNodes]);
-    const executionNode = executionNodeID ? document2.nodes.find((node) => node.id === executionNodeID) ?? document2.nodes.find((node) => node.data.step_id === executionNodeID) : void 0;
+    })), [focusedNodeID, layout.nodes, workflow, runtimeNodes]);
+    const [renderNodes, setRenderNodes] = (0, import_react15.useState)(displayNodes);
+    (0, import_react15.useEffect)(() => {
+      setRenderNodes((current) => preserveLayoutMeasurements(displayNodes, current));
+    }, [displayNodes]);
+    const activeNodeIDs = (0, import_react15.useMemo)(() => activeGraphNodeIDs(structuralDocument, runtimeNodes), [structuralDocument, runtimeNodes]);
+    const currentNodeID = isExecutionEnded(runStatus) ? executionNodeID : activities[0]?.nodeID;
+    const executionNode = currentNodeID ? document2.nodes.find((node) => node.id === currentNodeID) : void 0;
     const resolvedExecutionNodeID = executionNode?.id;
-    const executionTerminal = isTerminalRunStatus(runStatus);
-    const executionPosition = (0, import_react11.useMemo)(
+    const executionTerminal = isExecutionEnded(runStatus);
+    const executionPosition = (0, import_react15.useMemo)(
       () => ({ nodeID: resolvedExecutionNodeID, terminal: executionTerminal }),
       [executionTerminal, resolvedExecutionNodeID]
     );
-    const breakpointKeys = (0, import_react11.useMemo)(
+    const breakpointKeys = (0, import_react15.useMemo)(
       () => new Set(breakpoints.map((breakpoint) => breakpointKey(breakpoint.nodeID, breakpoint.phase))),
       [breakpoints]
     );
-    const selected = document2.nodes.find((node) => node.id === selectedId);
+    const requestedHistoricalNode = issueSelection?.segmentID && issueSelection.graphRevision !== void 0 && issueSelection.qualifiedNodeID ? revisionNodes[revisionNodeKey(issueSelection.segmentID, issueSelection.graphRevision, issueSelection.qualifiedNodeID)] : void 0;
+    const selected = document2.nodes.find((node) => node.id === selectedId) ?? (issueSelection?.nodeID === selectedId ? requestedHistoricalNode : void 0);
     const selectedSegmentID = typeof selected?.data.segment_id === "string" ? selected.data.segment_id : "";
     const selectedOriginalNodeID = typeof selected?.data.original_node_id === "string" ? selected.data.original_node_id : selected?.id ?? "";
     const availableGraphRevisions = selectedSegmentID ? segmentGraphRevisions[selectedSegmentID] ?? [] : [];
@@ -37267,11 +38964,11 @@
     const inspectedNode = selectedGraphRevision === latestGraphRevision ? selected : revisionNodes[revisionRequestID];
     const routeTarget = document2.nodes.find((node) => node.id === routeTargetID);
     const routeTargetName = String(routeTarget?.data.title || routeTarget?.data.id || routeTarget?.id || "selected step");
-    const routeTestCandidates = (0, import_react11.useMemo)(() => {
+    const routeTestCandidates = (0, import_react15.useMemo)(() => {
       const kinds = /* @__PURE__ */ new Set(["cli", "tool", "host_action", "collector", "choice", "decision", "approve"]);
       return document2.nodes.filter((node) => node.id !== routeTargetID && prerequisiteProjection?.nodeIDs.has(node.id) && kinds.has(String(node.data.kind ?? "")));
     }, [document2, prerequisiteProjection, routeTargetID]);
-    const routeTestBlockers = (0, import_react11.useMemo)(() => document2.nodes.flatMap((node) => {
+    const routeTestBlockers = (0, import_react15.useMemo)(() => document2.nodes.flatMap((node) => {
       if (node.id === routeTargetID || !prerequisiteProjection?.nodeIDs.has(node.id)) return [];
       const kind = String(node.data.kind ?? "");
       const dynamicInclude = kind === "include" && node.data.dynamic === true;
@@ -37288,6 +38985,23 @@
     const routeTestContextKey = `${document2.hash}:${routeTestContext?.planHash ?? ""}`;
     const currentRouteTestEditor = routeTestEditor?.contextKey === routeTestContextKey ? routeTestEditor : void 0;
     const routeTestReviewOpen = currentRouteTestEditor !== void 0;
+    const navigateIssue = (issue) => {
+      setIssueSelection(issue);
+      setSelectedId(issue.nodeID);
+      setShowPanel(true);
+      setRouteTargetID(void 0);
+      setRouteTestEditor(void 0);
+      setIssueNotice(true);
+      setLocateNodeID(issue.nodeID);
+      const node = document2.nodes.find((value) => value.id === issue.nodeID);
+      const segmentID = issue.segmentID || String(node?.data.segment_id ?? "");
+      const originalID = issue.qualifiedNodeID || String(node?.data.original_node_id ?? "");
+      if (sessionID && segmentID && issue.graphRevision !== void 0) {
+        setInspectionRevision({ nodeID: issue.nodeID, revision: issue.graphRevision });
+        if (unloadedSegmentIDs.includes(segmentID)) vscode.postMessage({ type: "session.load-segment", segmentID, revision: issue.graphRevision });
+        onRequestGraphRevision(revisionNodeKey(segmentID, issue.graphRevision, originalID), segmentID, issue.graphRevision, originalID);
+      }
+    };
     const showRoutesThrough = (nodeID) => {
       if (!routeTargetID) restoreViewportRef.current = flowRef.current?.getViewport();
       setRouteScope("through");
@@ -37303,12 +39017,42 @@
       setRouteTargetID(void 0);
       setRouteTestEditor(void 0);
     };
-    const locateExecutionNode = () => {
-      if (!resolvedExecutionNodeID) return;
+    const locateExecutionNode = (activity) => {
+      setActivityLocationNotice(void 0);
+      if (!activity.inGraph) {
+        if (sessionID && activity.segmentID && activity.graphRevision !== void 0) {
+          if (unloadedSegmentIDs.includes(activity.segmentID)) {
+            vscode.postMessage({ type: "session.load-segment", segmentID: activity.segmentID, revision: activity.graphRevision });
+          }
+          onRequestGraphRevision(
+            revisionNodeKey(activity.segmentID, activity.graphRevision, activity.path),
+            activity.segmentID,
+            activity.graphRevision,
+            activity.path
+          );
+          setInspectionRevision({ nodeID: activity.nodeID, revision: activity.graphRevision });
+          setIssueSelection({
+            nodeID: activity.nodeID,
+            qualifiedNodeID: activity.path,
+            segmentID: activity.segmentID,
+            graphRevision: activity.graphRevision,
+            occurrenceID: activity.occurrenceID,
+            status: activity.status,
+            blockedOutcome: false
+          });
+          setSelectedId(activity.nodeID);
+          setShowPanel(true);
+          setActivityLocationNotice(`Requested existing segment revision ${activity.graphRevision}: ${activity.path}. The viewport is unchanged until this exact node is available.`);
+        } else {
+          setActivityLocationNotice(`No graph location is available for ${activity.path}. This is the exact runtime child path; no substitute node was selected.`);
+        }
+        return;
+      }
       setRouteTargetID(void 0);
       setRouteTestEditor(void 0);
-      setSelectedId(resolvedExecutionNodeID);
-      setLocateNodeID(resolvedExecutionNodeID);
+      setSelectedId(activity.nodeID);
+      setShowPanel(true);
+      setLocateNodeID(activity.nodeID);
     };
     const resizeInspectorFromClientX = (clientX) => {
       const bounds = workspaceRef.current?.getBoundingClientRect();
@@ -37326,29 +39070,61 @@
       event.preventDefault();
       setInspectorRatio(clampInspectorRatio(next));
     };
-    (0, import_react11.useEffect)(() => persistInspectorRatio(inspectorRatio), [inspectorRatio]);
-    (0, import_react11.useEffect)(() => {
+    (0, import_react15.useEffect)(() => persistInspectorRatio(inspectorRatio), [inspectorRatio]);
+    (0, import_react15.useEffect)(() => {
       if (!sessionID || !selectedSegmentID || selected?.data.graph_loaded !== false || !unloadedSegmentIDs.includes(selectedSegmentID)) return;
       const revision = segmentGraphRevisions[selectedSegmentID]?.at(-1);
       if (revision) vscode.postMessage({ type: "session.load-segment", segmentID: selectedSegmentID, revision });
     }, [selected?.id, selected?.data.graph_loaded, selectedSegmentID, sessionID, segmentGraphRevisions, unloadedSegmentIDs]);
-    (0, import_react11.useEffect)(() => setInspectionRevision(void 0), [selected?.id]);
-    (0, import_react11.useEffect)(() => {
-      if (pending?.nodeID || pending?.stepID) setSelectedId(pending.nodeID ?? pending.stepID);
-    }, [pending?.turnID, pending?.nodeID, pending?.stepID]);
-    (0, import_react11.useEffect)(() => {
+    (0, import_react15.useEffect)(() => {
+      if (issueSelection?.nodeID !== selected?.id) setInspectionRevision(void 0);
+    }, [selected?.id]);
+    (0, import_react15.useEffect)(() => {
+      if (pending2?.nodeID || pending2?.stepID) setSelectedId(pending2.nodeID ?? pending2.stepID);
+    }, [pending2?.turnID, pending2?.nodeID, pending2?.stepID]);
+    (0, import_react15.useEffect)(() => {
       if (!testMode) return;
       const receiveTestAction = (event) => {
         const message = event.data;
         if (message?.type === "test.action" && message.action === "select-node" && message.name) {
           const selectedNode = document2.nodes.find((node) => node.id === message.name || node.data.id === message.name);
           setSelectedId(selectedNode?.id);
+        } else if (message?.type === "test.action" && message.action === "inspect-results") {
+          vscode.postMessage({
+            type: "typed-results.state",
+            selectedID: selectedId,
+            inspectedKind: inspectedNode?.data.kind,
+            availability: results?.state,
+            showPanel,
+            state: window.document.querySelector(".typed-results")?.getAttribute("data-results-state"),
+            unavailableReason: window.document.querySelector('.typed-results[data-results-state="unavailable"]')?.textContent,
+            values: Array.from(window.document.querySelectorAll(".typed-results [data-result-name]")).map((value) => ({
+              name: value.dataset.resultName,
+              text: value.querySelector("pre")?.textContent
+            })),
+            forbiddenElements: window.document.querySelectorAll(".typed-results a, .typed-results img, .typed-results script").length
+          });
+        } else if (message?.type === "test.action" && message.action === "inspect-expressions") {
+          vscode.postMessage({
+            type: "inspector.expressions",
+            inspectorText: window.document.querySelector(".step-inspector")?.textContent,
+            markdownElements: window.document.querySelectorAll(".step-inspector .markdown-body, .step-inspector a[href], .step-inspector script, .step-inspector img").length,
+            values: Array.from(window.document.querySelectorAll(".step-inspector [data-expression-path]")).map((value) => ({
+              path: value.dataset.expressionPath,
+              text: value.textContent,
+              tokens: Array.from(value.querySelectorAll("[data-expression-class]")).map((token) => ({
+                class: token.dataset.expressionClass,
+                text: token.textContent,
+                color: getComputedStyle(token).color
+              }))
+            }))
+          });
         }
       };
       window.addEventListener("message", receiveTestAction);
       return () => window.removeEventListener("message", receiveTestAction);
-    }, [document2.nodes, testMode]);
-    (0, import_react11.useEffect)(() => {
+    }, [document2.nodes, testMode, displayNodes, displayDocument, workflow, runtimeNodes, viewPreference, selectedId, issues]);
+    (0, import_react15.useEffect)(() => {
       if (!testMode || !selected) return;
       const frame2 = requestAnimationFrame(() => {
         vscode.postMessage({
@@ -37360,7 +39136,88 @@
       });
       return () => cancelAnimationFrame(frame2);
     }, [selected?.id, testMode]);
-    (0, import_react11.useEffect)(() => {
+    (0, import_react15.useEffect)(() => {
+      if (!testMode) return;
+      const receive = (event) => {
+        const message = event.data;
+        if (message?.type !== "test.action") return;
+        if (message.action === "set-graph-viewport" && message.value) {
+          void flowRef.current?.setViewport(JSON.parse(message.value));
+        }
+        if (message.action !== "inspect-graph-visibility") return;
+        const canvas = canvasRef.current?.getBoundingClientRect();
+        const rendered = Array.from(window.document.querySelectorAll(".react-flow__node")).map((element) => {
+          const box = element.getBoundingClientRect(), css = getComputedStyle(element);
+          return {
+            id: element.dataset.id,
+            box: box.toJSON(),
+            opacity: css.opacity,
+            visibility: css.visibility,
+            statusText: element.querySelector(".step-status")?.textContent,
+            statusClass: element.querySelector(".step-node")?.className,
+            intersects: !!canvas && box.right > canvas.left && box.left < canvas.right && box.bottom > canvas.top && box.top < canvas.bottom && box.width > 0 && box.height > 0 && css.opacity !== "0" && css.visibility !== "hidden",
+            transform: element.style.transform
+          };
+        });
+        vscode.postMessage({
+          type: "graph.visibility",
+          canonicalIDs: document2.nodes.map((node) => node.id),
+          projectedIDs: displayDocument.nodes.map((node) => node.id),
+          edges: displayDocument.edges.map((edge) => ({
+            id: edge.id,
+            source: edge.source,
+            target: edge.target,
+            label: edge.label
+          })),
+          nodes: rendered,
+          canvas: canvas?.toJSON(),
+          viewport: flowRef.current?.getViewport(),
+          positions: flowRef.current?.getNodes().map((node) => ({
+            id: node.id,
+            position: node.position,
+            parent: node.parentNode,
+            width: node.width,
+            height: node.height
+          })),
+          edgePaths: window.document.querySelectorAll(".react-flow__edge-path").length,
+          edgeClasses: Array.from(window.document.querySelectorAll(".react-flow__edge")).map((edge) => edge.getAttribute("class")),
+          mode: viewPreference.workflowMode,
+          selectedID: selectedId,
+          routeTargetID,
+          runtimeStatuses: Object.fromEntries(Object.entries(runtimeNodes).map(([id2, value]) => [id2, value.status])),
+          activity: {
+            text: window.document.querySelector(".current-activity")?.textContent,
+            items: activities.map(({ nodeID, path, title, label, container, inGraph, occurrenceID }) => ({ nodeID, path, title, label, container, inGraph, occurrenceID })),
+            counts: progressCounts,
+            summary: window.document.querySelector(".workflow-summary")?.textContent,
+            overview: window.document.querySelector(".overview-stats")?.textContent
+          },
+          issues,
+          runStatus,
+          runStarting,
+          sessionID,
+          topology: layoutTopologyKey
+        });
+      };
+      window.addEventListener("message", receive);
+      return () => window.removeEventListener("message", receive);
+    }, [
+      testMode,
+      document2,
+      displayDocument,
+      viewPreference.workflowMode,
+      selectedId,
+      routeTargetID,
+      issues,
+      runStatus,
+      runStarting,
+      sessionID,
+      layoutTopologyKey,
+      runtimeNodes,
+      activities,
+      progressCounts
+    ]);
+    (0, import_react15.useEffect)(() => {
       if (!flowRef.current) return;
       const frame2 = requestAnimationFrame(() => {
         if (routeTargetID) {
@@ -37375,7 +39232,7 @@
       });
       return () => cancelAnimationFrame(frame2);
     }, [layout.edges.length, layout.nodes.length, routeScope, routeTargetID]);
-    (0, import_react11.useEffect)(() => {
+    (0, import_react15.useEffect)(() => {
       if (!locateNodeID || routeTargetID) return;
       let frame2 = 0;
       let attempts = 0;
@@ -37395,7 +39252,7 @@
       locate();
       return () => cancelAnimationFrame(frame2);
     }, [locateNodeID, routeTargetID]);
-    (0, import_react11.useEffect)(() => {
+    (0, import_react15.useEffect)(() => {
       if (!routeTargetID) return;
       let frame2 = 0;
       const refit = () => {
@@ -37413,7 +39270,7 @@
         cancelAnimationFrame(frame2);
       };
     }, [routeTargetID]);
-    (0, import_react11.useEffect)(() => {
+    (0, import_react15.useEffect)(() => {
       if (!testMode) return;
       let secondFrame = 0;
       const firstFrame = requestAnimationFrame(() => {
@@ -37436,7 +39293,16 @@
         if (secondFrame) cancelAnimationFrame(secondFrame);
       };
     }, [document2, layout.nodes.length, layout.edges.length, style2, testMode]);
-    return /* @__PURE__ */ import_react11.default.createElement("main", { className: `app style-${style2}${showPanel ? "" : " panel-hidden"} has-panel-content` }, /* @__PURE__ */ import_react11.default.createElement("header", { className: "toolbar" }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "identity" }, /* @__PURE__ */ import_react11.default.createElement("strong", null, document2.runbook.name ?? document2.runbook.id ?? "Runbook"), /* @__PURE__ */ import_react11.default.createElement("span", null, sessionID ? `${sessionSegmentCount} segments | ${document2.nodes.length} steps` : `${document2.nodes.length} steps`)), /* @__PURE__ */ import_react11.default.createElement("div", { className: "run-actions" }, /* @__PURE__ */ import_react11.default.createElement("span", { className: `run-status status-${runStatus}`, role: "status", "aria-live": "polite" }, runStarting ? "starting" : runStatus), !runActive && !sessionID ? /* @__PURE__ */ import_react11.default.createElement(
+    return /* @__PURE__ */ import_react15.default.createElement(import_react15.default.Fragment, null, /* @__PURE__ */ import_react15.default.createElement("main", { className: `app style-${style2}${showPanel ? "" : " panel-hidden"} has-panel-content` }, /* @__PURE__ */ import_react15.default.createElement("header", { className: "toolbar" }, /* @__PURE__ */ import_react15.default.createElement("div", { className: "identity" }, /* @__PURE__ */ import_react15.default.createElement("strong", null, document2.runbook.name ?? document2.runbook.id ?? "Runbook"), /* @__PURE__ */ import_react15.default.createElement("span", null, sessionID ? `${sessionSegmentCount} segments | ${document2.nodes.length} steps` : `${document2.nodes.length} steps`)), /* @__PURE__ */ import_react15.default.createElement("div", { className: "run-actions" }, /* @__PURE__ */ import_react15.default.createElement("div", { className: "workflow-mode", role: "group", "aria-label": "Graph detail" }, ["workflow", "all"].map((mode) => /* @__PURE__ */ import_react15.default.createElement(
+      "button",
+      {
+        type: "button",
+        key: mode,
+        "aria-pressed": viewPreference.workflowMode === mode,
+        onClick: () => changePreference({ workflowMode: mode })
+      },
+      mode === "workflow" ? "Workflow" : "All steps"
+    ))), /* @__PURE__ */ import_react15.default.createElement("span", { className: `run-status status-${runStatus}`, role: "status", "aria-live": "polite" }, runStarting ? "starting" : runStatus), !runActive && !sessionID ? /* @__PURE__ */ import_react15.default.createElement(
       "button",
       {
         className: "primary",
@@ -37445,9 +39311,9 @@
         title: reloading ? "Wait for the runbook graph to finish reloading" : void 0,
         onClick: onRun
       },
-      /* @__PURE__ */ import_react11.default.createElement(Play, { "aria-hidden": "true" }),
+      /* @__PURE__ */ import_react15.default.createElement(Play, { "aria-hidden": "true" }),
       "Run"
-    ) : null, !runActive && !sessionID ? /* @__PURE__ */ import_react11.default.createElement(
+    ) : null, !runActive && !sessionID ? /* @__PURE__ */ import_react15.default.createElement(
       "button",
       {
         className: "session-run",
@@ -37456,9 +39322,9 @@
         title: "Start a durable investigation session",
         onClick: onStartSession
       },
-      /* @__PURE__ */ import_react11.default.createElement(Workflow, { "aria-hidden": "true" }),
-      /* @__PURE__ */ import_react11.default.createElement("span", null, "Start session")
-    ) : null, !runActive && !sessionID ? /* @__PURE__ */ import_react11.default.createElement(
+      /* @__PURE__ */ import_react15.default.createElement(Workflow, { "aria-hidden": "true" }),
+      /* @__PURE__ */ import_react15.default.createElement("span", null, "Start session")
+    ) : null, !runActive && !sessionID ? /* @__PURE__ */ import_react15.default.createElement(
       "button",
       {
         className: "debug-run",
@@ -37467,33 +39333,33 @@
         title: reloading ? "Wait for the runbook graph to finish reloading" : routeTestReviewOpen ? "Close the route-test review before starting a debug run" : breakpoints.length === 0 ? "Add a breakpoint to start a debug run" : "Start with debugger enabled",
         onClick: onDebugRun
       },
-      /* @__PURE__ */ import_react11.default.createElement(Bug, { "aria-hidden": "true" }),
-      /* @__PURE__ */ import_react11.default.createElement("span", null, "Debug Run")
-    ) : null, !runActive && (sessionID ? sessionClosed || !sessionAttached && !runStarting : isTerminalRunStatus(runStatus)) ? /* @__PURE__ */ import_react11.default.createElement("button", { className: "reset-run", type: "button", onClick: () => {
+      /* @__PURE__ */ import_react15.default.createElement(Bug, { "aria-hidden": "true" }),
+      /* @__PURE__ */ import_react15.default.createElement("span", null, "Debug Run")
+    ) : null, !runActive && (sessionID ? sessionClosed || !sessionAttached && !runStarting : isTerminalRunStatus(runStatus)) ? /* @__PURE__ */ import_react15.default.createElement("button", { className: "reset-run", type: "button", onClick: () => {
       setRouteTestEditor(void 0);
       onReset();
-    } }, /* @__PURE__ */ import_react11.default.createElement(RotateCcw, { "aria-hidden": "true" }), "Reset") : null, sessionID && sessionPaused && sessionAttached ? /* @__PURE__ */ import_react11.default.createElement("button", { className: "primary", type: "button", onClick: onResumeSession }, /* @__PURE__ */ import_react11.default.createElement(Play, { "aria-hidden": "true" }), "Resume") : null, canCloseSession ? /* @__PURE__ */ import_react11.default.createElement("div", { className: "session-close-actions" }, /* @__PURE__ */ import_react11.default.createElement(
+    } }, /* @__PURE__ */ import_react15.default.createElement(RotateCcw, { "aria-hidden": "true" }), "Reset") : null, sessionID && sessionPaused && sessionAttached ? /* @__PURE__ */ import_react15.default.createElement("button", { className: "primary", type: "button", onClick: onResumeSession }, /* @__PURE__ */ import_react15.default.createElement(Play, { "aria-hidden": "true" }), "Resume") : null, canCloseSession ? /* @__PURE__ */ import_react15.default.createElement("div", { className: "session-close-actions" }, /* @__PURE__ */ import_react15.default.createElement(
       "select",
       {
         "aria-label": "Investigation outcome",
         value: closeStatus,
         onChange: (event) => setCloseStatus(event.target.value)
       },
-      /* @__PURE__ */ import_react11.default.createElement("option", { value: "resolved" }, "Resolved"),
-      /* @__PURE__ */ import_react11.default.createElement("option", { value: "escalated" }, "Escalated"),
-      /* @__PURE__ */ import_react11.default.createElement("option", { value: "cancelled" }, "Cancelled"),
-      /* @__PURE__ */ import_react11.default.createElement("option", { value: "abandoned" }, "Abandoned")
-    ), /* @__PURE__ */ import_react11.default.createElement("button", { className: "primary", type: "button", onClick: () => onCloseSession(closeStatus) }, /* @__PURE__ */ import_react11.default.createElement(CircleCheck, { "aria-hidden": "true" }), "Close")) : null, runActive && runID ? /* @__PURE__ */ import_react11.default.createElement("button", { className: "danger", type: "button", onClick: onCancel }, /* @__PURE__ */ import_react11.default.createElement(Square, { "aria-hidden": "true" }), "Cancel") : null, /* @__PURE__ */ import_react11.default.createElement(
+      /* @__PURE__ */ import_react15.default.createElement("option", { value: "resolved" }, "Resolved"),
+      /* @__PURE__ */ import_react15.default.createElement("option", { value: "escalated" }, "Escalated"),
+      /* @__PURE__ */ import_react15.default.createElement("option", { value: "cancelled" }, "Cancelled"),
+      /* @__PURE__ */ import_react15.default.createElement("option", { value: "abandoned" }, "Abandoned")
+    ), /* @__PURE__ */ import_react15.default.createElement("button", { className: "primary", type: "button", onClick: () => onCloseSession(closeStatus) }, /* @__PURE__ */ import_react15.default.createElement(CircleCheck, { "aria-hidden": "true" }), "Close")) : null, runActive && runID ? /* @__PURE__ */ import_react15.default.createElement("button", { className: "danger", type: "button", onClick: onCancel }, /* @__PURE__ */ import_react15.default.createElement(Square, { "aria-hidden": "true" }), "Cancel") : null, /* @__PURE__ */ import_react15.default.createElement(
       "select",
       {
         "aria-label": "Graph style",
         value: style2,
         onChange: (event) => onStyleChange(event.target.value)
       },
-      /* @__PURE__ */ import_react11.default.createElement("option", { value: "smooth-curves" }, "Smooth"),
-      /* @__PURE__ */ import_react11.default.createElement("option", { value: "minimalist" }, "Minimal"),
-      /* @__PURE__ */ import_react11.default.createElement("option", { value: "header-badges" }, "Headers")
-    ), /* @__PURE__ */ import_react11.default.createElement("button", { type: "button", className: showPanel ? "toggle active" : "toggle", onClick: () => setShowPanel((value) => !value) }, /* @__PURE__ */ import_react11.default.createElement(PanelRight, { "aria-hidden": "true" }), "Panel"))), /* @__PURE__ */ import_react11.default.createElement(
+      /* @__PURE__ */ import_react15.default.createElement("option", { value: "smooth-curves" }, "Smooth"),
+      /* @__PURE__ */ import_react15.default.createElement("option", { value: "minimalist" }, "Minimal"),
+      /* @__PURE__ */ import_react15.default.createElement("option", { value: "header-badges" }, "Headers")
+    ), /* @__PURE__ */ import_react15.default.createElement("button", { type: "button", className: showPanel ? "toggle active" : "toggle", onClick: () => setShowPanel((value) => !value) }, /* @__PURE__ */ import_react15.default.createElement(PanelRight, { "aria-hidden": "true" }), "Panel"))), /* @__PURE__ */ import_react15.default.createElement(
       InputsForm,
       {
         declarations,
@@ -37501,17 +39367,43 @@
         disabled: runActive,
         onChange: onInputChange
       }
-    ), runError ? /* @__PURE__ */ import_react11.default.createElement("div", { className: "run-error", role: "alert" }, runError) : null, executionNode ? /* @__PURE__ */ import_react11.default.createElement("section", { className: `execution-position-strip ${executionTerminal ? "last-reached" : "current"}`, "aria-live": "polite" }, /* @__PURE__ */ import_react11.default.createElement("div", null, /* @__PURE__ */ import_react11.default.createElement("span", null, executionTerminal ? "Last reached" : "Current step"), /* @__PURE__ */ import_react11.default.createElement("strong", null, String(executionNode.data.title || executionNode.data.step_id || executionNode.id)), /* @__PURE__ */ import_react11.default.createElement("code", { title: executionNode.id }, String(executionNode.data.step_id || executionNode.id))), /* @__PURE__ */ import_react11.default.createElement("button", { type: "button", onClick: locateExecutionNode, title: `Locate ${String(executionNode.data.title || executionNode.id)} on the graph` }, /* @__PURE__ */ import_react11.default.createElement(LocateFixed, { "aria-hidden": "true" }), /* @__PURE__ */ import_react11.default.createElement("span", null, "Locate"))) : null, routeTargetID && routeProjection ? /* @__PURE__ */ import_react11.default.createElement("section", { className: "route-view-strip", "aria-label": `Routes through ${routeTargetName}` }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "route-view-copy" }, /* @__PURE__ */ import_react11.default.createElement("strong", null, "Showing routes through: ", routeTargetName), /* @__PURE__ */ import_react11.default.createElement("span", null, routeProjection.predecessorCount, " steps lead to it, ", routeProjection.successorCount, " follow it, ", routeProjection.boundaryEdges.length, " hidden dependencies")), /* @__PURE__ */ import_react11.default.createElement("div", { className: "route-view-actions" }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "route-scope", role: "radiogroup", "aria-label": "Visible routes" }, /* @__PURE__ */ import_react11.default.createElement("button", { type: "button", role: "radio", "aria-checked": routeScope === "through", onClick: () => setRouteScope("through") }, "Through this step"), /* @__PURE__ */ import_react11.default.createElement("button", { type: "button", role: "radio", "aria-checked": routeScope === "to", onClick: () => setRouteScope("to") }, "To this step"), /* @__PURE__ */ import_react11.default.createElement("button", { type: "button", role: "radio", "aria-checked": routeScope === "from", onClick: () => setRouteScope("from") }, "From this step")), /* @__PURE__ */ import_react11.default.createElement("button", { type: "button", disabled: routeActionsDisabled, onClick: showFullGraph }, "Show full graph"))) : null, currentRouteTestEditor ? /* @__PURE__ */ import_react11.default.createElement("div", { className: "route-test-global-safety", role: "status" }, routeTestOutcome?.passed ? "Route test completed - external actions were blocked" : routeTestRunning ? "Testing route - XTS and external actions are blocked" : "Reviewing route test - protected execution starts only when you run this route test") : null, /* @__PURE__ */ import_react11.default.createElement(
+    ), runError ? /* @__PURE__ */ import_react15.default.createElement("div", { className: "run-error", role: "alert" }, runError) : null, issueNotice || issues.length ? /* @__PURE__ */ import_react15.default.createElement("section", { className: "workflow-issues", "aria-label": "Execution issues" }, /* @__PURE__ */ import_react15.default.createElement("strong", null, issues.length ? "Showing issue context" : "Showing selected step context"), /* @__PURE__ */ import_react15.default.createElement("span", null, "Structural context, not a claim those alternatives executed."), issues.map((issue, index) => /* @__PURE__ */ import_react15.default.createElement(
+      "button",
+      {
+        type: "button",
+        key: `${issue.nodeID}:${issue.occurrenceID ?? index}`,
+        onClick: () => navigateIssue(issue),
+        title: issue.nodeID
+      },
+      issue.status,
+      issue.blockedOutcome ? " \xB7 blocked outcome" : "",
+      ": ",
+      issue.qualifiedNodeID || issue.nodeID,
+      issue.occurrenceID ? ` \xB7 occurrence ${index + 1}` : ""
+    )), issueSelection && !selected ? /* @__PURE__ */ import_react15.default.createElement("span", { role: "status" }, "Historical graph unavailable \u2014 occurrence remains in the issue index.") : null) : null, /* @__PURE__ */ import_react15.default.createElement("div", { className: "workflow-summary", role: "status" }, progressCounts.total, " canonical steps \xB7 ", progressCounts.completed, " done \xB7 ", progressCounts.issues, " issues \xB7 ", progressCounts.skipped, " skipped \xB7 ", progressCounts.running, " running \xB7 ", progressCounts.remaining, " ", executionTerminal ? "without final status" : "remaining", " \xB7 ", workflow.segments.size, " visual technical groups \xB7 hidden is not skipped"), /* @__PURE__ */ import_react15.default.createElement(
+      CurrentActivity,
+      {
+        activities,
+        runStatus,
+        remaining: progressCounts.remaining,
+        onLocate: locateExecutionNode,
+        locationNotice: activityLocationNotice
+      }
+    ), routeTargetID && routeProjection ? /* @__PURE__ */ import_react15.default.createElement("section", { className: "route-view-strip", "aria-label": `Routes through ${routeTargetName}` }, /* @__PURE__ */ import_react15.default.createElement("div", { className: "route-view-copy" }, /* @__PURE__ */ import_react15.default.createElement("strong", null, "Showing routes through: ", routeTargetName), /* @__PURE__ */ import_react15.default.createElement("span", null, routeProjection.predecessorCount, " steps lead to it, ", routeProjection.successorCount, " follow it, ", routeProjection.boundaryEdges.length, " hidden dependencies")), /* @__PURE__ */ import_react15.default.createElement("div", { className: "route-view-actions" }, /* @__PURE__ */ import_react15.default.createElement("div", { className: "route-scope", role: "radiogroup", "aria-label": "Visible routes" }, /* @__PURE__ */ import_react15.default.createElement("button", { type: "button", role: "radio", "aria-checked": routeScope === "through", onClick: () => setRouteScope("through") }, "Through this step"), /* @__PURE__ */ import_react15.default.createElement("button", { type: "button", role: "radio", "aria-checked": routeScope === "to", onClick: () => setRouteScope("to") }, "To this step"), /* @__PURE__ */ import_react15.default.createElement("button", { type: "button", role: "radio", "aria-checked": routeScope === "from", onClick: () => setRouteScope("from") }, "From this step")), /* @__PURE__ */ import_react15.default.createElement("button", { type: "button", disabled: routeActionsDisabled, onClick: showFullGraph }, "Show full graph"))) : null, currentRouteTestEditor ? /* @__PURE__ */ import_react15.default.createElement("div", { className: "route-test-global-safety", role: "status" }, routeTestOutcome?.passed ? "Route test completed - external actions were blocked" : routeTestRunning ? "Testing route - XTS and external actions are blocked" : "Reviewing route test - protected execution starts only when you run this route test") : null, /* @__PURE__ */ import_react15.default.createElement(
       "div",
       {
         ref: workspaceRef,
         className: "workspace",
         style: { "--inspector-width": `${inspectorRatio * 100}%` }
       },
-      /* @__PURE__ */ import_react11.default.createElement("section", { ref: canvasRef, className: "canvas", "aria-label": "Runbook structure" }, /* @__PURE__ */ import_react11.default.createElement(RuntimeNodesContext.Provider, { value: runtimeNodes }, /* @__PURE__ */ import_react11.default.createElement(ExecutionPositionContext.Provider, { value: executionPosition }, /* @__PURE__ */ import_react11.default.createElement(DebugBreakpointsContext.Provider, { value: breakpointKeys }, /* @__PURE__ */ import_react11.default.createElement(ReactFlowProvider, null, /* @__PURE__ */ import_react11.default.createElement(
+      /* @__PURE__ */ import_react15.default.createElement("section", { ref: canvasRef, className: "canvas", "aria-label": "Runbook structure" }, /* @__PURE__ */ import_react15.default.createElement(RuntimeNodesContext.Provider, { value: runtimeNodes }, /* @__PURE__ */ import_react15.default.createElement(ExecutionPositionContext.Provider, { value: executionPosition }, /* @__PURE__ */ import_react15.default.createElement(DebugBreakpointsContext.Provider, { value: breakpointKeys }, /* @__PURE__ */ import_react15.default.createElement(ReactFlowProvider, null, /* @__PURE__ */ import_react15.default.createElement(
         ReactFlow,
         {
-          nodes: displayNodes,
+          nodes: renderNodes,
+          onNodesChange: (changes) => {
+            const measurements = changes.filter((change) => change.type === "dimensions");
+            if (measurements.length) setRenderNodes((current) => applyNodeChanges(measurements, current));
+          },
           edges: runtimeEdges,
           nodeTypes,
           fitView: true,
@@ -37523,13 +39415,18 @@
             flowRef.current = instance;
           },
           onNodeClick: (_, node) => {
-            if (node.data.synthetic !== true) setSelectedId(node.id);
+            if (node.data.synthetic !== true) {
+              setIssueSelection(void 0);
+              setSelectedId(node.id);
+            }
           },
-          onPaneClick: () => setSelectedId(void 0)
+          onPaneClick: () => {
+            setSelectedId(void 0);
+          }
         },
-        /* @__PURE__ */ import_react11.default.createElement(Background$1, { variant: BackgroundVariant.Dots, gap: 20, size: 1 }),
-        /* @__PURE__ */ import_react11.default.createElement(Controls$1, { showInteractive: false }),
-        /* @__PURE__ */ import_react11.default.createElement(
+        /* @__PURE__ */ import_react15.default.createElement(Background$1, { variant: BackgroundVariant.Dots, gap: 20, size: 1 }),
+        /* @__PURE__ */ import_react15.default.createElement(Controls$1, { showInteractive: false }),
+        /* @__PURE__ */ import_react15.default.createElement(
           MiniMap$1,
           {
             pannable: true,
@@ -37541,7 +39438,7 @@
           }
         )
       )))))),
-      showPanel ? /* @__PURE__ */ import_react11.default.createElement(
+      showPanel ? /* @__PURE__ */ import_react15.default.createElement(
         "div",
         {
           className: "inspector-resizer",
@@ -37573,16 +39470,16 @@
           }
         }
       ) : null,
-      /* @__PURE__ */ import_react11.default.createElement("aside", { id: "step-details-panel", className: "inspector", "aria-label": "Step details" }, pending ? /* @__PURE__ */ import_react11.default.createElement(
+      /* @__PURE__ */ import_react15.default.createElement("aside", { id: "step-details-panel", className: "inspector", "aria-label": "Step details" }, pending2 ? /* @__PURE__ */ import_react15.default.createElement(
         InteractionPane,
         {
-          key: `${pending.turnID}:${runError ?? ""}`,
-          interaction: pending,
+          key: `${pending2.turnID}:${runError ?? ""}`,
+          interaction: pending2,
           onSubmit: onSubmitInteraction,
           onConfirmHostAction,
           xtsOpened
         }
-      ) : currentRouteTestEditor && routeTarget && routeTestContext ? /* @__PURE__ */ import_react11.default.createElement(
+      ) : currentRouteTestEditor && routeTarget && routeTestContext ? /* @__PURE__ */ import_react15.default.createElement(
         RouteTestPane,
         {
           key: currentRouteTestEditor.key,
@@ -37603,7 +39500,7 @@
           onStop: onCancel,
           onClose: () => setRouteTestEditor(void 0)
         }
-      ) : selected ? /* @__PURE__ */ import_react11.default.createElement("div", { className: "selected-step-panel" }, !routeTargetID || routeTargetID !== selected.id ? /* @__PURE__ */ import_react11.default.createElement("div", { className: "route-context-action" }, /* @__PURE__ */ import_react11.default.createElement("button", { type: "button", disabled: routeActionsDisabled, onClick: () => showRoutesThrough(selected.id) }, "Show routes through this step")) : null, routeTargetID === selected.id && routeTestContext ? /* @__PURE__ */ import_react11.default.createElement("section", { className: "route-test-launcher", "aria-label": "Route tests" }, /* @__PURE__ */ import_react11.default.createElement(
+      ) : selected ? /* @__PURE__ */ import_react15.default.createElement("div", { className: "selected-step-panel" }, !routeTargetID || routeTargetID !== selected.id ? /* @__PURE__ */ import_react15.default.createElement("div", { className: "route-context-action" }, /* @__PURE__ */ import_react15.default.createElement("button", { type: "button", disabled: routeActionsDisabled, onClick: () => showRoutesThrough(selected.id) }, "Show routes through this step")) : null, routeTargetID === selected.id && routeTestContext ? /* @__PURE__ */ import_react15.default.createElement("section", { className: "route-test-launcher", "aria-label": "Route tests" }, /* @__PURE__ */ import_react15.default.createElement(
         "button",
         {
           type: "button",
@@ -37612,7 +39509,7 @@
           onClick: () => setRouteTestEditor({ key: `new:${selected.id}:${Date.now()}`, contextKey: routeTestContextKey })
         },
         "Test reaching this step"
-      ), savedRouteTests.length > 0 ? /* @__PURE__ */ import_react11.default.createElement("div", { className: "saved-route-tests" }, /* @__PURE__ */ import_react11.default.createElement("h3", null, "Saved route tests"), savedRouteTests.map((saved) => /* @__PURE__ */ import_react11.default.createElement(
+      ), savedRouteTests.length > 0 ? /* @__PURE__ */ import_react15.default.createElement("div", { className: "saved-route-tests" }, /* @__PURE__ */ import_react15.default.createElement("h3", null, "Saved route tests"), savedRouteTests.map((saved) => /* @__PURE__ */ import_react15.default.createElement(
         "button",
         {
           type: "button",
@@ -37625,13 +39522,27 @@
             contextKey: routeTestContextKey
           })
         },
-        /* @__PURE__ */ import_react11.default.createElement("span", null, saved.artifact.name),
-        /* @__PURE__ */ import_react11.default.createElement("small", null, saved.needsReview ? "Needs review" : saved.artifact.last_result?.status ?? "Draft")
-      ))) : null) : null, inspectedNode ? /* @__PURE__ */ import_react11.default.createElement(
+        /* @__PURE__ */ import_react15.default.createElement("span", null, saved.artifact.name),
+        /* @__PURE__ */ import_react15.default.createElement("small", null, saved.needsReview ? "Needs review" : saved.artifact.last_result?.status ?? "Draft")
+      ))) : null) : null, inspectedNode?.data.kind === "results" ? /* @__PURE__ */ import_react15.default.createElement(ResultsViewer, { results, nodeID: inspectedNode.id }) : null, inspectedNode ? /* @__PURE__ */ import_react15.default.createElement(
         StepInspector,
         {
           node: inspectedNode,
           runtime: runtimeNodes[selected.id],
+          requestedOccurrenceID: issueSelection?.nodeID === selected.id ? issueSelection.occurrenceID : void 0,
+          snapshotDigest: typeof inspectedNode.data.display_plan_snapshot_digest === "string" ? inspectedNode.data.display_plan_snapshot_digest : typeof inspectedNode.data.executable_snapshot_hash === "string" ? inspectedNode.data.executable_snapshot_hash : document2.display_plan_snapshot_digest ?? document2.execution_plan_hash ?? document2.presentation_state?.plan_snapshot_digest ?? "missing-binding",
+          onOccurrenceChange: (occurrence) => {
+            setIssueSelection(void 0);
+            if (occurrence.graphRevision !== void 0 && selectedSegmentID) {
+              setInspectionRevision({ nodeID: selected.id, revision: occurrence.graphRevision });
+              onRequestGraphRevision(
+                revisionNodeKey(selectedSegmentID, occurrence.graphRevision, selectedOriginalNodeID),
+                selectedSegmentID,
+                occurrence.graphRevision,
+                selectedOriginalNodeID
+              );
+            }
+          },
           availableGraphRevisions,
           selectedGraphRevision,
           onGraphRevisionChange: (revision) => {
@@ -37645,7 +39556,7 @@
               );
             }
           },
-          debugControls: selectedGraphRevision === latestGraphRevision ? /* @__PURE__ */ import_react11.default.createElement(
+          debugControls: selectedGraphRevision === latestGraphRevision ? /* @__PURE__ */ import_react15.default.createElement(
             DebugSelectionControls,
             {
               document: document2,
@@ -37656,9 +39567,9 @@
               onToggle: onToggleBreakpoint,
               onWatchesChange
             }
-          ) : /* @__PURE__ */ import_react11.default.createElement("p", { className: "debug-protected" }, "Historical graph revisions are read-only.")
+          ) : /* @__PURE__ */ import_react15.default.createElement("p", { className: "debug-protected" }, "Historical graph revisions are read-only.")
         }
-      ) : /* @__PURE__ */ import_react11.default.createElement("div", { className: "inspector-blank", role: "status" }, "Loading graph revision...")) : /* @__PURE__ */ import_react11.default.createElement(
+      ) : /* @__PURE__ */ import_react15.default.createElement("div", { className: "inspector-blank", role: "status" }, "Historical graph unavailable or loading \u2014 no current-source substitution.")) : /* @__PURE__ */ import_react15.default.createElement(
         RunOverview,
         {
           document: document2,
@@ -37676,57 +39587,68 @@
           activeNodeIDs
         }
       ))
-    ));
+    )));
   }
   function App() {
-    const [document2, setDocument] = (0, import_react11.useState)();
-    const [testMode, setTestMode] = (0, import_react11.useState)(false);
-    const [style2, setStyle] = (0, import_react11.useState)("smooth-curves");
-    const [loading, setLoading] = (0, import_react11.useState)(true);
-    const [error, setError] = (0, import_react11.useState)();
-    const [runError, setRunError] = (0, import_react11.useState)();
-    const [runDiagnostics, setRunDiagnostics] = (0, import_react11.useState)("");
-    const [sessionID, setSessionID] = (0, import_react11.useState)();
-    const [sessionStatus, setSessionStatus] = (0, import_react11.useState)();
-    const [sessionAttached, setSessionAttached] = (0, import_react11.useState)(false);
-    const [segmentGraphRevisions, setSegmentGraphRevisions] = (0, import_react11.useState)({});
-    const [unloadedSegmentIDs, setUnloadedSegmentIDs] = (0, import_react11.useState)([]);
-    const [revisionNodes, setRevisionNodes] = (0, import_react11.useState)({});
-    const [runID, setRunID] = (0, import_react11.useState)();
-    const [runStatus, setRunStatus] = (0, import_react11.useState)("idle");
-    const [runStarting, setRunStarting] = (0, import_react11.useState)(false);
-    const [reloading, setReloading] = (0, import_react11.useState)(false);
-    const [runtimeNodes, setRuntimeNodes] = (0, import_react11.useState)({});
-    const [executionNodeID, setExecutionNodeID] = (0, import_react11.useState)();
-    const [breakpoints, setBreakpoints] = (0, import_react11.useState)([]);
-    const [watches, setWatches] = (0, import_react11.useState)("");
-    const [pending, setPending] = (0, import_react11.useState)();
-    const [inputValues, setInputValues] = (0, import_react11.useState)({});
-    const [routeTestContext, setRouteTestContext] = (0, import_react11.useState)();
-    const [routeTests, setRouteTests] = (0, import_react11.useState)([]);
-    const [routeTestOutcome, setRouteTestOutcome] = (0, import_react11.useState)();
-    const [routeTestRunning, setRouteTestRunning] = (0, import_react11.useState)(false);
-    const [routeTestError, setRouteTestError] = (0, import_react11.useState)();
-    const [xtsOpened, setXtsOpened] = (0, import_react11.useState)(false);
-    const pendingRef = (0, import_react11.useRef)();
-    const runIDRef = (0, import_react11.useRef)();
-    const sessionIDRef = (0, import_react11.useRef)();
-    const sessionStatusRef = (0, import_react11.useRef)();
-    const runFinishedRef = (0, import_react11.useRef)(false);
-    const hostSessionRef = (0, import_react11.useRef)(globalThis.crypto.randomUUID());
-    const hostRequestRef = (0, import_react11.useRef)();
-    (0, import_react11.useEffect)(() => {
-      pendingRef.current = pending;
-    }, [pending]);
-    (0, import_react11.useEffect)(() => {
+    const [document2, setDocument] = (0, import_react15.useState)();
+    const [results, setResults] = (0, import_react15.useState)();
+    const [testMode, setTestMode] = (0, import_react15.useState)(false);
+    const [style2, setStyle] = (0, import_react15.useState)("smooth-curves");
+    const [loading, setLoading] = (0, import_react15.useState)(true);
+    const [error, setError] = (0, import_react15.useState)();
+    const [runError, setRunError] = (0, import_react15.useState)();
+    const [runDiagnostics, setRunDiagnostics] = (0, import_react15.useState)("");
+    const [sessionID, setSessionID] = (0, import_react15.useState)();
+    const [sessionStatus, setSessionStatus] = (0, import_react15.useState)();
+    const [sessionAttached, setSessionAttached] = (0, import_react15.useState)(false);
+    const [segmentGraphRevisions, setSegmentGraphRevisions] = (0, import_react15.useState)({});
+    const [unloadedSegmentIDs, setUnloadedSegmentIDs] = (0, import_react15.useState)([]);
+    const [revisionNodes, setRevisionNodes] = (0, import_react15.useState)({});
+    const [runID, setRunID] = (0, import_react15.useState)();
+    const [runStatus, setRunStatus] = (0, import_react15.useState)("idle");
+    const [runStarting, setRunStarting] = (0, import_react15.useState)(false);
+    const [reloading, setReloading] = (0, import_react15.useState)(false);
+    const [runtimeNodes, setRuntimeNodes] = (0, import_react15.useState)({});
+    const [executionNodeID, setExecutionNodeID] = (0, import_react15.useState)();
+    const [breakpoints, setBreakpoints] = (0, import_react15.useState)([]);
+    const [watches, setWatches] = (0, import_react15.useState)("");
+    const [pending2, setPending] = (0, import_react15.useState)();
+    const [inputValues, setInputValues] = (0, import_react15.useState)({});
+    const [routeTestContext, setRouteTestContext] = (0, import_react15.useState)();
+    const [routeTests, setRouteTests] = (0, import_react15.useState)([]);
+    const [routeTestOutcome, setRouteTestOutcome] = (0, import_react15.useState)();
+    const [routeTestRunning, setRouteTestRunning] = (0, import_react15.useState)(false);
+    const [routeTestError, setRouteTestError] = (0, import_react15.useState)();
+    const [xtsOpened, setXtsOpened] = (0, import_react15.useState)(false);
+    const pendingRef = (0, import_react15.useRef)();
+    const resolvedTurnsRef = (0, import_react15.useRef)(/* @__PURE__ */ new Set());
+    const runIDRef = (0, import_react15.useRef)();
+    const sessionIDRef = (0, import_react15.useRef)();
+    const sessionStatusRef = (0, import_react15.useRef)();
+    const runFinishedRef = (0, import_react15.useRef)(false);
+    const directDocumentRef = (0, import_react15.useRef)();
+    const directRunScopeRef = (0, import_react15.useRef)();
+    const displayWithdrawalsRef = (0, import_react15.useRef)(
+      decodeDisplayWithdrawals(recordValue(vscode.getState?.())?.displayWithdrawals)
+    );
+    const hostSessionRef = (0, import_react15.useRef)(globalThis.crypto.randomUUID());
+    const hostRequestRef = (0, import_react15.useRef)();
+    (0, import_react15.useEffect)(() => {
+      pendingRef.current = pending2;
+    }, [pending2]);
+    (0, import_react15.useEffect)(() => {
       runIDRef.current = runID;
     }, [runID]);
-    (0, import_react11.useEffect)(() => {
+    (0, import_react15.useEffect)(() => {
       sessionIDRef.current = sessionID;
     }, [sessionID]);
-    (0, import_react11.useEffect)(() => {
+    (0, import_react15.useEffect)(() => {
       sessionStatusRef.current = sessionStatus;
     }, [sessionStatus]);
+    (0, import_react15.useEffect)(() => {
+      displayWithdrawalsRef.current = retainDirectDisplayWithdrawals(displayWithdrawalsRef.current, runtimeNodes);
+      vscode.setState?.({ ...recordValue(vscode.getState?.()), displayWithdrawals: displayWithdrawalsRef.current });
+    }, [runtimeNodes]);
     const clearActiveRun = () => {
       hostRequestRef.current = void 0;
       pendingRef.current = void 0;
@@ -37735,14 +39657,23 @@
       setPending(void 0);
       setRunID(void 0);
     };
-    (0, import_react11.useEffect)(() => {
+    (0, import_react15.useEffect)(() => {
       const receive = (event) => {
         const message = event.data;
         if (!message || typeof message !== "object") return;
         if (message.type === "loading") {
           setError(void 0);
         } else if (message.type === "graph") {
+          setResults(void 0);
+          directDocumentRef.current = message.document;
           setDocument(message.document);
+          if (message.document.presentation_state) {
+            const retained = message.document.presentation_state;
+            setRuntimeNodes((current) => applyDirectRetainedDocument(
+              restoreDirectDisplayWithdrawals(current, displayWithdrawalsRef.current, retained.run_id, retained.plan_snapshot_digest),
+              message.document
+            ));
+          }
           setRouteTestContext(message.routeTestContext);
           setRouteTests(message.routeTests ?? []);
           setRouteTestOutcome(void 0);
@@ -37757,7 +39688,10 @@
           setStyle(message.style);
           setLoading(false);
           setError(void 0);
+        } else if (message.type === "highlighting") {
+          window.document.body.dataset.highlightingEnabled = String(message.enabled);
         } else if (message.type === "session.starting" || message.type === "session.reconnecting") {
+          directDocumentRef.current = void 0;
           clearActiveRun();
           setSegmentGraphRevisions({});
           setUnloadedSegmentIDs([]);
@@ -37791,7 +39725,7 @@
           setRouteTestOutcome(void 0);
           setRouteTestRunning(false);
           setRouteTestError(void 0);
-          setRuntimeNodes(state.runtimeNodes);
+          setRuntimeNodes(normalizeRuntimeStatuses(state.runtimeNodes));
           setExecutionNodeID(state.executionNodeID);
           setPending(state.pending);
           setRunID(state.activeRunID);
@@ -37826,7 +39760,10 @@
           setLoading(false);
           setError(message.message);
         } else if (message.type === "run.starting") {
+          setResults(void 0);
+          directRunScopeRef.current = void 0;
           clearActiveRun();
+          resolvedTurnsRef.current.clear();
           runFinishedRef.current = false;
           setRunStarting(true);
           setRouteTestRunning(message.routeTest === true);
@@ -37842,36 +39779,53 @@
         } else if (message.type === "run.frame") {
           const frame2 = message.frame;
           if (frame2.type === "run.started") {
+            if (runFinishedRef.current || !frame2.runID || runIDRef.current && frame2.runID !== runIDRef.current) return;
             runIDRef.current = frame2.runID;
+            directRunScopeRef.current = frame2.runID;
             setRunID(frame2.runID);
             setRunStarting(false);
             if (!pendingRef.current) setRunStatus("running");
           } else if (frame2.type === "run.event" && frame2.event) {
-            setRuntimeNodes((current) => applyRuntimeEvent(current, frame2.event));
+            if (directRunScopeRef.current && frame2.event.run_id !== directRunScopeRef.current) return;
+            const graph = directDocumentRef.current;
+            const binding = graph?.display_plan_snapshot_digest ?? graph?.execution_plan_hash ?? graph?.presentation_state?.plan_snapshot_digest ?? "missing-binding";
+            setRuntimeNodes((current) => applyRuntimeEvent(
+              restoreDirectDisplayWithdrawals(current, displayWithdrawalsRef.current, frame2.event.run_id, binding),
+              frame2.event,
+              binding
+            ));
             if (frame2.event.kind === "step/started" || frame2.event.kind === "step/resumed") {
               const reachedNodeID = eventNodeID(frame2.event);
               if (reachedNodeID) setExecutionNodeID(reachedNodeID);
             }
-            if (frame2.event.kind === "run/started" && !pendingRef.current) setRunStatus("running");
+            if (frame2.event.kind === "run/started" && !pendingRef.current && !runFinishedRef.current) setRunStatus((current) => isTerminalRunStatus(current) ? current : "running");
             else if (frame2.event.kind === "run/completed") {
               clearActiveRun();
+              runFinishedRef.current = true;
               setRunStatus("completed");
             } else if (frame2.event.kind === "run/failed") {
               clearActiveRun();
+              runFinishedRef.current = true;
               setRunStatus("failed");
             } else if (frame2.event.kind === "run/cancelled") {
               clearActiveRun();
+              runFinishedRef.current = true;
               setRunStatus("cancelled");
             } else if (frame2.event.kind === "run/indeterminate") {
               clearActiveRun();
+              runFinishedRef.current = true;
               setRunStatus("indeterminate");
             }
           } else if (frame2.type === "interaction.pending" && frame2.interaction) {
+            if (runFinishedRef.current || !runIDRef.current || frame2.interaction.runID !== runIDRef.current || typeof frame2.interaction.turnID !== "string" || !frame2.interaction.turnID.trim() || resolvedTurnsRef.current.has(frame2.interaction.turnID) || pendingRef.current && pendingRef.current.turnID !== frame2.interaction.turnID) return;
             pendingRef.current = frame2.interaction;
             setPending(frame2.interaction);
             setExecutionNodeID(frame2.interaction.nodeID ?? frame2.interaction.stepID);
             setRunStatus("waiting");
           } else if (frame2.type === "interaction.resolved") {
+            if (pendingRef.current?.turnID !== frame2.turnID) return;
+            if (runFinishedRef.current || frame2.runID && frame2.runID !== runIDRef.current) return;
+            resolvedTurnsRef.current.add(frame2.turnID);
             if (hostRequestRef.current?.turnID === frame2.turnID) hostRequestRef.current = void 0;
             setPending((current) => {
               if (current?.turnID !== frame2.turnID) return current;
@@ -37880,11 +39834,21 @@
             });
             setRunStatus((current) => isTerminalRunStatus(current) ? current : "running");
           } else if (frame2.type === "run.finished") {
+            if (frame2.runID && directRunScopeRef.current && frame2.runID !== directRunScopeRef.current) return;
+            setResults(frame2.resultsAvailability ?? { state: "unavailable", reason: "runtime-did-not-deliver-results" });
+            const summaryRunID = frame2.runID ?? directRunScopeRef.current;
             clearActiveRun();
             runFinishedRef.current = true;
             setRunStarting(false);
             setRouteTestRunning(false);
-            setRuntimeNodes((current) => applyTerminalSteps(current, frame2.steps));
+            const graph = directDocumentRef.current;
+            const binding = graph?.display_plan_snapshot_digest ?? graph?.execution_plan_hash ?? graph?.presentation_state?.plan_snapshot_digest ?? "missing-binding";
+            setRuntimeNodes((current) => applyTerminalSteps(
+              summaryRunID ? restoreDirectDisplayWithdrawals(current, displayWithdrawalsRef.current, summaryRunID, binding) : current,
+              frame2.steps,
+              binding,
+              summaryRunID
+            ));
             setRunStatus(frame2.status ?? "completed");
             if (frame2.routeTest) setRouteTestOutcome(frame2.routeTest);
           } else if (frame2.type === "protocol.error") {
@@ -37958,7 +39922,7 @@
       vscode.postMessage({ type: "ready" });
       return () => window.removeEventListener("message", receive);
     }, []);
-    (0, import_react11.useEffect)(() => {
+    (0, import_react15.useEffect)(() => {
       if (!document2) return;
       const values = {};
       for (const declaration of graphInputDeclarations(document2)) {
@@ -37996,10 +39960,10 @@
         request: interaction.host_action.request
       });
     };
-    (0, import_react11.useEffect)(() => {
-      if (!pending || pending.kind !== "host_action" || !pending.host_action || !runID || pending.host_action.capability === "xts.open-view") return;
-      dispatchHostAction(pending, false);
-    }, [pending?.turnID, runID]);
+    (0, import_react15.useEffect)(() => {
+      if (!pending2 || pending2.kind !== "host_action" || !pending2.host_action || !runID || pending2.host_action.capability === "xts.open-view") return;
+      dispatchHostAction(pending2, false);
+    }, [pending2?.turnID, runID]);
     const startRun = (debugMode = false) => {
       if (!document2) return;
       const declarations = graphInputDeclarations(document2);
@@ -38112,6 +40076,7 @@
       }
       if (runStarting || !isTerminalRunStatus(runStatus)) return;
       vscode.postMessage({ type: "run.reset" });
+      setResults(void 0);
       clearActiveRun();
       runFinishedRef.current = true;
       setRunStatus("idle");
@@ -38125,13 +40090,13 @@
       setRouteTestError(void 0);
     };
     const submitInteraction = (answer) => {
-      if (!pending || !runID) return;
+      if (!pending2 || !runID) return;
       vscode.postMessage(sessionID ? {
         type: "session.command",
         command: {
           type: "interaction.answer",
           runID,
-          turnID: pending.turnID,
+          turnID: pending2.turnID,
           payload: answer
         }
       } : {
@@ -38139,12 +40104,12 @@
         command: {
           type: "interaction.answer",
           runID,
-          turnID: pending.turnID,
+          turnID: pending2.turnID,
           answer
         }
       });
     };
-    (0, import_react11.useEffect)(() => {
+    (0, import_react15.useEffect)(() => {
       if (!testMode) return;
       const receiveTestAction = (event) => {
         const message = event.data;
@@ -38168,7 +40133,7 @@
         } else if (message.action === "save-route-test-result" && message.artifact) {
           vscode.postMessage({ type: "route-test.save", artifact: { ...message.artifact, last_result: {} } });
         } else if (message.action === "click-button" && message.name) {
-          const button = Array.from(window.document.querySelectorAll("button")).find((candidate) => candidate.textContent?.trim() === message.name);
+          const button = Array.from(window.document.querySelectorAll("button")).find((candidate) => candidate.textContent?.trim() === message.name || candidate.title === message.name);
           button?.click();
           requestAnimationFrame(() => requestAnimationFrame(() => vscode.postMessage({
             type: "test.dom.state",
@@ -38229,8 +40194,8 @@
       };
       window.addEventListener("message", receiveTestAction);
       return () => window.removeEventListener("message", receiveTestAction);
-    }, [document2, inputValues, pending, runID, runStatus, runStarting, breakpoints, watches, testMode]);
-    (0, import_react11.useEffect)(() => {
+    }, [document2, inputValues, pending2, runID, runStatus, runStarting, breakpoints, watches, testMode]);
+    (0, import_react15.useEffect)(() => {
       if (!testMode) return;
       const frame2 = requestAnimationFrame(() => {
         vscode.postMessage({
@@ -38243,9 +40208,9 @@
           runStarting,
           reloading,
           runError,
-          pendingKind: pending?.kind,
-          pendingDebugPhase: pending?.debug?.phase,
-          pendingTurnID: pending?.turnID,
+          pendingKind: pending2?.kind,
+          pendingDebugPhase: pending2?.debug?.phase,
+          pendingTurnID: pending2?.turnID,
           inputCount: document2 ? graphInputDeclarations(document2).length : 0,
           graphNodeIDs: document2?.nodes.map((node) => node.id) ?? [],
           segmentCount: document2?.groups.filter((group) => group.kind === "session-segment").length ?? 0,
@@ -38279,21 +40244,22 @@
         });
       });
       return () => cancelAnimationFrame(frame2);
-    }, [document2, inputValues, sessionID, sessionStatus, sessionAttached, runID, runStatus, runStarting, reloading, runError, pending?.turnID, runtimeNodes, executionNodeID, breakpoints, routeTestContext?.planHash, routeTestOutcome, routeTestError, routeTests, testMode]);
-    if (loading) return /* @__PURE__ */ import_react11.default.createElement("div", { className: "state", role: "status" }, "Loading runbook...");
-    if (error) return /* @__PURE__ */ import_react11.default.createElement("div", { className: "state error", role: "alert" }, error);
-    if (!document2) return /* @__PURE__ */ import_react11.default.createElement("div", { className: "state", role: "status" }, "No graph loaded");
-    return /* @__PURE__ */ import_react11.default.createElement(
+    }, [document2, inputValues, sessionID, sessionStatus, sessionAttached, runID, runStatus, runStarting, reloading, runError, pending2?.turnID, runtimeNodes, executionNodeID, breakpoints, routeTestContext?.planHash, routeTestOutcome, routeTestError, routeTests, testMode]);
+    if (loading) return /* @__PURE__ */ import_react15.default.createElement("div", { className: "state", role: "status" }, "Loading runbook...");
+    if (error) return /* @__PURE__ */ import_react15.default.createElement("div", { className: "state error", role: "alert" }, error);
+    if (!document2) return /* @__PURE__ */ import_react15.default.createElement("div", { className: "state", role: "status" }, "No graph loaded");
+    return /* @__PURE__ */ import_react15.default.createElement(
       GraphView2,
       {
         document: document2,
+        results: sessionAttached ? void 0 : results,
         testMode,
         style: style2,
         runtimeNodes,
         executionNodeID,
         breakpoints,
         watches,
-        pending,
+        pending: pending2,
         sessionID,
         sessionStatus,
         sessionAttached,
@@ -38347,7 +40313,7 @@
   }
   var root2 = document.getElementById("root");
   if (!root2) throw new Error("Missing webview root element");
-  (0, import_client.createRoot)(root2).render(/* @__PURE__ */ import_react11.default.createElement(App, null));
+  (0, import_client.createRoot)(root2).render(/* @__PURE__ */ import_react15.default.createElement(App, null));
 })();
 /*! Bundled license information:
 

@@ -59,6 +59,11 @@ function compositeNodeID(sessionID: string, segmentID: string, nodeID: string): 
 }
 
 suite('investigation session graph', () => {
+  test('Workflow Markdown production controls and retained clipboard', async function () {
+    this.timeout(120000);
+    if (!process.env.GERT_WORKFLOW_ARTIFACTS && !process.env.GERT_TEST_GREP?.includes('Workflow Markdown')) this.skip();
+    await require('../../../test/helpers/workflow-markdown-native.cjs').verify(vscode);
+  });
   test('renders a cross-runbook session and sends fenced interaction answers', async function () {
     this.timeout(30_000);
     const extension = vscode.extensions.getExtension(EXTENSION_ID);

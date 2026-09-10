@@ -58,6 +58,27 @@ test('client accepts only a complete hash-verified graph sequence', () => {
     onExit() {},
   });
 
+  test('actual session frame wrapper sanitizes classified output before onGroup delivery', () => {
+    const vector = require('./fixtures/presentation-contract.json');
+    const child = fakeChild(), groups = [], errors = [];
+    new SessionStdioClient(child, { sessionID, afterSequence: 0, onGroup: group => groups.push(group),
+      onAcceptedSequence() {}, onError: message => errors.push(message), onExit() {} });
+    child.stdout.write(JSON.stringify(frame({
+      type: 'run.event', segmentID, runID,
+      payload: { kind: 'step/completed', payload: {
+        code_presentation: structuredClone(vector.graph_details_example.code_presentation),
+        output: { script: 'NEVER_FORWARD_SECRET', table: [{ x: 1 }] },
+        output_value_status: { script: 'redacted' },
+      } },
+    })) + '\n');
+    assert.deepEqual(errors, []);
+    assert.equal(groups.length, 1);
+    const payload = groups[0].frames[0].payload.payload;
+    assert.equal(payload.output.script, undefined);
+    assert.equal(payload.output_value_status.script, 'redacted');
+    assert.deepEqual(payload.output.table, [{ x: 1 }]);
+    assert.ok(payload.code_presentation);
+  });
   child.stdout.write(`${JSON.stringify(frame({
     type: 'segment.graph', segmentID, runID, sequenceIndex: 0, sequenceCount: 2,
     payload: {

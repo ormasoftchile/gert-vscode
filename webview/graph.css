@@ -343,3 +343,34 @@ button, input, select, textarea { font: inherit; }
   .canvas { border-right: 0; }
   .react-flow__minimap { display: none; }
 }
+.gert-code { margin: 8px 0; min-width: 0; }
+.gert-code figcaption { font-size: 11px; color: var(--vscode-descriptionForeground); }
+.gert-code button { float: right; cursor: pointer; }
+.gert-code pre { max-height: 360px; overflow: auto; white-space: pre; padding: 8px; }
+.authored-value { white-space: pre-wrap; overflow-wrap: anywhere; }
+/* Workflow segments are neutral view controls, never execution statuses. */
+.technical-segment { box-sizing: border-box; width: 100%; height: 100%; border: 1px dashed var(--vscode-descriptionForeground); border-radius: 24px; background: var(--vscode-editor-background); padding: 6px 10px; text-align: center; }
+.technical-segment button { border: 0; background: transparent; color: var(--vscode-foreground); cursor: pointer; }
+.technical-segment small { display: block; font-size: 10px; color: var(--vscode-descriptionForeground); }
+.workflow-mode, .markdown-toolbar, .markdown-toolbar > div { display: flex; gap: 4px; align-items: center; }
+.workflow-mode button[aria-pressed="true"], .markdown-toolbar button[aria-pressed="true"] { outline: 1px solid var(--vscode-focusBorder); }
+.workflow-issues { display: flex; gap: 8px; flex-wrap: wrap; padding: 8px 14px; border-bottom: 1px solid var(--vscode-panel-border); max-height: 145px; overflow: auto; }
+.workflow-issues span { color: var(--vscode-descriptionForeground); }
+.workflow-summary { padding: 4px 14px; font-size: 11px; color: var(--vscode-descriptionForeground); }
+.markdown-output { min-width: 0; overflow: auto; }
+.markdown-toolbar { justify-content: space-between; flex-wrap: wrap; }
+.markdown-notice { font-size: 12px; color: var(--vscode-descriptionForeground); }
+.markdown-output[data-value-status="truncated"] .markdown-notice { font-weight: bold; color: var(--vscode-editorWarning-foreground); }
+.markdown-raw { white-space: pre; overflow: auto; tab-size: 4; }
+.markdown-rendered { overflow-wrap: anywhere; }
+.markdown-rendered table { border-collapse: collapse; width: 100%; margin: 12px 0; }
+.markdown-rendered th, .markdown-rendered td { border: 1px solid var(--vscode-panel-border); padding: 6px 10px; text-align: left; }
+.markdown-rendered pre { white-space: pre; overflow: auto; padding: 12px; background: var(--vscode-textCodeBlock-background); }
+.markdown-rendered a { color: var(--vscode-textLink-foreground); }
+.current-activity { --position-color: var(--vscode-charts-green); flex-shrink: 0; max-height: 220px; overflow: auto; }
+.current-activity > div { width: 100%; min-width: 0; flex-direction: column; align-items: stretch; gap: 3px; }
+.current-activity strong { white-space: normal; overflow-wrap: anywhere; }
+.current-activity .current-activity-item { display: flex; justify-content: space-between; gap: 12px; margin-top: 7px; }
+.current-activity-item > div { display: flex; flex-direction: column; min-width: 0; gap: 2px; }
+.current-activity .current-activity-item code { white-space: normal; overflow-wrap: anywhere; }
+.current-activity small { color: var(--vscode-descriptionForeground); }

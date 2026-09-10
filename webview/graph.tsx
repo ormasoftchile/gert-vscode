@@ -3,6 +3,7 @@ import { ArrowLeft, ArrowRight, Bug, CheckCircle2, CircleDot, LocateFixed, Panel
 import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import ReactFlow, {
+  applyNodeChanges,
   Background,
   BackgroundVariant,
   Controls,
@@ -20,6 +21,20 @@ import ReactFlow, {
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import './graph.css';
+import { terminalPresentation } from '../src/presentationProjection';
+import { applyDirectRetainedDocument, applyDirectDisplaySummary, reconcileDirectDisplayState,
+  beginDirectDisplayOccurrence, retainDirectDisplayWithdrawals, restoreDirectDisplayWithdrawals, type DisplayObservations } from '../src/displayObservations';
+import { decodeDisplayWithdrawals } from '../src/displayObservationStorage';
+import { projectWorkflow, workflowIssueIndex, type WorkflowIssue, type WorkflowMode } from '../src/workflowProjection';
+import { preserveLayoutMeasurements } from '../src/graphLayoutMeasurements';
+import { canonicalProgress, currentActivities, compareOccurrences, directOccurrenceID, validProgressIdentity, producerStepKind, displayRuntimeStatuses, isExecutionEnded, normalizeRuntimeStatuses, type CurrentActivity } from '../src/executionProgress';
+import { CurrentActivity as CurrentActivityStrip } from './CurrentActivity';
+import { decodeWorkflowPreference, mergeWorkflowPreference } from '../src/workflowView';
+import type { ResultsAvailability } from '../src/typedResultsTypes';
+import { ResultsViewer } from './ResultsViewer';
+import type { RetainedPresentation } from '../src/presentationHistory';
+import { configureHighlighting } from './highlighting/browserClient';
+configureHighlighting(document.body.dataset.highlightingWorker ?? '');
 import {
   RunOverview,
   StepInspector,
@@ -35,7 +50,7 @@ import type {
 import type { DirectDebugBreakpoint, DirectDebugCallFrame, DirectDebugPhase } from '../src/directDebug';
 import { activeGraphNodeIDs, edgeRuntimeState, withBranchMerges } from '../src/branchTopology';
 import type { GraphEdge } from '../src/directGraphPreview';
-import { isTerminalRunStatus } from '../src/runStatus';
+import { isSettledStepStatus, isTerminalRunStatus } from '../src/runStatus';
 import {
   buildRouteProjectionIndex,
   computeRouteProjection,
@@ -62,6 +77,8 @@ import {
 type NodeStyle = 'smooth-curves' | 'minimalist' | 'header-badges';
 
 type HostMessage =
+  | { type: 'workflow-markdown.preference'; preference: unknown }
+  | { type: 'highlighting'; enabled: boolean }
   | { type: 'loading' }
   | {
       type: 'graph';
@@ -91,7 +108,7 @@ type HostMessage =
   | { type: 'route-test.error'; message: string }
   | {
       type: 'test.action';
-      action: 'set-input' | 'run' | 'debug' | 'reset' | 'cancel' | 'answer' | 'toggle-breakpoint' | 'select-node' | 'run-route-test' | 'save-route-test' | 'save-route-test-result' | 'click-button' | 'click-route-test-checkbox' | 'toggle-choice' | 'set-collector-field';
+      action: 'inspect-graph-visibility' | 'inspect-results' | 'set-graph-viewport' | 'set-input' | 'run' | 'debug' | 'reset' | 'cancel' | 'answer' | 'toggle-breakpoint' | 'select-node' | 'inspect-expressions' | 'run-route-test' | 'save-route-test' | 'save-route-test-result' | 'click-button' | 'click-route-test-checkbox' | 'toggle-choice' | 'set-collector-field';
       name?: string;
       value?: string;
       answer?: Record<string, unknown>;
@@ -104,16 +121,26 @@ interface StdioFrame {
   version: 'gert-stdio/v1';
   runID?: string;
   status?: string;
+  resultsAvailability?: ResultsAvailability;
   event?: RuntimeEvent;
   interaction?: PendingInteraction;
   turnID?: string;
   steps?: Array<{
     step_id?: string;
     node_id?: string;
+    qualified_node_id?: string;
+    phase?: string;
+    invocation?: number;
+    retry_attempt?: number;
+    occurrence_sequence?: number;
+    frame_id?: string;
+    frame_step_index?: number;
     status?: string;
     error?: string;
     duration_ms?: number;
     output?: Record<string, unknown>;
+    display_presentation?: unknown;
+    display_presentation_diagnostic?: unknown;
   }>;
   routeTest?: RouteTestOutcome;
 }
@@ -276,6 +303,8 @@ const kindLabels: Record<string, string> = {
   include: 'Include',
   iterate: 'Iterate',
   noop: 'No-op',
+  assign: 'Assign bindings',
+  results: 'Results',
   parallel: 'Parallel',
   tool: 'Tool',
   wait_for_event: 'Wait event',
@@ -298,7 +327,9 @@ function StepNode({ data, selected }: NodeProps<GraphNodeData>) {
   const title = typeof data.title === 'string' ? data.title : '';
   const isTerminal = kind === 'end';
   const runtime = runtimeNodes[id];
-  const status = runtime?.status ?? (typeof data.status === 'string' ? data.status : 'pending');
+  const observedStatus = runtime?.status ?? (typeof data.status === 'string' ? data.status : 'pending');
+  const status = executionPosition.terminal && ['running', 'delaying', 'waiting'].includes(observedStatus)
+    ? 'no-final-status' : observedStatus;
   const error = runtime?.error ?? (typeof data.error === 'string' ? data.error : '');
   const hasBeforeBreakpoint = debugBreakpoints.has(breakpointKey(id, 'before'));
   const hasAfterBreakpoint = debugBreakpoints.has(breakpointKey(id, 'after'));
@@ -338,7 +369,7 @@ function StepNode({ data, selected }: NodeProps<GraphNodeData>) {
         </div>
         <div className="step-id">{id}</div>
         {title && title !== id ? <div className="step-title">{title}</div> : null}
-        {status !== 'pending' ? <div className="step-status">{status}{error ? `: ${error}` : ''}</div> : null}
+        {status !== 'pending' ? <div className="step-status">{status === 'no-final-status' ? 'No final status' : status}{error ? `: ${error}` : ''}</div> : null}
         {!isTerminal ? <Handle type="source" position={Position.Bottom} /> : null}
       </div>
     </>
@@ -377,7 +408,15 @@ function SessionEntryNode() {
   );
 }
 
-const nodeTypes = { gertStep: StepNode, branchMerge: BranchMergeNode, sessionEntry: SessionEntryNode, frameBox: FrameNode };
+function TechnicalSegmentNode({ data }: NodeProps<GraphNodeData>) {
+  return <div className="technical-segment" title="Visual grouping only, not execution evidence. Click to expand without rerunning.">
+    <Handle type="target" position={Position.Top} />
+    <button type="button" className="nodrag" onClick={() => (data.expand as (() => void) | undefined)?.()}>{String(data.title)}</button>
+    <small>{String(data.memberSummary ?? 'Visual grouping — not skipped')}</small>
+    <Handle type="source" position={Position.Bottom} />
+  </div>;
+}
+const nodeTypes = { technicalSegment: TechnicalSegmentNode, gertStep: StepNode, branchMerge: BranchMergeNode, sessionEntry: SessionEntryNode, frameBox: FrameNode };
 
 function InputsForm({
   declarations,
@@ -939,6 +978,7 @@ interface GroupBounds {
 }
 
 function nodeDimensions(kind: string, style: NodeStyle): Dimensions {
+  if (kind === 'technical-segment') return { width: 200, height: 58 };
   if (kind === 'merge' || kind === 'session-entry') return { width: 14, height: 14 };
   if (style === 'minimalist') {
     if (kind === 'end') return { width: 164, height: 48 };
@@ -1144,7 +1184,7 @@ function layoutDocument(
     const parentBounds = groupID ? groupBounds.get(groupID) : undefined;
     return {
       id: node.id,
-      type: node.data.kind === 'session-entry' ? 'sessionEntry' : node.data.synthetic === true ? 'branchMerge' : 'gertStep',
+      type: node.data.kind === 'technical-segment' ? 'technicalSegment' : node.data.kind === 'session-entry' ? 'sessionEntry' : node.data.synthetic === true ? 'branchMerge' : 'gertStep',
       position: {
         x: position.x - (parentBounds?.x ?? 0),
         y: position.y - (parentBounds?.y ?? 0),
@@ -1238,6 +1278,7 @@ function runtimeEdgeClass(edge: GraphEdge, runtimeNodes: Readonly<Record<string,
 
 function eventNodeID(event: RuntimeEvent): string | undefined {
   const payload = event.payload ?? {};
+  if (typeof payload.qualified_node_id === 'string' && payload.qualified_node_id) return payload.qualified_node_id;
   const explicitNodeID = payload.node_id;
   if (typeof explicitNodeID === 'string' && explicitNodeID) return explicitNodeID;
   const stepID = payload.step_id;
@@ -1282,10 +1323,11 @@ function appendRuntimeLog(current: RuntimeLogLine[] | undefined, payload: Record
 function applyRuntimeEvent(
   current: Readonly<Record<string, RuntimeNodeState>>,
   event: RuntimeEvent,
+  expectedDisplaySnapshot = 'missing-binding',
 ): Record<string, RuntimeNodeState> {
   const nodeID = eventNodeID(event);
   if (!nodeID) return { ...current };
-  const previous = current[nodeID] ?? { status: 'pending' };
+  let previous = current[nodeID] ?? { status: 'pending' };
   if (event.kind === 'debug/override_applied') {
     return {
       ...current,
@@ -1296,7 +1338,8 @@ function applyRuntimeEvent(
     const payload = event.payload ?? {};
     return {
       ...current,
-      [nodeID]: { ...previous, logs: appendRuntimeLog(previous.logs, payload) },
+      [nodeID]: { ...previous, logs: appendRuntimeLog(previous.logs, payload),
+        lastActivityAt: event.timestamp ?? previous.lastActivityAt },
     };
   }
   let status = previous.status;
@@ -1306,15 +1349,53 @@ function applyRuntimeEvent(
   else if (event.kind === 'step/failed') status = 'failed';
   else if (event.kind === 'step/indeterminate') status = 'indeterminate';
   else if (event.kind === 'step/skipped') status = 'skipped';
+  else if (event.kind === 'step/cancelled') status = 'cancelled';
+  else if (event.kind === 'step/denied') status = 'denied';
+  else if (event.kind === 'step/blocked') status = 'blocked';
   else return current as Record<string, RuntimeNodeState>;
   const payload = event.payload ?? {};
-  return {
-    ...current,
-    [nodeID]: {
+  const counter = (value: unknown, minimum = 1) =>
+    typeof value === 'number' && Number.isSafeInteger(value) && value >= minimum ? value : undefined;
+  const invocation = counter(payload.invocation);
+  const retryAttempt = counter(payload.retry_attempt === undefined ? payload.attempt : payload.retry_attempt);
+  const occurrenceID = directOccurrenceID(event.run_id, nodeID, payload) +
+    (validProgressIdentity(payload) ? '' : `:uncertain:${event.sequence}`);
+  const existingOccurrence = previous.occurrences?.find(item => item.occurrenceID === occurrenceID);
+  const directDisplaySnapshot = existingOccurrence?.directDisplaySnapshot ?? expectedDisplaySnapshot;
+  if (['step/started', 'step/resumed', 'step/delaying'].includes(event.kind) && !existingOccurrence && validProgressIdentity(payload)) {
+    previous = beginDirectDisplayOccurrence(previous, payload, event.run_id, directDisplaySnapshot) as RuntimeNodeState;
+  }
+  if (event.run_id && existingOccurrence && isSettledStepStatus(existingOccurrence.status) &&
+      ['step/started', 'step/resumed', 'step/delaying'].includes(event.kind)) return current as Record<string, RuntimeNodeState>;
+  const retainedSameOccurrence = event.kind === 'step/started'
+    ? previous.occurrences?.find(item => item.occurrenceID === occurrenceID &&
+      (item.displayPresentation || item.displayPresentationDiagnostic)) : undefined;
+  const presentation = event.kind === 'step/completed' || event.kind === 'step/failed'
+    ? terminalPresentation(payload, existingOccurrence, directDisplaySnapshot) : undefined;
+  if (existingOccurrence && isSettledStepStatus(existingOccurrence.status) &&
+      (existingOccurrence.displayPresentation || existingOccurrence.displayPresentationDiagnostic ||
+        presentation?.displayPresentation || presentation?.displayPresentationDiagnostic) &&
+      (event.kind === 'step/completed' || event.kind === 'step/failed')) {
+    const update = { output: recordValue(payload.output), displayPresentation: presentation?.displayPresentation,
+      displayPresentationDiagnostic: presentation?.displayPresentationDiagnostic };
+    return { ...current, [nodeID]: reconcileDirectDisplayState({
+      ...previous, ...(previous.occurrenceID === occurrenceID ? update : {}),
+      occurrences: previous.occurrences!.map(item => item.occurrenceID === occurrenceID ? { ...item, ...update } : item),
+    }, previous) as RuntimeNodeState };
+  }
+  const value: RuntimeNodeState = {
       ...previous,
+      directDisplaySnapshot,
       status,
-      error: typeof payload.error === 'string' ? payload.error : previous.error,
-      durationMs: typeof payload.duration_ms === 'number' ? payload.duration_ms : previous.durationMs,
+      ...(event.kind === 'step/started' && !existingOccurrence ? {
+        error: undefined, durationMs: undefined, startedAt: undefined, finishedAt: undefined,
+      } : {}),
+      lastActivityAt: event.timestamp ?? existingOccurrence?.lastActivityAt,
+      stepKind: producerStepKind(payload) ?? previous.stepKind,
+      error: typeof payload.error === 'string' ? payload.error
+        : event.kind === 'step/started' && !existingOccurrence ? undefined : previous.error,
+      durationMs: typeof payload.duration_ms === 'number' ? payload.duration_ms
+        : event.kind === 'step/started' && !existingOccurrence ? undefined : previous.durationMs,
       attempt: typeof payload.attempt === 'number'
         ? payload.attempt
         : typeof payload.attempt_number === 'number'
@@ -1322,33 +1403,77 @@ function applyRuntimeEvent(
           : previous.attempt,
       delay: typeof payload.delay === 'string' ? payload.delay : previous.delay,
       skipReason: typeof payload.reason === 'string' ? payload.reason : previous.skipReason,
-      output: recordValue(payload.output) ?? previous.output,
+      output: event.kind === 'step/completed' || event.kind === 'step/failed'
+        ? recordValue(payload.output) : previous.output,
+      ...((event.kind === 'step/completed' || event.kind === 'step/failed') ? {
+        codePresentation: undefined, outputValueStatus: undefined, presentationDiagnostic: undefined,
+        displayPresentation: undefined, displayPresentationDiagnostic: undefined, ...presentation,
+      } : {}),
+      ...(event.kind === 'step/started' ? { output: undefined, codePresentation: undefined, outputValueStatus: undefined, presentationDiagnostic: undefined,
+        displayPresentation: undefined, displayPresentationDiagnostic: undefined } : {}),
+      ...(retainedSameOccurrence ? {
+        output: retainedSameOccurrence.output, displayPresentation: retainedSameOccurrence.displayPresentation,
+        displayPresentationDiagnostic: retainedSameOccurrence.displayPresentationDiagnostic,
+      } : {}),
       captures: recordValue(payload.captures) ?? previous.captures,
       evidence: payload.evidence ?? previous.evidence,
       ...(event.kind === 'step/started' && event.timestamp ? { startedAt: event.timestamp } : {}),
       ...((event.kind === 'step/completed' || event.kind === 'step/failed' || event.kind === 'step/indeterminate' || event.kind === 'step/skipped') && event.timestamp
         ? { finishedAt: event.timestamp }
         : {}),
-    },
   };
+  const { occurrences: _history, retainedPresentations: _retained, displayObservations: _displayHistory, ...observation } = value;
+  const occurrence = { ...observation, occurrenceID, runID: event.run_id, segmentID: '', qualifiedNodeID: nodeID,
+    phase: typeof payload.phase === 'string' ? payload.phase : undefined, invocation, retryAttempt,
+    frameID: typeof payload.frame_id === 'string' ? payload.frame_id : undefined,
+    frameStepIndex: counter(payload.frame_step_index, 0),
+    dispatchOccurrenceID: typeof payload.dispatch_occurrence_id === 'string' ? payload.dispatch_occurrence_id : undefined,
+    executionLane: typeof payload.execution_lane === 'string' ? payload.execution_lane : undefined,
+    startedEventSequence: existingOccurrence?.startedEventSequence ??
+      (event.kind === 'step/started' || event.kind === 'step/resumed' ? event.sequence : undefined),
+    occurrenceSequence: counter(payload.occurrence_sequence) ?? existingOccurrence?.occurrenceSequence,
+    executionSource: 'live' as const };
+  const history = [...(previous.occurrences ?? [])];
+  const index = history.findIndex(item => item.occurrenceID === occurrenceID);
+  if (index < 0) history.push(occurrence);
+  else if (!(event.kind === 'step/started' && ['completed', 'failed', 'denied', 'indeterminate', 'cancelled', 'blocked', 'skipped'].includes(history[index].status))) {
+    history[index] = occurrence;
+  }
+  const latest = history.filter(item => item.runID === event.run_id)
+    .reduce((left, right) => compareOccurrences(left, right) > 0 ? left : right);
+  return { ...current, [nodeID]: reconcileDirectDisplayState({
+    ...(latest.occurrenceID === occurrenceID ? value : previous),
+    runID: latest.runID, occurrenceID: latest.occurrenceID, occurrences: history,
+  }, previous) as RuntimeNodeState };
 }
 
 function applyTerminalSteps(
   current: Readonly<Record<string, RuntimeNodeState>>,
   steps: StdioFrame['steps'],
+  expectedDisplaySnapshot = 'missing-binding',
+  runID?: string,
 ): Record<string, RuntimeNodeState> {
   if (!steps) return { ...current };
   const next = { ...current };
   for (const step of steps) {
     const nodeID = step.node_id || step.step_id;
     if (!nodeID || !step.status) continue;
+    const prior = next[nodeID];
+    const display = applyDirectDisplaySummary(prior ?? {}, step as unknown as Record<string, unknown>, nodeID,
+      runID ?? prior?.runID ?? '', expectedDisplaySnapshot);
+    const frozenOutcome = prior && prior.runID === display.runID &&
+      prior.directDisplaySnapshot === display.directDisplaySnapshot &&
+      isSettledStepStatus(prior.status) && display.displayObservations?.[nodeID]?.length;
     next[nodeID] = {
-      ...next[nodeID],
-      status: step.status,
-      error: step.error || next[nodeID]?.error,
-      durationMs: step.duration_ms ?? next[nodeID]?.durationMs,
-      output: step.output ?? next[nodeID]?.output,
-    };
+      ...display,
+      status: frozenOutcome ? prior.status : step.status,
+      error: frozenOutcome ? prior.error : step.error || prior?.error,
+      durationMs: frozenOutcome ? prior.durationMs : step.duration_ms ?? prior?.durationMs,
+      // Summary previews have no slot classifications; keep the terminal event's
+      // approved values and frozen metadata together instead of replacing them.
+      output: display.displayPresentation || display.displayPresentationDiagnostic ? display.output :
+        prior?.codePresentation || prior?.presentationDiagnostic ? prior.output : step.output ?? prior?.output,
+    } as RuntimeNodeState;
   }
   return next;
 }
@@ -1461,9 +1586,10 @@ function DebugSelectionControls({
 
 function GraphView({
   document,
+  results,
   testMode,
   style,
-  runtimeNodes,
+  runtimeNodes: observedRuntimeNodes,
   executionNodeID,
   breakpoints,
   watches,
@@ -1505,6 +1631,7 @@ function GraphView({
   xtsOpened,
 }: {
   document: GraphDocument;
+  results?: ResultsAvailability;
   testMode: boolean;
   style: NodeStyle;
   runtimeNodes: Readonly<Record<string, RuntimeNodeState>>;
@@ -1548,13 +1675,48 @@ function GraphView({
   onRunRouteTest(artifact: RouteTestArtifact): void;
   xtsOpened: boolean;
 }) {
+  const runtimeNodes = useMemo(() => displayRuntimeStatuses(observedRuntimeNodes, runStatus, document), [observedRuntimeNodes, runStatus, document]);
   const [selectedId, setSelectedId] = useState<string>();
+  useEffect(() => {
+    if (!testMode) return;
+    const report = (event: ErrorEvent) => vscode.postMessage({ type: 'test.error', message: event.message, stack: event.error?.stack });
+    window.addEventListener('error', report);
+    return () => window.removeEventListener('error', report);
+  }, [testMode]);
+  const [viewPreference, setViewPreference] = useState(() =>
+    decodeWorkflowPreference(recordValue(vscode.getState?.())?.workflowView));
+  const [expandedTechnicalIDs, setExpandedTechnicalIDs] = useState<ReadonlySet<string>>(new Set());
+  const [issueSelection, setIssueSelection] = useState<WorkflowIssue>();
+  const [issueNotice, setIssueNotice] = useState(false);
+  const issues = useMemo(() => workflowIssueIndex(runtimeNodes), [runtimeNodes]);
+  const changePreference = (patch: Partial<typeof viewPreference>) => {
+    const preference = decodeWorkflowPreference({ ...viewPreference, ...patch });
+    setViewPreference(preference);
+    vscode.setState?.(mergeWorkflowPreference(vscode.getState?.(), preference));
+  };
+  useEffect(() => {
+    const canonicalIDs = new Set(document.nodes.map(node => node.id));
+    setExpandedTechnicalIDs(current => new Set([...current].filter(id => canonicalIDs.has(id))));
+    setSelectedId(current => current && canonicalIDs.has(current) ? current : undefined);
+  }, [document.hash, document.runbook.path, sessionID]);
   const [showPanel, setShowPanel] = useState(true);
+  useEffect(() => {
+    if (results?.state === 'available' && runStatus === 'completed') {
+      const origin = results.publication.origin.node_id;
+      if (document.nodes.some(node => node.id === origin && node.data.kind === 'results')) {
+        setSelectedId(origin); setShowPanel(true);
+      }
+    }
+  }, [results, runStatus]);
   const [inspectorRatio, setInspectorRatio] = useState(restoredInspectorRatio);
   const [routeTargetID, setRouteTargetID] = useState<string>();
   const [routeScope, setRouteScope] = useState<RouteProjectionScope>('through');
   const [routeTestEditor, setRouteTestEditor] = useState<{ artifact?: RouteTestArtifact; needsReview?: boolean; key: string; contextKey: string }>();
   const [locateNodeID, setLocateNodeID] = useState<string>();
+  const [activityLocationNotice, setActivityLocationNotice] = useState<string>();
+  const activities = useMemo(() => currentActivities(document, observedRuntimeNodes, runStatus, runID, pending),
+    [document, observedRuntimeNodes, runStatus, runID, pending]);
+  const progressCounts = useMemo(() => canonicalProgress(document, observedRuntimeNodes, runStatus), [document, observedRuntimeNodes, runStatus]);
   const [closeStatus, setCloseStatus] = useState<'resolved' | 'escalated' | 'cancelled' | 'abandoned'>('resolved');
   const [inspectionRevision, setInspectionRevision] = useState<{ nodeID: string; revision: number }>();
   const flowRef = useRef<ReactFlowInstance<GraphNodeData>>();
@@ -1585,10 +1747,33 @@ function GraphView({
       : undefined,
     [routeIndex, routeSourceDocument, routeTargetID, sessionID],
   );
-  const displayDocument = useMemo(
+  const routeDisplayDocument = useMemo(
     () => routeProjection ? projectRouteDocument(routeSourceDocument, routeProjection) : structuralDocument,
     [routeProjection, routeSourceDocument, structuralDocument],
   );
+  const pinnedNodeIDs = useMemo(() => new Set([
+    ...(selectedId ? [selectedId] : []), ...(locateNodeID ? [locateNodeID] : []),
+    ...activities.filter(value => value.inGraph).map(value => value.nodeID),
+    ...(pending?.nodeID ? [pending.nodeID] : []), ...breakpoints.map(value => value.nodeID),
+  ]), [selectedId, locateNodeID, pending?.nodeID, breakpoints, activities]);
+  const issueContextDocument = useMemo(() => {
+    const structuralIDs = new Set(structuralDocument.nodes.map(node => node.id));
+    const canonicalIDs = new Set(document.nodes.map(node => node.id));
+    return issues.some(issue => !structuralIDs.has(issue.nodeID) && canonicalIDs.has(issue.nodeID))
+      ? document : structuralDocument;
+  }, [document, structuralDocument, issues]);
+  const workflow = useMemo(() => projectWorkflow(issueContextDocument, runtimeNodes, {
+    mode: viewPreference.workflowMode, expandedNodeIDs: expandedTechnicalIDs, pinnedNodeIDs,
+    collapsedGroupIDs: new Set(),
+  }, routeDisplayDocument), [issueContextDocument, runtimeNodes, viewPreference.workflowMode, expandedTechnicalIDs, pinnedNodeIDs, routeDisplayDocument]);
+  const displayDocument = workflow.document;
+  useEffect(() => {
+    if (!routeTargetID) return;
+    const visible = new Set(routeDisplayDocument.nodes.map(node => node.id));
+    if ([...workflow.forcedNodeIDs].some(id => !visible.has(id))) {
+      setRouteTargetID(undefined); setRouteTestEditor(undefined); setIssueNotice(true);
+    }
+  }, [issues, routeTargetID, routeDisplayDocument, workflow]);
   const layoutTopologyKey = useMemo(() => sessionGraphTopologyKey(displayDocument), [displayDocument]);
   const layoutGeometry = useMemo(() => layoutDocument(displayDocument, style), [layoutTopologyKey, style]);
   const layout = useMemo(
@@ -1607,15 +1792,31 @@ function GraphView({
   const focusedNodeID = routeTargetID ?? selectedId;
   const displayNodes = useMemo(() => layout.nodes.map((node) => ({
     ...node,
+    ...(workflow.segments.has(node.id) ? { data: {
+      ...node.data,
+      expand: () => setExpandedTechnicalIDs(current => new Set([...current, ...workflow.segments.get(node.id)!.memberNodeIDs])),
+      memberSummary: (() => {
+        const counts = new Map<string, number>();
+        for (const id of workflow.segments.get(node.id)!.memberNodeIDs) {
+          const status = runtimeNodes[id]?.status;
+          if (status) counts.set(status, (counts.get(status) ?? 0) + 1);
+        }
+        return counts.size ? [...counts].map(([status, count]) => `${count} ${status === 'no-final-status' ? 'No final status' : status}`).join(', ') : 'Visual grouping — not skipped';
+      })(),
+    } } : {}),
     selected: node.id === focusedNodeID,
-  })), [focusedNodeID, layout.nodes]);
+  })), [focusedNodeID, layout.nodes, workflow, runtimeNodes]);
+  const [renderNodes, setRenderNodes] = useState<Node<GraphNodeData>[]>(displayNodes);
+  useEffect(() => {
+    setRenderNodes(current => preserveLayoutMeasurements(displayNodes, current));
+  }, [displayNodes]);
   const activeNodeIDs = useMemo(() => activeGraphNodeIDs(structuralDocument, runtimeNodes), [structuralDocument, runtimeNodes]);
-  const executionNode = executionNodeID
-    ? document.nodes.find((node) => node.id === executionNodeID) ??
-      document.nodes.find((node) => node.data.step_id === executionNodeID)
+  const currentNodeID = isExecutionEnded(runStatus) ? executionNodeID : activities[0]?.nodeID;
+  const executionNode = currentNodeID
+    ? document.nodes.find((node) => node.id === currentNodeID)
     : undefined;
   const resolvedExecutionNodeID = executionNode?.id;
-  const executionTerminal = isTerminalRunStatus(runStatus);
+  const executionTerminal = isExecutionEnded(runStatus);
   const executionPosition = useMemo(
     () => ({ nodeID: resolvedExecutionNodeID, terminal: executionTerminal }),
     [executionTerminal, resolvedExecutionNodeID],
@@ -1624,7 +1825,10 @@ function GraphView({
     () => new Set(breakpoints.map((breakpoint) => breakpointKey(breakpoint.nodeID, breakpoint.phase))),
     [breakpoints],
   );
-  const selected = document.nodes.find((node) => node.id === selectedId);
+  const requestedHistoricalNode = issueSelection?.segmentID && issueSelection.graphRevision !== undefined && issueSelection.qualifiedNodeID
+    ? revisionNodes[revisionNodeKey(issueSelection.segmentID, issueSelection.graphRevision, issueSelection.qualifiedNodeID)] : undefined;
+  const selected = document.nodes.find((node) => node.id === selectedId) ??
+    (issueSelection?.nodeID === selectedId ? requestedHistoricalNode : undefined);
   const selectedSegmentID = typeof selected?.data.segment_id === 'string' ? selected.data.segment_id : '';
   const selectedOriginalNodeID = typeof selected?.data.original_node_id === 'string'
     ? selected.data.original_node_id
@@ -1666,6 +1870,18 @@ function GraphView({
   const routeTestContextKey = `${document.hash}:${routeTestContext?.planHash ?? ''}`;
   const currentRouteTestEditor = routeTestEditor?.contextKey === routeTestContextKey ? routeTestEditor : undefined;
   const routeTestReviewOpen = currentRouteTestEditor !== undefined;
+  const navigateIssue = (issue: WorkflowIssue) => {
+    setIssueSelection(issue); setSelectedId(issue.nodeID); setShowPanel(true);
+    setRouteTargetID(undefined); setRouteTestEditor(undefined); setIssueNotice(true); setLocateNodeID(issue.nodeID);
+    const node = document.nodes.find(value => value.id === issue.nodeID);
+    const segmentID = issue.segmentID || String(node?.data.segment_id ?? '');
+    const originalID = issue.qualifiedNodeID || String(node?.data.original_node_id ?? '');
+    if (sessionID && segmentID && issue.graphRevision !== undefined) {
+      setInspectionRevision({ nodeID: issue.nodeID, revision: issue.graphRevision });
+      if (unloadedSegmentIDs.includes(segmentID)) vscode.postMessage({ type: 'session.load-segment', segmentID, revision: issue.graphRevision });
+      onRequestGraphRevision(revisionNodeKey(segmentID, issue.graphRevision, originalID), segmentID, issue.graphRevision, originalID);
+    }
+  };
 
   const showRoutesThrough = (nodeID: string) => {
     if (!routeTargetID) restoreViewportRef.current = flowRef.current?.getViewport();
@@ -1682,12 +1898,30 @@ function GraphView({
     setRouteTargetID(undefined);
     setRouteTestEditor(undefined);
   };
-  const locateExecutionNode = () => {
-    if (!resolvedExecutionNodeID) return;
+  const locateExecutionNode = (activity: CurrentActivity) => {
+    setActivityLocationNotice(undefined);
+    if (!activity.inGraph) {
+      if (sessionID && activity.segmentID && activity.graphRevision !== undefined) {
+        if (unloadedSegmentIDs.includes(activity.segmentID)) {
+          vscode.postMessage({ type: 'session.load-segment', segmentID: activity.segmentID, revision: activity.graphRevision });
+        }
+        onRequestGraphRevision(revisionNodeKey(activity.segmentID, activity.graphRevision, activity.path),
+          activity.segmentID, activity.graphRevision, activity.path);
+        setInspectionRevision({ nodeID: activity.nodeID, revision: activity.graphRevision });
+        setIssueSelection({ nodeID: activity.nodeID, qualifiedNodeID: activity.path, segmentID: activity.segmentID,
+          graphRevision: activity.graphRevision, occurrenceID: activity.occurrenceID, status: activity.status, blockedOutcome: false });
+        setSelectedId(activity.nodeID); setShowPanel(true);
+        setActivityLocationNotice(`Requested existing segment revision ${activity.graphRevision}: ${activity.path}. The viewport is unchanged until this exact node is available.`);
+      } else {
+        setActivityLocationNotice(`No graph location is available for ${activity.path}. This is the exact runtime child path; no substitute node was selected.`);
+      }
+      return;
+    }
     setRouteTargetID(undefined);
     setRouteTestEditor(undefined);
-    setSelectedId(resolvedExecutionNodeID);
-    setLocateNodeID(resolvedExecutionNodeID);
+    setSelectedId(activity.nodeID);
+    setShowPanel(true);
+    setLocateNodeID(activity.nodeID);
   };
 
   const resizeInspectorFromClientX = (clientX: number) => {
@@ -1717,7 +1951,9 @@ function GraphView({
     if (revision) vscode.postMessage({ type: 'session.load-segment', segmentID: selectedSegmentID, revision });
   }, [selected?.id, selected?.data.graph_loaded, selectedSegmentID, sessionID, segmentGraphRevisions, unloadedSegmentIDs]);
 
-  useEffect(() => setInspectionRevision(undefined), [selected?.id]);
+  useEffect(() => {
+    if (issueSelection?.nodeID !== selected?.id) setInspectionRevision(undefined);
+  }, [selected?.id]);
 
   useEffect(() => {
     if (pending?.nodeID || pending?.stepID) setSelectedId(pending.nodeID ?? pending.stepID);
@@ -1730,11 +1966,34 @@ function GraphView({
       if (message?.type === 'test.action' && message.action === 'select-node' && message.name) {
         const selectedNode = document.nodes.find((node) => node.id === message.name || node.data.id === message.name);
         setSelectedId(selectedNode?.id);
+      } else if (message?.type === 'test.action' && message.action === 'inspect-results') {
+        vscode.postMessage({
+          type: 'typed-results.state',
+          selectedID: selectedId, inspectedKind: inspectedNode?.data.kind, availability: results?.state, showPanel,
+          state: window.document.querySelector('.typed-results')?.getAttribute('data-results-state'),
+          unavailableReason: window.document.querySelector('.typed-results[data-results-state="unavailable"]')?.textContent,
+          values: Array.from(window.document.querySelectorAll<HTMLElement>('.typed-results [data-result-name]')).map(value => ({
+            name: value.dataset.resultName, text: value.querySelector('pre')?.textContent,
+          })),
+          forbiddenElements: window.document.querySelectorAll('.typed-results a, .typed-results img, .typed-results script').length,
+        });
+      } else if (message?.type === 'test.action' && message.action === 'inspect-expressions') {
+        vscode.postMessage({
+          type: 'inspector.expressions',
+          inspectorText: window.document.querySelector('.step-inspector')?.textContent,
+          markdownElements: window.document.querySelectorAll('.step-inspector .markdown-body, .step-inspector a[href], .step-inspector script, .step-inspector img').length,
+          values: Array.from(window.document.querySelectorAll<HTMLElement>('.step-inspector [data-expression-path]')).map(value => ({
+            path: value.dataset.expressionPath, text: value.textContent,
+            tokens: Array.from(value.querySelectorAll<HTMLElement>('[data-expression-class]')).map(token => ({
+              class: token.dataset.expressionClass, text: token.textContent, color: getComputedStyle(token).color,
+            })),
+          })),
+        });
       }
     };
     window.addEventListener('message', receiveTestAction);
     return () => window.removeEventListener('message', receiveTestAction);
-  }, [document.nodes, testMode]);
+  }, [document.nodes, testMode, displayNodes, displayDocument, workflow, runtimeNodes, viewPreference, selectedId, issues]);
 
   useEffect(() => {
     if (!testMode || !selected) return;
@@ -1748,6 +2007,47 @@ function GraphView({
     });
     return () => cancelAnimationFrame(frame);
   }, [selected?.id, testMode]);
+
+  useEffect(() => {
+    if (!testMode) return;
+    const receive = (event: MessageEvent<HostMessage>) => {
+      const message = event.data;
+      if (message?.type !== 'test.action') return;
+      if (message.action === 'set-graph-viewport' && message.value) {
+        void flowRef.current?.setViewport(JSON.parse(message.value));
+      }
+      if (message.action !== 'inspect-graph-visibility') return;
+      const canvas = canvasRef.current?.getBoundingClientRect();
+      const rendered = Array.from(window.document.querySelectorAll<HTMLElement>('.react-flow__node')).map(element => {
+        const box = element.getBoundingClientRect(), css = getComputedStyle(element);
+        return { id: element.dataset.id, box: box.toJSON(), opacity: css.opacity, visibility: css.visibility,
+          statusText: element.querySelector('.step-status')?.textContent,
+          statusClass: element.querySelector('.step-node')?.className,
+          intersects: !!canvas && box.right > canvas.left && box.left < canvas.right &&
+            box.bottom > canvas.top && box.top < canvas.bottom && box.width > 0 && box.height > 0 &&
+            css.opacity !== '0' && css.visibility !== 'hidden', transform: element.style.transform };
+      });
+      vscode.postMessage({ type: 'graph.visibility', canonicalIDs: document.nodes.map(node => node.id),
+        projectedIDs: displayDocument.nodes.map(node => node.id), edges: displayDocument.edges.map(edge => ({
+          id: edge.id, source: edge.source, target: edge.target, label: edge.label })),
+        nodes: rendered, canvas: canvas?.toJSON(), viewport: flowRef.current?.getViewport(),
+        positions: flowRef.current?.getNodes().map(node => ({ id: node.id, position: node.position, parent: node.parentNode,
+          width: node.width, height: node.height })),
+        edgePaths: window.document.querySelectorAll('.react-flow__edge-path').length,
+        edgeClasses: Array.from(window.document.querySelectorAll('.react-flow__edge')).map(edge => edge.getAttribute('class')),
+        mode: viewPreference.workflowMode, selectedID: selectedId, routeTargetID,
+        runtimeStatuses: Object.fromEntries(Object.entries(runtimeNodes).map(([id, value]) => [id, value.status])),
+        activity: { text: window.document.querySelector('.current-activity')?.textContent,
+          items: activities.map(({ nodeID, path, title, label, container, inGraph, occurrenceID }) =>
+            ({ nodeID, path, title, label, container, inGraph, occurrenceID })), counts: progressCounts,
+          summary: window.document.querySelector('.workflow-summary')?.textContent,
+          overview: window.document.querySelector('.overview-stats')?.textContent },
+        issues, runStatus, runStarting, sessionID, topology: layoutTopologyKey });
+    };
+    window.addEventListener('message', receive);
+    return () => window.removeEventListener('message', receive);
+  }, [testMode, document, displayDocument, viewPreference.workflowMode, selectedId, routeTargetID,
+    issues, runStatus, runStarting, sessionID, layoutTopologyKey, runtimeNodes, activities, progressCounts]);
 
   useEffect(() => {
     if (!flowRef.current) return;
@@ -1829,6 +2129,7 @@ function GraphView({
   }, [document, layout.nodes.length, layout.edges.length, style, testMode]);
 
   return (
+    <>
     <main className={`app style-${style}${showPanel ? '' : ' panel-hidden'} has-panel-content`}>
       <header className="toolbar">
         <div className="identity">
@@ -1836,6 +2137,11 @@ function GraphView({
           <span>{sessionID ? `${sessionSegmentCount} segments | ${document.nodes.length} steps` : `${document.nodes.length} steps`}</span>
         </div>
         <div className="run-actions">
+          <div className="workflow-mode" role="group" aria-label="Graph detail">
+            {(['workflow', 'all'] as WorkflowMode[]).map(mode => <button type="button" key={mode}
+              aria-pressed={viewPreference.workflowMode === mode} onClick={() => changePreference({ workflowMode: mode })}>
+              {mode === 'workflow' ? 'Workflow' : 'All steps'}</button>)}
+          </div>
           <span className={`run-status status-${runStatus}`} role="status" aria-live="polite">{runStarting ? 'starting' : runStatus}</span>
           {!runActive && !sessionID ? (
             <button
@@ -1927,18 +2233,21 @@ function GraphView({
         onChange={onInputChange}
       />
       {runError ? <div className="run-error" role="alert">{runError}</div> : null}
-      {executionNode ? (
-        <section className={`execution-position-strip ${executionTerminal ? 'last-reached' : 'current'}`} aria-live="polite">
-          <div>
-            <span>{executionTerminal ? 'Last reached' : 'Current step'}</span>
-            <strong>{String(executionNode.data.title || executionNode.data.step_id || executionNode.id)}</strong>
-            <code title={executionNode.id}>{String(executionNode.data.step_id || executionNode.id)}</code>
-          </div>
-          <button type="button" onClick={locateExecutionNode} title={`Locate ${String(executionNode.data.title || executionNode.id)} on the graph`}>
-            <LocateFixed aria-hidden="true" /><span>Locate</span>
-          </button>
-        </section>
-      ) : null}
+      {issueNotice || issues.length ? <section className="workflow-issues" aria-label="Execution issues">
+        <strong>{issues.length ? 'Showing issue context' : 'Showing selected step context'}</strong><span>Structural context, not a claim those alternatives executed.</span>
+        {issues.map((issue, index) => <button type="button" key={`${issue.nodeID}:${issue.occurrenceID ?? index}`}
+          onClick={() => navigateIssue(issue)} title={issue.nodeID}>
+          {issue.status}{issue.blockedOutcome ? ' · blocked outcome' : ''}: {issue.qualifiedNodeID || issue.nodeID}
+          {issue.occurrenceID ? ` · occurrence ${index + 1}` : ''}
+        </button>)}
+        {issueSelection && !selected ? <span role="status">Historical graph unavailable — occurrence remains in the issue index.</span> : null}
+      </section> : null}
+      <div className="workflow-summary" role="status">
+        {progressCounts.total} canonical steps · {progressCounts.completed} done · {progressCounts.issues} issues · {progressCounts.skipped} skipped · {progressCounts.running} running · {progressCounts.remaining} {executionTerminal ? 'without final status' : 'remaining'}
+        {' · '}{workflow.segments.size} visual technical groups · hidden is not skipped
+      </div>
+      <CurrentActivityStrip activities={activities} runStatus={runStatus} remaining={progressCounts.remaining}
+        onLocate={locateExecutionNode} locationNotice={activityLocationNotice} />
       {routeTargetID && routeProjection ? (
         <section className="route-view-strip" aria-label={`Routes through ${routeTargetName}`}>
           <div className="route-view-copy">
@@ -1977,7 +2286,11 @@ function GraphView({
               <DebugBreakpointsContext.Provider value={breakpointKeys}>
                 <ReactFlowProvider>
                 <ReactFlow
-                  nodes={displayNodes}
+                  nodes={renderNodes}
+                  onNodesChange={changes => {
+                    const measurements = changes.filter(change => change.type === 'dimensions');
+                    if (measurements.length) setRenderNodes(current => applyNodeChanges(measurements, current));
+                  }}
                   edges={runtimeEdges}
                   nodeTypes={nodeTypes}
                   fitView
@@ -1986,8 +2299,8 @@ function GraphView({
                   maxZoom={1.8}
                   nodesDraggable={false}
                   onInit={(instance) => { flowRef.current = instance; }}
-                  onNodeClick={(_, node) => { if (node.data.synthetic !== true) setSelectedId(node.id); }}
-                  onPaneClick={() => setSelectedId(undefined)}
+                  onNodeClick={(_, node) => { if (node.data.synthetic !== true) { setIssueSelection(undefined); setSelectedId(node.id); } }}
+                  onPaneClick={() => { setSelectedId(undefined); }}
                 >
                   <Background variant={BackgroundVariant.Dots} gap={20} size={1} />
                   <Controls showInteractive={false} />
@@ -2108,9 +2421,23 @@ function GraphView({
                   ) : null}
                 </section>
               ) : null}
+              {inspectedNode?.data.kind === 'results' ? <ResultsViewer results={results} nodeID={inspectedNode.id} /> : null}
               {inspectedNode ? <StepInspector
                 node={inspectedNode}
                 runtime={runtimeNodes[selected.id]}
+                requestedOccurrenceID={issueSelection?.nodeID === selected.id ? issueSelection.occurrenceID : undefined}
+                snapshotDigest={typeof inspectedNode.data.display_plan_snapshot_digest === 'string'
+                  ? inspectedNode.data.display_plan_snapshot_digest : typeof inspectedNode.data.executable_snapshot_hash === 'string'
+                  ? inspectedNode.data.executable_snapshot_hash : document.display_plan_snapshot_digest ??
+                    document.execution_plan_hash ?? document.presentation_state?.plan_snapshot_digest ?? 'missing-binding'}
+                onOccurrenceChange={(occurrence) => {
+                  setIssueSelection(undefined);
+                  if (occurrence.graphRevision !== undefined && selectedSegmentID) {
+                    setInspectionRevision({ nodeID: selected.id, revision: occurrence.graphRevision });
+                    onRequestGraphRevision(revisionNodeKey(selectedSegmentID, occurrence.graphRevision, selectedOriginalNodeID),
+                      selectedSegmentID, occurrence.graphRevision, selectedOriginalNodeID);
+                  }
+                }}
                 availableGraphRevisions={availableGraphRevisions}
                 selectedGraphRevision={selectedGraphRevision}
                 onGraphRevisionChange={(revision) => {
@@ -2135,7 +2462,7 @@ function GraphView({
                     onWatchesChange={onWatchesChange}
                   /> : <p className="debug-protected">Historical graph revisions are read-only.</p>
                 )}
-              /> : <div className="inspector-blank" role="status">Loading graph revision...</div>}
+              /> : <div className="inspector-blank" role="status">Historical graph unavailable or loading — no current-source substitution.</div>}
             </div>
           ) : (
             <RunOverview
@@ -2157,11 +2484,13 @@ function GraphView({
         </aside>
       </div>
     </main>
+    </>
   );
 }
 
 function App() {
   const [document, setDocument] = useState<GraphDocument>();
+  const [results, setResults] = useState<ResultsAvailability>();
   const [testMode, setTestMode] = useState(false);
   const [style, setStyle] = useState<NodeStyle>('smooth-curves');
   const [loading, setLoading] = useState(true);
@@ -2191,10 +2520,15 @@ function App() {
   const [routeTestError, setRouteTestError] = useState<string>();
   const [xtsOpened, setXtsOpened] = useState(false);
   const pendingRef = useRef<PendingInteraction>();
+  const resolvedTurnsRef = useRef(new Set<string>());
   const runIDRef = useRef<string>();
   const sessionIDRef = useRef<string>();
   const sessionStatusRef = useRef<string>();
   const runFinishedRef = useRef(false);
+  const directDocumentRef = useRef<GraphDocument>();
+  const directRunScopeRef = useRef<string>();
+  const displayWithdrawalsRef = useRef<DisplayObservations>(
+    decodeDisplayWithdrawals(recordValue(vscode.getState?.())?.displayWithdrawals));
   const hostSessionRef = useRef(globalThis.crypto.randomUUID());
   const hostRequestRef = useRef<{
     runID: string;
@@ -2208,6 +2542,10 @@ function App() {
   useEffect(() => { runIDRef.current = runID; }, [runID]);
   useEffect(() => { sessionIDRef.current = sessionID; }, [sessionID]);
   useEffect(() => { sessionStatusRef.current = sessionStatus; }, [sessionStatus]);
+  useEffect(() => {
+    displayWithdrawalsRef.current = retainDirectDisplayWithdrawals(displayWithdrawalsRef.current, runtimeNodes);
+    vscode.setState?.({ ...recordValue(vscode.getState?.()), displayWithdrawals: displayWithdrawalsRef.current });
+  }, [runtimeNodes]);
 
   const clearActiveRun = () => {
     hostRequestRef.current = undefined;
@@ -2225,7 +2563,15 @@ function App() {
       if (message.type === 'loading') {
         setError(undefined);
       } else if (message.type === 'graph') {
+        setResults(undefined);
+        directDocumentRef.current = message.document;
         setDocument(message.document);
+        if (message.document.presentation_state) {
+          const retained = message.document.presentation_state;
+          setRuntimeNodes(current => applyDirectRetainedDocument(
+            restoreDirectDisplayWithdrawals(current, displayWithdrawalsRef.current, retained.run_id, retained.plan_snapshot_digest),
+            message.document) as Record<string, RuntimeNodeState>);
+        }
         setRouteTestContext(message.routeTestContext);
         setRouteTests(message.routeTests ?? []);
         setRouteTestOutcome(undefined);
@@ -2240,7 +2586,10 @@ function App() {
         setStyle(message.style);
         setLoading(false);
         setError(undefined);
+      } else if (message.type === 'highlighting') {
+        window.document.body.dataset.highlightingEnabled = String(message.enabled);
       } else if (message.type === 'session.starting' || message.type === 'session.reconnecting') {
+        directDocumentRef.current = undefined;
         clearActiveRun();
         setSegmentGraphRevisions({});
         setUnloadedSegmentIDs([]);
@@ -2274,7 +2623,7 @@ function App() {
         setRouteTestOutcome(undefined);
         setRouteTestRunning(false);
         setRouteTestError(undefined);
-        setRuntimeNodes(state.runtimeNodes as Record<string, RuntimeNodeState>);
+        setRuntimeNodes(normalizeRuntimeStatuses(state.runtimeNodes as Record<string, RuntimeNodeState>));
         setExecutionNodeID(state.executionNodeID);
         setPending(state.pending as unknown as PendingInteraction | undefined);
         setRunID(state.activeRunID);
@@ -2311,7 +2660,10 @@ function App() {
         setLoading(false);
         setError(message.message);
       } else if (message.type === 'run.starting') {
+        setResults(undefined);
+        directRunScopeRef.current = undefined;
         clearActiveRun();
+        resolvedTurnsRef.current.clear();
         runFinishedRef.current = false;
         setRunStarting(true);
         setRouteTestRunning(message.routeTest === true);
@@ -2327,27 +2679,42 @@ function App() {
       } else if (message.type === 'run.frame') {
         const frame = message.frame;
         if (frame.type === 'run.started') {
+          if (runFinishedRef.current || !frame.runID || (runIDRef.current && frame.runID !== runIDRef.current)) return;
           runIDRef.current = frame.runID;
+          directRunScopeRef.current = frame.runID;
           setRunID(frame.runID);
           setRunStarting(false);
           if (!pendingRef.current) setRunStatus('running');
         } else if (frame.type === 'run.event' && frame.event) {
-          setRuntimeNodes((current) => applyRuntimeEvent(current, frame.event!));
+          if (directRunScopeRef.current && frame.event.run_id !== directRunScopeRef.current) return;
+          const graph = directDocumentRef.current;
+          const binding = graph?.display_plan_snapshot_digest ?? graph?.execution_plan_hash ??
+            graph?.presentation_state?.plan_snapshot_digest ?? 'missing-binding';
+          setRuntimeNodes((current) => applyRuntimeEvent(
+            restoreDirectDisplayWithdrawals(current, displayWithdrawalsRef.current, frame.event!.run_id, binding),
+            frame.event!, binding));
           if (frame.event.kind === 'step/started' || frame.event.kind === 'step/resumed') {
             const reachedNodeID = eventNodeID(frame.event);
             if (reachedNodeID) setExecutionNodeID(reachedNodeID);
           }
-          if (frame.event.kind === 'run/started' && !pendingRef.current) setRunStatus('running');
-          else if (frame.event.kind === 'run/completed') { clearActiveRun(); setRunStatus('completed'); }
-          else if (frame.event.kind === 'run/failed') { clearActiveRun(); setRunStatus('failed'); }
-          else if (frame.event.kind === 'run/cancelled') { clearActiveRun(); setRunStatus('cancelled'); }
-          else if (frame.event.kind === 'run/indeterminate') { clearActiveRun(); setRunStatus('indeterminate'); }
+          if (frame.event.kind === 'run/started' && !pendingRef.current && !runFinishedRef.current) setRunStatus(current => isTerminalRunStatus(current) ? current : 'running');
+          else if (frame.event.kind === 'run/completed') { clearActiveRun(); runFinishedRef.current = true; setRunStatus('completed'); }
+          else if (frame.event.kind === 'run/failed') { clearActiveRun(); runFinishedRef.current = true; setRunStatus('failed'); }
+          else if (frame.event.kind === 'run/cancelled') { clearActiveRun(); runFinishedRef.current = true; setRunStatus('cancelled'); }
+          else if (frame.event.kind === 'run/indeterminate') { clearActiveRun(); runFinishedRef.current = true; setRunStatus('indeterminate'); }
         } else if (frame.type === 'interaction.pending' && frame.interaction) {
+          if (runFinishedRef.current || !runIDRef.current || frame.interaction.runID !== runIDRef.current ||
+              typeof frame.interaction.turnID !== 'string' || !frame.interaction.turnID.trim() ||
+              resolvedTurnsRef.current.has(frame.interaction.turnID) ||
+              (pendingRef.current && pendingRef.current.turnID !== frame.interaction.turnID)) return;
           pendingRef.current = frame.interaction;
           setPending(frame.interaction);
           setExecutionNodeID(frame.interaction.nodeID ?? frame.interaction.stepID);
           setRunStatus('waiting');
         } else if (frame.type === 'interaction.resolved') {
+          if (pendingRef.current?.turnID !== frame.turnID) return;
+          if (runFinishedRef.current || (frame.runID && frame.runID !== runIDRef.current)) return;
+          resolvedTurnsRef.current.add(frame.turnID!);
           if (hostRequestRef.current?.turnID === frame.turnID) hostRequestRef.current = undefined;
           setPending((current) => {
             if (current?.turnID !== frame.turnID) return current;
@@ -2356,11 +2723,19 @@ function App() {
           });
           setRunStatus((current) => isTerminalRunStatus(current) ? current : 'running');
         } else if (frame.type === 'run.finished') {
+          if (frame.runID && directRunScopeRef.current && frame.runID !== directRunScopeRef.current) return;
+          setResults(frame.resultsAvailability ?? { state: 'unavailable', reason: 'runtime-did-not-deliver-results' });
+          const summaryRunID = frame.runID ?? directRunScopeRef.current;
           clearActiveRun();
           runFinishedRef.current = true;
           setRunStarting(false);
           setRouteTestRunning(false);
-          setRuntimeNodes((current) => applyTerminalSteps(current, frame.steps));
+          const graph = directDocumentRef.current;
+          const binding = graph?.display_plan_snapshot_digest ?? graph?.execution_plan_hash ??
+            graph?.presentation_state?.plan_snapshot_digest ?? 'missing-binding';
+          setRuntimeNodes((current) => applyTerminalSteps(
+            summaryRunID ? restoreDirectDisplayWithdrawals(current, displayWithdrawalsRef.current, summaryRunID, binding) : current,
+            frame.steps, binding, summaryRunID));
           setRunStatus(frame.status ?? 'completed');
           if (frame.routeTest) setRouteTestOutcome(frame.routeTest);
         } else if (frame.type === 'protocol.error') {
@@ -2612,6 +2987,7 @@ function App() {
     }
     if (runStarting || !isTerminalRunStatus(runStatus)) return;
     vscode.postMessage({ type: 'run.reset' });
+    setResults(undefined);
     clearActiveRun();
     runFinishedRef.current = true;
     setRunStatus('idle');
@@ -2671,7 +3047,7 @@ function App() {
         vscode.postMessage({ type: 'route-test.save', artifact: { ...message.artifact, last_result: {} } });
       } else if (message.action === 'click-button' && message.name) {
         const button = Array.from(window.document.querySelectorAll<HTMLButtonElement>('button'))
-          .find((candidate) => candidate.textContent?.trim() === message.name);
+          .find((candidate) => candidate.textContent?.trim() === message.name || candidate.title === message.name);
         button?.click();
         requestAnimationFrame(() => requestAnimationFrame(() => vscode.postMessage({
           type: 'test.dom.state',
@@ -2796,6 +3172,7 @@ function App() {
   return (
     <GraphView
       document={document}
+      results={sessionAttached ? undefined : results}
       testMode={testMode}
       style={style}
       runtimeNodes={runtimeNodes}
